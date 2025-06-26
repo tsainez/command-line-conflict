@@ -37,13 +37,17 @@ pyinstaller --onefile main.py
 
 The current prototype lets you left-click and drag to select units and right-click to command them to move on the grid.
 
-## Proposed File Structure
-Instead of a flat file structure, the plan is to make this into a package for further expandability down the line. 
+## Project Structure
+The source code now lives in a package with a dedicated module for units so
+additional unit types can be added easily.
 ```
 command_line_conflict/
 ├── __init__.py
-├── core.py      # game loop, Engine class
-├── units.py     # Unit class, other entities
-├── render.py    # drawing logic
-└── main.py      # just imports Engine and runs it
+├── config.py      # constants
+├── engine.py      # Game class and loop
+└── units/
+    ├── __init__.py
+    ├── base.py    # Unit class
+    └── airplane.py  # example subclass
+main.py             # entry point
 ```

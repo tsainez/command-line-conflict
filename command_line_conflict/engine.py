@@ -1,0 +1,83 @@
+import pygame
+
+from . import config
+from .units import Unit
+
+
+class Game:
+    """Main game engine."""
+
+    def __init__(self) -> None:
+        pygame.init()
+        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+        pygame.display.set_caption("ASCII RTS")
+        self.clock = pygame.time.Clock()
+        self.font = pygame.font.SysFont("monospace", 16)
+
+        self.units = [Unit(5, 5), Unit(10, 10), Unit(15, 5)]
+        self.selection_start = None
+        self.running = True
+
+    def handle_event(self, event) -> None:
+        if event.type == pygame.QUIT:
+            self.running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.selection_start = event.pos
+            for u in self.units:
+                u.selected = False
+        elif (
+            event.type == pygame.MOUSEBUTTONUP
+            and event.button == 1
+            and self.selection_start
+        ):
+            x1, y1 = self.selection_start
+            x2, y2 = event.pos
+            self.selection_start = None
+            min_x, max_x = sorted((x1, x2))
+            min_y, max_y = sorted((y1, y2))
+            for u in self.units:
+                ux = u.x * config.GRID_SIZE
+                uy = u.y * config.GRID_SIZE
+                if min_x <= ux <= max_x and min_y <= uy <= max_y:
+                    u.selected = True
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            grid_x = event.pos[0] // config.GRID_SIZE
+            grid_y = event.pos[1] // config.GRID_SIZE
+            for u in self.units:
+                if u.selected:
+                    u.target_x = grid_x
+                    u.target_y = grid_y
+
+    def update(self, dt: float) -> None:
+        for u in self.units:
+            u.update(dt)
+
+    def draw(self) -> None:
+        self.screen.fill((0, 0, 0))
+
+        for x in range(0, config.SCREEN_WIDTH, config.GRID_SIZE):
+            pygame.draw.line(self.screen, (40, 40, 40), (x, 0), (x, config.SCREEN_HEIGHT))
+        for y in range(0, config.SCREEN_HEIGHT, config.GRID_SIZE):
+            pygame.draw.line(self.screen, (40, 40, 40), (0, y), (config.SCREEN_WIDTH, y))
+
+        for u in self.units:
+            u.draw(self.screen, self.font)
+
+        pygame.display.flip()
+
+    def run(self) -> None:
+        while self.running:
+            dt = self.clock.tick(config.FPS) / 1000.0
+            for event in pygame.event.get():
+                self.handle_event(event)
+            self.update(dt)
+            self.draw()
+        pygame.quit()
+
+
+def main() -> None:
+    Game().run()
+
+
+if __name__ == "__main__":
+    main()
