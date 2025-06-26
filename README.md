@@ -6,9 +6,33 @@ A fast-paced, open-source RTS game inspired by Starcraft, rendered entirely in c
 
 This project uses **Python** and `pygame` for its simple and readable implementation. To run the prototype:
 
-```bash
-pip install pygame
-python main.py
+1) From your repo root, create & activate a venv  
+```
+python3 -m venv .venv           # or “python -m venv .venv”  
+source .venv/bin/activate       
+```
+
+2) Upgrade pip and install requirements  
+```
+pip install --upgrade pip       
+pip install -r requirements.txt  
+```
+
+3) (Optional) Run linters/tests  
+```
+# black --check .  
+# isort --check-only .  
+# pytest -q  
+```
+
+4) Launch the game  
+`python main.py    `              
+
+5) (Optional) Bundle into a single executable with PyInstaller  
+```
+pip install pyinstaller         
+pyinstaller --onefile main.py    
+# → dist/main  is your standalone binary  
 ```
 
 The current prototype lets you left-click and drag to select units and right-click to command them to move on the grid.
