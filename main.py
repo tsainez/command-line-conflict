@@ -14,6 +14,7 @@ pygame.display.set_caption("ASCII RTS")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("monospace", 16)
 
+
 class Unit:
     """A very simple unit that can move around the grid."""
 
@@ -38,8 +39,9 @@ class Unit:
 
     def draw(self, surf):
         color = (0, 255, 0) if self.selected else (255, 255, 255)
-        ch = font.render('U', True, color)
+        ch = font.render("U", True, color)
         surf.blit(ch, (int(self.x) * GRID_SIZE, int(self.y) * GRID_SIZE))
+
 
 units = [Unit(5, 5), Unit(10, 10), Unit(15, 5)]
 selection_start = None
