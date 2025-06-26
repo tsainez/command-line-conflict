@@ -6,6 +6,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 GRID_SIZE = 20
 FPS = 60
+# units per second
 UNIT_SPEED = 2
 
 pygame.init()
@@ -25,17 +26,18 @@ class Unit:
         self.target_y = self.y
         self.selected = False
 
-    def update(self):
+    def update(self, dt):
         """Move the unit toward its target."""
         dx = self.target_x - self.x
         dy = self.target_y - self.y
         dist = (dx * dx + dy * dy) ** 0.5
-        if dist < 0.1:
+        if dist < 0.01:
             return
-        step_x = UNIT_SPEED * dx / dist
-        step_y = UNIT_SPEED * dy / dist
-        self.x += step_x
-        self.y += step_y
+        step = UNIT_SPEED * dt
+        if step > dist:
+            step = dist
+        self.x += step * dx / dist
+        self.y += step * dy / dist
 
     def draw(self, surf):
         color = (0, 255, 0) if self.selected else (255, 255, 255)
@@ -48,6 +50,7 @@ selection_start = None
 running = True
 
 while running:
+    dt = clock.tick(FPS) / 1000.0
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -78,7 +81,7 @@ while running:
                     u.target_y = grid_y
 
     for u in units:
-        u.update()
+        u.update(dt)
 
     screen.fill((0, 0, 0))
 
@@ -93,6 +96,5 @@ while running:
         u.draw(screen)
 
     pygame.display.flip()
-    clock.tick(FPS)
 
 pygame.quit()
