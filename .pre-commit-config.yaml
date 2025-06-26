@@ -1,8 +1,0 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
-repos:
-- repo: https://github.com/psf/black   # “Go grab the Black formatter from this GitHub URL.”
-  rev: 25.1.0                          # “Use the latest stable version of Black.”
-  hooks:
-    - id: black                        # “And run the hook named ‘black’ from that repo.”
-
