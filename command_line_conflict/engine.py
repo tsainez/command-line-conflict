@@ -68,6 +68,22 @@ class Game:
         for u in self.map.units:
             u.draw(self.screen, self.font)
 
+        # Highlight selected units
+        if self.selection_start:
+            x1, y1 = self.selection_start
+            x2, y2 = pygame.mouse.get_pos()
+            min_x, max_x = sorted((x1, x2))
+            min_y, max_y = sorted((y1, y2))
+            min_x = (min_x // config.GRID_SIZE) * config.GRID_SIZE
+            min_y = (min_y // config.GRID_SIZE) * config.GRID_SIZE
+            max_x = ((max_x // config.GRID_SIZE) + 1) * config.GRID_SIZE
+            max_y = ((max_y // config.GRID_SIZE) + 1) * config.GRID_SIZE
+            rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+            overlay = pygame.Surface(rect.size, pygame.SRCALPHA)
+            overlay.fill((0, 255, 0, 60))
+            self.screen.blit(overlay, rect.topleft)
+            pygame.draw.rect(self.screen, (0, 255, 0), rect, 1)
+
         pygame.display.flip()
 
     def run(self) -> None:
