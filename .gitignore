@@ -1,1 +1,5 @@
 .venv
+
+# Ignore all __pycache__ directories and compiled Python files
+**/__pycache__/
+**/*.py[cod]
