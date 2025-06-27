@@ -35,7 +35,7 @@ pyinstaller --onefile main.py
 # → dist/main  is your standalone binary  
 ```
 
-The current prototype lets you left-click and drag to select units and right-click to command them to move on the grid.
+The current prototype lets you left-click and drag to select units and right-click to command them to move on the grid. Press **A** while hovering the mouse over a tile to spawn a new airplane unit.
 
 ## Project Structure
 The source code now lives in a package with a dedicated module for units so
@@ -45,9 +45,27 @@ command_line_conflict/
 ├── __init__.py
 ├── config.py      # constants
 ├── engine.py      # Game class and loop
+├── maps/          # level definitions
+│   ├── __init__.py
+│   ├── base.py
+│   └── simple_map.py
 └── units/
     ├── __init__.py
     ├── base.py    # Unit class
     └── airplane.py  # example subclass
 main.py             # entry point
 ```
+
+### Spawning Units
+Maps manage the list of units in play. To add a unit programmatically, call
+`spawn_unit` on the current map:
+
+```python
+from command_line_conflict.units import Airplane
+from command_line_conflict.maps import SimpleMap
+
+game_map = SimpleMap()
+game_map.spawn_unit(Airplane(3, 3))
+```
+
+While the game runs, press **A** to spawn a new airplane at the mouse cursor.

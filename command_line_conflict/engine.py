@@ -1,20 +1,21 @@
 import pygame
 
 from . import config
-from .units import Unit
+from .units import Airplane
+from .maps import Map, SimpleMap
 
 
 class Game:
     """Main game engine."""
 
-    def __init__(self) -> None:
+    def __init__(self, game_map: Map | None = None) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
         pygame.display.set_caption("ASCII RTS")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("monospace", 16)
 
-        self.units = [Unit(5, 5), Unit(10, 10), Unit(15, 5)]
+        self.map = game_map or SimpleMap()
         self.selection_start = None
         self.running = True
 
@@ -23,7 +24,7 @@ class Game:
             self.running = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
-            for u in self.units:
+            for u in self.map.units:
                 u.selected = False
         elif (
             event.type == pygame.MOUSEBUTTONUP
@@ -35,7 +36,7 @@ class Game:
             self.selection_start = None
             min_x, max_x = sorted((x1, x2))
             min_y, max_y = sorted((y1, y2))
-            for u in self.units:
+            for u in self.map.units:
                 ux = u.x * config.GRID_SIZE
                 uy = u.y * config.GRID_SIZE
                 if min_x <= ux <= max_x and min_y <= uy <= max_y:
@@ -43,14 +44,18 @@ class Game:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
             grid_y = event.pos[1] // config.GRID_SIZE
-            for u in self.units:
+            for u in self.map.units:
                 if u.selected:
                     u.target_x = grid_x
                     u.target_y = grid_y
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+            mx, my = pygame.mouse.get_pos()
+            gx = mx // config.GRID_SIZE
+            gy = my // config.GRID_SIZE
+            self.map.spawn_unit(Airplane(gx, gy))
 
     def update(self, dt: float) -> None:
-        for u in self.units:
-            u.update(dt)
+        self.map.update(dt)
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))
@@ -60,7 +65,7 @@ class Game:
         for y in range(0, config.SCREEN_HEIGHT, config.GRID_SIZE):
             pygame.draw.line(self.screen, (40, 40, 40), (0, y), (config.SCREEN_WIDTH, y))
 
-        for u in self.units:
+        for u in self.map.units:
             u.draw(self.screen, self.font)
 
         pygame.display.flip()
@@ -75,8 +80,9 @@ class Game:
         pygame.quit()
 
 
-def main() -> None:
-    Game().run()
+def main(game_map: Map | None = None) -> None:
+    """Helper to launch the game with a given map."""
+    Game(game_map).run()
 
 
 if __name__ == "__main__":
