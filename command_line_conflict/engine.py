@@ -1,8 +1,8 @@
 import pygame
 
 from . import config
-from .units import Airplane
 from .maps import Map, SimpleMap
+from .units import Airplane
 
 
 class Game:
@@ -10,7 +10,9 @@ class Game:
 
     def __init__(self, game_map: Map | None = None) -> None:
         pygame.init()
-        self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode(
+            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
+        )
         pygame.display.set_caption("ASCII RTS")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("monospace", 16)
@@ -46,8 +48,7 @@ class Game:
             grid_y = event.pos[1] // config.GRID_SIZE
             for u in self.map.units:
                 if u.selected:
-                    u.target_x = grid_x
-                    u.target_y = grid_y
+                    u.set_target(grid_x, grid_y, self.map)
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_a:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
@@ -61,10 +62,15 @@ class Game:
         self.screen.fill((0, 0, 0))
 
         for x in range(0, config.SCREEN_WIDTH, config.GRID_SIZE):
-            pygame.draw.line(self.screen, (40, 40, 40), (x, 0), (x, config.SCREEN_HEIGHT))
+            pygame.draw.line(
+                self.screen, (40, 40, 40), (x, 0), (x, config.SCREEN_HEIGHT)
+            )
         for y in range(0, config.SCREEN_HEIGHT, config.GRID_SIZE):
-            pygame.draw.line(self.screen, (40, 40, 40), (0, y), (config.SCREEN_WIDTH, y))
+            pygame.draw.line(
+                self.screen, (40, 40, 40), (0, y), (config.SCREEN_WIDTH, y)
+            )
 
+        self.map.draw(self.screen, self.font)
         for u in self.map.units:
             u.draw(self.screen, self.font)
 
