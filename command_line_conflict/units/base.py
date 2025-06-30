@@ -38,7 +38,41 @@ class Unit:
     def draw(self, surf, font) -> None:
         color = (0, 255, 0) if self.selected else (255, 255, 255)
         ch = font.render(self.icon, True, color)
-        surf.blit(ch, (int(self.x) * config.GRID_SIZE, int(self.y) * config.GRID_SIZE))
+        surf.blit(
+            ch,
+            (
+                int(self.x) * config.GRID_SIZE,
+                int(self.y) * config.GRID_SIZE,
+            ),
+        )
+
+        self.draw_orders(surf, font)
+
+    def draw_orders(self, surf, font) -> None:
+        """Render target point and remaining path when selected."""
+        if not self.selected:
+            return
+
+        final = (int(self.target_x), int(self.target_y))
+
+        # If the unit has arrived and has no path, nothing to draw
+        if not self.path and final == (int(self.x), int(self.y)):
+            return
+
+        # Combine remaining path with final destination
+        tiles = list(self.path)
+        if not tiles or tiles[-1] != final:
+            tiles.append(final)
+
+        # draw intermediate path tiles
+        for tx, ty in tiles[:-1]:
+            ch = font.render("\u2591", True, (0, 255, 0))
+            surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+
+        # draw final destination
+        tx, ty = tiles[-1]
+        ch = font.render("\u2588", True, (255, 0, 0))
+        surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
 
 
 class GroundUnit(Unit):
