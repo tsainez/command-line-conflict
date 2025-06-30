@@ -64,15 +64,31 @@ class Unit:
         if not tiles or tiles[-1] != final:
             tiles.append(final)
 
-        # draw intermediate path tiles
+        # draw arrows along remaining path
+        prev_x, prev_y = int(self.x), int(self.y)
         for tx, ty in tiles[:-1]:
-            ch = font.render("\u2591", True, (0, 255, 0))
+            arrow = self._arrow_char(tx - prev_x, ty - prev_y)
+            ch = font.render(arrow, True, (0, 255, 0))
             surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+            prev_x, prev_y = tx, ty
 
-        # draw final destination
+        # draw final destination as a solid block
         tx, ty = tiles[-1]
         ch = font.render("\u2588", True, (255, 0, 0))
         surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+
+    @staticmethod
+    def _arrow_char(dx: int, dy: int) -> str:
+        """Return an arrow character for the given direction."""
+        if dx == 1 and dy == 0:
+            return "\u2192"  # right arrow
+        if dx == -1 and dy == 0:
+            return "\u2190"  # left arrow
+        if dx == 0 and dy == 1:
+            return "\u2193"  # down arrow
+        if dx == 0 and dy == -1:
+            return "\u2191"  # up arrow
+        return "+"
 
 
 class GroundUnit(Unit):
