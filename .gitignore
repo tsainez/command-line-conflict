@@ -3,3 +3,8 @@
 # Ignore all __pycache__ directories and compiled Python files
 **/__pycache__/
 **/*.py[cod]
+
+# MacOS specific files
+.DS_Store
+command_line_conflict/.DS_Store
+command_line_conflict/fonts/.DS_Store
