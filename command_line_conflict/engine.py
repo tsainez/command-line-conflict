@@ -15,7 +15,26 @@ class Game:
         )
         pygame.display.set_caption("ASCII RTS")
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont("monospace", 16)
+
+        # Use a font that supports Unicode arrows for path rendering.
+        candidates = [
+            "dejavusansmono",  # bundled with many Linux distros
+            "couriernew",      # available on Windows and macOS
+            "menlo",           # default monospace on macOS
+            "consolas",        # common on Windows
+        ]
+
+        font_path = None
+        for name in candidates:
+            font_path = pygame.font.match_font(name)
+            if font_path:
+                break
+
+        if font_path:
+            self.font = pygame.font.Font(font_path, 16)
+        else:
+            # Fall back to the generic monospace font
+            self.font = pygame.font.SysFont("monospace", 16)
 
         self.map = game_map or SimpleMap()
         self.selection_start = None
