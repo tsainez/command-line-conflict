@@ -40,11 +40,12 @@ pyinstaller --onefile main.py
 The current prototype lets you left-click and drag to select units and right-click to command them to move on the grid. Press **A** while hovering the mouse over a tile to spawn a new airplane unit.
 
 ### Font Support
-Unit movement paths use Unicode arrow characters. The engine will try to load
-**DejaVu Sans Mono** first and then fall back to common system monospace fonts
-like **Courier New**. These fonts ship with Windows 10 and recent macOS
-releases. If you see empty blocks instead of arrows, install a font containing
-these glyphs (e.g. DejaVu Sans Mono) and make sure Pygame can locate it.
+Unit movement paths use Unicode arrow characters. The engine now bundles
+**DejaVu Sans Mono** and attempts to load it on startup. If that fails, it tries
+common system monospace fonts like **Courier New** and finally falls back to the
+default monospace font with ASCII graphics. If you see placeholder blocks
+instead of arrows, ensure the DejaVu font can be loaded or rely on the ASCII
+fallback.
 
 ## Project Structure
 The source code now lives in a package with a dedicated module for units so

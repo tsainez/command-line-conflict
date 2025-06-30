@@ -1,8 +1,11 @@
+import os
+from pathlib import Path
 import pygame
 
 from . import config
 from .maps import Map, SimpleMap
 from .units import Airplane
+from .units import base as unit_base
 
 
 class Game:
@@ -16,25 +19,38 @@ class Game:
         pygame.display.set_caption("ASCII RTS")
         self.clock = pygame.time.Clock()
 
-        # Use a font that supports Unicode arrows for path rendering.
-        candidates = [
-            "dejavusansmono",  # bundled with many Linux distros
-            "couriernew",      # available on Windows and macOS
-            "menlo",           # default monospace on macOS
-            "consolas",        # common on Windows
-        ]
+        # Prefer the bundled DejaVu font for rendering path arrows
+        font_dir = Path(__file__).resolve().parent / "fonts"
+        bundled = font_dir / "DejaVuSansMono.ttf"
+        self.font = None
+        if bundled.exists():
+            try:
+                self.font = pygame.font.Font(str(bundled), 16)
+                unit_base.USE_ASCII = False
+            except Exception:
+                self.font = None
 
-        font_path = None
-        for name in candidates:
-            font_path = pygame.font.match_font(name)
+        if self.font is None:
+            # Try common system fonts
+            candidates = [
+                "dejavusansmono",
+                "couriernew",
+                "menlo",
+                "consolas",
+            ]
+            font_path = None
+            for name in candidates:
+                font_path = pygame.font.match_font(name)
+                if font_path:
+                    break
+
             if font_path:
-                break
-
-        if font_path:
-            self.font = pygame.font.Font(font_path, 16)
-        else:
-            # Fall back to the generic monospace font
-            self.font = pygame.font.SysFont("monospace", 16)
+                self.font = pygame.font.Font(font_path, 16)
+                unit_base.USE_ASCII = False
+            else:
+                # Final fallback to generic monospace and ASCII graphics
+                self.font = pygame.font.SysFont("monospace", 16)
+                unit_base.USE_ASCII = True
 
         self.map = game_map or SimpleMap()
         self.selection_start = None
