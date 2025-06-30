@@ -36,12 +36,14 @@ class Game:
             x1, y1 = self.selection_start
             x2, y2 = event.pos
             self.selection_start = None
-            min_x, max_x = sorted((x1, x2))
-            min_y, max_y = sorted((y1, y2))
+
+            sx, ex = sorted((x1 // config.GRID_SIZE, x2 // config.GRID_SIZE))
+            sy, ey = sorted((y1 // config.GRID_SIZE, y2 // config.GRID_SIZE))
+
             for u in self.map.units:
-                ux = u.x * config.GRID_SIZE
-                uy = u.y * config.GRID_SIZE
-                if min_x <= ux <= max_x and min_y <= uy <= max_y:
+                ux = int(u.x)
+                uy = int(u.y)
+                if sx <= ux <= ex and sy <= uy <= ey:
                     u.selected = True
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE

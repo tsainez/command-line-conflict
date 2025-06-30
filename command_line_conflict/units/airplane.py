@@ -10,4 +10,11 @@ class Airplane(AirUnit):
     def draw(self, surf, font) -> None:
         color = (0, 255, 255) if self.selected else (200, 200, 200)
         ch = font.render(self.icon, True, color)
-        surf.blit(ch, (int(self.x) * config.GRID_SIZE, int(self.y) * config.GRID_SIZE))
+        surf.blit(
+            ch,
+            (
+                int(self.x) * config.GRID_SIZE,
+                int(self.y) * config.GRID_SIZE,
+            ),
+        )
+        self.draw_orders(surf, font)
