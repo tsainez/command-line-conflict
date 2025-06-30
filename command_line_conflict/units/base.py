@@ -1,5 +1,8 @@
 from .. import config
 
+# Flag toggled by the engine to decide whether ASCII graphics should be used
+USE_ASCII = False
+
 
 class Unit:
     """Base unit class."""
@@ -72,23 +75,55 @@ class Unit:
             surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
             prev_x, prev_y = tx, ty
 
-        # draw final destination as a solid block
+        # draw final destination
         tx, ty = tiles[-1]
-        ch = font.render("\u2588", True, (255, 0, 0))
+        final_char = "X" if USE_ASCII else "\u2588"
+        ch = font.render(final_char, True, (255, 0, 0))
         surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
 
     @staticmethod
     def _arrow_char(dx: int, dy: int) -> str:
-        """Return an arrow character for the given direction."""
-        if dx == 1 and dy == 0:
-            return "\u2192"  # right arrow
-        if dx == -1 and dy == 0:
-            return "\u2190"  # left arrow
-        if dx == 0 and dy == 1:
-            return "\u2193"  # down arrow
-        if dx == 0 and dy == -1:
-            return "\u2191"  # up arrow
-        return "+"
+        """Return a character representing movement direction."""
+        if USE_ASCII:
+            if dx == 1 and dy == 0:
+                return ">"
+            if dx == -1 and dy == 0:
+                return "<"
+            if dx == 0 and dy == 1:
+                return "v"
+            if dx == 0 and dy == -1:
+                return "^"
+            if dx == 1 and dy == 1:
+                return "\\"
+            if dx == -1 and dy == -1:
+                return "\\"
+            if dx == 1 and dy == -1:
+                return "/"
+            if dx == -1 and dy == 1:
+                return "/"
+            if dx != 0:
+                return "-"
+            if dy != 0:
+                return "|"
+            return "+"
+        else:
+            if dx == 1 and dy == 0:
+                return "\u2192"  # right arrow
+            if dx == -1 and dy == 0:
+                return "\u2190"  # left arrow
+            if dx == 0 and dy == 1:
+                return "\u2193"  # down arrow
+            if dx == 0 and dy == -1:
+                return "\u2191"  # up arrow
+            if dx == 1 and dy == 1:
+                return "\u2198"  # down-right
+            if dx == -1 and dy == 1:
+                return "\u2199"  # down-left
+            if dx == 1 and dy == -1:
+                return "\u2197"  # up-right
+            if dx == -1 and dy == -1:
+                return "\u2196"  # up-left
+            return "+"
 
 
 class GroundUnit(Unit):
