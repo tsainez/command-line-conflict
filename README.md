@@ -20,9 +20,11 @@ pip install -r requirements.txt
 
 3) (Optional) Run linters/tests  
 ```
-# black --check .  
-# isort --check-only .  
-# pytest -q  
+pip install black isort pytest  # needed for optional linting/tests
+
+black --check .  
+isort --check-only .  
+pytest -q  
 ```
 
 4) Launch the game  
