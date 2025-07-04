@@ -16,6 +16,9 @@ class Unit:
         self.target_y = self.y
         self.selected = False
         self.path: list[tuple[int, int]] = []
+        # Remember the last commanded destination so it persists even if
+        # the intermediate path is consumed while moving.
+        self.order_target: tuple[int, int] | None = None
 
     def is_air(self) -> bool:  # pragma: no cover - tiny helper
         return False
@@ -24,6 +27,7 @@ class Unit:
         self.target_x = x
         self.target_y = y
         self.path = []
+        self.order_target = (x, y)
 
     def update(self, dt: float, game_map=None) -> None:
         """Move the unit toward its target."""
@@ -56,14 +60,26 @@ class Unit:
         if not self.selected:
             return
 
-        final = (int(self.target_x), int(self.target_y))
+        # Determine the true final destination for rendering. Ground units
+        # overwrite ``target_x``/``target_y`` with intermediate waypoints
+        # while moving, so rely on the remembered order target when present.
+        if self.path:
+            final = self.path[-1]
+        elif self.order_target is not None:
+            final = (int(self.order_target[0]), int(self.order_target[1]))
+        else:
+            final = (int(self.target_x), int(self.target_y))
 
         # If the unit has arrived and has no path, nothing to draw
         if not self.path and final == (int(self.x), int(self.y)):
             return
 
-        # Combine remaining path with final destination
+        # Combine remaining path with final destination. Air units do not have a
+        # path list, so approximate a straight line for visualization when
+        # ``self.path`` is empty.
         tiles = list(self.path)
+        if not tiles:
+            tiles = self._direct_line((int(self.x), int(self.y)), final)
         if not tiles or tiles[-1] != final:
             tiles.append(final)
 
@@ -82,8 +98,27 @@ class Unit:
         surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
 
     @staticmethod
+    def _direct_line(start: tuple[int, int], end: tuple[int, int]) -> list[tuple[int, int]]:
+        """Return a simple diagonal path from ``start`` to ``end``."""
+        x, y = start
+        path: list[tuple[int, int]] = []
+        while (x, y) != end:
+            if x < end[0]:
+                x += 1
+            elif x > end[0]:
+                x -= 1
+            if y < end[1]:
+                y += 1
+            elif y > end[1]:
+                y -= 1
+            path.append((x, y))
+        return path
+
+    @staticmethod
     def _arrow_char(dx: int, dy: int) -> str:
         """Return a character representing movement direction."""
+        dx = (dx > 0) - (dx < 0)
+        dy = (dy > 0) - (dy < 0)
         if USE_ASCII:
             if dx == 1 and dy == 0:
                 return ">"
