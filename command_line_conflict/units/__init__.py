@@ -1,7 +1,9 @@
-from .air_units import Helicopter, Jet
 from .airplane import Airplane
 from .base import AirUnit, GroundUnit, Unit
-from .ground_units import Marine, Tank
+from .helicopter import Helicopter
+from .jet import Jet
+from .marine import Marine
+from .tank import Tank
 
 __all__ = [
     "Unit",
