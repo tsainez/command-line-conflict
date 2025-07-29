@@ -8,10 +8,14 @@ class Unit:
     """Base unit class."""
 
     icon = "U"
+    max_hp = 100
+    attack_range = 5
+    speed = 2
 
     def __init__(self, x: float, y: float) -> None:
         self.x = float(x)
         self.y = float(y)
+        self.hp = self.max_hp
         self.target_x = self.x
         self.target_y = self.y
         self.selected = False
@@ -36,7 +40,7 @@ class Unit:
         dist = (dx * dx + dy * dy) ** 0.5
         if dist < 0.01:
             return
-        step = config.UNIT_SPEED * dt
+        step = self.speed * dt
         if step > dist:
             step = dist
         self.x += step * dx / dist
@@ -184,7 +188,7 @@ class GroundUnit(Unit):
                 self.y = self.target_y
                 self.path.pop(0)
             else:
-                step = config.UNIT_SPEED * dt
+                step = self.speed * dt
                 if step > dist:
                     step = dist
                 self.x += step * dx / dist
