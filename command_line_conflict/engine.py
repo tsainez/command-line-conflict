@@ -1,3 +1,5 @@
+import importlib
+import inspect
 import os
 from pathlib import Path
 
@@ -5,8 +7,31 @@ import pygame
 
 from . import config
 from .maps import Map, SimpleMap
-from .units import Airplane
 from .units import base as unit_base
+
+
+def load_unit_types() -> dict[int, type[unit_base.Unit]]:
+    """Scan the ``units`` directory and build a map of hotkeys to unit types."""
+    key_map = {}
+    units_dir = Path(__file__).resolve().parent / "units"
+    for filename in os.listdir(units_dir):
+        if not filename.endswith(".py") or filename.startswith(("_", "base.")):
+            continue
+
+        module_name = f"command_line_conflict.units.{filename.removesuffix('.py')}"
+        module = importlib.import_module(module_name)
+        for _, member in inspect.getmembers(module, inspect.isclass):
+            if (
+                issubclass(member, unit_base.Unit)
+                and member is not unit_base.Unit
+                and member not in (unit_base.GroundUnit, unit_base.AirUnit)
+            ):
+                # We have a concrete unit type. Map it to a key.
+                # All current unit names are unique, so first letter is fine.
+                key_name = member.__name__[0].lower()
+                key_code = getattr(pygame, f"K_{key_name}")
+                key_map[key_code] = member
+    return key_map
 
 
 class Game:
@@ -56,6 +81,7 @@ class Game:
         self.map = game_map or SimpleMap()
         self.selection_start = None
         self.running = True
+        self.unit_spawn_keys = load_unit_types()
 
     def handle_event(self, event) -> None:
         if event.type == pygame.QUIT:
@@ -87,11 +113,13 @@ class Game:
             for u in self.map.units:
                 if u.selected:
                     u.set_target(grid_x, grid_y, self.map)
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_a:
-            mx, my = pygame.mouse.get_pos()
-            gx = mx // config.GRID_SIZE
-            gy = my // config.GRID_SIZE
-            self.map.spawn_unit(Airplane(gx, gy))
+        elif event.type == pygame.KEYDOWN:
+            if event.key in self.unit_spawn_keys:
+                unit_type = self.unit_spawn_keys[event.key]
+                mx, my = pygame.mouse.get_pos()
+                gx = mx // config.GRID_SIZE
+                gy = my // config.GRID_SIZE
+                self.map.spawn_unit(unit_type(gx, gy))
 
     def update(self, dt: float) -> None:
         self.map.update(dt)
