@@ -19,7 +19,7 @@ You'll need `git` to download the game files. If you don't have it, you can down
 1.  Open **Command Prompt** or **PowerShell**. You can find these by searching in the Start Menu.
 2.  Clone the repository using the following command:
     ```
-    git clone https://github.com/smol-ai/command-line-conflict.git
+    git clone https://github.com/tsainez/command-line-conflict.git
     ```
 3.  Navigate into the newly created directory:
     ```
