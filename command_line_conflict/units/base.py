@@ -102,7 +102,9 @@ class Unit:
         surf.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
 
     @staticmethod
-    def _direct_line(start: tuple[int, int], end: tuple[int, int]) -> list[tuple[int, int]]:
+    def _direct_line(
+        start: tuple[int, int], end: tuple[int, int]
+    ) -> list[tuple[int, int]]:
         """Return a simple diagonal path from ``start`` to ``end``."""
         x, y = start
         path: list[tuple[int, int]] = []
