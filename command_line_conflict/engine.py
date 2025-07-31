@@ -6,7 +6,14 @@ import pygame
 from . import config
 from .fog_of_war import FogOfWar
 from .maps import Map, SimpleMap
-from .units import Arachnotron
+from .units import (
+    Arachnotron,
+    Chassis,
+    Extractor,
+    Immortal,
+    Observer,
+    Rover,
+)
 from .units import base as unit_base
 
 
@@ -89,11 +96,24 @@ class Game:
             for u in self.map.units:
                 if u.selected:
                     u.set_target(grid_x, grid_y, self.map)
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+        elif event.type == pygame.KEYDOWN:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
-            self.map.spawn_unit(Arachnotron(gx, gy))
+            if event.key == pygame.K_1:
+                self.map.spawn_unit(Extractor(gx, gy))
+            elif event.key == pygame.K_2:
+                self.map.spawn_unit(Chassis(gx, gy))
+            elif event.key == pygame.K_3:
+                self.map.spawn_unit(Rover(gx, gy))
+            elif event.key == pygame.K_4:
+                self.map.spawn_unit(Arachnotron(gx, gy))
+            elif event.key == pygame.K_5:
+                self.map.spawn_unit(Observer(gx, gy))
+            elif event.key == pygame.K_6:
+                self.map.spawn_unit(Immortal(gx, gy))
+            elif event.key == pygame.K_w:
+                self.map.add_wall(gx, gy)
 
     def update(self, dt: float) -> None:
         self.map.update(dt)
