@@ -4,8 +4,9 @@ from pathlib import Path
 import pygame
 
 from . import config
+from .fog_of_war import FogOfWar
 from .maps import Map, SimpleMap
-from .units import Airplane
+from .units import Arachnotron
 from .units import base as unit_base
 
 
@@ -54,6 +55,7 @@ class Game:
                 unit_base.USE_ASCII = True
 
         self.map = game_map or SimpleMap()
+        self.fog_of_war = FogOfWar(self.map.width, self.map.height)
         self.selection_start = None
         self.running = True
 
@@ -91,10 +93,11 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
-            self.map.spawn_unit(Airplane(gx, gy))
+            self.map.spawn_unit(Arachnotron(gx, gy))
 
     def update(self, dt: float) -> None:
         self.map.update(dt)
+        self.fog_of_war.update(self.map.units)
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))
@@ -111,6 +114,8 @@ class Game:
         self.map.draw(self.screen, self.font)
         for u in self.map.units:
             u.draw(self.screen, self.font)
+
+        self.fog_of_war.draw(self.screen)
 
         # Highlight selected units
         if self.selection_start:

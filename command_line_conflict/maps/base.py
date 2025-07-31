@@ -29,11 +29,11 @@ class Map:
             if unit is moving_unit:
                 continue
             if int(unit.x) == x and int(unit.y) == y:
-                # air units can only be blocked by other air units
-                if moving_unit.is_air() and unit.is_air():
+                # flying units can only be blocked by other flying units
+                if moving_unit.can_fly and unit.can_fly:
                     return True
                 # ground units can only be blocked by other ground units
-                if not moving_unit.is_air() and not unit.is_air():
+                if not moving_unit.can_fly and not unit.can_fly:
                     return True
         return False
 
