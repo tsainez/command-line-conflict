@@ -23,6 +23,20 @@ class Map:
     def is_blocked(self, x: int, y: int) -> bool:
         return (x, y) in self.walls
 
+    def is_occupied(self, x: int, y: int, moving_unit: "Unit") -> bool:
+        """Check if a grid cell is occupied by another unit."""
+        for unit in self.units:
+            if unit is moving_unit:
+                continue
+            if int(unit.x) == x and int(unit.y) == y:
+                # air units can only be blocked by other air units
+                if moving_unit.is_air() and unit.is_air():
+                    return True
+                # ground units can only be blocked by other ground units
+                if not moving_unit.is_air() and not unit.is_air():
+                    return True
+        return False
+
     def find_path(
         self, start: Tuple[int, int], goal: Tuple[int, int]
     ) -> List[Tuple[int, int]]:
