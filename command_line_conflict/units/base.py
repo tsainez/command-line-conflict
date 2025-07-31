@@ -40,11 +40,22 @@ class Unit:
         dist = (dx * dx + dy * dy) ** 0.5
         if dist < 0.01:
             return
+
         step = self.speed * dt
         if step > dist:
             step = dist
-        self.x += step * dx / dist
-        self.y += step * dy / dist
+
+        proposed_x = self.x + step * dx / dist
+        proposed_y = self.y + step * dy / dist
+
+        if game_map:
+            # If moving to a new cell, check if it's occupied
+            if int(proposed_x) != int(self.x) or int(proposed_y) != int(self.y):
+                if game_map.is_occupied(int(proposed_x), int(proposed_y), self):
+                    return  # Don't move into an occupied cell
+
+        self.x = proposed_x
+        self.y = proposed_y
 
     def draw(self, surf, font) -> None:
         color = (0, 255, 0) if self.selected else (255, 255, 255)
@@ -181,6 +192,10 @@ class GroundUnit(Unit):
     def update(self, dt: float, game_map=None) -> None:
         if self.path:
             next_x, next_y = self.path[0]
+            if game_map and game_map.is_occupied(next_x, next_y, self):
+                if int(self.x) != next_x or int(self.y) != next_y:
+                    return
+
             self.target_x, self.target_y = next_x, next_y
             dx = self.target_x - self.x
             dy = self.target_y - self.y
