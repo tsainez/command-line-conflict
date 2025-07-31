@@ -23,6 +23,7 @@ class Unit:
         # Remember the last commanded destination so it persists even if
         # the intermediate path is consumed while moving.
         self.order_target: tuple[int, int] | None = None
+        self.repath_cooldown = 0.0
 
     def is_air(self) -> bool:  # pragma: no cover - tiny helper
         return False
@@ -35,6 +36,9 @@ class Unit:
 
     def update(self, dt: float, game_map=None) -> None:
         """Move the unit toward its target."""
+        if self.repath_cooldown > 0:
+            self.repath_cooldown -= dt
+
         dx = self.target_x - self.x
         dy = self.target_y - self.y
         dist = (dx * dx + dy * dy) ** 0.5
@@ -193,8 +197,18 @@ class GroundUnit(Unit):
         if self.path:
             next_x, next_y = self.path[0]
             if game_map and game_map.is_occupied(next_x, next_y, self):
-                if int(self.x) != next_x or int(self.y) != next_y:
-                    return
+                # If the next cell is occupied, try to repath
+                if self.repath_cooldown <= 0 and self.order_target:
+                    start = (int(self.x), int(self.y))
+                    goal = self.order_target
+                    # Temporarily treat the occupied cell as a wall
+                    new_path = game_map.find_path(
+                        start, goal, extra_obstacles={(next_x, next_y)}
+                    )
+                    if new_path:
+                        self.path = new_path
+                    self.repath_cooldown = 0.5  # Wait before repathing again
+                return  # Stop movement for this frame
 
             self.target_x, self.target_y = next_x, next_y
             dx = self.target_x - self.x

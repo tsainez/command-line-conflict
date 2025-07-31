@@ -38,9 +38,12 @@ class Map:
         return False
 
     def find_path(
-        self, start: Tuple[int, int], goal: Tuple[int, int]
+        self,
+        start: Tuple[int, int],
+        goal: Tuple[int, int],
+        extra_obstacles: set[Tuple[int, int]] | None = None,
     ) -> List[Tuple[int, int]]:
-        """A* pathfinding ignoring dynamic obstacles."""
+        """A* pathfinding that can account for dynamic obstacles."""
         if self.is_blocked(*goal):
             return []
 
@@ -63,7 +66,9 @@ class Map:
                 nx, ny = current[0] + dx, current[1] + dy
                 if not (0 <= nx < self.width and 0 <= ny < self.height):
                     continue
-                if self.is_blocked(nx, ny):
+                if self.is_blocked(nx, ny) or (
+                    extra_obstacles and (nx, ny) in extra_obstacles
+                ):
                     continue
                 tentative_g = g_score[current] + 1
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
