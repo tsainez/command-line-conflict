@@ -4,6 +4,8 @@ A fast-paced, open-source RTS game inspired by Starcraft, rendered entirely in c
 
 ## Getting Started
 
+> **Note for Windows users:** For detailed, step-by-step instructions, please see our [Windows Installation Guide](docs/WindowsInstallation.md).
+
 This project uses **Python** and `pygame` for its simple and readable implementation. To run the prototype:
 
 1) From your repo root, create & activate a venv
@@ -41,6 +43,7 @@ pyinstaller --onefile main.py
 
 For more detailed documentation, please see the following files in the `docs` directory:
 
+*   [Windows Installation](docs/WindowsInstallation.md)
 *   [Project Structure](docs/ProjectStructure.md)
 *   [Maps](docs/Maps.md)
 *   [Unit Types](docs/UnitTypes.md)
