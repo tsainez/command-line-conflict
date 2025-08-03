@@ -1,4 +1,3 @@
-from ..units import Airplane, Marine, Tank
 from .base import Map
 
 
@@ -11,7 +10,3 @@ class WallMap(Map):
         for x in range(3, 17):
             if x != 10:
                 self.add_wall(x, 7)
-
-        self.spawn_unit(Marine(1, 1))
-        self.spawn_unit(Tank(2, 2))
-        self.spawn_unit(Airplane(4, 1))

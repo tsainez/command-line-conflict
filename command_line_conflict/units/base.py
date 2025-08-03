@@ -10,7 +10,13 @@ class Unit:
     icon = "U"
     max_hp = 100
     attack_range = 5
+    attack_damage = 0
     speed = 2
+    vision_range = 5
+    health_regen_rate = 0.0
+    can_fly = False
+    flee_health_threshold: float | None = None
+    flees_from_enemies = False
 
     def __init__(self, x: float, y: float) -> None:
         self.x = float(x)
@@ -25,41 +31,79 @@ class Unit:
         self.order_target: tuple[int, int] | None = None
         self.repath_cooldown = 0.0
 
-    def is_air(self) -> bool:  # pragma: no cover - tiny helper
-        return False
-
     def set_target(self, x: int, y: int, game_map=None) -> None:
-        self.target_x = x
-        self.target_y = y
-        self.path = []
         self.order_target = (x, y)
+        self.path = []
+        if not self.can_fly and game_map:
+            sx, sy = int(self.x), int(self.y)
+            self.path = game_map.find_path((sx, sy), (x, y))
+
+        if not self.path:  # For flying units or ground units with no path
+            self.target_x = x
+            self.target_y = y
 
     def update(self, dt: float, game_map=None) -> None:
         """Move the unit toward its target."""
+        # Health regeneration
+        if self.hp < self.max_hp:
+            self.hp += self.health_regen_rate * dt
+            self.hp = min(self.hp, self.max_hp)
+
         if self.repath_cooldown > 0:
             self.repath_cooldown -= dt
 
-        dx = self.target_x - self.x
-        dy = self.target_y - self.y
-        dist = (dx * dx + dy * dy) ** 0.5
-        if dist < 0.01:
-            return
+        if self.path:
+            next_x, next_y = self.path[0]
+            if game_map and game_map.is_occupied(next_x, next_y, self):
+                # If the next cell is occupied, try to repath
+                if self.repath_cooldown <= 0 and self.order_target:
+                    start = (int(self.x), int(self.y))
+                    goal = self.order_target
+                    # Temporarily treat the occupied cell as a wall
+                    new_path = game_map.find_path(
+                        start, goal, extra_obstacles={(next_x, next_y)}
+                    )
+                    if new_path:
+                        self.path = new_path
+                    self.repath_cooldown = 0.5  # Wait before repathing again
+                return  # Stop movement for this frame
 
-        step = self.speed * dt
-        if step > dist:
-            step = dist
+            self.target_x, self.target_y = next_x, next_y
+            dx = self.target_x - self.x
+            dy = self.target_y - self.y
+            dist = (dx * dx + dy * dy) ** 0.5
+            if dist < 0.01:
+                self.x = self.target_x
+                self.y = self.target_y
+                self.path.pop(0)
+            else:
+                step = self.speed * dt
+                if step > dist:
+                    step = dist
+                self.x += step * dx / dist
+                self.y += step * dy / dist
+        else:
+            dx = self.target_x - self.x
+            dy = self.target_y - self.y
+            dist = (dx * dx + dy * dy) ** 0.5
+            if dist < 0.01:
+                return
 
-        proposed_x = self.x + step * dx / dist
-        proposed_y = self.y + step * dy / dist
+            step = self.speed * dt
+            if step > dist:
+                step = dist
 
-        if game_map:
-            # If moving to a new cell, check if it's occupied
-            if int(proposed_x) != int(self.x) or int(proposed_y) != int(self.y):
-                if game_map.is_occupied(int(proposed_x), int(proposed_y), self):
-                    return  # Don't move into an occupied cell
+            proposed_x = self.x + step * dx / dist
+            proposed_y = self.y + step * dy / dist
 
-        self.x = proposed_x
-        self.y = proposed_y
+            if game_map:
+                # If moving to a new cell, check if it's occupied
+                if int(proposed_x) != int(self.x) or int(proposed_y) != int(self.y):
+                    if game_map.is_occupied(int(proposed_x), int(proposed_y), self):
+                        return  # Don't move into an occupied cell
+
+            self.x = proposed_x
+            self.y = proposed_y
 
     def draw(self, surf, font) -> None:
         color = (0, 255, 0) if self.selected else (255, 255, 255)
@@ -97,7 +141,7 @@ class Unit:
         # path list, so approximate a straight line for visualization when
         # ``self.path`` is empty.
         tiles = list(self.path)
-        if not tiles:
+        if not tiles and self.can_fly:
             tiles = self._direct_line((int(self.x), int(self.y)), final)
         if not tiles or tiles[-1] != final:
             tiles.append(final)
@@ -180,58 +224,3 @@ class Unit:
             if dx == -1 and dy == -1:
                 return "\u2196"  # up-left
             return "+"
-
-
-class GroundUnit(Unit):
-    """Unit that uses pathfinding and cannot cross walls."""
-
-    icon = "G"
-
-    def set_target(self, x: int, y: int, game_map=None) -> None:
-        super().set_target(x, y, game_map)
-        if game_map:
-            sx, sy = int(self.x), int(self.y)
-            self.path = game_map.find_path((sx, sy), (x, y))
-
-    def update(self, dt: float, game_map=None) -> None:
-        if self.path:
-            next_x, next_y = self.path[0]
-            if game_map and game_map.is_occupied(next_x, next_y, self):
-                # If the next cell is occupied, try to repath
-                if self.repath_cooldown <= 0 and self.order_target:
-                    start = (int(self.x), int(self.y))
-                    goal = self.order_target
-                    # Temporarily treat the occupied cell as a wall
-                    new_path = game_map.find_path(
-                        start, goal, extra_obstacles={(next_x, next_y)}
-                    )
-                    if new_path:
-                        self.path = new_path
-                    self.repath_cooldown = 0.5  # Wait before repathing again
-                return  # Stop movement for this frame
-
-            self.target_x, self.target_y = next_x, next_y
-            dx = self.target_x - self.x
-            dy = self.target_y - self.y
-            dist = (dx * dx + dy * dy) ** 0.5
-            if dist < 0.01:
-                self.x = self.target_x
-                self.y = self.target_y
-                self.path.pop(0)
-            else:
-                step = self.speed * dt
-                if step > dist:
-                    step = dist
-                self.x += step * dx / dist
-                self.y += step * dy / dist
-        else:
-            super().update(dt, game_map)
-
-
-class AirUnit(Unit):
-    """Unit that can fly over walls."""
-
-    icon = "A"
-
-    def is_air(self) -> bool:  # pragma: no cover - simple helper
-        return True

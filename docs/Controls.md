@@ -3,12 +3,15 @@
 ## Mouse
 
 *   **Left-click and drag:** Select units.
-*   **Right-click:** Command selected units to move to the clicked location.
+*   **Right-click:** Issue a move command to selected units.
 
 ## Keyboard
 
-*   **A:** Spawn an Airplane at the mouse cursor.
-*   **H:** Spawn a Helicopter at the mouse cursor.
-*   **J:** Spawn a Jet at the mouse cursor.
-*   **M:** Spawn a Marine at the mouse cursor.
-*   **T:** Spawn a Tank at the mouse cursor.
+*   **1:** Spawn an Extractor at the mouse cursor.
+*   **2:** Spawn a Chassis at the mouse cursor.
+*   **3:** Spawn a Rover at the mouse cursor.
+*   **4:** Spawn an Arachnotron at the mouse cursor.
+*   **5:** Spawn an Observer at the mouse cursor.
+*   **6:** Spawn an Immortal at the mouse cursor.
+*   **W:** Place a wall at the mouse cursor.
+*   **Q:** Quit the game.
