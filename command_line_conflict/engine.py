@@ -114,6 +114,8 @@ class Game:
                 self.map.spawn_unit(Immortal(gx, gy))
             elif event.key == pygame.K_w:
                 self.map.add_wall(gx, gy)
+            elif event.key == pygame.K_q:
+                self.running = False
 
     def update(self, dt: float) -> None:
         self.map.update(dt)
