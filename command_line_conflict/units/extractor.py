@@ -3,7 +3,8 @@ from .base import Unit
 
 class Extractor(Unit):
     """
-    A unit that can harvest resources but has no combat capabilities.
+    A unit that can harvest resources but has no combat capabilities. 
+    It can pathfind in order to reach resource nodes, but is otherwise defenseless.
     """
 
     icon = "E"

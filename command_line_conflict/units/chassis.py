@@ -3,7 +3,8 @@ from .base import Unit
 
 class Chassis(Unit):
     """
-    A basic, cheap, melee combat unit.
+    A basic, cheap, melee combat unit. It can attack enemies in adjacent cells, and pathfind to reach them.
+    It's affordability makes it easy to produce in large numbers, but it is weak to being kited by ranged units.
     """
 
     icon = "C"

@@ -3,8 +3,8 @@ from .base import Unit
 
 class Observer(Unit):
     """
-    A fast, non-combat unit with a large vision range. It will flee from
-    enemies.
+    An unarmed scouting unit dedicated for intelligence gathering. It has a large vision range, and can traverse over obstacles. 
+    It will intentionally avoid combat by detecting enemies from a distance, and navigating around their detection range
     """
 
     icon = "O"

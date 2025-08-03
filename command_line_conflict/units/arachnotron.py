@@ -3,7 +3,8 @@ from .base import Unit
 
 class Arachnotron(Unit):
     """
-    A flying unit that can move over any terrain.
+    A specialized ranged unit designed to break stalemates and static defenses. 
+    This unit can bypass obstacles and attack from a distance, making it effective against fortified positions.
     """
 
     icon = "A"

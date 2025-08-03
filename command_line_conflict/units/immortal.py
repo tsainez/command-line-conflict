@@ -3,8 +3,9 @@ from .base import Unit
 
 class Immortal(Unit):
     """
-    A powerful ranged unit with health regeneration. It will flee when its
-    health is low.
+    A powerful ranged unit with health regeneration. 
+    It will automatically flee when its health is low.
+    While other units will self-sacrifice, this unit survives to fight another day.
     """
 
     icon = "I"

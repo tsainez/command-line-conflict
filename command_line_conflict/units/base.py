@@ -5,7 +5,7 @@ USE_ASCII = False
 
 
 class Unit:
-    """Base unit class."""
+    """Base unit class, from which all other units inherit."""
 
     icon = "U"
     max_hp = 100
