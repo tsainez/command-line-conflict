@@ -20,7 +20,7 @@ from .units import base as unit_base
 class Game:
     """Main game engine."""
 
-    def __init__(self, game_map: Map | None = None) -> None:
+    def __init__(self, game_map: Map) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode(
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
@@ -61,7 +61,7 @@ class Game:
                 self.font = pygame.font.SysFont("monospace", 16)
                 unit_base.USE_ASCII = True
 
-        self.map = game_map or SimpleMap()
+        self.map = game_map
         self.fog_of_war = FogOfWar(self.map.width, self.map.height)
         self.selection_start = None
         self.running = True
@@ -100,18 +100,9 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
-            if event.key == pygame.K_1:
-                self.map.spawn_unit(Extractor(gx, gy))
-            elif event.key == pygame.K_2:
-                self.map.spawn_unit(Chassis(gx, gy))
-            elif event.key == pygame.K_3:
-                self.map.spawn_unit(Rover(gx, gy))
-            elif event.key == pygame.K_4:
-                self.map.spawn_unit(Arachnotron(gx, gy))
-            elif event.key == pygame.K_5:
-                self.map.spawn_unit(Observer(gx, gy))
-            elif event.key == pygame.K_6:
-                self.map.spawn_unit(Immortal(gx, gy))
+            if event.key in config.KEY_BINDINGS:
+                unit_class = config.KEY_BINDINGS[event.key]
+                self.map.spawn_unit(unit_class(gx, gy))
             elif event.key == pygame.K_w:
                 self.map.add_wall(gx, gy)
             elif event.key == pygame.K_q:
@@ -167,10 +158,6 @@ class Game:
         pygame.quit()
 
 
-def main(game_map: Map | None = None) -> None:
+def main(game_map: Map) -> None:
     """Helper to launch the game with a given map."""
     Game(game_map).run()
-
-
-if __name__ == "__main__":
-    main()

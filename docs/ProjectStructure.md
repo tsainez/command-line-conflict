@@ -16,9 +16,12 @@ command_line_conflict/
 │   └── wall_map.py
 └── units/
     ├── __init__.py
-    ├── base.py    # Unit class
-    ├── air_units.py
-    ├── airplane.py
-    └── ground_units.py
+    ├── arachnotron.py
+    ├── base.py
+    ├── chassis.py
+    ├── extractor.py
+    ├── immortal.py
+    ├── observer.py
+    └── rover.py
 main.py             # entry point
 ```
