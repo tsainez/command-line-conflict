@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
 
@@ -36,6 +38,18 @@ class Map:
                 if not moving_unit.can_fly and not unit.can_fly:
                     return True
         return False
+
+    def get_unit_at(self, x: int, y: int) -> "Unit" | None:
+        """Return the unit at a given grid coordinate, or None."""
+        for unit in self.units:
+            if int(unit.x) == x and int(unit.y) == y:
+                return unit
+        return None
+
+    def get_enemies(self, unit: "Unit") -> List["Unit"]:
+        """Return a list of enemy units."""
+        # For now, all other units are considered enemies
+        return [u for u in self.units if u is not unit]
 
     def find_path(
         self,
@@ -80,7 +94,10 @@ class Map:
         return []
 
     def update(self, dt: float) -> None:
-        for u in list(self.units):
+        # Remove dead units
+        self.units = [u for u in self.units if u.hp > 0]
+
+        for u in self.units:
             u.update(dt, self)
 
     def draw(self, surf, font) -> None:

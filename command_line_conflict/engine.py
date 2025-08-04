@@ -93,9 +93,21 @@ class Game:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
             grid_y = event.pos[1] // config.GRID_SIZE
+
+            # In the future, this should check for units of the opposing player
+            enemy_unit = None
+            for unit in self.map.units:
+                if int(unit.x) == grid_x and int(unit.y) == grid_y:
+                    enemy_unit = unit
+                    break
+
             for u in self.map.units:
                 if u.selected:
-                    u.set_target(grid_x, grid_y, self.map)
+                    # Don't let units attack themselves
+                    if enemy_unit and enemy_unit is not u:
+                        u.attack_target = enemy_unit
+                    else:
+                        u.set_target(grid_x, grid_y, self.map)
         elif event.type == pygame.KEYDOWN:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE

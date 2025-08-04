@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .. import config
 
 # Flag toggled by the engine to decide whether ASCII graphics should be used
@@ -11,6 +13,7 @@ class Unit:
     max_hp = 100
     attack_range = 5
     attack_damage = 0
+    attack_speed = 1.0
     speed = 2
     vision_range = 5
     health_regen_rate = 0.0
@@ -30,8 +33,12 @@ class Unit:
         # the intermediate path is consumed while moving.
         self.order_target: tuple[int, int] | None = None
         self.repath_cooldown = 0.0
+        self.attack_target: Unit | None = None
+        self.attack_cooldown = 0.0
+        self.is_fleeing = False
 
     def set_target(self, x: int, y: int, game_map=None) -> None:
+        self.attack_target = None  # Clear attack target on move command
         self.order_target = (x, y)
         self.path = []
         if not self.can_fly and game_map:
@@ -42,31 +49,109 @@ class Unit:
             self.target_x = x
             self.target_y = y
 
+    def find_closest_enemy(self, game_map) -> Unit | None:
+        """Find the closest enemy unit within vision range."""
+        closest_enemy = None
+        min_dist = float("inf")
+
+        # In the future, this should get units from the opposing player
+        for enemy in game_map.units:
+            if enemy is self:
+                continue
+            dist = ((self.x - enemy.x) ** 2 + (self.y - enemy.y) ** 2) ** 0.5
+            if dist <= self.vision_range and dist < min_dist:
+                min_dist = dist
+                closest_enemy = enemy
+        return closest_enemy
+
     def update(self, dt: float, game_map=None) -> None:
-        """Move the unit toward its target."""
+        """Update the unit's state, including combat and movement."""
+        # Cooldowns
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= dt
+        if self.repath_cooldown > 0:
+            self.repath_cooldown -= dt
+
         # Health regeneration
         if self.hp < self.max_hp:
             self.hp += self.health_regen_rate * dt
             self.hp = min(self.hp, self.max_hp)
 
-        if self.repath_cooldown > 0:
-            self.repath_cooldown -= dt
+        # Fleeing logic
+        is_low_health = (
+            self.flee_health_threshold is not None
+            and self.hp / self.max_hp <= self.flee_health_threshold
+        )
+        closest_enemy = self.find_closest_enemy(game_map)
+        sees_enemy = closest_enemy is not None
 
+        if not self.is_fleeing:
+            if (is_low_health or self.flees_from_enemies) and sees_enemy:
+                self.is_fleeing = True
+                self.attack_target = None
+        else:  # is fleeing
+            if not sees_enemy and not is_low_health:
+                self.is_fleeing = False
+
+        if self.is_fleeing:
+            self.attack_target = None
+            if closest_enemy:
+                dx = self.x - closest_enemy.x
+                dy = self.y - closest_enemy.y
+                dist = (dx**2 + dy**2) ** 0.5
+                if dist > 0:
+                    flee_x = self.x + dx / dist * 5
+                    flee_y = self.y + dy / dist * 5
+                    self.set_target(flee_x, flee_y, game_map)
+            self._move(dt, game_map)
+            return
+
+        # Combat logic
+        if not self.attack_target and self.attack_damage > 0:
+            self.attack_target = self.find_closest_enemy(game_map)
+
+        if self.attack_target:
+            if self.attack_target.hp <= 0:
+                self.attack_target = None
+            else:
+                dist_to_target = (
+                    (self.x - self.attack_target.x) ** 2
+                    + (self.y - self.attack_target.y) ** 2
+                ) ** 0.5
+
+                if dist_to_target <= self.attack_range:
+                    # Stop moving and attack
+                    self.path = []
+                    self.target_x, self.target_y = self.x, self.y
+                    if self.attack_cooldown <= 0 and self.attack_damage > 0:
+                        self.attack_target.hp -= self.attack_damage
+                        self.attack_cooldown = 1 / self.attack_speed
+                    return  # Don't move while attacking
+                else:
+                    # Move towards target
+                    if self.repath_cooldown <= 0:
+                        self.set_target(
+                            self.attack_target.x, self.attack_target.y, game_map
+                        )
+                        self.attack_target = None  # Will be re-acquired next frame
+
+        self._move(dt, game_map)
+
+    def _move(self, dt: float, game_map=None) -> None:
+        """Handle the unit's movement logic."""
         if self.path:
             next_x, next_y = self.path[0]
             if game_map and game_map.is_occupied(next_x, next_y, self):
-                # If the next cell is occupied, try to repath
                 if self.repath_cooldown <= 0 and self.order_target:
                     start = (int(self.x), int(self.y))
                     goal = self.order_target
-                    # Temporarily treat the occupied cell as a wall
                     new_path = game_map.find_path(
                         start, goal, extra_obstacles={(next_x, next_y)}
                     )
                     if new_path:
                         self.path = new_path
-                    self.repath_cooldown = 0.5  # Wait before repathing again
-                return  # Stop movement for this frame
+                    self.repath_cooldown = 0.5
+                return
 
             self.target_x, self.target_y = next_x, next_y
             dx = self.target_x - self.x
@@ -97,10 +182,9 @@ class Unit:
             proposed_y = self.y + step * dy / dist
 
             if game_map:
-                # If moving to a new cell, check if it's occupied
                 if int(proposed_x) != int(self.x) or int(proposed_y) != int(self.y):
                     if game_map.is_occupied(int(proposed_x), int(proposed_y), self):
-                        return  # Don't move into an occupied cell
+                        return
 
             self.x = proposed_x
             self.y = proposed_y
