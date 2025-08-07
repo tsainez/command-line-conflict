@@ -37,13 +37,13 @@ class Unit:
         self.attack_cooldown = 0.0
         self.is_fleeing = False
 
-    def set_target(self, x: int, y: int, game_map=None) -> None:
+    def set_target(self, x: int, y: int, game_map=None, fog_of_war=None) -> None:
         self.attack_target = None  # Clear attack target on move command
         self.order_target = (x, y)
         self.path = []
         if not self.can_fly and game_map:
             sx, sy = int(self.x), int(self.y)
-            self.path = game_map.find_path((sx, sy), (x, y))
+            self.path = game_map.find_path((sx, sy), (x, y), fog_of_war=fog_of_war)
 
         if not self.path:  # For flying units or ground units with no path
             self.target_x = x
@@ -102,7 +102,7 @@ class Unit:
                 if dist > 0:
                     flee_x = self.x + dx / dist * 5
                     flee_y = self.y + dy / dist * 5
-                    self.set_target(flee_x, flee_y, game_map)
+                    self.set_target(flee_x, flee_y, game_map, None)
             self._move(dt, game_map)
             return
 
@@ -131,7 +131,7 @@ class Unit:
                     # Move towards target
                     if self.repath_cooldown <= 0:
                         self.set_target(
-                            self.attack_target.x, self.attack_target.y, game_map
+                            self.attack_target.x, self.attack_target.y, game_map, None
                         )
                         self.attack_target = None  # Will be re-acquired next frame
 

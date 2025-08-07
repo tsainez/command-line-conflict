@@ -107,7 +107,7 @@ class Game:
                     if enemy_unit and enemy_unit is not u:
                         u.attack_target = enemy_unit
                     else:
-                        u.set_target(grid_x, grid_y, self.map)
+                        u.set_target(grid_x, grid_y, self.map, self.fog_of_war)
         elif event.type == pygame.KEYDOWN:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
