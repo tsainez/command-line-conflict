@@ -1,0 +1,92 @@
+from ..game_state import GameState
+from ..components.position import Position
+from ..components.attack import Attack
+from ..components.health import Health
+from ..components.vision import Vision
+from ..components.movable import Movable
+
+
+class CombatSystem:
+    """
+    This system is responsible for handling combat between entities.
+    """
+
+    def update(self, game_state: GameState, dt: float) -> None:
+        for entity_id, components in game_state.entities.items():
+            attack = components.get(Attack)
+            if not attack:
+                continue
+
+            # Cooldowns
+            if attack.attack_cooldown > 0:
+                attack.attack_cooldown -= dt
+
+            # Find a target if we don't have one
+            if not attack.attack_target:
+                vision = components.get(Vision)
+                if vision:
+                    my_pos = components.get(Position)
+                    if my_pos:
+                        closest_enemy = self._find_closest_enemy(
+                            entity_id, my_pos, vision, game_state
+                        )
+                        if closest_enemy:
+                            attack.attack_target = closest_enemy
+
+            # Attack the target if we have one
+            if attack.attack_target:
+                target_components = game_state.entities.get(attack.attack_target)
+                if not target_components:
+                    attack.attack_target = None
+                    continue
+
+                target_health = target_components.get(Health)
+                if not target_health or target_health.hp <= 0:
+                    attack.attack_target = None
+                    continue
+
+                my_pos = components.get(Position)
+                target_pos = target_components.get(Position)
+                if not my_pos or not target_pos:
+                    continue
+
+                dist_to_target = (
+                    (my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2
+                ) ** 0.5
+
+                if dist_to_target <= attack.attack_range:
+                    # Stop moving and attack
+                    movable = components.get(Movable)
+                    if movable:
+                        movable.path = []
+                        movable.target_x, movable.target_y = my_pos.x, my_pos.y
+
+                    if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
+                        target_health.hp -= attack.attack_damage
+                        attack.attack_cooldown = 1 / attack.attack_speed
+                else:
+                    # Move towards target
+                    movable = components.get(Movable)
+                    if movable:
+                        movable.target_x = target_pos.x
+                        movable.target_y = target_pos.y
+
+    def _find_closest_enemy(
+        self, my_id: int, my_pos: Position, vision: Vision, game_state: GameState
+    ) -> int | None:
+        closest_enemy = None
+        min_dist = float("inf")
+
+        for other_id, other_components in game_state.entities.items():
+            if other_id == my_id:
+                continue
+
+            other_pos = other_components.get(Position)
+            if not other_pos:
+                continue
+
+            dist = ((my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2) ** 0.5
+            if dist <= vision.vision_range and dist < min_dist:
+                min_dist = dist
+                closest_enemy = other_id
+        return closest_enemy
