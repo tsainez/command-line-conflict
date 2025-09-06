@@ -35,3 +35,33 @@ class SelectionSystem:
                 selectable.is_selected = True
             else:
                 selectable.is_selected = False
+
+    def handle_click_selection(
+        self, game_state: GameState, mouse_pos: tuple[int, int], shift_pressed: bool
+    ) -> None:
+        gx = mouse_pos[0] // config.GRID_SIZE
+        gy = mouse_pos[1] // config.GRID_SIZE
+
+        clicked_entity_id = -1
+        for entity_id, components in game_state.entities.items():
+            position = components.get(Position)
+            if position and int(position.x) == gx and int(position.y) == gy:
+                if components.get(Selectable):
+                    clicked_entity_id = entity_id
+                    break
+
+        if clicked_entity_id != -1:
+            if shift_pressed:
+                selectable = game_state.get_component(clicked_entity_id, Selectable)
+                if selectable:
+                    selectable.is_selected = not selectable.is_selected
+            else:
+                for entity_id, components in game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable:
+                        selectable.is_selected = entity_id == clicked_entity_id
+        elif not shift_pressed:
+            for entity_id, components in game_state.entities.items():
+                selectable = components.get(Selectable)
+                if selectable:
+                    selectable.is_selected = False

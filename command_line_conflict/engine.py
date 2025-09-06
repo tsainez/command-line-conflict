@@ -79,9 +79,19 @@ class Game:
             and event.button == 1
             and self.selection_start
         ):
-            self.selection_system.update(
-                self.game_state, self.selection_start, event.pos
-            )
+            x1, y1 = self.selection_start
+            x2, y2 = event.pos
+            # If the mouse moved less than 5 pixels, it's a click
+            if (x2 - x1) ** 2 + (y2 - y1) ** 2 < 25:
+                mods = pygame.key.get_mods()
+                shift_pressed = mods & pygame.KMOD_SHIFT
+                self.selection_system.handle_click_selection(
+                    self.game_state, event.pos, shift_pressed
+                )
+            else:
+                self.selection_system.update(
+                    self.game_state, self.selection_start, event.pos
+                )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
