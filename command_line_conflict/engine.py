@@ -13,6 +13,7 @@ from .systems.health_system import HealthSystem
 from .systems.movement_system import MovementSystem
 from .systems.rendering_system import RenderingSystem
 from .systems.selection_system import SelectionSystem
+from .systems.sound_system import SoundSystem
 
 
 class Game:
@@ -57,7 +58,8 @@ class Game:
                 self.font = pygame.font.SysFont("monospace", 16)
 
         game_map = game_map or SimpleMap()
-        self.game_state = GameState(game_map)
+        self.sound_system = SoundSystem()
+        self.game_state = GameState(game_map, self.sound_system)
         self.selection_start = None
         self.running = True
 
@@ -153,6 +155,7 @@ class Game:
         pygame.display.flip()
 
     def run(self) -> None:
+        self.sound_system.play_music()
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
             for event in pygame.event.get():

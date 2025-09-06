@@ -1,15 +1,20 @@
 from .maps.base import Map
 
 
+from .maps.base import Map
+from .systems.sound_system import SoundSystem
+
+
 class GameState:
     """
     A container for all the state of the game.
     """
 
-    def __init__(self, game_map: Map) -> None:
+    def __init__(self, game_map: Map, sound_system: SoundSystem | None = None) -> None:
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
+        self.sound_system = sound_system
 
     def create_entity(self) -> int:
         entity_id = self.next_entity_id

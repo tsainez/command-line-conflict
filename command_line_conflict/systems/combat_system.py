@@ -64,6 +64,8 @@ class CombatSystem:
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
                         target_health.hp -= attack.attack_damage
                         attack.attack_cooldown = 1 / attack.attack_speed
+                        if game_state.sound_system:
+                            game_state.sound_system.play_sound("gunshot")
                 else:
                     # Move towards target
                     movable = components.get(Movable)
