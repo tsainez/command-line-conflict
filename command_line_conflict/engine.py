@@ -6,6 +6,7 @@ import pygame
 from . import config
 from . import factories
 from .game_state import GameState
+from .logger import log
 from .maps import Map, SimpleMap
 from .systems.combat_system import CombatSystem
 from .systems.flee_system import FleeSystem
@@ -13,6 +14,7 @@ from .systems.health_system import HealthSystem
 from .systems.movement_system import MovementSystem
 from .systems.rendering_system import RenderingSystem
 from .systems.selection_system import SelectionSystem
+from .components.selectable import Selectable
 
 
 class Game:
@@ -70,6 +72,7 @@ class Game:
         self.selection_system = SelectionSystem()
 
     def handle_event(self, event) -> None:
+        log.debug(f"Handling event: {event}")
         if event.type == pygame.QUIT:
             self.running = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -85,10 +88,12 @@ class Game:
             if (x2 - x1) ** 2 + (y2 - y1) ** 2 < 25:
                 mods = pygame.key.get_mods()
                 shift_pressed = mods & pygame.KMOD_SHIFT
+                log.debug(f"Click selection at {event.pos}. Shift: {shift_pressed}")
                 self.selection_system.handle_click_selection(
                     self.game_state, event.pos, shift_pressed
                 )
             else:
+                log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
                 self.selection_system.update(
                     self.game_state, self.selection_start, event.pos
                 )
@@ -96,9 +101,11 @@ class Game:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
             grid_y = event.pos[1] // config.GRID_SIZE
+            log.debug(f"Right-click move command at grid coordinates: {(grid_x, grid_y)}")
             for entity_id, components in self.game_state.entities.items():
-                selectable = components.get("Selectable")
+                selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
+                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
                     self.movement_system.set_target(
                         self.game_state, entity_id, grid_x, grid_y
                     )
@@ -163,6 +170,7 @@ class Game:
         pygame.display.flip()
 
     def run(self) -> None:
+        log.info("Game starting...")
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
             for event in pygame.event.get():
