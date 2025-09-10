@@ -1,3 +1,4 @@
+# Python virtual environment
 .venv
 
 # Ignore all __pycache__ directories and compiled Python files
@@ -8,3 +9,6 @@
 .DS_Store
 command_line_conflict/.DS_Store
 command_line_conflict/fonts/.DS_Store
+
+# Project generated files
+game.logs

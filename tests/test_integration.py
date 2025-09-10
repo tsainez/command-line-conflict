@@ -1,3 +1,4 @@
+# TODO: Add a description of each test scenario. 
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.simple_map import SimpleMap
 from command_line_conflict import factories
@@ -9,7 +10,7 @@ from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.vision import Vision
 
-
+# TODO: Expand these tests to cover more integration scenarios.
 def test_chassis_pathfinding_around_wall():
     game_map = SimpleMap()
     game_map.add_wall(5, 7)
