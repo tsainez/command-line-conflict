@@ -1,0 +1,5 @@
+2025-09-10 21:01:24,538 - Command Line Conflict - INFO - Game starting...
+2025-09-10 21:01:24,550 - Command Line Conflict - DEBUG - Handling event: <Event(32774-WindowShown {'window': None})>
+2025-09-10 21:01:24,550 - Command Line Conflict - DEBUG - Handling event: <Event(32775-WindowHidden {'window': None})>
+2025-09-10 21:01:24,550 - Command Line Conflict - DEBUG - Handling event: <Event(32774-WindowShown {'window': None})>
+2025-09-10 21:01:54,557 - Command Line Conflict - INFO - 30-second timer expired. Exiting game.

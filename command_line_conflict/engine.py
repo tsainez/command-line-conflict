@@ -4,17 +4,17 @@ from pathlib import Path
 import pygame
 
 from . import config
-from .fog_of_war import FogOfWar
+from . import factories
+from .game_state import GameState
+from .logger import log
 from .maps import Map, SimpleMap
-from .units import (
-    Arachnotron,
-    Chassis,
-    Extractor,
-    Immortal,
-    Observer,
-    Rover,
-)
-from .units import base as unit_base
+from .systems.combat_system import CombatSystem
+from .systems.flee_system import FleeSystem
+from .systems.health_system import HealthSystem
+from .systems.movement_system import MovementSystem
+from .systems.rendering_system import RenderingSystem
+from .systems.selection_system import SelectionSystem
+from .components.selectable import Selectable
 
 
 class Game:
@@ -35,7 +35,6 @@ class Game:
         if bundled.exists():
             try:
                 self.font = pygame.font.Font(str(bundled), 16)
-                unit_base.USE_ASCII = False
             except Exception:
                 self.font = None
 
@@ -55,24 +54,29 @@ class Game:
 
             if font_path:
                 self.font = pygame.font.Font(font_path, 16)
-                unit_base.USE_ASCII = False
             else:
                 # Final fallback to generic monospace and ASCII graphics
                 self.font = pygame.font.SysFont("monospace", 16)
-                unit_base.USE_ASCII = True
 
-        self.map = game_map or SimpleMap()
-        self.fog_of_war = FogOfWar(self.map.width, self.map.height)
+        game_map = game_map or SimpleMap()
+        self.game_state = GameState(game_map)
         self.selection_start = None
         self.running = True
 
+        # Initialize systems
+        self.movement_system = MovementSystem()
+        self.rendering_system = RenderingSystem(self.screen, self.font)
+        self.combat_system = CombatSystem()
+        self.flee_system = FleeSystem()
+        self.health_system = HealthSystem()
+        self.selection_system = SelectionSystem()
+
     def handle_event(self, event) -> None:
+        log.debug(f"Handling event: {event}")
         if event.type == pygame.QUIT:
             self.running = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
-            for u in self.map.units:
-                u.selected = False
         elif (
             event.type == pygame.MOUSEBUTTONUP
             and event.button == 1
@@ -80,58 +84,57 @@ class Game:
         ):
             x1, y1 = self.selection_start
             x2, y2 = event.pos
+            # If the mouse moved less than 5 pixels, it's a click
+            if (x2 - x1) ** 2 + (y2 - y1) ** 2 < 25:
+                mods = pygame.key.get_mods()
+                shift_pressed = mods & pygame.KMOD_SHIFT
+                log.debug(f"Click selection at {event.pos}. Shift: {shift_pressed}")
+                self.selection_system.handle_click_selection(
+                    self.game_state, event.pos, shift_pressed
+                )
+            else:
+                log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
+                self.selection_system.update(
+                    self.game_state, self.selection_start, event.pos
+                )
             self.selection_start = None
-
-            sx, ex = sorted((x1 // config.GRID_SIZE, x2 // config.GRID_SIZE))
-            sy, ey = sorted((y1 // config.GRID_SIZE, y2 // config.GRID_SIZE))
-
-            for u in self.map.units:
-                ux = int(u.x)
-                uy = int(u.y)
-                if sx <= ux <= ex and sy <= uy <= ey:
-                    u.selected = True
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
             grid_y = event.pos[1] // config.GRID_SIZE
-
-            # In the future, this should check for units of the opposing player
-            enemy_unit = None
-            for unit in self.map.units:
-                if int(unit.x) == grid_x and int(unit.y) == grid_y:
-                    enemy_unit = unit
-                    break
-
-            for u in self.map.units:
-                if u.selected:
-                    # Don't let units attack themselves
-                    if enemy_unit and enemy_unit is not u:
-                        u.attack_target = enemy_unit
-                    else:
-                        u.set_target(grid_x, grid_y, self.map)
+            log.debug(f"Right-click move command at grid coordinates: {(grid_x, grid_y)}")
+            for entity_id, components in self.game_state.entities.items():
+                selectable = components.get(Selectable)
+                if selectable and selectable.is_selected:
+                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                    self.movement_system.set_target(
+                        self.game_state, entity_id, grid_x, grid_y
+                    )
         elif event.type == pygame.KEYDOWN:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
             if event.key == pygame.K_1:
-                self.map.spawn_unit(Extractor(gx, gy))
+                factories.create_extractor(self.game_state, gx, gy)
             elif event.key == pygame.K_2:
-                self.map.spawn_unit(Chassis(gx, gy))
+                factories.create_chassis(self.game_state, gx, gy)
             elif event.key == pygame.K_3:
-                self.map.spawn_unit(Rover(gx, gy))
+                factories.create_rover(self.game_state, gx, gy)
             elif event.key == pygame.K_4:
-                self.map.spawn_unit(Arachnotron(gx, gy))
+                factories.create_arachnotron(self.game_state, gx, gy)
             elif event.key == pygame.K_5:
-                self.map.spawn_unit(Observer(gx, gy))
+                factories.create_observer(self.game_state, gx, gy)
             elif event.key == pygame.K_6:
-                self.map.spawn_unit(Immortal(gx, gy))
+                factories.create_immortal(self.game_state, gx, gy)
             elif event.key == pygame.K_w:
-                self.map.add_wall(gx, gy)
+                self.game_state.map.add_wall(gx, gy)
             elif event.key == pygame.K_q:
                 self.running = False
 
     def update(self, dt: float) -> None:
-        self.map.update(dt)
-        self.fog_of_war.update(self.map.units)
+        self.health_system.update(self.game_state, dt)
+        self.flee_system.update(self.game_state, dt)
+        self.combat_system.update(self.game_state, dt)
+        self.movement_system.update(self.game_state, dt)
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))
@@ -145,11 +148,8 @@ class Game:
                 self.screen, (40, 40, 40), (0, y), (config.SCREEN_WIDTH, y)
             )
 
-        self.map.draw(self.screen, self.font)
-        for u in self.map.units:
-            u.draw(self.screen, self.font)
-
-        self.fog_of_war.draw(self.screen)
+        self.game_state.map.draw(self.screen, self.font)
+        self.rendering_system.draw(self.game_state)
 
         # Highlight selected units
         if self.selection_start:
@@ -170,6 +170,7 @@ class Game:
         pygame.display.flip()
 
     def run(self) -> None:
+        log.info("Game starting...")
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
             for event in pygame.event.get():

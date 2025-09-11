@@ -4,7 +4,6 @@ from heapq import heappop, heappush
 from typing import Dict, List, Tuple
 
 from .. import config
-from ..units import Unit
 
 
 class Map:
@@ -13,11 +12,7 @@ class Map:
     def __init__(self, width: int = 40, height: int = 30) -> None:
         self.width = width
         self.height = height
-        self.units: List[Unit] = []
         self.walls: set[Tuple[int, int]] = set()
-
-    def spawn_unit(self, unit: Unit) -> None:
-        self.units.append(unit)
 
     def add_wall(self, x: int, y: int) -> None:
         self.walls.add((x, y))
@@ -25,40 +20,15 @@ class Map:
     def is_blocked(self, x: int, y: int) -> bool:
         return (x, y) in self.walls
 
-    def is_occupied(self, x: int, y: int, moving_unit: "Unit") -> bool:
-        """Check if a grid cell is occupied by another unit."""
-        for unit in self.units:
-            if unit is moving_unit:
-                continue
-            if int(unit.x) == x and int(unit.y) == y:
-                # flying units can only be blocked by other flying units
-                if moving_unit.can_fly and unit.can_fly:
-                    return True
-                # ground units can only be blocked by other ground units
-                if not moving_unit.can_fly and not unit.can_fly:
-                    return True
-        return False
-
-    def get_unit_at(self, x: int, y: int) -> "Unit" | None:
-        """Return the unit at a given grid coordinate, or None."""
-        for unit in self.units:
-            if int(unit.x) == x and int(unit.y) == y:
-                return unit
-        return None
-
-    def get_enemies(self, unit: "Unit") -> List["Unit"]:
-        """Return a list of enemy units."""
-        # For now, all other units are considered enemies
-        return [u for u in self.units if u is not unit]
-
     def find_path(
         self,
         start: Tuple[int, int],
         goal: Tuple[int, int],
+        can_fly: bool = False,
         extra_obstacles: set[Tuple[int, int]] | None = None,
     ) -> List[Tuple[int, int]]:
         """A* pathfinding that can account for dynamic obstacles."""
-        if self.is_blocked(*goal):
+        if not can_fly and self.is_blocked(*goal):
             return []
 
         open_set: List[Tuple[int, Tuple[int, int]]] = []
@@ -80,8 +50,10 @@ class Map:
                 nx, ny = current[0] + dx, current[1] + dy
                 if not (0 <= nx < self.width and 0 <= ny < self.height):
                     continue
-                if self.is_blocked(nx, ny) or (
-                    extra_obstacles and (nx, ny) in extra_obstacles
+                if (
+                    not can_fly
+                    and self.is_blocked(nx, ny)
+                    or (extra_obstacles and (nx, ny) in extra_obstacles)
                 ):
                     continue
                 tentative_g = g_score[current] + 1
@@ -92,13 +64,6 @@ class Map:
                     came_from[(nx, ny)] = current
 
         return []
-
-    def update(self, dt: float) -> None:
-        # Remove dead units
-        self.units = [u for u in self.units if u.hp > 0]
-
-        for u in self.units:
-            u.update(dt, self)
 
     def draw(self, surf, font) -> None:
         for x, y in self.walls:
