@@ -16,3 +16,14 @@ def mock_pygame(mocker):
     pygame.init()
     yield
     pygame.quit()
+
+
+@pytest.fixture
+def game_state():
+    """
+    Returns a GameState object with a SimpleMap.
+    """
+    from command_line_conflict.game_state import GameState
+    from command_line_conflict.maps.simple_map import SimpleMap
+    game_map = SimpleMap()
+    return GameState(game_map)
