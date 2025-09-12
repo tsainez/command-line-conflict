@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from command_line_conflict.game_state import GameState
 from command_line_conflict import config
@@ -17,6 +18,7 @@ class UISystem:
     def __init__(self, screen, font):
         self.screen = screen
         self.font = font
+        self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
             "1: Extractor",
             "2: Chassis",
@@ -59,7 +61,7 @@ class UISystem:
             panel_y += 20
 
         if health:
-            health_text = f"Health: {int(health.current_hp)} / {health.max_hp}"
+            health_text = f"Health: {int(health.hp)} / {health.max_hp}"
             text = self.font.render(health_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
             panel_y += 20
@@ -80,16 +82,35 @@ class UISystem:
             radius = attack.range * config.GRID_SIZE
             center_x = int(position.x * config.GRID_SIZE + config.GRID_SIZE / 2)
             center_y = int(position.y * config.GRID_SIZE + config.GRID_SIZE / 2)
-            pygame.draw.circle(self.screen, (255, 0, 0), (center_x, center_y), radius, 1)
+            self._draw_dotted_circle(
+                self.screen, (255, 0, 0), (center_x, center_y), radius, 10
+            )
+
+    def _draw_dotted_circle(
+        self, surface, color, center, radius, dash_length
+    ) -> None:
+        num_dashes = 30
+        for i in range(num_dashes):
+            angle = 2 * math.pi * i / num_dashes
+            start_angle = angle
+            end_angle = angle + 2 * math.pi / (2 * num_dashes)
+            start_pos = (
+                center[0] + radius * math.cos(start_angle),
+                center[1] + radius * math.sin(start_angle),
+            )
+            end_pos = (
+                center[0] + radius * math.cos(end_angle),
+                center[1] + radius * math.sin(end_angle),
+            )
+            pygame.draw.line(surface, color, start_pos, end_pos, 1)
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
         components = game_state.entities[entity_id]
         position = components.get(Position)
         health = components.get(Health)
         if position and health:
-            health_text = f"{int(health.current_hp)}"
-            font = pygame.font.Font(None, 18)
-            text = font.render(health_text, True, (255, 255, 255))
+            health_text = f"{int(health.hp)}"
+            text = self.small_font.render(health_text, True, (255, 255, 255))
             text_rect = text.get_rect(
                 center=(
                     position.x * config.GRID_SIZE + config.GRID_SIZE / 2,
@@ -104,7 +125,7 @@ class UISystem:
         for entity_id in entity_ids:
             health = game_state.get_component(entity_id, Health)
             if health:
-                total_health += health.current_hp
+                total_health += health.hp
                 max_health += health.max_hp
 
         panel_x_offset = 450
@@ -130,11 +151,16 @@ class UISystem:
 
         x_offset = 10
         y_offset = panel_y + 10
+        column_width = 200
+        row_height = 20
+        items_per_row = 4
+
         for i, option in enumerate(self.key_options):
+            col = i % items_per_row
+            row = i // items_per_row
+
+            x_pos = x_offset + col * column_width
+            y_pos = y_offset + row * row_height
+
             text = self.font.render(option, True, (255, 255, 255))
-            self.screen.blit(text, (x_offset, y_offset))
-            if i % 2 == 0:
-                x_offset += 200
-            else:
-                x_offset -= 200
-                y_offset += 20
+            self.screen.blit(text, (x_pos, y_pos))
