@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 3) (Optional) Run linters/tests
 ```
-pip install black isort pytest  # needed for optional linting/tests
+pip install -r requirements-dev.txt # Install dev dependencies
 
 black --check .
 isort --check-only .
