@@ -23,3 +23,11 @@ class GameState:
 
     def get_component(self, entity_id: int, component_type):
         return self.entities[entity_id].get(component_type)
+
+    def remove_component(self, entity_id: int, component_type) -> None:
+        if component_type in self.entities[entity_id]:
+            del self.entities[entity_id][component_type]
+
+    def remove_entity(self, entity_id: int) -> None:
+        if entity_id in self.entities:
+            del self.entities[entity_id]

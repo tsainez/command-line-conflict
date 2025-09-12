@@ -67,7 +67,7 @@ class UISystem:
             panel_y += 20
 
         if attack:
-            attack_text = f"Attack: {attack.damage} (Range: {attack.range})"
+            attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
@@ -78,8 +78,8 @@ class UISystem:
         components = game_state.entities[entity_id]
         position = components.get(Position)
         attack = components.get(Attack)
-        if position and attack and attack.range > 0:
-            radius = attack.range * config.GRID_SIZE
+        if position and attack and attack.attack_range > 0:
+            radius = attack.attack_range * config.GRID_SIZE
             center_x = int(position.x * config.GRID_SIZE + config.GRID_SIZE / 2)
             center_y = int(position.y * config.GRID_SIZE + config.GRID_SIZE / 2)
             self._draw_dotted_circle(
