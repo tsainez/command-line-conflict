@@ -8,9 +8,7 @@ class MovementSystem:
     This system is responsible for moving entities that have a position and are movable.
     """
 
-    def set_target(
-        self, game_state: GameState, entity_id: int, x: int, y: int
-    ) -> None:
+    def set_target(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
         movable = game_state.get_component(entity_id, Movable)
         position = game_state.get_component(entity_id, Position)
         if not movable or not position:

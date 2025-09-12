@@ -85,7 +85,9 @@ class CombatSystem:
             if not other_pos:
                 continue
 
-            dist = ((my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2) ** 0.5
+            dist = (
+                (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+            ) ** 0.5
             if dist <= vision.vision_range and dist < min_dist:
                 min_dist = dist
                 closest_enemy = other_id

@@ -50,9 +50,7 @@ def test_arachnotron_pathfinding_over_wall(game_state):
     arachnotron_movable.target_y = 7
 
     # Find a path to the target
-    arachnotron_movable.path = game_state.map.find_path(
-        (1, 7), (18, 7), can_fly=True
-    )
+    arachnotron_movable.path = game_state.map.find_path((1, 7), (18, 7), can_fly=True)
 
     # Check that the path is valid and goes over the wall
     assert arachnotron_movable.path is not None

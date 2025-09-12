@@ -1,6 +1,7 @@
 import pygame
 from command_line_conflict import config
 
+
 class SettingsScene:
     def __init__(self, game):
         self.game = game
@@ -11,23 +12,30 @@ class SettingsScene:
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
         self.current_screen_size_index = 0
         try:
-            self.current_screen_size_index = self.screen_sizes.index((config.SCREEN['width'], config.SCREEN['height']))
+            self.current_screen_size_index = self.screen_sizes.index(
+                (config.SCREEN["width"], config.SCREEN["height"])
+            )
         except ValueError:
             self.current_screen_size_index = 0
-
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                self.selected_option = (self.selected_option - 1) % len(self.settings_options)
+                self.selected_option = (self.selected_option - 1) % len(
+                    self.settings_options
+                )
             elif event.key == pygame.K_DOWN:
-                self.selected_option = (self.selected_option + 1) % len(self.settings_options)
+                self.selected_option = (self.selected_option + 1) % len(
+                    self.settings_options
+                )
             elif event.key == pygame.K_RETURN:
                 if self.selected_option == 0:
-                    self.current_screen_size_index = (self.current_screen_size_index + 1) % len(self.screen_sizes)
+                    self.current_screen_size_index = (
+                        self.current_screen_size_index + 1
+                    ) % len(self.screen_sizes)
                     width, height = self.screen_sizes[self.current_screen_size_index]
-                    config.SCREEN['width'] = width
-                    config.SCREEN['height'] = height
+                    config.SCREEN["width"] = width
+                    config.SCREEN["height"] = height
                     self.game.screen = pygame.display.set_mode((width, height))
                 elif self.selected_option == 1:
                     config.DEBUG = not config.DEBUG
@@ -51,12 +59,16 @@ class SettingsScene:
                 color = (255, 255, 255)
 
             if i == 0:
-                text_to_render = f"{option}: {config.SCREEN['width']}x{config.SCREEN['height']}"
+                text_to_render = (
+                    f"{option}: {config.SCREEN['width']}x{config.SCREEN['height']}"
+                )
             elif i == 1:
                 text_to_render = f"{option}: {'On' if config.DEBUG else 'Off'}"
             else:
                 text_to_render = option
 
             text = self.option_font.render(text_to_render, True, color)
-            text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
+            text_rect = text.get_rect(
+                center=(self.game.screen.get_width() / 2, 300 + i * 60)
+            )
             screen.blit(text, text_rect)

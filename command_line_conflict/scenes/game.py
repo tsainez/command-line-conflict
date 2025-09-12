@@ -57,7 +57,9 @@ class GameScene:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x = event.pos[0] // config.GRID_SIZE
             grid_y = event.pos[1] // config.GRID_SIZE
-            log.debug(f"Right-click move command at grid coordinates: {(grid_x, grid_y)}")
+            log.debug(
+                f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
+            )
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
@@ -88,7 +90,6 @@ class GameScene:
             elif event.key == pygame.K_ESCAPE:
                 self.game.scene_manager.switch_to("menu")
 
-
     def update(self, dt):
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
@@ -98,14 +99,10 @@ class GameScene:
     def draw(self, screen):
         screen.fill((0, 0, 0))
 
-        for x in range(0, config.SCREEN['width'], config.GRID_SIZE):
-            pygame.draw.line(
-                screen, (40, 40, 40), (x, 0), (x, config.SCREEN['height'])
-            )
-        for y in range(0, config.SCREEN['height'], config.GRID_SIZE):
-            pygame.draw.line(
-                screen, (40, 40, 40), (0, y), (config.SCREEN['width'], y)
-            )
+        for x in range(0, config.SCREEN["width"], config.GRID_SIZE):
+            pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, config.SCREEN["height"]))
+        for y in range(0, config.SCREEN["height"], config.GRID_SIZE):
+            pygame.draw.line(screen, (40, 40, 40), (0, y), (config.SCREEN["width"], y))
 
         self.game_state.map.draw(screen, self.font)
         self.rendering_system.draw(self.game_state)

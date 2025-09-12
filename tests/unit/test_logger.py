@@ -4,6 +4,7 @@ from unittest.mock import patch, mock_open
 
 from command_line_conflict.logger import setup_logger
 
+
 def test_setup_logger_default_level():
     """
     Tests that the logger is created with the default log level (INFO)
@@ -11,6 +12,7 @@ def test_setup_logger_default_level():
     """
     logger = setup_logger()
     assert logger.level == logging.INFO
+
 
 @patch.dict(os.environ, {"LOG_LEVEL": "DEBUG"})
 def test_setup_logger_debug_level():
@@ -20,6 +22,7 @@ def test_setup_logger_debug_level():
     """
     logger = setup_logger()
     assert logger.level == logging.DEBUG
+
 
 @patch("logging.FileHandler")
 def test_setup_logger_file_handler_append_mode(mock_file_handler):

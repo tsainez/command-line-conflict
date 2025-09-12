@@ -13,9 +13,13 @@ class MenuScene:
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                self.selected_option = (self.selected_option - 1) % len(self.menu_options)
+                self.selected_option = (self.selected_option - 1) % len(
+                    self.menu_options
+                )
             elif event.key == pygame.K_DOWN:
-                self.selected_option = (self.selected_option + 1) % len(self.menu_options)
+                self.selected_option = (self.selected_option + 1) % len(
+                    self.menu_options
+                )
             elif event.key == pygame.K_RETURN:
                 if self.selected_option == 0:
                     self.game.scene_manager.switch_to("game")
@@ -30,7 +34,9 @@ class MenuScene:
     def draw(self, screen):
         screen.fill((0, 0, 0))
 
-        title_text = self.title_font.render("Command Line Conflict", True, (255, 255, 255))
+        title_text = self.title_font.render(
+            "Command Line Conflict", True, (255, 255, 255)
+        )
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
@@ -40,5 +46,7 @@ class MenuScene:
             else:
                 color = (255, 255, 255)
             text = self.option_font.render(option, True, color)
-            text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
+            text_rect = text.get_rect(
+                center=(self.game.screen.get_width() / 2, 300 + i * 60)
+            )
             screen.blit(text, text_rect)

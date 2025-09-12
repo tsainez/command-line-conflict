@@ -1,6 +1,7 @@
 import pytest
 import pygame
 
+
 @pytest.fixture(autouse=True)
 def mock_pygame(mocker):
     """Mock pygame to avoid display initialization."""
@@ -25,5 +26,6 @@ def game_state():
     """
     from command_line_conflict.game_state import GameState
     from command_line_conflict.maps.simple_map import SimpleMap
+
     game_map = SimpleMap()
     return GameState(game_map)
