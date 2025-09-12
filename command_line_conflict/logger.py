@@ -36,5 +36,6 @@ def setup_logger():
 
     return logger
 
+
 # Create a single logger instance to be used throughout the application
 log = setup_logger()

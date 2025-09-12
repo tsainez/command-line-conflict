@@ -10,7 +10,10 @@ class SelectionSystem:
     """
 
     def update(
-        self, game_state: GameState, selection_start: tuple[int, int] | None, mouse_pos: tuple[int, int]
+        self,
+        game_state: GameState,
+        selection_start: tuple[int, int] | None,
+        mouse_pos: tuple[int, int],
     ) -> None:
         if not selection_start:
             return

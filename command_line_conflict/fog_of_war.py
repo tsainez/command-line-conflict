@@ -1,10 +1,12 @@
 import pygame
 from . import config
 
+
 class FogOfWar:
     """
     Manages the fog of war overlay for the game map.
     """
+
     HIDDEN = 0
     EXPLORED = 1
     VISIBLE = 2
@@ -33,10 +35,14 @@ class FogOfWar:
             ux, uy = int(unit.x), int(unit.y)
             vision_radius = unit.vision_range
             # Iterate over a square bounding box around the unit's vision circle
-            for x in range(max(0, ux - vision_radius), min(self.width, ux + vision_radius + 1)):
-                for y in range(max(0, uy - vision_radius), min(self.height, uy + vision_radius + 1)):
+            for x in range(
+                max(0, ux - vision_radius), min(self.width, ux + vision_radius + 1)
+            ):
+                for y in range(
+                    max(0, uy - vision_radius), min(self.height, uy + vision_radius + 1)
+                ):
                     # Use squared distance to avoid expensive sqrt
-                    dist_sq = (x - ux)**2 + (y - uy)**2
+                    dist_sq = (x - ux) ** 2 + (y - uy) ** 2
                     if dist_sq <= vision_radius**2:
                         self.grid[y][x] = self.VISIBLE
 
