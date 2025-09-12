@@ -4,6 +4,7 @@ from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
 from ..components.movable import Movable
+from ..components.dead import Dead
 from .. import config
 
 
@@ -22,10 +23,25 @@ class RenderingSystem:
             renderable = components.get(Renderable)
 
             if position and renderable:
-                color = (255, 255, 255)
-                selectable = components.get(Selectable)
-                if selectable and selectable.is_selected:
-                    color = (0, 255, 0)
+                dead = components.get(Dead)
+                if dead:
+                    color = (128, 128, 128)  # Grey for dead units
+                else:
+                    color = (255, 255, 255)
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        color = (0, 255, 0)
+                        shadow_ch = self.font.render(
+                            renderable.icon, True, (128, 128, 128)
+                        )
+                        self.screen.blit(
+                            shadow_ch,
+                            (
+                                int(position.x) * config.GRID_SIZE + 2,
+                                int(position.y) * config.GRID_SIZE + 2,
+                            ),
+                        )
+
                 ch = self.font.render(renderable.icon, True, color)
                 self.screen.blit(
                     ch,
@@ -34,7 +50,9 @@ class RenderingSystem:
                         int(position.y) * config.GRID_SIZE,
                     ),
                 )
-                if selectable and selectable.is_selected:
+
+                selectable = components.get(Selectable)
+                if not dead and selectable and selectable.is_selected:
                     self.draw_orders(components)
 
     def draw_orders(self, components) -> None:

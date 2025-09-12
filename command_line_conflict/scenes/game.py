@@ -11,6 +11,8 @@ from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
+from command_line_conflict.systems.ui_system import UISystem
+from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.components.selectable import Selectable
 
 
@@ -28,6 +30,8 @@ class GameScene:
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
+        self.ui_system = UISystem(self.game.screen, self.font)
+        self.corpse_removal_system = CorpseRemovalSystem()
 
     def handle_event(self, event):
         log.debug(f"Handling event: {event}")
@@ -95,6 +99,7 @@ class GameScene:
         self.flee_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
+        self.corpse_removal_system.update(self.game_state, dt)
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
@@ -106,6 +111,7 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font)
         self.rendering_system.draw(self.game_state)
+        self.ui_system.draw(self.game_state)
 
         # Highlight selected units
         if self.selection_start:
