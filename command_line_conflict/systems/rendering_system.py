@@ -26,6 +26,15 @@ class RenderingSystem:
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     color = (0, 255, 0)
+                    shadow_ch = self.font.render(renderable.icon, True, (128, 128, 128))
+                    self.screen.blit(
+                        shadow_ch,
+                        (
+                            int(position.x) * config.GRID_SIZE + 2,
+                            int(position.y) * config.GRID_SIZE + 2,
+                        ),
+                    )
+
                 ch = self.font.render(renderable.icon, True, color)
                 self.screen.blit(
                     ch,
