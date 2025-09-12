@@ -2,12 +2,16 @@ from ..game_state import GameState
 from ..components.selectable import Selectable
 from ..components.position import Position
 from .. import config
+from ..camera import Camera
 
 
 class SelectionSystem:
     """
     This system is responsible for selecting entities.
     """
+
+    def __init__(self, camera: Camera):
+        self.camera = camera
 
     def update(
         self,
@@ -18,8 +22,8 @@ class SelectionSystem:
         if not selection_start:
             return
 
-        x1, y1 = selection_start
-        x2, y2 = mouse_pos
+        x1, y1 = self.camera.screen_to_world(*selection_start)
+        x2, y2 = self.camera.screen_to_world(*mouse_pos)
         sx, ex = sorted((x1 // config.GRID_SIZE, x2 // config.GRID_SIZE))
         sy, ey = sorted((y1 // config.GRID_SIZE, y2 // config.GRID_SIZE))
 
@@ -42,8 +46,9 @@ class SelectionSystem:
     def handle_click_selection(
         self, game_state: GameState, mouse_pos: tuple[int, int], shift_pressed: bool
     ) -> None:
-        gx = mouse_pos[0] // config.GRID_SIZE
-        gy = mouse_pos[1] // config.GRID_SIZE
+        wx, wy = self.camera.screen_to_world(*mouse_pos)
+        gx = wx // config.GRID_SIZE
+        gy = wy // config.GRID_SIZE
 
         clicked_entity_id = -1
         for entity_id, components in game_state.entities.items():

@@ -2,6 +2,8 @@ import pygame
 
 from command_line_conflict import config
 from command_line_conflict import factories
+from command_line_conflict.camera import Camera
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
@@ -12,6 +14,8 @@ from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.vision import Vision
 
 
 class GameScene:
@@ -20,16 +24,19 @@ class GameScene:
         self.font = game.font
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
+        self.camera = Camera(config.SCREEN["width"], config.SCREEN["height"])
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
 
         # Initialize systems
         self.movement_system = MovementSystem()
-        self.rendering_system = RenderingSystem(self.game.screen, self.font)
+        self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
         self.combat_system = CombatSystem()
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
-        self.selection_system = SelectionSystem()
+        self.selection_system = SelectionSystem(self.camera)
 
     def handle_event(self, event):
+        self.camera.handle_event(event)
         log.debug(f"Handling event: {event}")
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
@@ -55,8 +62,9 @@ class GameScene:
                 )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            grid_x = event.pos[0] // config.GRID_SIZE
-            grid_y = event.pos[1] // config.GRID_SIZE
+            world_x, world_y = self.camera.screen_to_world(*event.pos)
+            grid_x = world_x // config.GRID_SIZE
+            grid_y = world_y // config.GRID_SIZE
             log.debug(
                 f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
             )
@@ -68,7 +76,7 @@ class GameScene:
                         self.game_state, entity_id, grid_x, grid_y
                     )
         elif event.type == pygame.KEYDOWN:
-            mx, my = pygame.mouse.get_pos()
+            mx, my = self.camera.screen_to_world(*pygame.mouse.get_pos())
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
             if event.key == pygame.K_1:
@@ -91,6 +99,16 @@ class GameScene:
                 self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
+        self.camera.update()
+        units_for_fog_of_war = []
+        for _id, components in self.game_state.entities.items():
+            if components.get(Position) and components.get(Vision):
+                unit = type("Unit", (), {})()
+                unit.x = components.get(Position).x
+                unit.y = components.get(Position).y
+                unit.vision_range = components.get(Vision).radius
+                units_for_fog_of_war.append(unit)
+        self.fog_of_war.update(units_for_fog_of_war)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
@@ -101,23 +119,34 @@ class GameScene:
 
         for x in range(0, config.SCREEN["width"], config.GRID_SIZE):
             pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, config.SCREEN["height"]))
-        for y in range(0, config.SCREEN["height"], config.GRID_SIZE):
-            pygame.draw.line(screen, (40, 40, 40), (0, y), (config.SCREEN["width"], y))
+        for x in range(
+            round(self.camera.x % (config.GRID_SIZE * self.camera.zoom)),
+            config.SCREEN["width"],
+            round(config.GRID_SIZE * self.camera.zoom),
+        ):
+            pygame.draw.line(
+                screen, (40, 40, 40), (x, 0), (x, config.SCREEN["height"])
+            )
+        for y in range(
+            round(self.camera.y % (config.GRID_SIZE * self.camera.zoom)),
+            config.SCREEN["height"],
+            round(config.GRID_SIZE * self.camera.zoom),
+        ):
+            pygame.draw.line(
+                screen, (40, 40, 40), (0, y), (config.SCREEN["width"], y)
+            )
 
-        self.game_state.map.draw(screen, self.font)
+        self.game_state.map.draw(screen, self.font, self.camera)
         self.rendering_system.draw(self.game_state)
+        self.fog_of_war.draw(screen, self.camera)
 
         # Highlight selected units
         if self.selection_start:
             x1, y1 = self.selection_start
             x2, y2 = pygame.mouse.get_pos()
-            min_x, max_x = sorted((x1, x2))
-            min_y, max_y = sorted((y1, y2))
-            min_x = (min_x // config.GRID_SIZE) * config.GRID_SIZE
-            min_y = (min_y // config.GRID_SIZE) * config.GRID_SIZE
-            max_x = ((max_x // config.GRID_SIZE) + 1) * config.GRID_SIZE
-            max_y = ((max_y // config.GRID_SIZE) + 1) * config.GRID_SIZE
-            rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+            rect = pygame.Rect(
+                min(x1, x2), min(y1, y2), abs(x1 - x2), abs(y1 - y2)
+            )
             overlay = pygame.Surface(rect.size, pygame.SRCALPHA)
             overlay.fill((0, 255, 0, 60))
             screen.blit(overlay, rect.topleft)

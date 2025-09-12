@@ -65,7 +65,16 @@ class Map:
 
         return []
 
-    def draw(self, surf, font) -> None:
+    def draw(self, surf, font, camera) -> None:
+        zoomed_grid_size = int(config.GRID_SIZE * camera.zoom)
+        if zoomed_grid_size <= 0:
+            return
+
+        zoomed_font = pygame.font.Font(font.get_path(), zoomed_grid_size)
+
         for x, y in self.walls:
-            ch = font.render("#", True, (100, 100, 100))
-            surf.blit(ch, (x * config.GRID_SIZE, y * config.GRID_SIZE))
+            ch = zoomed_font.render("#", True, (100, 100, 100))
+            screen_pos = camera.world_to_screen(
+                x * config.GRID_SIZE, y * config.GRID_SIZE
+            )
+            surf.blit(ch, screen_pos)

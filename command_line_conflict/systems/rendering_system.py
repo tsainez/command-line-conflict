@@ -7,14 +7,18 @@ from ..components.movable import Movable
 from .. import config
 
 
+from ..camera import Camera
+
+
 class RenderingSystem:
     """
     This system is responsible for rendering entities on the screen.
     """
 
-    def __init__(self, screen, font):
+    def __init__(self, screen, font, camera: Camera):
         self.screen = screen
         self.font = font
+        self.camera = camera
 
     def draw(self, game_state: GameState) -> None:
         for entity_id, components in game_state.entities.items():
@@ -26,14 +30,20 @@ class RenderingSystem:
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     color = (0, 255, 0)
-                ch = self.font.render(renderable.icon, True, color)
-                self.screen.blit(
-                    ch,
-                    (
-                        int(position.x) * config.GRID_SIZE,
-                        int(position.y) * config.GRID_SIZE,
-                    ),
+
+                # Apply camera zoom to font size
+                font_size = int(config.GRID_SIZE * self.camera.zoom)
+                if font_size <= 0:
+                    continue
+                font = pygame.font.Font(self.font.get_path(), font_size)
+                ch = font.render(renderable.icon, True, color)
+
+                screen_pos = self.camera.world_to_screen(
+                    int(position.x) * config.GRID_SIZE,
+                    int(position.y) * config.GRID_SIZE,
                 )
+                self.screen.blit(ch, screen_pos)
+
                 if selectable and selectable.is_selected:
                     self.draw_orders(components)
 
@@ -62,17 +72,28 @@ class RenderingSystem:
         if not tiles or tiles[-1] != final:
             tiles.append(final)
 
+        font_size = int(config.GRID_SIZE * self.camera.zoom)
+        if font_size <= 0:
+            return
+        font = pygame.font.Font(self.font.get_path(), font_size)
+
         prev_x, prev_y = int(position.x), int(position.y)
         for tx, ty in tiles[:-1]:
             arrow = self._arrow_char(tx - prev_x, ty - prev_y)
-            ch = self.font.render(arrow, True, (0, 255, 0))
-            self.screen.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+            ch = font.render(arrow, True, (0, 255, 0))
+            screen_pos = self.camera.world_to_screen(
+                tx * config.GRID_SIZE, ty * config.GRID_SIZE
+            )
+            self.screen.blit(ch, screen_pos)
             prev_x, prev_y = tx, ty
 
         tx, ty = tiles[-1]
         final_char = "X"
-        ch = self.font.render(final_char, True, (255, 0, 0))
-        self.screen.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+        ch = font.render(final_char, True, (255, 0, 0))
+        screen_pos = self.camera.world_to_screen(
+            tx * config.GRID_SIZE, ty * config.GRID_SIZE
+        )
+        self.screen.blit(ch, screen_pos)
 
     @staticmethod
     def _direct_line(

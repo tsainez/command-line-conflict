@@ -46,22 +46,27 @@ class FogOfWar:
                     if dist_sq <= vision_radius**2:
                         self.grid[y][x] = self.VISIBLE
 
-    def draw(self, screen: pygame.Surface) -> None:
+    def draw(self, screen: pygame.Surface, camera) -> None:
         """
         Draw the fog of war onto the screen.
         """
         self.surface.fill((0, 0, 0, 0))  # Clear the surface with transparency
+        zoomed_grid_size = int(config.GRID_SIZE * camera.zoom)
+        if zoomed_grid_size == 0:
+            return
+
         for y in range(self.height):
             for x in range(self.width):
                 rect = (
-                    x * config.GRID_SIZE,
-                    y * config.GRID_SIZE,
-                    config.GRID_SIZE,
-                    config.GRID_SIZE,
+                    x * zoomed_grid_size,
+                    y * zoomed_grid_size,
+                    zoomed_grid_size,
+                    zoomed_grid_size,
                 )
                 if self.grid[y][x] == self.HIDDEN:
                     pygame.draw.rect(self.surface, (0, 0, 0, 255), rect)
                 elif self.grid[y][x] == self.EXPLORED:
                     pygame.draw.rect(self.surface, (0, 0, 0, 180), rect)
 
-        screen.blit(self.surface, (0, 0))
+        scaled_surface = pygame.transform.scale(self.surface, (int(self.width * config.GRID_SIZE * camera.zoom), int(self.height * config.GRID_SIZE * camera.zoom)))
+        screen.blit(scaled_surface, (camera.x, camera.y))
