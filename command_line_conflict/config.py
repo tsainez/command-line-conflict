@@ -1,4 +1,11 @@
+DEBUG = False
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+SCREEN = {
+    "width": SCREEN_WIDTH,
+    "height": SCREEN_HEIGHT,
+}
+
 GRID_SIZE = 20
 FPS = 60
