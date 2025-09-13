@@ -27,7 +27,6 @@ class UISystem:
             "5: Observer",
             "6: Immortal",
             "W: Wall",
-            "Q: Quit",
         ]
 
     def draw(self, game_state: GameState) -> None:
@@ -113,8 +112,8 @@ class UISystem:
             text = self.small_font.render(health_text, True, (255, 255, 255))
             text_rect = text.get_rect(
                 center=(
-                    position.x * config.GRID_SIZE + config.GRID_SIZE / 2,
-                    position.y * config.GRID_SIZE - 5,
+                    int(position.x) * config.GRID_SIZE + config.GRID_SIZE / 2,
+                    int(position.y) * config.GRID_SIZE - 5,
                 )
             )
             self.screen.blit(text, text_rect)

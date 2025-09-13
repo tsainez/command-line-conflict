@@ -17,7 +17,7 @@ class RenderingSystem:
         self.screen = screen
         self.font = font
 
-    def draw(self, game_state: GameState) -> None:
+    def draw(self, game_state: GameState, paused: bool) -> None:
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
@@ -26,6 +26,8 @@ class RenderingSystem:
                 dead = components.get(Dead)
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
+                elif paused:
+                    color = (128, 128, 128)  # Grey for paused units
                 else:
                     color = (255, 255, 255)
                     selectable = components.get(Selectable)
