@@ -20,7 +20,7 @@ def test_chassis_pathfinding_around_wall(game_state):
     game_state.map.add_wall(7, 7)
 
     # Create a chassis unit and set its target
-    chassis_id = factories.create_chassis(game_state, 1, 7)
+    chassis_id = factories.create_chassis(game_state, 1, 7, player_id=1)
     chassis_movable = game_state.get_component(chassis_id, Movable)
     chassis_movable.target_x = 18
     chassis_movable.target_y = 7
@@ -44,7 +44,7 @@ def test_arachnotron_pathfinding_over_wall(game_state):
     game_state.map.add_wall(7, 7)
 
     # Create an arachnotron unit and set its target
-    arachnotron_id = factories.create_arachnotron(game_state, 1, 7)
+    arachnotron_id = factories.create_arachnotron(game_state, 1, 7, player_id=1)
     arachnotron_movable = game_state.get_component(arachnotron_id, Movable)
     arachnotron_movable.target_x = 18
     arachnotron_movable.target_y = 7
@@ -63,8 +63,8 @@ def test_unit_takes_damage_in_combat(game_state):
     Tests that a unit takes damage when it is attacked.
     """
     # Create an attacker and a defender
-    attacker_id = factories.create_chassis(game_state, 1, 7)
-    defender_id = factories.create_chassis(game_state, 2, 7)
+    attacker_id = factories.create_chassis(game_state, 1, 7, player_id=1)
+    defender_id = factories.create_chassis(game_state, 2, 7, player_id=2)
 
     # Get the defender's health
     defender_health = game_state.get_component(defender_id, Health)

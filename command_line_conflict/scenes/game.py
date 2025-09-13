@@ -22,6 +22,7 @@ class GameScene:
         self.font = game.font
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
+        self.player_id = 1
 
         # Initialize systems
         self.movement_system = MovementSystem()
@@ -76,17 +77,19 @@ class GameScene:
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
             if event.key == pygame.K_1:
-                factories.create_extractor(self.game_state, gx, gy)
+                factories.create_extractor(self.game_state, gx, gy, self.player_id)
             elif event.key == pygame.K_2:
-                factories.create_chassis(self.game_state, gx, gy)
+                factories.create_chassis(self.game_state, gx, gy, self.player_id)
             elif event.key == pygame.K_3:
-                factories.create_rover(self.game_state, gx, gy)
+                factories.create_rover(self.game_state, gx, gy, self.player_id)
             elif event.key == pygame.K_4:
-                factories.create_arachnotron(self.game_state, gx, gy)
+                factories.create_arachnotron(
+                    self.game_state, gx, gy, self.player_id
+                )
             elif event.key == pygame.K_5:
-                factories.create_observer(self.game_state, gx, gy)
+                factories.create_observer(self.game_state, gx, gy, self.player_id)
             elif event.key == pygame.K_6:
-                factories.create_immortal(self.game_state, gx, gy)
+                factories.create_immortal(self.game_state, gx, gy, self.player_id)
             elif event.key == pygame.K_w:
                 self.game_state.map.add_wall(gx, gy)
             elif event.key == pygame.K_q:

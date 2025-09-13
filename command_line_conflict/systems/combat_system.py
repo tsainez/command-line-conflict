@@ -4,6 +4,7 @@ from ..components.attack import Attack
 from ..components.health import Health
 from ..components.vision import Vision
 from ..components.movable import Movable
+from ..components.player import Player
 
 
 class CombatSystem:
@@ -23,12 +24,15 @@ class CombatSystem:
 
             # Find a target if we don't have one
             if not attack.attack_target:
+                player = components.get(Player)
+                if not player:
+                    continue
                 vision = components.get(Vision)
                 if vision:
                     my_pos = components.get(Position)
                     if my_pos:
-                        closest_enemy = self._find_closest_enemy(
-                            entity_id, my_pos, vision, game_state
+                        closest_enemy = self.find_closest_enemy(
+                            entity_id, player.player_id, my_pos, vision, game_state
                         )
                         if closest_enemy:
                             attack.attack_target = closest_enemy
@@ -71,14 +75,23 @@ class CombatSystem:
                         movable.target_x = target_pos.x
                         movable.target_y = target_pos.y
 
-    def _find_closest_enemy(
-        self, my_id: int, my_pos: Position, vision: Vision, game_state: GameState
+    def find_closest_enemy(
+        self,
+        my_id: int,
+        my_player_id: int,
+        my_pos: Position,
+        vision: Vision,
+        game_state: GameState,
     ) -> int | None:
         closest_enemy = None
         min_dist = float("inf")
 
         for other_id, other_components in game_state.entities.items():
             if other_id == my_id:
+                continue
+
+            other_player = other_components.get(Player)
+            if not other_player or other_player.player_id == my_player_id:
                 continue
 
             other_pos = other_components.get(Position)

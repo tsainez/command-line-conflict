@@ -5,6 +5,7 @@ from ..components.health import Health
 from ..components.vision import Vision
 from ..components.movable import Movable
 from ..components.attack import Attack
+from ..components.player import Player
 from .combat_system import CombatSystem
 
 
@@ -25,16 +26,17 @@ class FleeSystem:
             health = components.get(Health)
             vision = components.get(Vision)
             my_pos = components.get(Position)
+            player = components.get(Player)
 
-            if not health or not vision or not my_pos:
+            if not health or not vision or not my_pos or not player:
                 continue
 
             is_low_health = (
                 flee.flee_health_threshold is not None
                 and health.hp / health.max_hp <= flee.flee_health_threshold
             )
-            closest_enemy = self.combat_system._find_closest_enemy(
-                entity_id, my_pos, vision, game_state
+            closest_enemy = self.combat_system.find_closest_enemy(
+                entity_id, player.player_id, my_pos, vision, game_state
             )
             sees_enemy = closest_enemy is not None
 

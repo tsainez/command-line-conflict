@@ -7,13 +7,15 @@ from .components.attack import Attack
 from .components.vision import Vision
 from .components.flee import Flee
 from .components.selectable import Selectable
+from .components.player import Player
 
 
-def create_chassis(game_state: GameState, x: float, y: float) -> int:
+def create_chassis(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """
     Creates a new chassis entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="C"))
     game_state.add_component(entity_id, Movable(speed=2))
@@ -26,11 +28,12 @@ def create_chassis(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_rover(game_state: GameState, x: float, y: float) -> int:
+def create_rover(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """
     Creates a new rover entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="R"))
     game_state.add_component(entity_id, Movable(speed=2.5))
@@ -43,11 +46,14 @@ def create_rover(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
+def create_arachnotron(
+    game_state: GameState, x: float, y: float, player_id: int
+) -> int:
     """
     Creates a new arachnotron entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="A"))
     game_state.add_component(entity_id, Movable(speed=1.8, can_fly=True))
@@ -60,11 +66,12 @@ def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_observer(game_state: GameState, x: float, y: float) -> int:
+def create_observer(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """
     Creates a new observer entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="O"))
     game_state.add_component(entity_id, Movable(speed=4, can_fly=True))
@@ -75,11 +82,12 @@ def create_observer(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_immortal(game_state: GameState, x: float, y: float) -> int:
+def create_immortal(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """
     Creates a new immortal entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="I"))
     game_state.add_component(entity_id, Movable(speed=2))
@@ -95,11 +103,12 @@ def create_immortal(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_extractor(game_state: GameState, x: float, y: float) -> int:
+def create_extractor(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """
     Creates a new extractor entity.
     """
     entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="E"))
     game_state.add_component(entity_id, Movable(speed=1.5))
