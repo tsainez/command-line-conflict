@@ -52,7 +52,7 @@ class UISystem:
         attack = components.get(Attack)
         renderable = components.get(Renderable)
 
-        panel_x_offset = 450
+        panel_x_offset = 10
         panel_y = config.SCREEN_HEIGHT - 90
 
         if renderable:
@@ -128,7 +128,7 @@ class UISystem:
                 total_health += health.hp
                 max_health += health.max_hp
 
-        panel_x_offset = 450
+        panel_x_offset = 10
         panel_y = config.SCREEN_HEIGHT - 90
 
         count_text = f"Selected Units: {len(entity_ids)}"
@@ -149,11 +149,11 @@ class UISystem:
         self.screen.blit(overlay, panel_rect.topleft)
         pygame.draw.rect(self.screen, (255, 255, 255), panel_rect, 1)
 
-        x_offset = 10
+        x_offset = 410
         y_offset = panel_y + 10
-        column_width = 200
+        column_width = 150
         row_height = 20
-        items_per_row = 4
+        items_per_row = 2
 
         for i, option in enumerate(self.key_options):
             col = i % items_per_row
