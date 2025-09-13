@@ -2,7 +2,15 @@ import pygame
 
 
 class MenuScene:
+    """Manages the main menu scene, allowing navigation to other scenes."""
+
     def __init__(self, game):
+        """Initializes the MenuScene.
+
+        Args:
+            game: The main game object, providing access to the screen, font,
+                  and scene manager.
+        """
         self.game = game
         self.font = game.font
         self.menu_options = ["New Game", "Options", "Quit"]
@@ -11,6 +19,11 @@ class MenuScene:
         self.option_font = pygame.font.Font(None, 50)
 
     def handle_event(self, event):
+        """Handles user input for menu navigation.
+
+        Args:
+            event: The pygame event to handle.
+        """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 self.selected_option = (self.selected_option - 1) % len(
@@ -29,9 +42,19 @@ class MenuScene:
                     self.game.running = False
 
     def update(self, dt):
+        """Updates the menu scene. This scene has no dynamic elements.
+
+        Args:
+            dt: The time elapsed since the last frame.
+        """
         pass
 
     def draw(self, screen):
+        """Draws the menu options and title to the screen.
+
+        Args:
+            screen: The pygame screen surface to draw on.
+        """
         screen.fill((0, 0, 0))
 
         title_text = self.title_font.render(
