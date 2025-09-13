@@ -31,10 +31,9 @@ class UISystem:
             "5: Observer",
             "6: Immortal",
             "W: Wall",
-            "Q: Quit",
         ]
 
-    def draw(self, game_state: GameState) -> None:
+    def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
@@ -46,6 +45,9 @@ class UISystem:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:
             self._draw_multi_unit_info(game_state, selected_entities)
+
+        if paused:
+            self._draw_paused_message()
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         """Gets a list of all currently selected entity IDs.
@@ -75,7 +77,7 @@ class UISystem:
         attack = components.get(Attack)
         renderable = components.get(Renderable)
 
-        panel_x_offset = 450
+        panel_x_offset = 10
         panel_y = config.SCREEN_HEIGHT - 90
 
         if renderable:
@@ -157,8 +159,8 @@ class UISystem:
             text = self.small_font.render(health_text, True, (255, 255, 255))
             text_rect = text.get_rect(
                 center=(
-                    position.x * config.GRID_SIZE + config.GRID_SIZE / 2,
-                    position.y * config.GRID_SIZE - 5,
+                    int(position.x) * config.GRID_SIZE + config.GRID_SIZE / 2,
+                    int(position.y) * config.GRID_SIZE - 5,
                 )
             )
             self.screen.blit(text, text_rect)
@@ -180,7 +182,7 @@ class UISystem:
                 total_health += health.hp
                 max_health += health.max_hp
 
-        panel_x_offset = 450
+        panel_x_offset = 10
         panel_y = config.SCREEN_HEIGHT - 90
 
         count_text = f"Selected Units: {len(entity_ids)}"
@@ -202,11 +204,11 @@ class UISystem:
         self.screen.blit(overlay, panel_rect.topleft)
         pygame.draw.rect(self.screen, (255, 255, 255), panel_rect, 1)
 
-        x_offset = 10
+        x_offset = 410
         y_offset = panel_y + 10
-        column_width = 200
+        column_width = 150
         row_height = 20
-        items_per_row = 4
+        items_per_row = 2
 
         for i, option in enumerate(self.key_options):
             col = i % items_per_row
@@ -217,3 +219,11 @@ class UISystem:
 
             text = self.font.render(option, True, (255, 255, 255))
             self.screen.blit(text, (x_pos, y_pos))
+
+    def _draw_paused_message(self) -> None:
+        font = pygame.font.Font(None, 74)
+        text = font.render("Paused", True, (255, 255, 255))
+        text_rect = text.get_rect(
+            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
+        )
+        self.screen.blit(text, text_rect)

@@ -30,6 +30,7 @@ class GameScene:
         self.font = game.font
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
+        self.paused = False
 
         # Initialize systems
         self.movement_system = MovementSystem()
@@ -105,8 +106,8 @@ class GameScene:
                 factories.create_immortal(self.game_state, gx, gy)
             elif event.key == pygame.K_w:
                 self.game_state.map.add_wall(gx, gy)
-            elif event.key == pygame.K_q:
-                self.game.running = False
+            elif event.key == pygame.K_p:
+                self.paused = not self.paused
             elif event.key == pygame.K_ESCAPE:
                 self.game.scene_manager.switch_to("menu")
 
@@ -116,6 +117,8 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        if self.paused:
+            return
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
@@ -138,8 +141,8 @@ class GameScene:
             pygame.draw.line(screen, (40, 40, 40), (0, y), (config.SCREEN["width"], y))
 
         self.game_state.map.draw(screen, self.font)
-        self.rendering_system.draw(self.game_state)
-        self.ui_system.draw(self.game_state)
+        self.rendering_system.draw(self.game_state, self.paused)
+        self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units
         if self.selection_start:
