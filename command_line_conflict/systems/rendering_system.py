@@ -8,18 +8,22 @@ from ..components.dead import Dead
 from .. import config
 
 
+from ..camera import Camera
+
 class RenderingSystem:
     """Handles rendering all entities and UI elements to the screen."""
 
-    def __init__(self, screen, font):
+    def __init__(self, screen, font, camera: Camera):
         """Initializes the RenderingSystem.
 
         Args:
             screen: The pygame screen surface to draw on.
             font: The pygame font to use for rendering text.
+            camera: The camera object controlling view and zoom.
         """
         self.screen = screen
         self.font = font
+        self.camera = camera
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
@@ -37,6 +41,10 @@ class RenderingSystem:
 
             if position and renderable:
                 dead = components.get(Dead)
+                # Camera transform
+                cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                grid_size = int(config.GRID_SIZE * self.camera.zoom)
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
                 elif paused:
@@ -49,20 +57,22 @@ class RenderingSystem:
                         shadow_ch = self.font.render(
                             renderable.icon, True, (128, 128, 128)
                         )
+                        shadow_ch = pygame.transform.scale(shadow_ch, (grid_size, grid_size))
                         self.screen.blit(
                             shadow_ch,
                             (
-                                int(position.x) * config.GRID_SIZE + 2,
-                                int(position.y) * config.GRID_SIZE + 2,
+                                cam_x + 2,
+                                cam_y + 2,
                             ),
                         )
 
                 ch = self.font.render(renderable.icon, True, color)
+                ch = pygame.transform.scale(ch, (grid_size, grid_size))
                 self.screen.blit(
                     ch,
                     (
-                        int(position.x) * config.GRID_SIZE,
-                        int(position.y) * config.GRID_SIZE,
+                        cam_x,
+                        cam_y,
                     ),
                 )
 

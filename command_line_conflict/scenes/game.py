@@ -10,6 +10,7 @@ from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
+from command_line_conflict.camera import Camera
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
@@ -32,15 +33,18 @@ class GameScene:
         self.selection_start = None
         self.paused = False
 
-        # Initialize systems
-        self.movement_system = MovementSystem()
-        self.rendering_system = RenderingSystem(self.game.screen, self.font)
-        self.combat_system = CombatSystem()
-        self.flee_system = FleeSystem()
-        self.health_system = HealthSystem()
-        self.selection_system = SelectionSystem()
-        self.ui_system = UISystem(self.game.screen, self.font)
-        self.corpse_removal_system = CorpseRemovalSystem()
+    # Camera
+    self.camera = Camera()
+
+    # Initialize systems
+    self.movement_system = MovementSystem()
+    self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
+    self.combat_system = CombatSystem()
+    self.flee_system = FleeSystem()
+    self.health_system = HealthSystem()
+    self.selection_system = SelectionSystem()
+    self.ui_system = UISystem(self.game.screen, self.font)
+    self.corpse_removal_system = CorpseRemovalSystem()
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -110,6 +114,21 @@ class GameScene:
                 self.paused = not self.paused
             elif event.key == pygame.K_ESCAPE:
                 self.game.scene_manager.switch_to("menu")
+            # Camera movement (arrow keys or WASD)
+            elif event.key in (pygame.K_LEFT, pygame.K_a):
+                self.camera.move(-1, 0)
+            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                self.camera.move(1, 0)
+            elif event.key in (pygame.K_UP, pygame.K_w):
+                self.camera.move(0, -1)
+            elif event.key in (pygame.K_DOWN, pygame.K_s):
+                self.camera.move(0, 1)
+        # Camera zoom (mouse wheel)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 4:  # Scroll up
+                self.camera.zoom_in(0.1)
+            elif event.button == 5:  # Scroll down
+                self.camera.zoom_out(0.1)
 
     def update(self, dt):
         """Updates the state of all game systems.
@@ -135,12 +154,19 @@ class GameScene:
         """
         screen.fill((0, 0, 0))
 
-        for x in range(0, config.SCREEN["width"], config.GRID_SIZE):
-            pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, config.SCREEN["height"]))
-        for y in range(0, config.SCREEN["height"], config.GRID_SIZE):
-            pygame.draw.line(screen, (40, 40, 40), (0, y), (config.SCREEN["width"], y))
+        # Draw grid lines with camera and zoom
+        grid_size = int(config.GRID_SIZE * self.camera.zoom)
+        width = config.SCREEN["width"]
+        height = config.SCREEN["height"]
+        # Offset for camera
+        cam_x = self.camera.x
+        cam_y = self.camera.y
+        for x in range(0, width, grid_size):
+            pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, height))
+        for y in range(0, height, grid_size):
+            pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
-        self.game_state.map.draw(screen, self.font)
+        self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
         self.ui_system.draw(self.game_state, self.paused)
 

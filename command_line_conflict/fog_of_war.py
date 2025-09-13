@@ -56,8 +56,8 @@ class FogOfWar:
                     if dist_sq <= vision_radius**2:
                         self.grid[y][x] = self.VISIBLE
 
-    def draw(self, screen: pygame.Surface) -> None:
-        """Draws the fog of war overlay onto the screen.
+    def draw(self, screen: pygame.Surface, camera=None) -> None:
+        """Draws the fog of war overlay onto the screen, using camera if provided.
 
         Hidden tiles are drawn as black, and explored tiles are drawn as a
         semi-transparent black. Visible tiles are not drawn, allowing the
@@ -65,15 +65,23 @@ class FogOfWar:
 
         Args:
             screen: The pygame screen surface to draw on.
+            camera: The camera object for view/zoom (optional).
         """
         self.surface.fill((0, 0, 0, 0))  # Clear the surface with transparency
+        grid_size = config.GRID_SIZE
         for y in range(self.height):
             for x in range(self.width):
+                draw_x, draw_y = x, y
+                size = grid_size
+                if camera:
+                    draw_x = (x - camera.x) * grid_size * camera.zoom
+                    draw_y = (y - camera.y) * grid_size * camera.zoom
+                    size = int(grid_size * camera.zoom)
                 rect = (
-                    x * config.GRID_SIZE,
-                    y * config.GRID_SIZE,
-                    config.GRID_SIZE,
-                    config.GRID_SIZE,
+                    draw_x,
+                    draw_y,
+                    size,
+                    size,
                 )
                 if self.grid[y][x] == self.HIDDEN:
                     pygame.draw.rect(self.surface, (0, 0, 0, 255), rect)
