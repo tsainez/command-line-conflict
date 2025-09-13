@@ -9,15 +9,28 @@ from .. import config
 
 
 class RenderingSystem:
-    """
-    This system is responsible for rendering entities on the screen.
-    """
+    """Handles rendering all entities and UI elements to the screen."""
 
     def __init__(self, screen, font):
+        """Initializes the RenderingSystem.
+
+        Args:
+            screen: The pygame screen surface to draw on.
+            font: The pygame font to use for rendering text.
+        """
         self.screen = screen
         self.font = font
 
     def draw(self, game_state: GameState) -> None:
+        """Draws all renderable entities to the screen.
+
+        This method iterates through all entities, drawing them based on their
+        position and state (e.g., selected, dead). It also calls other
+        methods to draw additional UI elements like movement orders.
+
+        Args:
+            game_state: The current state of the game.
+        """
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
@@ -56,6 +69,11 @@ class RenderingSystem:
                     self.draw_orders(components)
 
     def draw_orders(self, components) -> None:
+        """Draws the movement path and target for a selected entity.
+
+        Args:
+            components: The component dictionary for the entity.
+        """
         movable = components.get(Movable)
         if not movable:
             return

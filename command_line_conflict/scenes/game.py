@@ -17,7 +17,15 @@ from command_line_conflict.components.selectable import Selectable
 
 
 class GameScene:
+    """Manages the main gameplay scene, including entities, systems, and events."""
+
     def __init__(self, game):
+        """Initializes the GameScene.
+
+        Args:
+            game: The main game object, providing access to the screen, font,
+                  and scene manager.
+        """
         self.game = game
         self.font = game.font
         self.game_state = GameState(SimpleMap())
@@ -34,6 +42,14 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
 
     def handle_event(self, event):
+        """Handles user input and other events for the game scene.
+
+        This includes mouse clicks for selection and movement, as well as
+        keyboard shortcuts for creating units and quitting the game.
+
+        Args:
+            event: The pygame event to handle.
+        """
         log.debug(f"Handling event: {event}")
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
@@ -95,6 +111,11 @@ class GameScene:
                 self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
+        """Updates the state of all game systems.
+
+        Args:
+            dt: The time elapsed since the last frame.
+        """
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
@@ -102,6 +123,13 @@ class GameScene:
         self.corpse_removal_system.update(self.game_state, dt)
 
     def draw(self, screen):
+        """Draws the entire game scene.
+
+        This includes the background grid, the map, all entities, and the UI.
+
+        Args:
+            screen: The pygame screen surface to draw on.
+        """
         screen.fill((0, 0, 0))
 
         for x in range(0, config.SCREEN["width"], config.GRID_SIZE):

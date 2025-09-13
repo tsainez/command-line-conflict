@@ -7,11 +7,18 @@ from ..components.movable import Movable
 
 
 class CombatSystem:
-    """
-    This system is responsible for handling combat between entities.
-    """
+    """Handles combat interactions between entities."""
 
     def update(self, game_state: GameState, dt: float) -> None:
+        """Processes combat logic for all entities.
+
+        This method iterates through all entities with an Attack component,
+        manages attack cooldowns, finds targets, and executes attacks.
+
+        Args:
+            game_state: The current state of the game.
+            dt: The time elapsed since the last frame.
+        """
         for entity_id, components in game_state.entities.items():
             attack = components.get(Attack)
             if not attack:
@@ -74,6 +81,17 @@ class CombatSystem:
     def _find_closest_enemy(
         self, my_id: int, my_pos: Position, vision: Vision, game_state: GameState
     ) -> int | None:
+        """Finds the closest enemy entity within the vision range.
+
+        Args:
+            my_id: The ID of the entity searching for an enemy.
+            my_pos: The Position component of the searching entity.
+            vision: The Vision component of the searching entity.
+            game_state: The current state of the game.
+
+        Returns:
+            The entity ID of the closest enemy, or None if no enemy is found.
+        """
         closest_enemy = None
         min_dist = float("inf")
 

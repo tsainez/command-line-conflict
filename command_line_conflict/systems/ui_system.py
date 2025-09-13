@@ -11,11 +11,15 @@ from command_line_conflict.components.renderable import Renderable
 
 
 class UISystem:
-    """
-    This system is responsible for rendering the UI.
-    """
+    """Handles rendering the user interface, including unit info and key options."""
 
     def __init__(self, screen, font):
+        """Initializes the UISystem.
+
+        Args:
+            screen: The pygame screen surface to draw on.
+            font: The main pygame font to use for rendering text.
+        """
         self.screen = screen
         self.font = font
         self.small_font = pygame.font.Font(None, 18)
@@ -31,6 +35,11 @@ class UISystem:
         ]
 
     def draw(self, game_state: GameState) -> None:
+        """Draws the main UI, including selected unit info and key options.
+
+        Args:
+            game_state: The current state of the game.
+        """
         self._draw_key_options()
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
@@ -39,6 +48,14 @@ class UISystem:
             self._draw_multi_unit_info(game_state, selected_entities)
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
+        """Gets a list of all currently selected entity IDs.
+
+        Args:
+            game_state: The current state of the game.
+
+        Returns:
+            A list of entity IDs for all selected entities.
+        """
         selected_entities = []
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
@@ -47,6 +64,12 @@ class UISystem:
         return selected_entities
 
     def _draw_single_unit_info(self, game_state: GameState, entity_id: int) -> None:
+        """Draws the detailed information panel for a single selected unit.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the selected entity.
+        """
         components = game_state.entities[entity_id]
         health = components.get(Health)
         attack = components.get(Attack)
@@ -75,6 +98,12 @@ class UISystem:
         self._draw_unit_health_text(game_state, entity_id)
 
     def _draw_attack_range(self, game_state: GameState, entity_id: int) -> None:
+        """Draws a circle indicating the attack range of a unit.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the entity.
+        """
         components = game_state.entities[entity_id]
         position = components.get(Position)
         attack = components.get(Attack)
@@ -89,6 +118,15 @@ class UISystem:
     def _draw_dotted_circle(
         self, surface, color, center, radius, dash_length
     ) -> None:
+        """Draws a dotted circle on a surface.
+
+        Args:
+            surface: The pygame surface to draw on.
+            color: The color of the circle.
+            center: The (x, y) coordinates of the circle's center.
+            radius: The radius of the circle.
+            dash_length: The length of each dash in the circle.
+        """
         num_dashes = 30
         for i in range(num_dashes):
             angle = 2 * math.pi * i / num_dashes
@@ -105,6 +143,12 @@ class UISystem:
             pygame.draw.line(surface, color, start_pos, end_pos, 1)
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
+        """Draws the current health of a unit above its icon.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the entity.
+        """
         components = game_state.entities[entity_id]
         position = components.get(Position)
         health = components.get(Health)
@@ -120,6 +164,14 @@ class UISystem:
             self.screen.blit(text, text_rect)
 
     def _draw_multi_unit_info(self, game_state: GameState, entity_ids: list[int]) -> None:
+        """Draws the information panel for multiple selected units.
+
+        This shows the total number of units and their combined health.
+
+        Args:
+            game_state: The current state of the game.
+            entity_ids: A list of IDs for the selected entities.
+        """
         total_health = 0
         max_health = 0
         for entity_id in entity_ids:
@@ -141,6 +193,7 @@ class UISystem:
         self.screen.blit(text, (panel_x_offset, panel_y))
 
     def _draw_key_options(self) -> None:
+        """Draws the panel at the bottom of the screen showing key bindings."""
         panel_height = 100
         panel_y = config.SCREEN_HEIGHT - panel_height
         panel_rect = pygame.Rect(0, panel_y, config.SCREEN_WIDTH, panel_height)

@@ -4,11 +4,17 @@ from ..components.movable import Movable
 
 
 class MovementSystem:
-    """
-    This system is responsible for moving entities that have a position and are movable.
-    """
+    """Handles the movement of entities."""
 
     def set_target(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
+        """Sets a new movement target for an entity and calculates the path.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the entity to move.
+            x: The target x-coordinate.
+            y: The target y-coordinate.
+        """
         movable = game_state.get_component(entity_id, Movable)
         position = game_state.get_component(entity_id, Position)
         if not movable or not position:
@@ -23,6 +29,15 @@ class MovementSystem:
         )
 
     def update(self, game_state: GameState, dt: float) -> None:
+        """Processes entity movement based on their current path or target.
+
+        This method moves entities along their calculated path or directly
+        towards their target if no path is set.
+
+        Args:
+            game_state: The current state of the game.
+            dt: The time elapsed since the last frame.
+        """
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             movable = components.get(Movable)

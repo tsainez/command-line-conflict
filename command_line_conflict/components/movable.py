@@ -5,6 +5,12 @@ class Movable(Component):
     """A component that allows an entity to move."""
 
     def __init__(self, speed: float, can_fly: bool = False):
+        """Initializes the Movable component.
+
+        Args:
+            speed: The speed at which the entity moves.
+            can_fly: Whether the entity can fly over obstacles.
+        """
         self.speed = speed
         self.target_x: float | None = None
         self.target_y: float | None = None

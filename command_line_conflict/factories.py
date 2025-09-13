@@ -1,3 +1,4 @@
+"""A collection of factory functions for creating game entities."""
 from .game_state import GameState
 from .components.position import Position
 from .components.renderable import Renderable
@@ -10,8 +11,15 @@ from .components.selectable import Selectable
 
 
 def create_chassis(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new chassis entity.
+    """Creates a new chassis unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -27,8 +35,15 @@ def create_chassis(game_state: GameState, x: float, y: float) -> int:
 
 
 def create_rover(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new rover entity.
+    """Creates a new rover unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -44,8 +59,15 @@ def create_rover(game_state: GameState, x: float, y: float) -> int:
 
 
 def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new arachnotron entity.
+    """Creates a new arachnotron unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -61,8 +83,15 @@ def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
 
 
 def create_observer(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new observer entity.
+    """Creates a new observer unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -76,8 +105,15 @@ def create_observer(game_state: GameState, x: float, y: float) -> int:
 
 
 def create_immortal(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new immortal entity.
+    """Creates a new immortal unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -96,8 +132,15 @@ def create_immortal(game_state: GameState, x: float, y: float) -> int:
 
 
 def create_extractor(game_state: GameState, x: float, y: float) -> int:
-    """
-    Creates a new extractor entity.
+    """Creates a new extractor unit.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+
+    Returns:
+        The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))

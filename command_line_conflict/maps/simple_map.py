@@ -2,7 +2,8 @@ from .base import Map
 
 
 class SimpleMap(Map):
-    """Default map that is initially empty."""
+    """A simple, empty map with no walls."""
 
     def __init__(self) -> None:
+        """Initializes the SimpleMap."""
         super().__init__()

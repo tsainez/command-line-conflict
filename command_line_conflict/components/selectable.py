@@ -7,4 +7,5 @@ class Selectable(Component):
     """
 
     def __init__(self):
+        """Initializes the Selectable component."""
         self.is_selected = False
