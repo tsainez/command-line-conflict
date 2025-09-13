@@ -29,13 +29,16 @@ class UISystem:
             "W: Wall",
         ]
 
-    def draw(self, game_state: GameState) -> None:
+    def draw(self, game_state: GameState, paused: bool) -> None:
         self._draw_key_options()
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:
             self._draw_multi_unit_info(game_state, selected_entities)
+
+        if paused:
+            self._draw_paused_message()
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         selected_entities = []
@@ -163,3 +166,11 @@ class UISystem:
 
             text = self.font.render(option, True, (255, 255, 255))
             self.screen.blit(text, (x_pos, y_pos))
+
+    def _draw_paused_message(self) -> None:
+        font = pygame.font.Font(None, 74)
+        text = font.render("Paused", True, (255, 255, 255))
+        text_rect = text.get_rect(
+            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
+        )
+        self.screen.blit(text, text_rect)

@@ -114,7 +114,7 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font)
         self.rendering_system.draw(self.game_state, self.paused)
-        self.ui_system.draw(self.game_state)
+        self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units
         if self.selection_start:
