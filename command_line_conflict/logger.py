@@ -1,3 +1,4 @@
+"""This module sets up the global logger for the application."""
 import logging
 import os
 import sys

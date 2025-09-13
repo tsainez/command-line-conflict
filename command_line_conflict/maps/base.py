@@ -7,17 +7,44 @@ from .. import config
 
 
 class Map:
-    """Container for units present in a level."""
+    """Represents the game map, including walls and pathfinding.
+
+    Attributes:
+        width: The width of the map in grid cells.
+        height: The height of the map in grid cells.
+        walls: A set of (x, y) tuples representing wall locations.
+    """
 
     def __init__(self, width: int = 40, height: int = 30) -> None:
+        """Initializes the map.
+
+        Args:
+            width: The width of the map.
+            height: The height of the map.
+        """
         self.width = width
         self.height = height
         self.walls: set[Tuple[int, int]] = set()
 
     def add_wall(self, x: int, y: int) -> None:
+        """Adds a wall at the specified coordinates.
+
+        Args:
+            x: The x-coordinate of the wall.
+            y: The y-coordinate of the wall.
+        """
         self.walls.add((x, y))
 
     def is_blocked(self, x: int, y: int) -> bool:
+        """Checks if a tile is blocked by a wall.
+
+        Args:
+            x: The x-coordinate to check.
+            y: The y-coordinate to check.
+
+        Returns:
+            True if the tile is blocked, False otherwise.
+        """
         return (x, y) in self.walls
 
     def find_path(
@@ -27,7 +54,21 @@ class Map:
         can_fly: bool = False,
         extra_obstacles: set[Tuple[int, int]] | None = None,
     ) -> List[Tuple[int, int]]:
-        """A* pathfinding that can account for dynamic obstacles."""
+        """Finds a path between two points using A* algorithm.
+
+        This method can account for flying units and dynamic obstacles.
+
+        Args:
+            start: The starting (x, y) coordinates.
+            goal: The destination (x, y) coordinates.
+            can_fly: If True, the path ignores walls.
+            extra_obstacles: A set of additional (x, y) coordinates to treat
+                             as obstacles for this pathfinding request.
+
+        Returns:
+            A list of (x, y) tuples representing the path from start to goal.
+            Returns an empty list if no path is found.
+        """
         if not can_fly and self.is_blocked(*goal):
             return []
 
@@ -66,6 +107,12 @@ class Map:
         return []
 
     def draw(self, surf, font) -> None:
+        """Draws the map walls to a surface.
+
+        Args:
+            surf: The pygame surface to draw on.
+            font: The pygame font to use for rendering the walls.
+        """
         for x, y in self.walls:
             ch = font.render("#", True, (100, 100, 100))
             surf.blit(ch, (x * config.GRID_SIZE, y * config.GRID_SIZE))

@@ -5,9 +5,7 @@ from .. import config
 
 
 class SelectionSystem:
-    """
-    This system is responsible for selecting entities.
-    """
+    """Handles entity selection via mouse clicks and drag-to-select."""
 
     def update(
         self,
@@ -15,6 +13,18 @@ class SelectionSystem:
         selection_start: tuple[int, int] | None,
         mouse_pos: tuple[int, int],
     ) -> None:
+        """Processes a drag-to-select action.
+
+        This method is called when a selection box is being drawn. It selects
+        all selectable entities within the rectangular area defined by the
+        selection start and current mouse position.
+
+        Args:
+            game_state: The current state of the game.
+            selection_start: The (x, y) pixel coordinates where the selection
+                             drag started. If None, no action is taken.
+            mouse_pos: The current (x, y) pixel coordinates of the mouse.
+        """
         if not selection_start:
             return
 
@@ -42,6 +52,17 @@ class SelectionSystem:
     def handle_click_selection(
         self, game_state: GameState, mouse_pos: tuple[int, int], shift_pressed: bool
     ) -> None:
+        """Handles entity selection from a single mouse click.
+
+        This method updates the selection based on a click. It can select a
+        single unit, add/remove a unit from the selection (with shift), or
+        deselect all units if the click is on an empty tile.
+
+        Args:
+            game_state: The current state of the game.
+            mouse_pos: The (x, y) pixel coordinates of the mouse click.
+            shift_pressed: True if the shift key was held during the click.
+        """
         gx = mouse_pos[0] // config.GRID_SIZE
         gy = mouse_pos[1] // config.GRID_SIZE
 

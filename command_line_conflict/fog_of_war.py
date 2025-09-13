@@ -3,15 +3,19 @@ from . import config
 
 
 class FogOfWar:
-    """
-    Manages the fog of war overlay for the game map.
-    """
+    """Manages the fog of war overlay, revealing the map based on unit vision."""
 
     HIDDEN = 0
     EXPLORED = 1
     VISIBLE = 2
 
     def __init__(self, width: int, height: int):
+        """Initializes the FogOfWar system.
+
+        Args:
+            width: The width of the map in grid cells.
+            height: The height of the map in grid cells.
+        """
         self.width = width
         self.height = height
         self.grid = [[self.HIDDEN for _ in range(width)] for _ in range(height)]
@@ -21,8 +25,14 @@ class FogOfWar:
         )
 
     def update(self, units: list) -> None:
-        """
-        Update the fog of war based on unit positions and vision ranges.
+        """Updates the fog of war based on unit positions and vision.
+
+        First, it downgrades all currently visible tiles to explored. Then, it
+        marks the tiles within each unit's vision range as visible.
+
+        Args:
+            units: A list of unit objects that have vision. Each unit must have
+                   x, y, and vision_range attributes.
         """
         # Step 1: Downgrade all VISIBLE tiles to EXPLORED
         for y in range(self.height):
@@ -47,8 +57,14 @@ class FogOfWar:
                         self.grid[y][x] = self.VISIBLE
 
     def draw(self, screen: pygame.Surface) -> None:
-        """
-        Draw the fog of war onto the screen.
+        """Draws the fog of war overlay onto the screen.
+
+        Hidden tiles are drawn as black, and explored tiles are drawn as a
+        semi-transparent black. Visible tiles are not drawn, allowing the
+        underlying map to be seen.
+
+        Args:
+            screen: The pygame screen surface to draw on.
         """
         self.surface.fill((0, 0, 0, 0))  # Clear the surface with transparency
         for y in range(self.height):

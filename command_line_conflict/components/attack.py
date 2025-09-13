@@ -7,6 +7,13 @@ class Attack(Component):
     """
 
     def __init__(self, attack_damage: int, attack_range: int, attack_speed: float):
+        """Initializes the Attack component.
+
+        Args:
+            attack_damage: The amount of damage the entity can inflict.
+            attack_range: The maximum distance from which the entity can attack.
+            attack_speed: The time in seconds between attacks.
+        """
         self.attack_damage = attack_damage
         self.attack_range = attack_range
         self.attack_speed = attack_speed

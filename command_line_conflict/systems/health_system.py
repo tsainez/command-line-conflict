@@ -8,11 +8,19 @@ from ..components.flee import Flee
 
 
 class HealthSystem:
-    """
-    This system is responsible for handling health regeneration and unit death.
-    """
+    """Manages entity health, including regeneration and death."""
 
     def update(self, game_state: GameState, dt: float) -> None:
+        """Processes health regeneration and handles entity death.
+
+        This method iterates through all entities with a Health component.
+        It applies health regeneration and marks entities with zero or less
+        health as Dead, removing other components to prevent further actions.
+
+        Args:
+            game_state: The current state of the game.
+            dt: The time elapsed since the last frame.
+        """
         for entity_id, components in list(game_state.entities.items()):
             health = components.get(Health)
 

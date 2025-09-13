@@ -9,14 +9,23 @@ from .combat_system import CombatSystem
 
 
 class FleeSystem:
-    """
-    This system is responsible for making entities flee from enemies.
-    """
+    """Handles the logic for entities fleeing from enemies."""
 
     def __init__(self):
+        """Initializes the FleeSystem."""
         self.combat_system = CombatSystem()
 
     def update(self, game_state: GameState, dt: float) -> None:
+        """Processes the fleeing logic for all entities.
+
+        This method checks for conditions that would cause an entity to flee,
+        such as low health or the presence of enemies, and then sets a
+        fleeing destination for the entity.
+
+        Args:
+            game_state: The current state of the game.
+            dt: The time elapsed since the last frame.
+        """
         for entity_id, components in game_state.entities.items():
             flee = components.get(Flee)
             if not flee:
