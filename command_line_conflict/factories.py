@@ -8,22 +8,26 @@ from .components.attack import Attack
 from .components.vision import Vision
 from .components.flee import Flee
 from .components.selectable import Selectable
+from .components.player import Player
+from . import config
 
 
-def create_chassis(game_state: GameState, x: float, y: float) -> int:
+def create_chassis(
+    game_state: GameState, x: float, y: float, player_id: int
+) -> int:
     """Creates a new chassis unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="C"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="C", color=color))
     game_state.add_component(entity_id, Movable(speed=2))
     game_state.add_component(entity_id, Health(hp=80, max_hp=80))
     game_state.add_component(
@@ -31,23 +35,24 @@ def create_chassis(game_state: GameState, x: float, y: float) -> int:
     )
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id
 
 
-def create_rover(game_state: GameState, x: float, y: float) -> int:
+def create_rover(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """Creates a new rover unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="R"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="R", color=color))
     game_state.add_component(entity_id, Movable(speed=2.5))
     game_state.add_component(entity_id, Health(hp=60, max_hp=60))
     game_state.add_component(
@@ -55,23 +60,26 @@ def create_rover(game_state: GameState, x: float, y: float) -> int:
     )
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id
 
 
-def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
+def create_arachnotron(
+    game_state: GameState, x: float, y: float, player_id: int
+) -> int:
     """Creates a new arachnotron unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="A"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="A", color=color))
     game_state.add_component(entity_id, Movable(speed=1.8, can_fly=True))
     game_state.add_component(entity_id, Health(hp=120, max_hp=120))
     game_state.add_component(
@@ -79,45 +87,47 @@ def create_arachnotron(game_state: GameState, x: float, y: float) -> int:
     )
     game_state.add_component(entity_id, Vision(vision_range=6))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id
 
 
-def create_observer(game_state: GameState, x: float, y: float) -> int:
+def create_observer(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """Creates a new observer unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="O"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="O", color=color))
     game_state.add_component(entity_id, Movable(speed=4, can_fly=True))
     game_state.add_component(entity_id, Health(hp=40, max_hp=40))
     game_state.add_component(entity_id, Vision(vision_range=15))
     game_state.add_component(entity_id, Flee(flees_from_enemies=True))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id
 
 
-def create_immortal(game_state: GameState, x: float, y: float) -> int:
+def create_immortal(game_state: GameState, x: float, y: float, player_id: int) -> int:
     """Creates a new immortal unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="I"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="I", color=color))
     game_state.add_component(entity_id, Movable(speed=2))
     game_state.add_component(
         entity_id, Health(hp=150, max_hp=150, health_regen_rate=2.0)
@@ -128,25 +138,29 @@ def create_immortal(game_state: GameState, x: float, y: float) -> int:
     game_state.add_component(entity_id, Vision(vision_range=7))
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.2))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id
 
 
-def create_extractor(game_state: GameState, x: float, y: float) -> int:
+def create_extractor(
+    game_state: GameState, x: float, y: float, player_id: int
+) -> int:
     """Creates a new extractor unit.
-
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
-
+        player_id: The ID of the player who owns this unit.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Renderable(icon="E"))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="E", color=color))
     game_state.add_component(entity_id, Movable(speed=1.5))
     game_state.add_component(entity_id, Health(hp=50, max_hp=50))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
     return entity_id

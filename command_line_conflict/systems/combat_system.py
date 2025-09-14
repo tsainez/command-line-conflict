@@ -4,6 +4,7 @@ from ..components.attack import Attack
 from ..components.health import Health
 from ..components.vision import Vision
 from ..components.movable import Movable
+from ..components.player import Player
 
 
 class CombatSystem:
@@ -11,10 +12,8 @@ class CombatSystem:
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes combat logic for all entities.
-
         This method iterates through all entities with an Attack component,
         manages attack cooldowns, finds targets, and executes attacks.
-
         Args:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
@@ -33,9 +32,10 @@ class CombatSystem:
                 vision = components.get(Vision)
                 if vision:
                     my_pos = components.get(Position)
-                    if my_pos:
+                    my_player = components.get(Player)
+                    if my_pos and my_player:
                         closest_enemy = self._find_closest_enemy(
-                            entity_id, my_pos, vision, game_state
+                            entity_id, my_pos, my_player, vision, game_state
                         )
                         if closest_enemy:
                             attack.attack_target = closest_enemy
@@ -79,16 +79,20 @@ class CombatSystem:
                         movable.target_y = target_pos.y
 
     def _find_closest_enemy(
-        self, my_id: int, my_pos: Position, vision: Vision, game_state: GameState
+        self,
+        my_id: int,
+        my_pos: Position,
+        my_player: Player,
+        vision: Vision,
+        game_state: GameState,
     ) -> int | None:
         """Finds the closest enemy entity within the vision range.
-
         Args:
             my_id: The ID of the entity searching for an enemy.
             my_pos: The Position component of the searching entity.
+            my_player: The Player component of the searching entity.
             vision: The Vision component of the searching entity.
             game_state: The current state of the game.
-
         Returns:
             The entity ID of the closest enemy, or None if no enemy is found.
         """
@@ -97,6 +101,10 @@ class CombatSystem:
 
         for other_id, other_components in game_state.entities.items():
             if other_id == my_id:
+                continue
+
+            other_player = other_components.get(Player)
+            if not other_player or other_player.player_id == my_player.player_id:
                 continue
 
             other_pos = other_components.get(Position)

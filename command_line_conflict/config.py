@@ -17,3 +17,9 @@ SCREEN = {
 GRID_SIZE = 20
 # The target frames per second for the game.
 FPS = 60
+
+# A dictionary mapping player IDs to their colors.
+PLAYER_COLORS = {
+    1: (0, 128, 255),  # Blue
+    2: (255, 0, 0),  # Red
+}
