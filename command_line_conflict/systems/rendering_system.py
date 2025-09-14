@@ -5,17 +5,18 @@ from ..components.renderable import Renderable
 from ..components.selectable import Selectable
 from ..components.movable import Movable
 from ..components.dead import Dead
+from ..components.player import Player
 from .. import config
 
 
 from ..camera import Camera
+
 
 class RenderingSystem:
     """Handles rendering all entities and UI elements to the screen."""
 
     def __init__(self, screen, font, camera: Camera):
         """Initializes the RenderingSystem.
-
         Args:
             screen: The pygame screen surface to draw on.
             font: The pygame font to use for rendering text.
@@ -27,37 +28,42 @@ class RenderingSystem:
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
-
         This method iterates through all entities, drawing them based on their
         position and state (e.g., selected, dead). It also calls other
         methods to draw additional UI elements like movement orders.
-
         Args:
             game_state: The current state of the game.
         """
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
+            player = components.get(Player)
 
             if position and renderable:
                 dead = components.get(Dead)
                 # Camera transform
-                cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-                cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                cam_x = (
+                    int(position.x) - self.camera.x
+                ) * config.GRID_SIZE * self.camera.zoom
+                cam_y = (
+                    int(position.y) - self.camera.y
+                ) * config.GRID_SIZE * self.camera.zoom
                 grid_size = int(config.GRID_SIZE * self.camera.zoom)
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
                 elif paused:
                     color = (128, 128, 128)  # Grey for paused units
                 else:
-                    color = (255, 255, 255)
+                    color = renderable.color
                     selectable = components.get(Selectable)
                     if selectable and selectable.is_selected:
                         color = (0, 255, 0)
                         shadow_ch = self.font.render(
                             renderable.icon, True, (128, 128, 128)
                         )
-                        shadow_ch = pygame.transform.scale(shadow_ch, (grid_size, grid_size))
+                        shadow_ch = pygame.transform.scale(
+                            shadow_ch, (grid_size, grid_size)
+                        )
                         self.screen.blit(
                             shadow_ch,
                             (

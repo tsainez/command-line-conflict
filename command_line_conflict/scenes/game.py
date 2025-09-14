@@ -43,8 +43,18 @@ class GameScene:
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
-        self.ui_system = UISystem(self.game.screen, self.font)
+        self.ui_system = UISystem(self.game.screen, self.font, self.camera)
         self.corpse_removal_system = CorpseRemovalSystem()
+        self._create_initial_units()
+
+    def _create_initial_units(self):
+        """Creates the starting units for each player."""
+        # Player 1 units
+        for i in range(3):
+            factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1)
+        # Player 2 units
+        for i in range(3):
+            factories.create_chassis(self.game_state, 40 + i * 2, 40, player_id=2)
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -98,17 +108,17 @@ class GameScene:
             mx, my = pygame.mouse.get_pos()
             gx, gy = self.camera.screen_to_grid(mx, my)
             if event.key == pygame.K_1:
-                factories.create_extractor(self.game_state, gx, gy)
+                factories.create_extractor(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_2:
-                factories.create_chassis(self.game_state, gx, gy)
+                factories.create_chassis(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_3:
-                factories.create_rover(self.game_state, gx, gy)
+                factories.create_rover(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_4:
-                factories.create_arachnotron(self.game_state, gx, gy)
+                factories.create_arachnotron(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_5:
-                factories.create_observer(self.game_state, gx, gy)
+                factories.create_observer(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_6:
-                factories.create_immortal(self.game_state, gx, gy)
+                factories.create_immortal(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_w:
                 self.game_state.map.add_wall(gx, gy)
             elif event.key == pygame.K_p:
