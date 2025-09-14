@@ -8,6 +8,7 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.production import Production
 
 
 from command_line_conflict.camera import Camera
@@ -37,6 +38,7 @@ class UISystem:
             "6: Immortal",
             "W: Wall",
         ]
+        self.producible_units = ["chassis", "rover"]
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws the main UI, including selected unit info and key options.
@@ -100,6 +102,27 @@ class UISystem:
             attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
+            panel_y += 20
+
+        if renderable and renderable.icon == "E":
+            build_text = "B: Build Factory"
+            text = self.font.render(build_text, True, (255, 255, 255))
+            self.screen.blit(text, (panel_x_offset, panel_y))
+            panel_y += 20
+
+        if renderable and renderable.icon == "F":
+            production = components.get(Production)
+            if production:
+                queue_text = f"Queue: {', '.join(production.production_queue)}"
+                text = self.font.render(queue_text, True, (255, 255, 255))
+                self.screen.blit(text, (panel_x_offset, panel_y))
+                panel_y += 20
+
+                for i, unit in enumerate(self.producible_units):
+                    unit_text = f"{i+1}: {unit.capitalize()}"
+                    text = self.font.render(unit_text, True, (255, 255, 255))
+                    self.screen.blit(text, (panel_x_offset, panel_y))
+                    panel_y += 20
 
         self._draw_attack_range(game_state, entity_id)
         self._draw_unit_health_text(game_state, entity_id)

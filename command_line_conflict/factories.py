@@ -9,6 +9,7 @@ from .components.vision import Vision
 from .components.flee import Flee
 from .components.selectable import Selectable
 from .components.player import Player
+from .components.production import Production
 from . import config
 
 
@@ -36,6 +37,28 @@ def create_chassis(
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id))
+    return entity_id
+
+
+def create_factory(game_state: GameState, x: float, y: float, player_id: int) -> int:
+    """Creates a new factory building.
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the building will be created.
+        y: The y-coordinate where the building will be created.
+        player_id: The ID of the player who owns this building.
+    Returns:
+        The entity ID of the newly created building.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="F", color=color))
+    game_state.add_component(entity_id, Health(hp=200, max_hp=200))
+    game_state.add_component(entity_id, Vision(vision_range=5))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id))
+    game_state.add_component(entity_id, Production())
     return entity_id
 
 
