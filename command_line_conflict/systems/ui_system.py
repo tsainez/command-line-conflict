@@ -8,6 +8,7 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.owner import Owner
 from command_line_conflict.components.harvester import Harvester
 from command_line_conflict.components.factory import Factory
 from command_line_conflict.components.production import Production
@@ -32,6 +33,7 @@ class UISystem:
         Args:
             game_state: The current state of the game.
         """
+        self._draw_player_info(game_state)
         selected_entities = self._get_selected_entities(game_state)
         self._set_key_options(game_state, selected_entities)
         self._draw_key_options()
@@ -222,27 +224,31 @@ class UISystem:
         )
         self.screen.blit(text, text_rect)
 
+    def _draw_player_info(self, game_state: GameState) -> None:
+        """Draws the current player's information."""
+        player = game_state.players[game_state.current_player_id]
+        text = self.font.render(f"Player {player.id}", True, player.color)
+        self.screen.blit(text, (10, 10))
+        text = self.font.render(f"Resources: {player.resources}", True, (255, 255, 255))
+        self.screen.blit(text, (10, 30))
+
     def _set_key_options(self, game_state: GameState, selected_entities: list[int]) -> None:
         if len(selected_entities) == 1:
             entity_id = selected_entities[0]
-            harvester = game_state.get_component(entity_id, Harvester)
-            factory = game_state.get_component(entity_id, Factory)
-            if harvester:
-                self.key_options = ["B: Build Factory"]
-            elif factory:
-                production = game_state.get_component(entity_id, Production)
-                if production:
-                    self.key_options = [f"{i+1}: {unit}" for i, unit in enumerate(production.production_list)]
+            owner = game_state.get_component(entity_id, Owner)
+            if owner and owner.player_id == game_state.current_player_id:
+                harvester = game_state.get_component(entity_id, Harvester)
+                factory = game_state.get_component(entity_id, Factory)
+                if harvester:
+                    self.key_options = ["B: Build Factory"]
+                elif factory:
+                    production = game_state.get_component(entity_id, Production)
+                    if production:
+                        self.key_options = [f"{i+1}: {unit}" for i, unit in enumerate(production.production_list)]
+                else:
+                    self.key_options = []
             else:
-                self.key_options = [
-                    "1: Extractor",
-                    "2: Chassis",
-                    "3: Rover",
-                    "4: Arachnotron",
-                    "5: Observer",
-                    "6: Immortal",
-                    "W: Wall",
-                ]
+                self.key_options = []
         else:
             self.key_options = [
                 "1: Extractor",
