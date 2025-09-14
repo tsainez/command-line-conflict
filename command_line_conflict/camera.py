@@ -1,3 +1,6 @@
+from . import config
+
+
 class Camera:
     def __init__(self, x=0, y=0, zoom=1.0, min_zoom=0.5, max_zoom=2.0):
         self.x = x
@@ -22,3 +25,9 @@ class Camera:
 
     def set_zoom(self, zoom):
         self.zoom = max(self.min_zoom, min(self.max_zoom, zoom))
+
+    def screen_to_grid(self, screen_x: int, screen_y: int) -> tuple[int, int]:
+        """Converts screen pixel coordinates to world grid coordinates."""
+        world_grid_x = (screen_x / self.zoom) / config.GRID_SIZE + self.x
+        world_grid_y = (screen_y / self.zoom) / config.GRID_SIZE + self.y
+        return int(world_grid_x), int(world_grid_y)

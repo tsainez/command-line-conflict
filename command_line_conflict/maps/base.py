@@ -1,6 +1,7 @@
 from __future__ import annotations
 import pygame
 
+import pygame
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
 
@@ -116,12 +117,14 @@ class Map:
             camera: The camera object for view/zoom (optional).
         """
         for x, y in self.walls:
-            draw_x, draw_y = x, y
             grid_size = config.GRID_SIZE
             if camera:
                 draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
                 draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
                 grid_size = int(config.GRID_SIZE * camera.zoom)
+            else:
+                draw_x = x * grid_size
+                draw_y = y * grid_size
             ch = font.render("#", True, (100, 100, 100))
-            ch = pygame.transform.scale(ch, (grid_size, grid_size)) if camera else ch
+            ch = pygame.transform.scale(ch, (grid_size, grid_size))
             surf.blit(ch, (draw_x, draw_y))

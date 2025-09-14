@@ -79,19 +79,21 @@ class GameScene:
             if (x2 - x1) ** 2 + (y2 - y1) ** 2 < 25:
                 mods = pygame.key.get_mods()
                 shift_pressed = mods & pygame.KMOD_SHIFT
-                log.debug(f"Click selection at {event.pos}. Shift: {shift_pressed}")
+                grid_pos = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+                log.debug(f"Click selection at {grid_pos}. Shift: {shift_pressed}")
                 self.selection_system.handle_click_selection(
-                    self.game_state, event.pos, shift_pressed
+                    self.game_state, grid_pos, shift_pressed
                 )
             else:
                 log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
+                grid_start = self.camera.screen_to_grid(self.selection_start[0], self.selection_start[1])
+                grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 self.selection_system.update(
-                    self.game_state, self.selection_start, event.pos
+                    self.game_state, grid_start, grid_end
                 )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            grid_x = event.pos[0] // config.GRID_SIZE
-            grid_y = event.pos[1] // config.GRID_SIZE
+            grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
             log.debug(
                 f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
             )
@@ -104,8 +106,7 @@ class GameScene:
                     )
         elif event.type == pygame.KEYDOWN:
             mx, my = pygame.mouse.get_pos()
-            gx = mx // config.GRID_SIZE
-            gy = my // config.GRID_SIZE
+            gx, gy = self.camera.screen_to_grid(mx, my)
             if event.key == pygame.K_1:
                 factories.create_extractor(self.game_state, gx, gy, player_id=1)
             elif event.key == pygame.K_2:
@@ -186,10 +187,6 @@ class GameScene:
             x2, y2 = pygame.mouse.get_pos()
             min_x, max_x = sorted((x1, x2))
             min_y, max_y = sorted((y1, y2))
-            min_x = (min_x // config.GRID_SIZE) * config.GRID_SIZE
-            min_y = (min_y // config.GRID_SIZE) * config.GRID_SIZE
-            max_x = ((max_x // config.GRID_SIZE) + 1) * config.GRID_SIZE
-            max_y = ((max_y // config.GRID_SIZE) + 1) * config.GRID_SIZE
             rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
             overlay = pygame.Surface(rect.size, pygame.SRCALPHA)
             overlay.fill((0, 255, 0, 60))

@@ -10,8 +10,8 @@ class SelectionSystem:
     def update(
         self,
         game_state: GameState,
-        selection_start: tuple[int, int] | None,
-        mouse_pos: tuple[int, int],
+        grid_start: tuple[int, int] | None,
+        grid_end: tuple[int, int],
     ) -> None:
         """Processes a drag-to-select action.
 
@@ -21,17 +21,17 @@ class SelectionSystem:
 
         Args:
             game_state: The current state of the game.
-            selection_start: The (x, y) pixel coordinates where the selection
-                             drag started. If None, no action is taken.
-            mouse_pos: The current (x, y) pixel coordinates of the mouse.
+            grid_start: The (x, y) grid coordinates where the selection
+                        drag started. If None, no action is taken.
+            grid_end: The current (x, y) grid coordinates of the mouse.
         """
-        if not selection_start:
+        if not grid_start:
             return
 
-        x1, y1 = selection_start
-        x2, y2 = mouse_pos
-        sx, ex = sorted((x1 // config.GRID_SIZE, x2 // config.GRID_SIZE))
-        sy, ey = sorted((y1 // config.GRID_SIZE, y2 // config.GRID_SIZE))
+        x1, y1 = grid_start
+        x2, y2 = grid_end
+        sx, ex = sorted((x1, x2))
+        sy, ey = sorted((y1, y2))
 
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
@@ -50,7 +50,7 @@ class SelectionSystem:
                 selectable.is_selected = False
 
     def handle_click_selection(
-        self, game_state: GameState, mouse_pos: tuple[int, int], shift_pressed: bool
+        self, game_state: GameState, grid_pos: tuple[int, int], shift_pressed: bool
     ) -> None:
         """Handles entity selection from a single mouse click.
 
@@ -60,11 +60,10 @@ class SelectionSystem:
 
         Args:
             game_state: The current state of the game.
-            mouse_pos: The (x, y) pixel coordinates of the mouse click.
+            grid_pos: The (x, y) grid coordinates of the mouse click.
             shift_pressed: True if the shift key was held during the click.
         """
-        gx = mouse_pos[0] // config.GRID_SIZE
-        gy = mouse_pos[1] // config.GRID_SIZE
+        gx, gy = grid_pos
 
         clicked_entity_id = -1
         for entity_id, components in game_state.entities.items():
