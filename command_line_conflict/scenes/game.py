@@ -43,7 +43,7 @@ class GameScene:
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
-        self.ui_system = UISystem(self.game.screen, self.font)
+        self.ui_system = UISystem(self.game.screen, self.font, self.camera)
         self.corpse_removal_system = CorpseRemovalSystem()
         self._create_initial_units()
 
