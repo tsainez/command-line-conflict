@@ -10,18 +10,23 @@ from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 
 
+from command_line_conflict.camera import Camera
+
+
 class UISystem:
     """Handles rendering the user interface, including unit info and key options."""
 
-    def __init__(self, screen, font):
+    def __init__(self, screen, font, camera: Camera):
         """Initializes the UISystem.
 
         Args:
             screen: The pygame screen surface to draw on.
             font: The main pygame font to use for rendering text.
+            camera: The camera object for view/zoom.
         """
         self.screen = screen
         self.font = font
+        self.camera = camera
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
             "1: Extractor",
@@ -110,9 +115,15 @@ class UISystem:
         position = components.get(Position)
         attack = components.get(Attack)
         if position and attack and attack.attack_range > 0:
-            radius = attack.attack_range * config.GRID_SIZE
-            center_x = int(position.x * config.GRID_SIZE + config.GRID_SIZE / 2)
-            center_y = int(position.y * config.GRID_SIZE + config.GRID_SIZE / 2)
+            radius = attack.attack_range * config.GRID_SIZE * self.camera.zoom
+            center_x = int(
+                (position.x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                + config.GRID_SIZE * self.camera.zoom / 2
+            )
+            center_y = int(
+                (position.y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                + config.GRID_SIZE * self.camera.zoom / 2
+            )
             self._draw_dotted_circle(
                 self.screen, (255, 0, 0), (center_x, center_y), radius, 10
             )
@@ -157,12 +168,16 @@ class UISystem:
         if position and health:
             health_text = f"{int(health.hp)}"
             text = self.small_font.render(health_text, True, (255, 255, 255))
-            text_rect = text.get_rect(
-                center=(
-                    int(position.x) * config.GRID_SIZE + config.GRID_SIZE / 2,
-                    int(position.y) * config.GRID_SIZE - 5,
-                )
+            grid_size = config.GRID_SIZE * self.camera.zoom
+            center_x = (
+                (position.x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                + grid_size / 2
             )
+            center_y = (
+                (position.y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                - 5 * self.camera.zoom
+            )
+            text_rect = text.get_rect(center=(center_x, center_y))
             self.screen.blit(text, text_rect)
 
     def _draw_multi_unit_info(self, game_state: GameState, entity_ids: list[int]) -> None:
