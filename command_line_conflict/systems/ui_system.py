@@ -8,6 +8,9 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.harvester import Harvester
+from command_line_conflict.components.factory import Factory
+from command_line_conflict.components.production import Production
 
 
 class UISystem:
@@ -15,7 +18,6 @@ class UISystem:
 
     def __init__(self, screen, font):
         """Initializes the UISystem.
-
         Args:
             screen: The pygame screen surface to draw on.
             font: The main pygame font to use for rendering text.
@@ -23,24 +25,16 @@ class UISystem:
         self.screen = screen
         self.font = font
         self.small_font = pygame.font.Font(None, 18)
-        self.key_options = [
-            "1: Extractor",
-            "2: Chassis",
-            "3: Rover",
-            "4: Arachnotron",
-            "5: Observer",
-            "6: Immortal",
-            "W: Wall",
-        ]
+        self.key_options = []
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws the main UI, including selected unit info and key options.
-
         Args:
             game_state: The current state of the game.
         """
-        self._draw_key_options()
         selected_entities = self._get_selected_entities(game_state)
+        self._set_key_options(game_state, selected_entities)
+        self._draw_key_options()
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:
@@ -227,3 +221,35 @@ class UISystem:
             center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
         )
         self.screen.blit(text, text_rect)
+
+    def _set_key_options(self, game_state: GameState, selected_entities: list[int]) -> None:
+        if len(selected_entities) == 1:
+            entity_id = selected_entities[0]
+            harvester = game_state.get_component(entity_id, Harvester)
+            factory = game_state.get_component(entity_id, Factory)
+            if harvester:
+                self.key_options = ["B: Build Factory"]
+            elif factory:
+                production = game_state.get_component(entity_id, Production)
+                if production:
+                    self.key_options = [f"{i+1}: {unit}" for i, unit in enumerate(production.production_list)]
+            else:
+                self.key_options = [
+                    "1: Extractor",
+                    "2: Chassis",
+                    "3: Rover",
+                    "4: Arachnotron",
+                    "5: Observer",
+                    "6: Immortal",
+                    "W: Wall",
+                ]
+        else:
+            self.key_options = [
+                "1: Extractor",
+                "2: Chassis",
+                "3: Rover",
+                "4: Arachnotron",
+                "5: Observer",
+                "6: Immortal",
+                "W: Wall",
+            ]

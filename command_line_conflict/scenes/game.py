@@ -15,6 +15,10 @@ from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.harvester import Harvester
+from command_line_conflict.components.factory import Factory
+from command_line_conflict.components.production import Production
+from command_line_conflict.components.position import Position
 
 
 class GameScene:
@@ -33,18 +37,18 @@ class GameScene:
         self.selection_start = None
         self.paused = False
 
-    # Camera
-    self.camera = Camera()
+        # Camera
+        self.camera = Camera()
 
-    # Initialize systems
-    self.movement_system = MovementSystem()
-    self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
-    self.combat_system = CombatSystem()
-    self.flee_system = FleeSystem()
-    self.health_system = HealthSystem()
-    self.selection_system = SelectionSystem()
-    self.ui_system = UISystem(self.game.screen, self.font)
-    self.corpse_removal_system = CorpseRemovalSystem()
+        # Initialize systems
+        self.movement_system = MovementSystem()
+        self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
+        self.combat_system = CombatSystem()
+        self.flee_system = FleeSystem()
+        self.health_system = HealthSystem()
+        self.selection_system = SelectionSystem()
+        self.ui_system = UISystem(self.game.screen, self.font)
+        self.corpse_removal_system = CorpseRemovalSystem()
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -96,7 +100,23 @@ class GameScene:
             mx, my = pygame.mouse.get_pos()
             gx = mx // config.GRID_SIZE
             gy = my // config.GRID_SIZE
-            if event.key == pygame.K_1:
+            selected_entities = self.ui_system._get_selected_entities(self.game_state)
+            is_factory_selected = False
+            if len(selected_entities) == 1:
+                factory = self.game_state.get_component(selected_entities[0], Factory)
+                if factory:
+                    is_factory_selected = True
+
+            if event.key in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9] and is_factory_selected:
+                entity_id = selected_entities[0]
+                production = self.game_state.get_component(entity_id, Production)
+                pos = self.game_state.get_component(entity_id, Position)
+                unit_index = event.key - pygame.K_1
+                if unit_index < len(production.production_list):
+                    unit_to_produce = production.production_list[unit_index]
+                    if hasattr(factories, f"create_{unit_to_produce.lower()}"):
+                        getattr(factories, f"create_{unit_to_produce.lower()}")(self.game_state, pos.x + 1, pos.y)
+            elif event.key == pygame.K_1:
                 factories.create_extractor(self.game_state, gx, gy)
             elif event.key == pygame.K_2:
                 factories.create_chassis(self.game_state, gx, gy)
@@ -108,6 +128,15 @@ class GameScene:
                 factories.create_observer(self.game_state, gx, gy)
             elif event.key == pygame.K_6:
                 factories.create_immortal(self.game_state, gx, gy)
+            elif event.key == pygame.K_b:
+                for entity_id, components in self.game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        harvester = components.get(Harvester)
+                        if harvester:
+                            pos = components.get(Position)
+                            factories.create_factory(self.game_state, pos.x + 1, pos.y)
+                            break  # Build one factory at a time
             elif event.key == pygame.K_w:
                 self.game_state.map.add_wall(gx, gy)
             elif event.key == pygame.K_p:

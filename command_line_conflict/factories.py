@@ -8,6 +8,29 @@ from .components.attack import Attack
 from .components.vision import Vision
 from .components.flee import Flee
 from .components.selectable import Selectable
+from .components.factory import Factory
+from .components.production import Production
+from .components.harvester import Harvester
+
+
+def create_factory(game_state: GameState, x: float, y: float) -> int:
+    """Creates a new factory unit.
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+    Returns:
+        The entity ID of the newly created unit.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    game_state.add_component(entity_id, Renderable(icon="F"))
+    game_state.add_component(entity_id, Health(hp=200, max_hp=200))
+    game_state.add_component(entity_id, Vision(vision_range=5))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Factory())
+    game_state.add_component(entity_id, Production(production_list=["Chassis", "Rover"]))
+    return entity_id
 
 
 def create_chassis(game_state: GameState, x: float, y: float) -> int:
@@ -149,4 +172,5 @@ def create_extractor(game_state: GameState, x: float, y: float) -> int:
     game_state.add_component(entity_id, Health(hp=50, max_hp=50))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Harvester())
     return entity_id
