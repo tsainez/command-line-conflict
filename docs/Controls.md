@@ -15,3 +15,8 @@
 *   **6:** Spawn an Immortal at the mouse cursor.
 *   **W:** Place a wall at the mouse cursor.
 *   **Q:** Quit the game.
+
+## Camera
+
+*   **WASD or Arrow Keys:** Move the camera.
+*   **Mouse Wheel:** Zoom in and out.
