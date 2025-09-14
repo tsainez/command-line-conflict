@@ -114,13 +114,17 @@ class RenderingSystem:
         for tx, ty in tiles[:-1]:
             arrow = self._arrow_char(tx - prev_x, ty - prev_y)
             ch = self.font.render(arrow, True, (0, 255, 0))
-            self.screen.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+            cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+            cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+            self.screen.blit(ch, (cam_x, cam_y))
             prev_x, prev_y = tx, ty
 
         tx, ty = tiles[-1]
         final_char = "X"
         ch = self.font.render(final_char, True, (255, 0, 0))
-        self.screen.blit(ch, (tx * config.GRID_SIZE, ty * config.GRID_SIZE))
+        cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+        cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+        self.screen.blit(ch, (cam_x, cam_y))
 
     @staticmethod
     def _direct_line(

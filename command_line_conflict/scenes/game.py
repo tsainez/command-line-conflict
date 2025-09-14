@@ -33,18 +33,18 @@ class GameScene:
         self.selection_start = None
         self.paused = False
 
-    # Camera
-    self.camera = Camera()
+        # Camera
+        self.camera = Camera()
 
-    # Initialize systems
-    self.movement_system = MovementSystem()
-    self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
-    self.combat_system = CombatSystem()
-    self.flee_system = FleeSystem()
-    self.health_system = HealthSystem()
-    self.selection_system = SelectionSystem()
-    self.ui_system = UISystem(self.game.screen, self.font)
-    self.corpse_removal_system = CorpseRemovalSystem()
+        # Initialize systems
+        self.movement_system = MovementSystem()
+        self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
+        self.combat_system = CombatSystem()
+        self.flee_system = FleeSystem()
+        self.health_system = HealthSystem()
+        self.selection_system = SelectionSystem()
+        self.ui_system = UISystem(self.game.screen, self.font)
+        self.corpse_removal_system = CorpseRemovalSystem()
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
