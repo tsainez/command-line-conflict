@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from command_line_conflict import config
 from command_line_conflict import factories
@@ -14,6 +15,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
+from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.components.selectable import Selectable
 
 
@@ -46,16 +48,21 @@ class GameScene:
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
         self.corpse_removal_system = CorpseRemovalSystem()
+        self.ai_system = AISystem()
         self._create_initial_units()
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
-        # Player 1 units
+        # Player 1 units (human)
         for i in range(3):
-            factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1)
-        # Player 2 units
+            factories.create_chassis(
+                self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
+            )
+        # Player 2 units (AI)
         for i in range(3):
-            factories.create_chassis(self.game_state, 40 + i * 2, 40, player_id=2)
+            factories.create_chassis(
+                self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
+            )
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -119,17 +126,29 @@ class GameScene:
                 mx, my = pygame.mouse.get_pos()
                 gx, gy = self.camera.screen_to_grid(mx, my)
                 if event.key == pygame.K_1:
-                    factories.create_extractor(self.game_state, gx, gy, player_id=1)
+                    factories.create_extractor(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_2:
-                    factories.create_chassis(self.game_state, gx, gy, player_id=1)
+                    factories.create_chassis(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_3:
-                    factories.create_rover(self.game_state, gx, gy, player_id=1)
+                    factories.create_rover(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_4:
-                    factories.create_arachnotron(self.game_state, gx, gy, player_id=1)
+                    factories.create_arachnotron(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_5:
-                    factories.create_observer(self.game_state, gx, gy, player_id=1)
+                    factories.create_observer(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_6:
-                    factories.create_immortal(self.game_state, gx, gy, player_id=1)
+                    factories.create_immortal(
+                        self.game_state, gx, gy, player_id=1, is_human=True
+                    )
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
@@ -172,6 +191,7 @@ class GameScene:
         self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
+        self.ai_system.update(self.game_state)
         self.combat_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
@@ -188,15 +208,15 @@ class GameScene:
 
         # Draw grid lines with camera and zoom
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
-        width = config.SCREEN["width"]
-        height = config.SCREEN["height"]
-        # Offset for camera
-        cam_x = self.camera.x
-        cam_y = self.camera.y
-        for x in range(0, width, grid_size):
-            pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, height))
-        for y in range(0, height, grid_size):
-            pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
+        if grid_size > 0:
+            width, height = self.game.screen.get_size()
+            start_x = (math.floor(self.camera.x) - self.camera.x) * grid_size
+            start_y = (math.floor(self.camera.y) - self.camera.y) * grid_size
+
+            for x in range(int(start_x), width, grid_size):
+                pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, height))
+            for y in range(int(start_y), height, grid_size):
+                pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)

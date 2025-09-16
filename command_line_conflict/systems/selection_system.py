@@ -1,6 +1,7 @@
 from ..game_state import GameState
 from ..components.selectable import Selectable
 from ..components.position import Position
+from ..components.player import Player
 from .. import config
 
 
@@ -35,7 +36,8 @@ class SelectionSystem:
 
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
-            if not selectable:
+            player = components.get(Player)
+            if not selectable or not player or not player.is_human:
                 continue
 
             position = components.get(Position)
@@ -68,7 +70,14 @@ class SelectionSystem:
         clicked_entity_id = -1
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
-            if position and int(position.x) == gx and int(position.y) == gy:
+            player = components.get(Player)
+            if (
+                position
+                and int(position.x) == gx
+                and int(position.y) == gy
+                and player
+                and player.is_human
+            ):
                 if components.get(Selectable):
                     clicked_entity_id = entity_id
                     break
