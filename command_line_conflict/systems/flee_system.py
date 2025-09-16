@@ -6,7 +6,7 @@ from ..components.vision import Vision
 from ..components.movable import Movable
 from ..components.attack import Attack
 from ..components.player import Player
-from .combat_system import CombatSystem
+from ..utils.targeting import Targeting
 
 
 class FleeSystem:
@@ -14,7 +14,7 @@ class FleeSystem:
 
     def __init__(self):
         """Initializes the FleeSystem."""
-        self.combat_system = CombatSystem()
+        pass
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes the fleeing logic for all entities.
@@ -44,7 +44,7 @@ class FleeSystem:
                 flee.flee_health_threshold is not None
                 and health.hp / health.max_hp <= flee.flee_health_threshold
             )
-            closest_enemy = self.combat_system._find_closest_enemy(
+            closest_enemy = Targeting.find_closest_enemy(
                 entity_id, my_pos, my_player, vision, game_state
             )
             sees_enemy = closest_enemy is not None
