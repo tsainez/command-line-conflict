@@ -35,6 +35,7 @@ class GameScene:
 
         # Camera
         self.camera = Camera()
+        self.camera_movement = {"up": False, "down": False, "left": False, "right": False}
 
         # Initialize systems
         self.movement_system = MovementSystem()
@@ -105,41 +106,60 @@ class GameScene:
                         self.game_state, entity_id, grid_x, grid_y
                     )
         elif event.type == pygame.KEYDOWN:
-            mx, my = pygame.mouse.get_pos()
-            gx, gy = self.camera.screen_to_grid(mx, my)
-            if event.key == pygame.K_1:
-                factories.create_extractor(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_2:
-                factories.create_chassis(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_3:
-                factories.create_rover(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_4:
-                factories.create_arachnotron(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_5:
-                factories.create_observer(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_6:
-                factories.create_immortal(self.game_state, gx, gy, player_id=1)
-            elif event.key == pygame.K_w:
-                self.game_state.map.add_wall(gx, gy)
-            elif event.key == pygame.K_p:
-                self.paused = not self.paused
-            elif event.key == pygame.K_ESCAPE:
-                self.game.scene_manager.switch_to("menu")
-            # Camera movement (arrow keys or WASD)
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
-                self.camera.move(-1, 0)
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
-                self.camera.move(1, 0)
-            elif event.key in (pygame.K_UP, pygame.K_w):
-                self.camera.move(0, -1)
+            # Camera movement
+            if event.key in (pygame.K_UP, pygame.K_w):
+                self.camera_movement["up"] = True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
-                self.camera.move(0, 1)
+                self.camera_movement["down"] = True
+            elif event.key in (pygame.K_LEFT, pygame.K_a):
+                self.camera_movement["left"] = True
+            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                self.camera_movement["right"] = True
+            else:
+                mx, my = pygame.mouse.get_pos()
+                gx, gy = self.camera.screen_to_grid(mx, my)
+                if event.key == pygame.K_1:
+                    factories.create_extractor(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_2:
+                    factories.create_chassis(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_3:
+                    factories.create_rover(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_4:
+                    factories.create_arachnotron(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_5:
+                    factories.create_observer(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_6:
+                    factories.create_immortal(self.game_state, gx, gy, player_id=1)
+                elif event.key == pygame.K_p:
+                    self.paused = not self.paused
+                elif event.key == pygame.K_ESCAPE:
+                    self.game.scene_manager.switch_to("menu")
+        elif event.type == pygame.KEYUP:
+            if event.key in (pygame.K_UP, pygame.K_w):
+                self.camera_movement["up"] = False
+            elif event.key in (pygame.K_DOWN, pygame.K_s):
+                self.camera_movement["down"] = False
+            elif event.key in (pygame.K_LEFT, pygame.K_a):
+                self.camera_movement["left"] = False
+            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                self.camera_movement["right"] = False
         # Camera zoom (mouse wheel)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:  # Scroll up
                 self.camera.zoom_in(0.1)
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
+
+    def _update_camera(self, dt):
+        """Updates the camera position based on user input."""
+        if self.camera_movement["up"]:
+            self.camera.move(0, -config.CAMERA_SPEED * dt)
+        if self.camera_movement["down"]:
+            self.camera.move(0, config.CAMERA_SPEED * dt)
+        if self.camera_movement["left"]:
+            self.camera.move(-config.CAMERA_SPEED * dt, 0)
+        if self.camera_movement["right"]:
+            self.camera.move(config.CAMERA_SPEED * dt, 0)
 
     def update(self, dt):
         """Updates the state of all game systems.
@@ -149,6 +169,7 @@ class GameScene:
         """
         if self.paused:
             return
+        self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
