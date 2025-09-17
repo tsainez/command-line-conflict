@@ -47,7 +47,8 @@ def test_draw_aggregate_attack_range(mock_draw_rect, ui_system, game_state):
     ui_system.draw(game_state, paused=False)
 
     # For a radius of 5, 81 tiles should be in range.
-    assert mock_draw_rect.call_count == 81
+    # +1 for the key options panel
+    assert mock_draw_rect.call_count == 81 + 1
 
 
 @patch("pygame.draw.rect")
@@ -92,4 +93,5 @@ def test_draw_aggregate_attack_range_multiple_units(
 
     # The total number of calls should be the size of the union of the two sets
     total_tiles = len(attack_tiles_1.union(attack_tiles_2))
-    assert mock_draw_rect.call_count == total_tiles
+    # +1 for the key options panel
+    assert mock_draw_rect.call_count == total_tiles + 1
