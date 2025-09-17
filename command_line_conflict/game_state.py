@@ -1,4 +1,5 @@
 from .maps.base import Map
+from .components.position import Position
 
 
 class GameState:
@@ -62,3 +63,12 @@ class GameState:
         """
         if entity_id in self.entities:
             del self.entities[entity_id]
+
+    def get_entities_at_position(self, x: int, y: int) -> list[int]:
+        """Returns a list of entity IDs at a given position."""
+        entities_at_pos = []
+        for entity_id, components in self.entities.items():
+            position = components.get(Position)
+            if position and int(position.x) == x and int(position.y) == y:
+                entities_at_pos.append(entity_id)
+        return entities_at_pos

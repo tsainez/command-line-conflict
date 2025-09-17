@@ -22,10 +22,20 @@ class MovementSystem:
 
         movable.target_x = x
         movable.target_y = y
+        extra_obstacles = set()
+        if movable.intelligent:
+            for other_entity_id, other_components in game_state.entities.items():
+                if other_entity_id == entity_id:
+                    continue
+                other_position = other_components.get(Position)
+                if other_position:
+                    extra_obstacles.add((int(other_position.x), int(other_position.y)))
+
         movable.path = game_state.map.find_path(
             (int(position.x), int(position.y)),
             (x, y),
             can_fly=movable.can_fly,
+            extra_obstacles=extra_obstacles,
         )
 
     def update(self, game_state: GameState, dt: float) -> None:
@@ -48,8 +58,15 @@ class MovementSystem:
             # This logic is adapted from the Unit._move method
             if movable.path:
                 next_x, next_y = movable.path[0]
-                # In the future, we'll need to handle pathfinding and obstacles.
-                # For now, we'll just move towards the next point in the path.
+
+                # Collision check for non-intelligent units
+                if not movable.intelligent:
+                    entities_at_next_pos = game_state.get_entities_at_position(next_x, next_y)
+                    if any(e != entity_id for e in entities_at_next_pos):
+                        movable.path = []
+                        movable.target_x = None
+                        movable.target_y = None
+                        continue
 
                 movable.target_x, movable.target_y = next_x, next_y
                 dx = movable.target_x - position.x
@@ -79,8 +96,13 @@ class MovementSystem:
                 proposed_x = position.x + step * dx / dist
                 proposed_y = position.y + step * dy / dist
 
-                # In the future, we'll need to handle collision detection.
-                # For now, we'll just move to the proposed position.
+                # Collision check for non-intelligent units
+                if not movable.intelligent:
+                    entities_at_proposed_pos = game_state.get_entities_at_position(int(proposed_x), int(proposed_y))
+                    if any(e != entity_id for e in entities_at_proposed_pos):
+                        movable.target_x = None
+                        movable.target_y = None
+                        continue
 
                 position.x = proposed_x
                 position.y = proposed_y
