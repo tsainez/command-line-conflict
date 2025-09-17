@@ -6,6 +6,7 @@ from command_line_conflict import config
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 
@@ -50,6 +51,7 @@ class UISystem:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:
             self._draw_multi_unit_info(game_state, selected_entities)
+            self._draw_aggregate_detection_range(game_state, selected_entities)
             self._draw_aggregate_attack_range(game_state, selected_entities)
 
         if paused:
@@ -102,8 +104,46 @@ class UISystem:
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
+        self._draw_aggregate_detection_range(game_state, [entity_id])
         self._draw_aggregate_attack_range(game_state, [entity_id])
         self._draw_unit_health_text(game_state, entity_id)
+
+    def _draw_aggregate_detection_range(
+        self, game_state: GameState, entity_ids: list[int]
+    ) -> None:
+        """Draws a combined detection range for multiple units."""
+        detection_tiles = set()
+        for entity_id in entity_ids:
+            position = game_state.get_component(entity_id, Position)
+            detection = game_state.get_component(entity_id, Detection)
+            if not position or not detection or detection.detection_range <= 0:
+                continue
+            unit_x, unit_y = int(position.x), int(position.y)
+            for x in range(
+                unit_x - detection.detection_range,
+                unit_x + detection.detection_range + 1,
+            ):
+                for y in range(
+                    unit_y - detection.detection_range,
+                    unit_y + detection.detection_range + 1,
+                ):
+                    if (
+                        x - unit_x
+                    ) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
+                        detection_tiles.add((x, y))
+
+        for x, y in detection_tiles:
+            cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+            cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+            surface = pygame.Surface(
+                (
+                    config.GRID_SIZE * self.camera.zoom,
+                    config.GRID_SIZE * self.camera.zoom,
+                ),
+                pygame.SRCALPHA,
+            )
+            pygame.draw.rect(surface, (0, 0, 255, 30), surface.get_rect())
+            self.screen.blit(surface, (cam_x, cam_y))
 
     def _draw_aggregate_attack_range(
         self, game_state: GameState, entity_ids: list[int]
@@ -153,11 +193,13 @@ class UISystem:
             text = self.small_font.render(health_text, True, (255, 255, 255))
             grid_size = config.GRID_SIZE * self.camera.zoom
             center_x = (
-                (position.x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                (int(position.x) - self.camera.x)
+                * config.GRID_SIZE
+                * self.camera.zoom
                 + grid_size / 2
             )
             center_y = (
-                (position.y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
                 - 5 * self.camera.zoom
             )
             text_rect = text.get_rect(center=(center_x, center_y))
