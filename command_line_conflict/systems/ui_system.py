@@ -102,7 +102,7 @@ class UISystem:
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
-        self._draw_attack_range(game_state, entity_id)
+        self._draw_aggregate_attack_range(game_state, [entity_id])
         self._draw_unit_health_text(game_state, entity_id)
 
     def _draw_aggregate_attack_range(
@@ -137,57 +137,6 @@ class UISystem:
             )
             pygame.draw.rect(surface, (255, 0, 0, 30), surface.get_rect())
             self.screen.blit(surface, (cam_x, cam_y))
-
-    def _draw_attack_range(self, game_state: GameState, entity_id: int) -> None:
-        """Draws a circle indicating the attack range of a unit.
-
-        Args:
-            game_state: The current state of the game.
-            entity_id: The ID of the entity.
-        """
-        components = game_state.entities[entity_id]
-        position = components.get(Position)
-        attack = components.get(Attack)
-        if position and attack and attack.attack_range > 0:
-            radius = attack.attack_range * config.GRID_SIZE * self.camera.zoom
-            center_x = int(
-                (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-                + config.GRID_SIZE * self.camera.zoom / 2
-            )
-            center_y = int(
-                (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-                + config.GRID_SIZE * self.camera.zoom / 2
-            )
-            self._draw_dotted_circle(
-                self.screen, (255, 0, 0), (center_x, center_y), radius, 10
-            )
-
-    def _draw_dotted_circle(
-        self, surface, color, center, radius, dash_length
-    ) -> None:
-        """Draws a dotted circle on a surface.
-
-        Args:
-            surface: The pygame surface to draw on.
-            color: The color of the circle.
-            center: The (x, y) coordinates of the circle's center.
-            radius: The radius of the circle.
-            dash_length: The length of each dash in the circle.
-        """
-        num_dashes = 30
-        for i in range(num_dashes):
-            angle = 2 * math.pi * i / num_dashes
-            start_angle = angle
-            end_angle = angle + 2 * math.pi / (2 * num_dashes)
-            start_pos = (
-                center[0] + radius * math.cos(start_angle),
-                center[1] + radius * math.sin(start_angle),
-            )
-            end_pos = (
-                center[0] + radius * math.cos(end_angle),
-                center[1] + radius * math.sin(end_angle),
-            )
-            pygame.draw.line(surface, color, start_pos, end_pos, 1)
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
         """Draws the current health of a unit above its icon.
