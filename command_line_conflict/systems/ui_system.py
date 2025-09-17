@@ -50,6 +50,7 @@ class UISystem:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:
             self._draw_multi_unit_info(game_state, selected_entities)
+            self._draw_aggregate_attack_range(game_state, selected_entities)
 
         if paused:
             self._draw_paused_message()
@@ -104,6 +105,39 @@ class UISystem:
         self._draw_attack_range(game_state, entity_id)
         self._draw_unit_health_text(game_state, entity_id)
 
+    def _draw_aggregate_attack_range(
+        self, game_state: GameState, entity_ids: list[int]
+    ) -> None:
+        """Draws a combined attack range for multiple units."""
+        attack_tiles = set()
+        for entity_id in entity_ids:
+            position = game_state.get_component(entity_id, Position)
+            attack = game_state.get_component(entity_id, Attack)
+            if not position or not attack or attack.attack_range <= 0:
+                continue
+            unit_x, unit_y = int(position.x), int(position.y)
+            for x in range(
+                unit_x - attack.attack_range, unit_x + attack.attack_range + 1
+            ):
+                for y in range(
+                    unit_y - attack.attack_range, unit_y + attack.attack_range + 1
+                ):
+                    if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= attack.attack_range**2:
+                        attack_tiles.add((x, y))
+
+        for x, y in attack_tiles:
+            cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+            cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+            surface = pygame.Surface(
+                (
+                    config.GRID_SIZE * self.camera.zoom,
+                    config.GRID_SIZE * self.camera.zoom,
+                ),
+                pygame.SRCALPHA,
+            )
+            pygame.draw.rect(surface, (255, 0, 0, 30), surface.get_rect())
+            self.screen.blit(surface, (cam_x, cam_y))
+
     def _draw_attack_range(self, game_state: GameState, entity_id: int) -> None:
         """Draws a circle indicating the attack range of a unit.
 
@@ -117,11 +151,11 @@ class UISystem:
         if position and attack and attack.attack_range > 0:
             radius = attack.attack_range * config.GRID_SIZE * self.camera.zoom
             center_x = int(
-                (position.x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
                 + config.GRID_SIZE * self.camera.zoom / 2
             )
             center_y = int(
-                (position.y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+                (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
                 + config.GRID_SIZE * self.camera.zoom / 2
             )
             self._draw_dotted_circle(
