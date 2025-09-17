@@ -8,6 +8,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.config import GRID_SIZE
 
 
@@ -26,6 +27,7 @@ def game_state():
             Position: Position(10, 10),
             Attack: Attack(attack_damage=10, attack_range=5, attack_speed=1),
             Selectable: selectable,
+            Renderable: Renderable(icon="T", color=(255, 255, 255)),
         }
     }
     return game_state

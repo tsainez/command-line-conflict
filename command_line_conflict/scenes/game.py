@@ -11,6 +11,8 @@ from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
+from command_line_conflict.systems.collision_system import CollisionSystem
+from command_line_conflict.systems.collision_system import CollisionSystem
 from command_line_conflict.camera import Camera
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
@@ -49,6 +51,7 @@ class GameScene:
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
+        self.collision_system = CollisionSystem()
         self._create_initial_units()
 
     def _create_initial_units(self):
@@ -194,6 +197,7 @@ class GameScene:
         self.ai_system.update(self.game_state)
         self.combat_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
+        self.collision_system.update(self.game_state)
         self.corpse_removal_system.update(self.game_state, dt)
 
     def draw(self, screen):
