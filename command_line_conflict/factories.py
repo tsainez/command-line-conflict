@@ -5,6 +5,7 @@ from .components.renderable import Renderable
 from .components.movable import Movable
 from .components.health import Health
 from .components.attack import Attack
+from .components.detection import Detection
 from .components.vision import Vision
 from .components.flee import Flee
 from .components.selectable import Selectable
@@ -34,6 +35,7 @@ def create_chassis(
     game_state.add_component(
         entity_id, Attack(attack_damage=10, attack_range=1, attack_speed=1.0)
     )
+    game_state.add_component(entity_id, Detection(detection_range=1))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
@@ -62,6 +64,7 @@ def create_rover(
     game_state.add_component(
         entity_id, Attack(attack_damage=15, attack_range=5, attack_speed=1.0)
     )
+    game_state.add_component(entity_id, Detection(detection_range=5))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
@@ -90,6 +93,7 @@ def create_arachnotron(
     game_state.add_component(
         entity_id, Attack(attack_damage=20, attack_range=6, attack_speed=1.0)
     )
+    game_state.add_component(entity_id, Detection(detection_range=6))
     game_state.add_component(entity_id, Vision(vision_range=6))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
@@ -115,6 +119,7 @@ def create_observer(
     game_state.add_component(entity_id, Renderable(icon="O", color=color))
     game_state.add_component(entity_id, Movable(speed=4, can_fly=True))
     game_state.add_component(entity_id, Health(hp=40, max_hp=40))
+    game_state.add_component(entity_id, Detection(detection_range=15))
     game_state.add_component(entity_id, Vision(vision_range=15))
     game_state.add_component(entity_id, Flee(flees_from_enemies=True))
     game_state.add_component(entity_id, Selectable())
@@ -146,6 +151,7 @@ def create_immortal(
     game_state.add_component(
         entity_id, Attack(attack_damage=25, attack_range=7, attack_speed=1.0)
     )
+    game_state.add_component(entity_id, Detection(detection_range=7))
     game_state.add_component(entity_id, Vision(vision_range=7))
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.2))
     game_state.add_component(entity_id, Selectable())
@@ -172,6 +178,7 @@ def create_extractor(
     game_state.add_component(entity_id, Renderable(icon="E", color=color))
     game_state.add_component(entity_id, Movable(speed=1.5))
     game_state.add_component(entity_id, Health(hp=50, max_hp=50))
+    game_state.add_component(entity_id, Detection(detection_range=5))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
