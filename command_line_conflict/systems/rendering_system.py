@@ -83,8 +83,11 @@ class RenderingSystem:
                 )
 
                 selectable = components.get(Selectable)
-                if not dead and selectable and selectable.is_selected:
-                    self.draw_orders(components)
+                if not dead:
+                    if selectable and selectable.is_selected:
+                        self.draw_orders(components)
+                    elif config.DEBUG:
+                        self.draw_orders(components)
 
     def draw_orders(self, components) -> None:
         """Draws the movement path and target for a selected entity.

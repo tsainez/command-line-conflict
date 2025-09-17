@@ -1,3 +1,5 @@
+from .. import config
+from ..logger import log
 from ..game_state import GameState
 from ..components.health import Health
 from ..components.dead import Dead
@@ -29,6 +31,8 @@ class HealthSystem:
 
             if health.hp <= 0:
                 if not components.get(Dead):
+                    if config.DEBUG:
+                        log.info(f"Entity {entity_id} has died.")
                     game_state.add_component(entity_id, Dead())
                     game_state.remove_component(entity_id, Movable)
                     game_state.remove_component(entity_id, Attack)
