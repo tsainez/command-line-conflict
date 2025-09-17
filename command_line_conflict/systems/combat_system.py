@@ -1,3 +1,5 @@
+from .. import config
+from ..logger import log
 from ..game_state import GameState
 from ..components.position import Position
 from ..components.attack import Attack
@@ -56,6 +58,11 @@ class CombatSystem:
                         movable.target_x, movable.target_y = my_pos.x, my_pos.y
 
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
+                        if config.DEBUG:
+                            log.info(
+                                f"Entity {entity_id} attacks {attack.attack_target} "
+                                f"for {attack.attack_damage} damage."
+                            )
                         target_health.hp -= attack.attack_damage
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:

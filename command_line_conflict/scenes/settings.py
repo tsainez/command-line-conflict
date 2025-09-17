@@ -1,5 +1,6 @@
 import pygame
 from command_line_conflict import config
+from ..logger import log
 
 
 class SettingsScene:
@@ -52,6 +53,7 @@ class SettingsScene:
                     self.game.screen = pygame.display.set_mode((width, height))
                 elif self.selected_option == 1:
                     config.DEBUG = not config.DEBUG
+                    log.info(f"Debug mode set to {config.DEBUG}")
                 elif self.selected_option == 2:
                     self.game.scene_manager.switch_to("menu")
 
