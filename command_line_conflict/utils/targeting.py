@@ -1,7 +1,9 @@
-from ..game_state import GameState
-from ..components.position import Position
 from ..components.player import Player
+from ..components.position import Position
 from ..components.vision import Vision
+from ..game_state import GameState
+
+# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class Targeting:

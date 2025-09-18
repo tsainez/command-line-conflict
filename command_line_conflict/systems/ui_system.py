@@ -1,17 +1,19 @@
-import pygame
 import math
 
-from command_line_conflict.game_state import GameState
+import pygame
+
 from command_line_conflict import config
-from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.components.health import Health
+from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.detection import Detection
+from command_line_conflict.components.health import Health
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.game_state import GameState
 
+# TODO: Integrate logger for debug mode. Currently not used.
 
-from command_line_conflict.camera import Camera
 
 
 class UISystem:
@@ -100,7 +102,9 @@ class UISystem:
             panel_y += 20
 
         if attack:
-            attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
+            attack_text = (
+                f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
+            )
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
@@ -127,9 +131,9 @@ class UISystem:
                     unit_y - detection.detection_range,
                     unit_y + detection.detection_range + 1,
                 ):
-                    if (
-                        x - unit_x
-                    ) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
+                    if (x - unit_x) ** 2 + (
+                        y - unit_y
+                    ) ** 2 <= detection.detection_range**2:
                         detection_tiles.add((x, y))
 
         for x, y in detection_tiles:
@@ -193,19 +197,17 @@ class UISystem:
             text = self.small_font.render(health_text, True, (255, 255, 255))
             grid_size = config.GRID_SIZE * self.camera.zoom
             center_x = (
-                (int(position.x) - self.camera.x)
-                * config.GRID_SIZE
-                * self.camera.zoom
-                + grid_size / 2
-            )
+                int(position.x) - self.camera.x
+            ) * config.GRID_SIZE * self.camera.zoom + grid_size / 2
             center_y = (
-                (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-                - 5 * self.camera.zoom
-            )
+                int(position.y) - self.camera.y
+            ) * config.GRID_SIZE * self.camera.zoom - 5 * self.camera.zoom
             text_rect = text.get_rect(center=(center_x, center_y))
             self.screen.blit(text, text_rect)
 
-    def _draw_multi_unit_info(self, game_state: GameState, entity_ids: list[int]) -> None:
+    def _draw_multi_unit_info(
+        self, game_state: GameState, entity_ids: list[int]
+    ) -> None:
         """Draws the information panel for multiple selected units.
 
         This shows the total number of units and their combined health.

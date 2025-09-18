@@ -1,5 +1,8 @@
 import pygame
+
 from . import config
+
+# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class FogOfWar:

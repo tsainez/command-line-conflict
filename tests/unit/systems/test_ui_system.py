@@ -1,18 +1,17 @@
-import pygame
-import pytest
 from unittest.mock import MagicMock, patch
 
-from command_line_conflict.systems.ui_system import UISystem
-from command_line_conflict.game_state import GameState
+import pygame
+import pytest
+
 from command_line_conflict.camera import Camera
-from command_line_conflict.components.position import Position
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.detection import Detection
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.config import GRID_SIZE
-
-
+from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map
+from command_line_conflict.systems.ui_system import UISystem
 
 
 @pytest.fixture
@@ -70,7 +69,6 @@ def test_draw_aggregate_attack_range_multiple_units(
     }
     game_state.get_component(1, Selectable).is_selected = True
 
-
     ui_system.draw(game_state, paused=False)
 
     # Calculate expected tiles for unit 1 attack (radius 5)
@@ -79,9 +77,7 @@ def test_draw_aggregate_attack_range_multiple_units(
     radius_1 = 5
     for x in range(unit_1_pos[0] - radius_1, unit_1_pos[0] + radius_1 + 1):
         for y in range(unit_1_pos[1] - radius_1, unit_1_pos[1] + radius_1 + 1):
-            if (x - unit_1_pos[0]) ** 2 + (
-                y - unit_1_pos[1]
-            ) ** 2 <= radius_1**2:
+            if (x - unit_1_pos[0]) ** 2 + (y - unit_1_pos[1]) ** 2 <= radius_1**2:
                 attack_tiles_1.add((x, y))
 
     # Calculate expected tiles for unit 2 attack (radius 2)
@@ -90,9 +86,7 @@ def test_draw_aggregate_attack_range_multiple_units(
     radius_2 = 2
     for x in range(unit_2_pos[0] - radius_2, unit_2_pos[0] + radius_2 + 1):
         for y in range(unit_2_pos[1] - radius_2, unit_2_pos[1] + radius_2 + 1):
-            if (x - unit_2_pos[0]) ** 2 + (
-                y - unit_2_pos[1]
-            ) ** 2 <= radius_2**2:
+            if (x - unit_2_pos[0]) ** 2 + (y - unit_2_pos[1]) ** 2 <= radius_2**2:
                 attack_tiles_2.add((x, y))
 
     # Calculate expected tiles for unit 1 detection (radius 5)
@@ -100,9 +94,7 @@ def test_draw_aggregate_attack_range_multiple_units(
     radius_3 = 5
     for x in range(unit_1_pos[0] - radius_3, unit_1_pos[0] + radius_3 + 1):
         for y in range(unit_1_pos[1] - radius_3, unit_1_pos[1] + radius_3 + 1):
-            if (x - unit_1_pos[0]) ** 2 + (
-                y - unit_1_pos[1]
-            ) ** 2 <= radius_3**2:
+            if (x - unit_1_pos[0]) ** 2 + (y - unit_1_pos[1]) ** 2 <= radius_3**2:
                 detection_tiles_1.add((x, y))
 
     # Calculate expected tiles for unit 2 detection (radius 2)
@@ -110,19 +102,14 @@ def test_draw_aggregate_attack_range_multiple_units(
     radius_4 = 2
     for x in range(unit_2_pos[0] - radius_4, unit_2_pos[0] + radius_4 + 1):
         for y in range(unit_2_pos[1] - radius_4, unit_2_pos[1] + radius_4 + 1):
-            if (x - unit_2_pos[0]) ** 2 + (
-                y - unit_2_pos[1]
-            ) ** 2 <= radius_4**2:
+            if (x - unit_2_pos[0]) ** 2 + (y - unit_2_pos[1]) ** 2 <= radius_4**2:
                 detection_tiles_2.add((x, y))
 
     # The total number of calls should be the size of the union of the two sets
     total_attack_tiles = len(attack_tiles_1.union(attack_tiles_2))
     total_detection_tiles = len(detection_tiles_1.union(detection_tiles_2))
     # +1 for the key options panel
-    assert (
-        mock_draw_rect.call_count
-        == total_attack_tiles + total_detection_tiles + 1
-    )
+    assert mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1
 
 
 @patch("pygame.draw.rect")

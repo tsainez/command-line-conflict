@@ -1,5 +1,8 @@
 from . import config
 
+# TODO: Integrate logger for debug mode. Currently not used.
+#       Not exactly sure how to do so here without spamming.
+
 
 class Camera:
     def __init__(self, x=0, y=0, zoom=1.0, min_zoom=0.5, max_zoom=2.0):

@@ -1,18 +1,21 @@
 import pytest
+
 from command_line_conflict.components.flee import Flee
+from command_line_conflict.components.movable import Movable
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.vision import Vision
-from command_line_conflict.components.movable import Movable
-from command_line_conflict.systems.flee_system import FleeSystem
-from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.factories import create_observer, create_rover
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map
+from command_line_conflict.systems.flee_system import FleeSystem
+from command_line_conflict.systems.movement_system import MovementSystem
+
 
 @pytest.fixture
 def game_state():
     game_map = Map(width=20, height=20)
     return GameState(game_map=game_map)
+
 
 def test_observer_flees_when_detected(game_state):
     # Create an observer and an enemy

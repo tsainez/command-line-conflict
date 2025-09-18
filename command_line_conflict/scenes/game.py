@@ -1,22 +1,23 @@
-import pygame
 import math
 
-from command_line_conflict import config
-from command_line_conflict import factories
+import pygame
+
+from command_line_conflict import config, factories
+from command_line_conflict.camera import Camera
+from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
+from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
+from command_line_conflict.systems.corpse_removal_system import \
+    CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
-from command_line_conflict.camera import Camera
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
-from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
-from command_line_conflict.systems.ai_system import AISystem
-from command_line_conflict.components.selectable import Selectable
 
 
 class GameScene:
@@ -37,11 +38,18 @@ class GameScene:
 
         # Camera
         self.camera = Camera()
-        self.camera_movement = {"up": False, "down": False, "left": False, "right": False}
+        self.camera_movement = {
+            "up": False,
+            "down": False,
+            "left": False,
+            "right": False,
+        }
 
         # Initialize systems
         self.movement_system = MovementSystem()
-        self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
+        self.rendering_system = RenderingSystem(
+            self.game.screen, self.font, self.camera
+        )
         self.combat_system = CombatSystem()
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
@@ -94,11 +102,11 @@ class GameScene:
                 )
             else:
                 log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
-                grid_start = self.camera.screen_to_grid(self.selection_start[0], self.selection_start[1])
-                grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-                self.selection_system.update(
-                    self.game_state, grid_start, grid_end
+                grid_start = self.camera.screen_to_grid(
+                    self.selection_start[0], self.selection_start[1]
                 )
+                grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+                self.selection_system.update(self.game_state, grid_start, grid_end)
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])

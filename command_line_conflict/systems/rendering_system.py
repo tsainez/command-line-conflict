@@ -1,15 +1,17 @@
 import pygame
-from ..game_state import GameState
+
+from .. import config
+from ..camera import Camera
+from ..components.dead import Dead
+from ..components.movable import Movable
+from ..components.player import Player
 from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
-from ..components.movable import Movable
-from ..components.dead import Dead
-from ..components.player import Player
-from .. import config
+from ..game_state import GameState
 
+# TODO: Integrate logger for debug mode. Currently not used.
 
-from ..camera import Camera
 
 
 class RenderingSystem:
@@ -43,11 +45,15 @@ class RenderingSystem:
                 dead = components.get(Dead)
                 # Camera transform
                 cam_x = (
-                    int(position.x) - self.camera.x
-                ) * config.GRID_SIZE * self.camera.zoom
+                    (int(position.x) - self.camera.x)
+                    * config.GRID_SIZE
+                    * self.camera.zoom
+                )
                 cam_y = (
-                    int(position.y) - self.camera.y
-                ) * config.GRID_SIZE * self.camera.zoom
+                    (int(position.y) - self.camera.y)
+                    * config.GRID_SIZE
+                    * self.camera.zoom
+                )
                 grid_size = int(config.GRID_SIZE * self.camera.zoom)
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units

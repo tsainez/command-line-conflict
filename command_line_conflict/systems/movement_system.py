@@ -1,6 +1,9 @@
-from ..game_state import GameState
-from ..components.position import Position
 from ..components.movable import Movable
+from ..components.position import Position
+from ..game_state import GameState
+
+# TODO: Integrate logger for debug mode. Currently not used.
+#       Consider logging movement issues or pathfinding failures for debugging.
 
 
 class MovementSystem:
@@ -61,7 +64,9 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_next_pos = game_state.get_entities_at_position(next_x, next_y)
+                    entities_at_next_pos = game_state.get_entities_at_position(
+                        next_x, next_y
+                    )
                     if any(e != entity_id for e in entities_at_next_pos):
                         movable.path = []
                         movable.target_x = None
@@ -98,7 +103,9 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_proposed_pos = game_state.get_entities_at_position(int(proposed_x), int(proposed_y))
+                    entities_at_proposed_pos = game_state.get_entities_at_position(
+                        int(proposed_x), int(proposed_y)
+                    )
                     if any(e != entity_id for e in entities_at_proposed_pos):
                         movable.target_x = None
                         movable.target_y = None

@@ -1,9 +1,9 @@
 from __future__ import annotations
-import pygame
 
-import pygame
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
+
+import pygame
 
 from .. import config
 

@@ -1,5 +1,8 @@
-from ..game_state import GameState
 from ..components.dead import Dead
+from ..game_state import GameState
+
+# TODO: Integrate logger for debug mode. Currently not used.
+#       Consider logging when corpses are removed for debugging purposes.
 
 
 class CorpseRemovalSystem:

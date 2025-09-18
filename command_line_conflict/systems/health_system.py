@@ -1,12 +1,13 @@
 from .. import config
-from ..logger import log
-from ..game_state import GameState
-from ..components.health import Health
-from ..components.dead import Dead
-from ..components.movable import Movable
 from ..components.attack import Attack
-from ..components.selectable import Selectable
+from ..components.dead import Dead
 from ..components.flee import Flee
+from ..components.health import Health
+from ..components.movable import Movable
+from ..components.selectable import Selectable
+from ..game_state import GameState
+from ..logger import \
+    log  # TODO: Expand logger usage, specifically for when in debug mode. Can we log more than just deaths?
 
 
 class HealthSystem:

@@ -1,16 +1,20 @@
 """A collection of factory functions for creating game entities."""
-from .game_state import GameState
-from .components.position import Position
-from .components.renderable import Renderable
-from .components.movable import Movable
-from .components.health import Health
+
+from . import config
 from .components.attack import Attack
 from .components.detection import Detection
-from .components.vision import Vision
 from .components.flee import Flee
-from .components.selectable import Selectable
+from .components.health import Health
+from .components.movable import Movable
 from .components.player import Player
-from . import config
+from .components.position import Position
+from .components.renderable import Renderable
+from .components.selectable import Selectable
+from .components.vision import Vision
+from .game_state import GameState
+
+# TODO: Integrate logger for debug mode. Currently not used.
+# TODO: Create a map with factories for the player to fight against.
 
 
 def create_chassis(
@@ -88,7 +92,9 @@ def create_arachnotron(
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="A", color=color))
-    game_state.add_component(entity_id, Movable(speed=1.8, can_fly=True, intelligent=True))
+    game_state.add_component(
+        entity_id, Movable(speed=1.8, can_fly=True, intelligent=True)
+    )
     game_state.add_component(entity_id, Health(hp=120, max_hp=120))
     game_state.add_component(
         entity_id, Attack(attack_damage=20, attack_range=6, attack_speed=1.0)
@@ -117,7 +123,9 @@ def create_observer(
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="O", color=color))
-    game_state.add_component(entity_id, Movable(speed=4, can_fly=True, intelligent=True))
+    game_state.add_component(
+        entity_id, Movable(speed=4, can_fly=True, intelligent=True)
+    )
     game_state.add_component(entity_id, Health(hp=40, max_hp=40))
     game_state.add_component(entity_id, Detection(detection_range=15))
     game_state.add_component(entity_id, Vision(vision_range=15))

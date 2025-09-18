@@ -1,12 +1,12 @@
 from .. import config
-from ..logger import log
-from ..game_state import GameState
-from ..components.position import Position
 from ..components.attack import Attack
 from ..components.health import Health
-from ..components.vision import Vision
 from ..components.movable import Movable
 from ..components.player import Player
+from ..components.position import Position
+from ..components.vision import Vision
+from ..game_state import GameState
+from ..logger import log
 
 
 class CombatSystem:
@@ -59,7 +59,7 @@ class CombatSystem:
 
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
                         if config.DEBUG:
-                            log.info(
+                            log.info(  # TODO: Can we get the entity names here?
                                 f"Entity {entity_id} attacks {attack.attack_target} "
                                 f"for {attack.attack_damage} damage."
                             )
@@ -71,4 +71,3 @@ class CombatSystem:
                     if movable:
                         movable.target_x = target_pos.x
                         movable.target_y = target_pos.y
-

@@ -1,12 +1,14 @@
-from ..game_state import GameState
-from ..components.position import Position
+from ..components.attack import Attack
 from ..components.flee import Flee
 from ..components.health import Health
-from ..components.vision import Vision
 from ..components.movable import Movable
-from ..components.attack import Attack
 from ..components.player import Player
+from ..components.position import Position
+from ..components.vision import Vision
+from ..game_state import GameState
 from ..utils.targeting import Targeting
+
+# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class FleeSystem:

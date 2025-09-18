@@ -1,12 +1,15 @@
-import pygame
 from unittest.mock import Mock, call, patch
-from command_line_conflict.systems.rendering_system import RenderingSystem
-from command_line_conflict.camera import Camera
-from command_line_conflict.game_state import GameState
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.movable import Movable
-from command_line_conflict.components.renderable import Renderable
+
+import pygame
+
 from command_line_conflict import config
+from command_line_conflict.camera import Camera
+from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.game_state import GameState
+from command_line_conflict.systems.rendering_system import RenderingSystem
+
 
 def test_draw_orders_are_affected_by_camera():
     # Arrange
@@ -16,7 +19,9 @@ def test_draw_orders_are_affected_by_camera():
     mock_font.render.return_value = mock_surface
 
     camera = Camera(x=10, y=5, zoom=2.0)
-    rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
+    rendering_system = RenderingSystem(
+        screen=mock_screen, font=mock_font, camera=camera
+    )
 
     mock_map = Mock()
     game_state = GameState(game_map=mock_map)
@@ -42,8 +47,8 @@ def test_draw_orders_are_affected_by_camera():
 
     # The character for the arrow from (20, 10) to (21, 11) is '\'
     # We need to escape it in the string literal.
-    assert call('\\', True, (0, 255, 0)) in mock_font.render.call_args_list
-    assert call('X', True, (255, 0, 0)) in mock_font.render.call_args_list
+    assert call("\\", True, (0, 255, 0)) in mock_font.render.call_args_list
+    assert call("X", True, (255, 0, 0)) in mock_font.render.call_args_list
 
     expected_calls = [
         call(mock_surface, (expected_x1, expected_y1)),
@@ -52,7 +57,7 @@ def test_draw_orders_are_affected_by_camera():
     mock_screen.blit.assert_has_calls(expected_calls, any_order=True)
 
 
-@patch('pygame.transform.scale')
+@patch("pygame.transform.scale")
 def test_draw_entities_are_affected_by_camera(mock_scale):
     # Arrange
     mock_screen = Mock()
@@ -65,7 +70,9 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
     mock_font.render.return_value = mock_surface
 
     camera = Camera(x=15, y=25, zoom=1.5)
-    rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
+    rendering_system = RenderingSystem(
+        screen=mock_screen, font=mock_font, camera=camera
+    )
 
     mock_map = Mock()
     game_state = GameState(game_map=mock_map)

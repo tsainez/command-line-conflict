@@ -1,5 +1,7 @@
-from .maps.base import Map
 from .components.position import Position
+from .maps.base import Map
+
+# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class GameState:

@@ -1,18 +1,22 @@
 import pytest
-from command_line_conflict.game_state import GameState
-from command_line_conflict.systems.movement_system import MovementSystem
-from command_line_conflict.components.position import Position
+
 from command_line_conflict.components.movable import Movable
-from command_line_conflict.maps.simple_map import SimpleMap
+from command_line_conflict.components.position import Position
 from command_line_conflict.factories import create_chassis, create_rover
+from command_line_conflict.game_state import GameState
+from command_line_conflict.maps.simple_map import SimpleMap
+from command_line_conflict.systems.movement_system import MovementSystem
+
 
 @pytest.fixture
 def game_state():
     return GameState(SimpleMap())
 
+
 @pytest.fixture
 def movement_system():
     return MovementSystem()
+
 
 def test_non_intelligent_unit_stops_at_obstacle(game_state, movement_system):
     # Create a non-intelligent 'chassis' unit
@@ -32,6 +36,7 @@ def test_non_intelligent_unit_stops_at_obstacle(game_state, movement_system):
     # The unit should not have moved into the occupied space.
     # It might have moved slightly towards it, but not onto the square.
     assert int(unit1_pos.x) == 10 and int(unit1_pos.y) == 10
+
 
 def test_intelligent_unit_moves_around_obstacle(game_state, movement_system):
     # Create an intelligent 'rover' unit

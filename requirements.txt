@@ -1,2 +1,5 @@
 pygame
 asciimatics
+pytest-mock
+black
+isort

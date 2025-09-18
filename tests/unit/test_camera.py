@@ -1,5 +1,6 @@
-from command_line_conflict.camera import Camera
 from command_line_conflict import config
+from command_line_conflict.camera import Camera
+
 
 def test_screen_to_grid():
     # Arrange
