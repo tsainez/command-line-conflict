@@ -15,18 +15,20 @@ class SelectionSystem:
         game_state: GameState,
         grid_start: tuple[int, int] | None,
         grid_end: tuple[int, int],
+        shift_pressed: bool = False,
     ) -> None:
         """Processes a drag-to-select action.
 
         This method is called when a selection box is being drawn. It selects
-        all selectable entities within the rectangular area defined by the
-        selection start and current mouse position.
+        all selectable entities within the rectangular area. If shift is
+        pressed, it adds to the selection. Otherwise, it replaces the selection.
 
         Args:
             game_state: The current state of the game.
             grid_start: The (x, y) grid coordinates where the selection
                         drag started. If None, no action is taken.
             grid_end: The current (x, y) grid coordinates of the mouse.
+            shift_pressed: True if the shift key was held during the drag.
         """
         if not grid_start:
             return
@@ -50,7 +52,7 @@ class SelectionSystem:
             uy = int(position.y)
             if sx <= ux <= ex and sy <= uy <= ey:
                 selectable.is_selected = True
-            else:
+            elif not shift_pressed:
                 selectable.is_selected = False
 
     def handle_click_selection(

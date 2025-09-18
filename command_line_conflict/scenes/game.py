@@ -102,11 +102,15 @@ class GameScene:
                 )
             else:
                 log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
+                mods = pygame.key.get_mods()
+                shift_pressed = mods & pygame.KMOD_SHIFT
                 grid_start = self.camera.screen_to_grid(
                     self.selection_start[0], self.selection_start[1]
                 )
                 grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-                self.selection_system.update(self.game_state, grid_start, grid_end)
+                self.selection_system.update(
+                    self.game_state, grid_start, grid_end, shift_pressed
+                )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
