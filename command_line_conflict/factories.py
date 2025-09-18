@@ -2,6 +2,7 @@
 
 from . import config
 from .components.attack import Attack
+from .components.confetti import Confetti
 from .components.detection import Detection
 from .components.flee import Flee
 from .components.health import Health
@@ -43,6 +44,22 @@ def create_chassis(
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    return entity_id
+
+
+def create_confetti(game_state: GameState, x: float, y: float) -> int:
+    """Creates a new confetti effect.
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the effect will be created.
+        y: The y-coordinate where the effect will be created.
+    Returns:
+        The entity ID of the newly created effect.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    game_state.add_component(entity_id, Renderable(icon="*"))
+    game_state.add_component(entity_id, Confetti(lifetime=0.2))
     return entity_id
 
 

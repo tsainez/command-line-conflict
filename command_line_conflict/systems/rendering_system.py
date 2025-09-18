@@ -1,7 +1,10 @@
+import random
+
 import pygame
 
 from .. import config
 from ..camera import Camera
+from ..components.confetti import Confetti
 from ..components.dead import Dead
 from ..components.movable import Movable
 from ..components.player import Player
@@ -42,7 +45,6 @@ class RenderingSystem:
             player = components.get(Player)
 
             if position and renderable:
-                dead = components.get(Dead)
                 # Camera transform
                 cam_x = (
                     (int(position.x) - self.camera.x)
@@ -55,6 +57,31 @@ class RenderingSystem:
                     * self.camera.zoom
                 )
                 grid_size = int(config.GRID_SIZE * self.camera.zoom)
+
+                confetti = components.get(Confetti)
+                if confetti:
+                    # Confetti is just a particle, so it should be simple
+                    colors = [
+                        (255, 0, 0),
+                        (0, 255, 0),
+                        (0, 0, 255),
+                        (255, 255, 0),
+                        (255, 0, 255),
+                        (0, 255, 255),
+                    ]
+                    color = random.choice(colors)
+                    ch = self.font.render(renderable.icon, True, color)
+                    ch = pygame.transform.scale(ch, (grid_size, grid_size))
+                    self.screen.blit(
+                        ch,
+                        (
+                            cam_x,
+                            cam_y,
+                        ),
+                    )
+                    continue
+
+                dead = components.get(Dead)
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
                 elif paused:
