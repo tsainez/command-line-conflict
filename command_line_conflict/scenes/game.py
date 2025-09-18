@@ -10,6 +10,7 @@ from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
+from command_line_conflict.systems.confetti_system import ConfettiSystem
 from command_line_conflict.systems.corpse_removal_system import \
     CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
@@ -57,6 +58,7 @@ class GameScene:
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
+        self.confetti_system = ConfettiSystem()
         self._create_initial_units()
 
     def _create_initial_units(self):
@@ -201,6 +203,7 @@ class GameScene:
         self.flee_system.update(self.game_state, dt)
         self.ai_system.update(self.game_state)
         self.combat_system.update(self.game_state, dt)
+        self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
 
