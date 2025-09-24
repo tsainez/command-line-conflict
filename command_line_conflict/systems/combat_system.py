@@ -21,7 +21,7 @@ class CombatSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in game_state.entities.items():
+        for entity_id, components in list(game_state.entities.items()):
             attack = components.get(Attack)
             if not attack:
                 continue
@@ -67,6 +67,10 @@ class CombatSystem:
                         target_health.hp -= attack.attack_damage
                         if attack.attack_range > 1:
                             create_confetti(game_state, target_pos.x, target_pos.y)
+                            if config.DEBUG:
+                                log.info(
+                                    f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
+                                )
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target
