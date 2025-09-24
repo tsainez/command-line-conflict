@@ -4,6 +4,7 @@ import pygame
 
 from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
+from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
@@ -122,7 +123,7 @@ class GameScene:
                     self.movement_system.set_target(
                         self.game_state, entity_id, grid_x, grid_y
                     )
-                    attack = components.get("attack")
+                    attack = components.get(Attack)
                     if attack:
                         attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
