@@ -122,6 +122,9 @@ class GameScene:
                     self.movement_system.set_target(
                         self.game_state, entity_id, grid_x, grid_y
                     )
+                    attack = components.get("attack")
+                    if attack:
+                        attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
             if event.key in (pygame.K_UP, pygame.K_w):
