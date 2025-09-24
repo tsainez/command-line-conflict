@@ -59,7 +59,7 @@ def create_confetti(game_state: GameState, x: float, y: float) -> int:
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="*"))
-    game_state.add_component(entity_id, Confetti(lifetime=0.2))
+    game_state.add_component(entity_id, Confetti(lifetime=0.5))
     return entity_id
 
 
