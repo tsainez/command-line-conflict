@@ -12,14 +12,14 @@ class AISystem:
     """Controls the behavior of AI-controlled entities."""
 
     def update(self, game_state: GameState) -> None:
-        """Processes AI logic for all non-human entities.
+        """Processes AI logic for all entities.
 
         Args:
             game_state: The current state of the game.
         """
         for entity_id, components in game_state.entities.items():
             player = components.get(Player)
-            if not player or player.is_human:
+            if not player:
                 continue
 
             attack = components.get(Attack)
