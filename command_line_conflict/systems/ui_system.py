@@ -17,7 +17,18 @@ from command_line_conflict.game_state import GameState
 
 
 class UISystem:
-    """Handles rendering the user interface, including unit info and key options."""
+    """Handles rendering the user interface, including unit info and key options.
+
+    This system is responsible for drawing all UI elements, such as information
+    panels for selected units, key binding hints, and pause messages.
+
+    Attributes:
+        screen: The pygame screen surface to draw on.
+        font: The main pygame font for rendering text.
+        camera (Camera): The camera object for handling view and zoom.
+        small_font: A smaller pygame font for less prominent text.
+        key_options (list[str]): A list of strings describing key bindings.
+    """
 
     def __init__(self, screen, font, camera: Camera):
         """Initializes the UISystem.
@@ -46,6 +57,7 @@ class UISystem:
 
         Args:
             game_state: The current state of the game.
+            paused (bool): A flag indicating if the game is paused.
         """
         self._draw_key_options()
         selected_entities = self._get_selected_entities(game_state)
@@ -115,7 +127,17 @@ class UISystem:
     def _draw_aggregate_detection_range(
         self, game_state: GameState, entity_ids: list[int]
     ) -> None:
-        """Draws a combined detection range for multiple units."""
+        """Draws a visual representation of the combined detection range.
+
+        This method calculates the union of the detection ranges of all
+        specified entities and renders it as a semi-transparent overlay on
+        the map.
+
+        Args:
+            game_state: The current state of the game.
+            entity_ids: A list of IDs for the entities whose detection ranges
+                        should be combined and drawn.
+        """
         detection_tiles = set()
         for entity_id in entity_ids:
             position = game_state.get_component(entity_id, Position)
@@ -152,7 +174,17 @@ class UISystem:
     def _draw_aggregate_attack_range(
         self, game_state: GameState, entity_ids: list[int]
     ) -> None:
-        """Draws a combined attack range for multiple units."""
+        """Draws a visual representation of the combined attack range.
+
+        This method calculates the union of the attack ranges of all
+        specified entities and renders it as a semi-transparent overlay on
+        the map.
+
+        Args:
+            game_state: The current state of the game.
+            entity_ids: A list of IDs for the entities whose attack ranges
+                        should be combined and drawn.
+        """
         attack_tiles = set()
         for entity_id in entity_ids:
             position = game_state.get_component(entity_id, Position)
@@ -263,6 +295,7 @@ class UISystem:
             self.screen.blit(text, (x_pos, y_pos))
 
     def _draw_paused_message(self) -> None:
+        """Displays a 'Paused' message in the center of the screen."""
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
         text_rect = text.get_rect(

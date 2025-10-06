@@ -2,7 +2,19 @@ import pygame
 
 
 class MenuScene:
-    """Manages the main menu scene, allowing navigation to other scenes."""
+    """Manages the main menu scene, allowing navigation to other scenes.
+
+    This scene displays the main menu options and handles user input for
+    navigating to the game, settings, or quitting the application.
+
+    Attributes:
+        game: The main game object, providing access to shared resources.
+        font: The default pygame font.
+        menu_options (list[str]): The text for the menu options.
+        selected_option (int): The index of the currently selected menu option.
+        title_font: The font used for the game title.
+        option_font: The font used for the menu options.
+    """
 
     def __init__(self, game):
         """Initializes the MenuScene.
@@ -47,7 +59,6 @@ class MenuScene:
         Args:
             dt: The time elapsed since the last frame.
         """
-        pass
 
     def draw(self, screen):
         """Draws the menu options and title to the screen.

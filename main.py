@@ -1,4 +1,8 @@
-"""This is the main entry point for the game."""
+"""The main entry point for the Command Line Conflict game.
+
+This script initializes and runs the game by calling the main function
+from the engine module.
+"""
 
 from command_line_conflict.engine import main
 

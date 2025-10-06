@@ -2,10 +2,12 @@ from .base import Component
 
 
 class Selectable(Component):
-    """
-    A component that makes an entity selectable by the player.
+    """Marks an entity as selectable by the player.
+
+    Attributes:
+        is_selected (bool): A flag indicating whether the entity is currently
+            selected by the player.
     """
 
     def __init__(self):
-        """Initializes the Selectable component."""
         self.is_selected = False

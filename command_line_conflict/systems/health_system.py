@@ -11,7 +11,12 @@ from ..logger import \
 
 
 class HealthSystem:
-    """Manages entity health, including regeneration and death."""
+    """Manages entity health, including regeneration and death.
+
+    This system is responsible for applying health regeneration over time and
+    for handling the consequences of an entity's health reaching zero,
+    such as adding the Dead component and removing combat-related components.
+    """
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes health regeneration and handles entity death.

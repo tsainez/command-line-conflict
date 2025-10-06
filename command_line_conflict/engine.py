@@ -13,7 +13,17 @@ from .scenes.settings import SettingsScene
 
 
 class SceneManager:
-    """Manages the different scenes (e.g., menu, game, settings) in the game."""
+    """Manages the different scenes (e.g., menu, game, settings) in the game.
+
+    This class handles the switching between scenes and delegates event handling,
+    updates, and drawing to the currently active scene.
+
+    Attributes:
+        game: The main game object.
+        scenes (dict[str, object]): A dictionary mapping scene names to their
+            respective scene objects.
+        current_scene: The currently active scene object.
+    """
 
     def __init__(self, game):
         """Initializes the SceneManager.
@@ -65,7 +75,18 @@ class SceneManager:
 
 
 class Game:
-    """The main game engine, responsible for the game loop and managing scenes."""
+    """The main game engine, responsible for the game loop and managing scenes.
+
+    This class initializes pygame, sets up the display, and contains the main
+    game loop. It uses a SceneManager to handle different game states.
+
+    Attributes:
+        screen: The main pygame screen surface.
+        clock: The pygame clock for controlling the frame rate.
+        running (bool): A flag that controls the main game loop.
+        font: The pygame font used for rendering text.
+        scene_manager (SceneManager): The manager for handling game scenes.
+    """
 
     def __init__(self, game_map: Map | None = None) -> None:
         """Initializes the game engine.

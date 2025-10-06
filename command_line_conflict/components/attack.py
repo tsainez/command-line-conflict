@@ -2,8 +2,14 @@ from .base import Component
 
 
 class Attack(Component):
-    """
-    A component that gives an entity the ability to attack.
+    """Gives an entity the ability to attack other entities.
+
+    Attributes:
+        attack_damage (int): The amount of damage the entity inflicts per attack.
+        attack_range (int): The maximum distance from which the entity can attack.
+        attack_speed (float): The time in seconds between consecutive attacks.
+        attack_target (int | None): The ID of the entity currently being targeted.
+        attack_cooldown (float): The time remaining until the entity can attack again.
     """
 
     def __init__(self, attack_damage: int, attack_range: int, attack_speed: float):

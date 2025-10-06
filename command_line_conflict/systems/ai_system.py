@@ -9,10 +9,18 @@ from ..utils.targeting import Targeting
 
 
 class AISystem:
-    """Controls the behavior of AI-controlled entities."""
+    """Controls the behavior of AI-controlled entities.
+
+    This system is responsible for the decision-making processes of non-player
+    characters (NPCs), such as identifying and acquiring targets for attack.
+    """
 
     def update(self, game_state: GameState) -> None:
         """Processes AI logic for all non-human entities.
+
+        For each non-human entity with an Attack component, this method checks
+        if a target is already assigned. If not, it uses the entity's Vision
+        to find the closest enemy and sets it as the new attack target.
 
         Args:
             game_state: The current state of the game.

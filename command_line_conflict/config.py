@@ -1,4 +1,8 @@
-"""This file contains the main configuration variables for the game."""
+"""This file contains the main configuration variables for the game.
+
+This module defines global constants and settings used throughout the game,
+such as screen dimensions, frame rate, and gameplay parameters.
+"""
 
 # A boolean that turns on/off debug mode.
 DEBUG = False

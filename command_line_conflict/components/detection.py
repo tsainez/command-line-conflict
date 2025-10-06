@@ -2,8 +2,11 @@ from .base import Component
 
 
 class Detection(Component):
-    """
-    A component that gives an entity a detection range.
+    """Gives an entity the ability to detect other entities within a certain range.
+
+    Attributes:
+        detection_range (int): The maximum distance at which this entity can
+            detect other entities.
     """
 
     def __init__(self, detection_range: int):

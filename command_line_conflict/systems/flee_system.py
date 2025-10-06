@@ -12,10 +12,14 @@ from ..utils.targeting import Targeting
 
 
 class FleeSystem:
-    """Handles the logic for entities fleeing from enemies."""
+    """Handles the logic for entities fleeing from enemies.
+
+    This system checks for conditions that would cause an entity to flee,
+    such as low health or the presence of enemies. When an entity is fleeing,
+    it will move away from the nearest threat.
+    """
 
     def __init__(self):
-        """Initializes the FleeSystem."""
         pass
 
     def update(self, game_state: GameState, dt: float) -> None:

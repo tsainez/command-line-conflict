@@ -6,7 +6,14 @@ from ..game_state import GameState
 
 
 class CorpseRemovalSystem:
-    """Removes dead entities from the game after a specified time."""
+    """Removes dead entities from the game after a specified time.
+
+    This system is responsible for cleaning up entities that have the Dead
+    component after a certain amount of time has passed.
+
+    Attributes:
+        corpse_lifetime (float): The time in seconds before a corpse is removed.
+    """
 
     def __init__(self, corpse_lifetime: float = 5.0):
         """Initializes the CorpseRemovalSystem.

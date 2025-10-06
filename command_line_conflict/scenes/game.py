@@ -21,7 +21,31 @@ from command_line_conflict.systems.ui_system import UISystem
 
 
 class GameScene:
-    """Manages the main gameplay scene, including entities, systems, and events."""
+    """Manages the main gameplay scene, including entities, systems, and events.
+
+    This class orchestrates the main game loop, handling user input, updating
+    game systems, and rendering the game state.
+
+    Attributes:
+        game: The main game object, providing access to shared resources like
+              the screen, font, and scene manager.
+        font: The pygame font used for rendering text.
+        game_state (GameState): The current state of the game world.
+        selection_start (tuple[int, int] | None): The starting screen coordinates
+            of a drag-selection box.
+        paused (bool): A flag indicating if the game is paused.
+        camera (Camera): The camera object for controlling the viewport.
+        camera_movement (dict[str, bool]): A dictionary tracking camera movement keys.
+        movement_system (MovementSystem): The system for handling entity movement.
+        rendering_system (RenderingSystem): The system for rendering game objects.
+        combat_system (CombatSystem): The system for handling combat.
+        flee_system (FleeSystem): The system for handling fleeing behavior.
+        health_system (HealthSystem): The system for managing entity health.
+        selection_system (SelectionSystem): The system for handling entity selection.
+        ui_system (UISystem): The system for rendering the UI.
+        corpse_removal_system (CorpseRemovalSystem): The system for removing dead entities.
+        ai_system (AISystem): The system for controlling AI behavior.
+    """
 
     def __init__(self, game):
         """Initializes the GameScene.
@@ -60,7 +84,11 @@ class GameScene:
         self._create_initial_units()
 
     def _create_initial_units(self):
-        """Creates the starting units for each player."""
+        """Creates the starting units for the game.
+
+        This method populates the map with initial units for both the human
+        player (Player 1) and the AI opponent (Player 2).
+        """
         # Player 1 units (human)
         for i in range(3):
             factories.create_chassis(
@@ -178,7 +206,14 @@ class GameScene:
                 self.camera.zoom_out(0.1)
 
     def _update_camera(self, dt):
-        """Updates the camera position based on user input."""
+        """Updates the camera position based on user input.
+
+        This method checks the `camera_movement` flags and moves the camera
+        accordingly. The movement speed is scaled by the delta time (dt).
+
+        Args:
+            dt (float): The time elapsed since the last frame.
+        """
         if self.camera_movement["up"]:
             self.camera.move(0, -config.CAMERA_SPEED * dt)
         if self.camera_movement["down"]:

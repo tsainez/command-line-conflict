@@ -10,15 +10,23 @@ from ..logger import log
 
 
 class CombatSystem:
-    """Handles combat interactions between entities."""
+    """Handles combat interactions between entities.
+
+    This system manages all aspects of combat, including attack cooldowns,
+    target validation, range checks, and applying damage.
+    """
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes combat logic for all entities.
-        This method iterates through all entities with an Attack component,
-        manages attack cooldowns, finds targets, and executes attacks.
+
+        This method iterates through all entities with an Attack component.
+        It manages attack cooldowns, validates the existence and health of
+        targets, checks if the target is in range, and executes attacks.
+        If a target is out of range, it orders the entity to move closer.
+
         Args:
             game_state: The current state of the game.
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame, used for cooldowns.
         """
         for entity_id, components in game_state.entities.items():
             attack = components.get(Attack)

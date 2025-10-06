@@ -6,11 +6,14 @@ import sys
 
 
 def setup_logger():
-    """
-    Sets up a logger that logs to both a file and the console.
+    """Sets up a logger that logs to both a file (`game.log`) and the console.
 
-    The log level is determined by the `LOG_LEVEL` environment variable.
-    If the variable is not set, it defaults to INFO.
+    The log level is determined by the `LOG_LEVEL` environment variable. If the
+    variable is not set, it defaults to INFO. The logger is configured to be
+    used as a singleton instance throughout the application.
+
+    Returns:
+        A configured logging.Logger instance.
     """
     # Create a logger
     logger = logging.getLogger("Command Line Conflict")

@@ -2,8 +2,13 @@ from .base import Component
 
 
 class Vision(Component):
-    """
-    A component that gives an entity vision.
+    """Gives an entity a line of sight.
+
+    This component defines the range at which an entity can "see" the game
+    world, which is used for revealing the fog of war.
+
+    Attributes:
+        vision_range (int): The maximum distance, in tiles, that the entity can see.
     """
 
     def __init__(self, vision_range: int):

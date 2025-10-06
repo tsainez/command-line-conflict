@@ -6,7 +6,22 @@ from . import config
 
 
 class FogOfWar:
-    """Manages the fog of war overlay, revealing the map based on unit vision."""
+    """Manages the fog of war overlay, revealing the map based on unit vision.
+
+    This class maintains a grid representing the visibility state of each map
+    tile (hidden, explored, or visible) and provides methods to update and
+    draw the fog of war.
+
+    Attributes:
+        width (int): The width of the map in grid cells.
+        height (int): The height of the map in grid cells.
+        grid (list[list[int]]): A 2D list representing the fog of war state for
+            each tile.
+        surface (pygame.Surface): A surface used for drawing the fog of war overlay.
+        HIDDEN (int): A constant representing a hidden tile.
+        EXPLORED (int): A constant representing an explored but not visible tile.
+        VISIBLE (int): A constant representing a currently visible tile.
+    """
 
     HIDDEN = 0
     EXPLORED = 1
@@ -30,12 +45,13 @@ class FogOfWar:
     def update(self, units: list) -> None:
         """Updates the fog of war based on unit positions and vision.
 
-        First, it downgrades all currently visible tiles to explored. Then, it
-        marks the tiles within each unit's vision range as visible.
+        This method first downgrades all currently visible tiles to "explored" status.
+        Then, it iterates through the provided units, marking the tiles within each
+        unit's vision range as "visible".
 
         Args:
-            units: A list of unit objects that have vision. Each unit must have
-                   x, y, and vision_range attributes.
+            units: A list of entities that provide vision. Each entity is expected
+                   to have Position and Vision components.
         """
         # Step 1: Downgrade all VISIBLE tiles to EXPLORED
         for y in range(self.height):

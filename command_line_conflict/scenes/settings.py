@@ -6,7 +6,20 @@ from ..logger import log
 
 
 class SettingsScene:
-    """Manages the settings menu, allowing players to change game options."""
+    """Manages the settings menu, allowing players to change game options.
+
+    This scene provides an interface for modifying game settings like screen
+    resolution and debug mode.
+
+    Attributes:
+        game: The main game object, providing access to shared resources.
+        option_font: The font used for the settings options.
+        title_font: The font used for the scene title.
+        settings_options (list[str]): The text for the settings options.
+        selected_option (int): The index of the currently selected option.
+        screen_sizes (list[tuple[int, int]]): A list of available screen resolutions.
+        current_screen_size_index (int): The index of the current screen size.
+    """
 
     def __init__(self, game):
         """Initializes the SettingsScene.
@@ -65,7 +78,6 @@ class SettingsScene:
         Args:
             dt: The time elapsed since the last frame.
         """
-        pass
 
     def draw(self, screen):
         """Draws the settings options and title to the screen.

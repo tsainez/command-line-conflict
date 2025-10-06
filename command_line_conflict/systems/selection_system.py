@@ -8,7 +8,12 @@ from ..game_state import GameState
 
 
 class SelectionSystem:
-    """Handles entity selection via mouse clicks and drag-to-select."""
+    """Handles entity selection via mouse clicks and drag-to-select.
+
+    This system is responsible for updating the `is_selected` flag on
+    `Selectable` components based on user input, such as clicking on single
+    entities or dragging a selection box.
+    """
 
     def update(
         self,

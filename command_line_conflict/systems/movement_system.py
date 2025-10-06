@@ -7,10 +7,19 @@ from ..game_state import GameState
 
 
 class MovementSystem:
-    """Handles the movement of entities."""
+    """Handles the movement of entities.
+
+    This system is responsible for pathfinding and moving entities from their
+    current position to a target destination. It supports both intelligent
+    pathfinding to avoid obstacles and simple direct movement.
+    """
 
     def set_target(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
         """Sets a new movement target for an entity and calculates the path.
+
+        If the entity is "intelligent," it will calculate a path using the A*
+        algorithm, considering other units as obstacles. Otherwise, it will
+        move in a straight line towards the target.
 
         Args:
             game_state: The current state of the game.

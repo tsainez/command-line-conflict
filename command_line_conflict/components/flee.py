@@ -2,8 +2,18 @@ from .base import Component
 
 
 class Flee(Component):
-    """
-    A component that gives an entity the ability to flee.
+    """Enables an entity to flee from perceived threats.
+
+    This component can trigger fleeing behavior based on a health threshold or
+    the presence of enemies.
+
+    Attributes:
+        flee_health_threshold (float | None): The health percentage below which
+            the entity will attempt to flee. If None, health is not a trigger.
+        flees_from_enemies (bool): If True, the entity will flee when enemies
+            are detected, regardless of health.
+        is_fleeing (bool): A flag indicating whether the entity is currently
+            in a fleeing state.
     """
 
     def __init__(

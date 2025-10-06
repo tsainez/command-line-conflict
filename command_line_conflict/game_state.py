@@ -5,7 +5,17 @@ from .maps.base import Map
 
 
 class GameState:
-    """Manages all game state, including entities, components, and the map."""
+    """Manages all game state, including entities, components, and the map.
+
+    This class acts as a container for all the data that defines the current
+    state of the game world. It uses an Entity-Component-System (ECS) architecture.
+
+    Attributes:
+        map (Map): The game map object.
+        entities (dict[int, dict]): A dictionary where keys are entity IDs and
+            values are dictionaries of components belonging to that entity.
+        next_entity_id (int): The next available ID for a new entity.
+    """
 
     def __init__(self, game_map: Map) -> None:
         """Initializes the GameState.
@@ -67,7 +77,15 @@ class GameState:
             del self.entities[entity_id]
 
     def get_entities_at_position(self, x: int, y: int) -> list[int]:
-        """Returns a list of entity IDs at a given position."""
+        """Returns a list of entity IDs at a given grid position.
+
+        Args:
+            x: The x-coordinate of the grid position.
+            y: The y-coordinate of the grid position.
+
+        Returns:
+            A list of entity IDs found at the specified position.
+        """
         entities_at_pos = []
         for entity_id, components in self.entities.items():
             position = components.get(Position)

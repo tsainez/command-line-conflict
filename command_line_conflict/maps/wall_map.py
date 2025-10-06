@@ -2,10 +2,14 @@ from .base import Map
 
 
 class WallMap(Map):
-    """A small map with a horizontal wall to demonstrate pathfinding."""
+    """A map featuring a horizontal wall with a single gap.
+
+    This map is designed to test pathfinding around obstacles. It creates a
+    horizontal wall across the center of the map, with a small opening
+    to allow units to pass through.
+    """
 
     def __init__(self) -> None:
-        """Initializes the WallMap and creates a horizontal wall with a gap."""
         super().__init__(width=20, height=15)
 
         # Create a simple horizontal wall with a gap
