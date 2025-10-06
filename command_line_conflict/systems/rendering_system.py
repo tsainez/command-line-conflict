@@ -82,8 +82,10 @@ class RenderingSystem:
                     continue
 
                 dead = components.get(Dead)
+                icon = renderable.icon
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
+                    icon = "☠"
                 elif paused:
                     color = (128, 128, 128)  # Grey for paused units
                 else:
@@ -91,9 +93,7 @@ class RenderingSystem:
                     selectable = components.get(Selectable)
                     if selectable and selectable.is_selected:
                         color = (0, 255, 0)
-                        shadow_ch = self.font.render(
-                            renderable.icon, True, (128, 128, 128)
-                        )
+                        shadow_ch = self.font.render(icon, True, (128, 128, 128))
                         shadow_ch = pygame.transform.scale(
                             shadow_ch, (grid_size, grid_size)
                         )
@@ -105,7 +105,7 @@ class RenderingSystem:
                             ),
                         )
 
-                ch = self.font.render(renderable.icon, True, color)
+                ch = self.font.render(icon, True, color)
                 ch = pygame.transform.scale(ch, (grid_size, grid_size))
                 self.screen.blit(
                     ch,
@@ -162,7 +162,7 @@ class RenderingSystem:
             prev_x, prev_y = tx, ty
 
         tx, ty = tiles[-1]
-        final_char = "➲"
+        final_char = "◎"
         ch = self.font.render(final_char, True, (255, 0, 0))
         cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
         cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom

@@ -4,6 +4,7 @@ import pygame
 
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
+from command_line_conflict.components.dead import Dead
 from command_line_conflict.components.movable import Movable
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
@@ -47,7 +48,7 @@ def test_draw_orders_are_affected_by_camera():
 
     # The character for the arrow from (20, 10) to (21, 11) is '↘'
     assert call("↘", True, (0, 255, 0)) in mock_font.render.call_args_list
-    assert call("➲", True, (255, 0, 0)) in mock_font.render.call_args_list
+    assert call("◎", True, (255, 0, 0)) in mock_font.render.call_args_list
 
     expected_calls = [
         call(mock_surface, (expected_x1, expected_y1)),
@@ -96,3 +97,34 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
 
     # Check that screen.blit was called with the transformed coordinates
     mock_screen.blit.assert_any_call(mock_scaled_surface, (expected_x, expected_y))
+
+
+@patch("pygame.transform.scale")
+def test_dead_unit_renders_as_skull(mock_scale):
+    # Arrange
+    mock_screen = Mock()
+    mock_font = Mock()
+    mock_surface = Mock()
+    mock_scaled_surface = Mock()
+    mock_surface.convert_alpha.return_value = mock_surface
+    mock_scale.return_value = mock_scaled_surface
+    mock_font.render.return_value = mock_surface
+
+    camera = Camera(x=0, y=0, zoom=1.0)
+    rendering_system = RenderingSystem(
+        screen=mock_screen, font=mock_font, camera=camera
+    )
+
+    mock_map = Mock()
+    game_state = GameState(game_map=mock_map)
+    entity_id = game_state.create_entity()
+
+    game_state.add_component(entity_id, Position(x=1, y=1))
+    game_state.add_component(entity_id, Renderable(icon="E"))
+    game_state.add_component(entity_id, Dead())
+
+    # Act
+    rendering_system.draw(game_state, paused=False)
+
+    # Assert
+    mock_font.render.assert_any_call("☠", True, (128, 128, 128))
