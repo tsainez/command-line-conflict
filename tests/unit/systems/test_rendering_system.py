@@ -45,10 +45,9 @@ def test_draw_orders_are_affected_by_camera():
     expected_x2 = (22 - camera.x) * config.GRID_SIZE * camera.zoom
     expected_y2 = (12 - camera.y) * config.GRID_SIZE * camera.zoom
 
-    # The character for the arrow from (20, 10) to (21, 11) is '\'
-    # We need to escape it in the string literal.
-    assert call("\\", True, (0, 255, 0)) in mock_font.render.call_args_list
-    assert call("X", True, (255, 0, 0)) in mock_font.render.call_args_list
+    # The character for the arrow from (20, 10) to (21, 11) is '↘'
+    assert call("↘", True, (0, 255, 0)) in mock_font.render.call_args_list
+    assert call("➲", True, (255, 0, 0)) in mock_font.render.call_args_list
 
     expected_calls = [
         call(mock_surface, (expected_x1, expected_y1)),

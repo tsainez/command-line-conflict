@@ -162,7 +162,7 @@ class RenderingSystem:
             prev_x, prev_y = tx, ty
 
         tx, ty = tiles[-1]
-        final_char = "X"
+        final_char = "➲"
         ch = self.font.render(final_char, True, (255, 0, 0))
         cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
         cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
@@ -193,23 +193,23 @@ class RenderingSystem:
         dx = (dx > 0) - (dx < 0)
         dy = (dy > 0) - (dy < 0)
         if dx == 1 and dy == 0:
-            return ">"
+            return "→"
         if dx == -1 and dy == 0:
-            return "<"
+            return "←"
         if dx == 0 and dy == 1:
-            return "v"
+            return "↓"
         if dx == 0 and dy == -1:
-            return "^"
+            return "↑"
         if dx == 1 and dy == 1:
-            return "\\"
+            return "↘"
         if dx == -1 and dy == -1:
-            return "\\"
+            return "↖"
         if dx == 1 and dy == -1:
-            return "/"
+            return "↗"
         if dx == -1 and dy == 1:
-            return "/"
+            return "↙"
         if dx != 0:
-            return "-"
+            return "─"
         if dy != 0:
-            return "|"
-        return "+"
+            return "│"
+        return "┼"
