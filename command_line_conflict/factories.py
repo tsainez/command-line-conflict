@@ -226,6 +226,7 @@ def create_extractor(
     game_state.add_component(entity_id, Renderable(icon="E", color=color))
     game_state.add_component(entity_id, Movable(speed=1.5, intelligent=True))
     game_state.add_component(entity_id, Health(hp=50, max_hp=50))
+    # Attack component is used for gathering resources
     game_state.add_component(
         entity_id, Attack(attack_damage=5, attack_range=1, attack_speed=1.0)
     )

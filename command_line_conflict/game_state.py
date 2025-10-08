@@ -17,8 +17,8 @@ class GameState:
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
         self.resources: dict[int, dict[str, int]] = {
-            1: {"minerals": 50},
-            2: {"minerals": 50},
+            1: {"minerals": 150},
+            2: {"minerals": 150},
         }
 
     def create_entity(self) -> int:

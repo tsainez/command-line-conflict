@@ -65,28 +65,34 @@ def test_win_condition(game_scene):
 
 
 def test_player_can_gather_minerals(game_scene):
-    """Tests that a player can right-click minerals to gather them."""
+    """Tests that a player can right-click minerals to gather them and that resources increase."""
     # Create an extractor and select it
     extractor_id = factories.create_extractor(
-        game_scene.game_state, 5, 5, 1, is_human=True
+        game_scene.game_state, 14, 15, 1, is_human=True
     )
     game_scene.game_state.get_component(extractor_id, Selectable).is_selected = True
+    initial_resources = game_scene.game_state.resources[1]["minerals"]
 
-    # Create a mineral patch in a new location
+    # Create a mineral patch
     minerals_id = factories.create_minerals(game_scene.game_state, 15, 15)
 
     # Simulate a right-click on the minerals
     game_scene.camera = Mock()
     game_scene.camera.screen_to_grid.return_value = (15, 15)
-
     event = Mock()
     event.type = pygame.MOUSEBUTTONDOWN
     event.button = 3
-    event.pos = (100, 100)  # Position doesn't matter as screen_to_grid is mocked
-
-    # Handle the event
+    event.pos = (200, 200)  # Position doesn't matter as screen_to_grid is mocked
     game_scene.handle_event(event)
 
-    # Check that the extractor is now targeting the minerals
+    # Check that the extractor is targeting the minerals
     extractor_attack = game_scene.game_state.get_component(extractor_id, Attack)
     assert extractor_attack.attack_target == minerals_id
+
+    # Let the combat system run for a bit to simulate gathering
+    # One second should be enough for one "attack"
+    game_scene.combat_system.update(game_scene.game_state, dt=1.0)
+
+    # Check that the player's resources have increased
+    final_resources = game_scene.game_state.resources[1]["minerals"]
+    assert final_resources > initial_resources
