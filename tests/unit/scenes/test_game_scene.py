@@ -1,9 +1,15 @@
 import pygame
+import pytest
+from unittest.mock import Mock
 
-from command_line_conflict.scenes.game import GameScene
+from command_line_conflict import factories
+from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.building import Building
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
+from command_line_conflict.components.resource import Resource
+from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.scenes.game import GameScene
 
 
 class MockGame:
@@ -13,15 +19,19 @@ class MockGame:
         self.scene_manager = None
 
 
-def test_win_condition():
-    """Tests that the game correctly identifies a winner when all buildings are destroyed."""
-    # Prevent pygame from trying to initialize video
+@pytest.fixture
+def game_scene():
+    """Fixture to create a GameScene with mocked dependencies."""
+    # Prevent pygame from trying to initialize video/font
     pygame.display.init = lambda: None
     pygame.font.init = lambda: None
-
     game = MockGame()
-    game_scene = GameScene(game)
+    scene = GameScene(game)
+    return scene
 
+
+def test_win_condition(game_scene):
+    """Tests that the game correctly identifies a winner when all buildings are destroyed."""
     # Initially, no one has buildings
     assert not game_scene.player1_has_buildings
     assert not game_scene.player2_has_buildings
@@ -52,3 +62,31 @@ def test_win_condition():
     game_scene._check_win_condition()
     assert game_scene.game_over
     assert game_scene.winner == 2
+
+
+def test_player_can_gather_minerals(game_scene):
+    """Tests that a player can right-click minerals to gather them."""
+    # Create an extractor and select it
+    extractor_id = factories.create_extractor(
+        game_scene.game_state, 5, 5, 1, is_human=True
+    )
+    game_scene.game_state.get_component(extractor_id, Selectable).is_selected = True
+
+    # Create a mineral patch in a new location
+    minerals_id = factories.create_minerals(game_scene.game_state, 15, 15)
+
+    # Simulate a right-click on the minerals
+    game_scene.camera = Mock()
+    game_scene.camera.screen_to_grid.return_value = (15, 15)
+
+    event = Mock()
+    event.type = pygame.MOUSEBUTTONDOWN
+    event.button = 3
+    event.pos = (100, 100)  # Position doesn't matter as screen_to_grid is mocked
+
+    # Handle the event
+    game_scene.handle_event(event)
+
+    # Check that the extractor is now targeting the minerals
+    extractor_attack = game_scene.game_state.get_component(extractor_id, Attack)
+    assert extractor_attack.attack_target == minerals_id

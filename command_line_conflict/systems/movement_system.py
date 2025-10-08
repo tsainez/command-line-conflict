@@ -1,3 +1,4 @@
+from ..components.attack import Attack
 from ..components.movable import Movable
 from ..components.position import Position
 from ..game_state import GameState
@@ -45,33 +46,40 @@ class MovementSystem:
         """Processes entity movement based on their current path or target.
 
         This method moves entities along their calculated path or directly
-        towards their target if no path is set.
+        towards their target if no path is set. It includes collision avoidance
+        to prevent units from overlapping.
 
         Args:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in game_state.entities.items():
+        for entity_id, components in list(game_state.entities.items()):
             position = components.get(Position)
             movable = components.get(Movable)
+            attack = components.get(Attack)
 
             if not position or not movable:
                 continue
 
-            # This logic is adapted from the Unit._move method
             if movable.path:
                 next_x, next_y = movable.path[0]
 
-                # Collision check for non-intelligent units
-                if not movable.intelligent:
-                    entities_at_next_pos = game_state.get_entities_at_position(
-                        next_x, next_y
-                    )
-                    if any(e != entity_id for e in entities_at_next_pos):
-                        movable.path = []
-                        movable.target_x = None
-                        movable.target_y = None
+                # Universal collision check
+                entities_at_next_pos = game_state.get_entities_at_position(
+                    next_x, next_y
+                )
+                is_blocked = False
+                for other_id in entities_at_next_pos:
+                    if other_id == entity_id:
                         continue
+                    if attack and attack.attack_target == other_id:
+                        continue  # Allow moving into target's space
+                    is_blocked = True
+                    break
+
+                if is_blocked:
+                    movable.path = []  # Stop movement by clearing path
+                    continue
 
                 movable.target_x, movable.target_y = next_x, next_y
                 dx = movable.target_x - position.x
@@ -101,15 +109,21 @@ class MovementSystem:
                 proposed_x = position.x + step * dx / dist
                 proposed_y = position.y + step * dy / dist
 
-                # Collision check for non-intelligent units
-                if not movable.intelligent:
-                    entities_at_proposed_pos = game_state.get_entities_at_position(
-                        int(proposed_x), int(proposed_y)
-                    )
-                    if any(e != entity_id for e in entities_at_proposed_pos):
-                        movable.target_x = None
-                        movable.target_y = None
+                # Universal collision check
+                entities_at_proposed_pos = game_state.get_entities_at_position(
+                    int(proposed_x), int(proposed_y)
+                )
+                is_blocked = False
+                for other_id in entities_at_proposed_pos:
+                    if other_id == entity_id:
                         continue
+                    if attack and attack.attack_target == other_id:
+                        continue  # Allow moving into target's space
+                    is_blocked = True
+                    break
+
+                if is_blocked:
+                    continue  # Stop movement if blocked
 
                 position.x = proposed_x
                 position.y = proposed_y

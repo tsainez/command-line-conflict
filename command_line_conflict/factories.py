@@ -39,7 +39,7 @@ def create_chassis(
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="C", color=color))
-    game_state.add_component(entity_id, Movable(speed=2, intelligent=False))
+    game_state.add_component(entity_id, Movable(speed=2, intelligent=True))
     game_state.add_component(entity_id, Health(hp=80, max_hp=80))
     game_state.add_component(
         entity_id, Attack(attack_damage=10, attack_range=1, attack_speed=1.0)

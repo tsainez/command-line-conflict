@@ -1,12 +1,15 @@
 from unittest.mock import Mock, call, patch
 
 import pygame
+import pytest
 
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.systems.rendering_system import RenderingSystem
 
@@ -75,14 +78,19 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
     )
 
     mock_map = Mock()
+    mock_map.width = 50
+    mock_map.height = 50
     game_state = GameState(game_map=mock_map)
     entity_id = game_state.create_entity()
-
     game_state.add_component(entity_id, Position(x=30, y=40))
     game_state.add_component(entity_id, Renderable(icon="E"))
+    game_state.add_component(entity_id, Player(player_id=1))
+
+    fog_of_war = FogOfWar(mock_map.width, mock_map.height)
+    fog_of_war.grid[40][30] = FogOfWar.VISIBLE
 
     # Act
-    rendering_system.draw(game_state, paused=False)
+    rendering_system.draw(game_state, paused=False, fog_of_war=fog_of_war)
 
     # Assert
     expected_x = (30 - camera.x) * config.GRID_SIZE * camera.zoom
@@ -97,3 +105,42 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
 
     # Check that screen.blit was called with the transformed coordinates
     mock_screen.blit.assert_any_call(mock_scaled_surface, (expected_x, expected_y))
+
+
+@patch("pygame.transform.scale")
+def test_rendering_system_respects_fog_of_war(mock_scale):
+    """Tests that enemy units in unseen tiles are not rendered."""
+    # Arrange
+    mock_screen = Mock()
+    mock_font = Mock()
+    mock_surface = Mock()
+    mock_scaled_surface = Mock()
+    mock_font.render.return_value = mock_surface
+    mock_scale.return_value = mock_scaled_surface
+
+    camera = Camera()
+    rendering_system = RenderingSystem(
+        screen=mock_screen, font=mock_font, camera=camera
+    )
+
+    mock_map = Mock()
+    mock_map.width = 50
+    mock_map.height = 50
+    game_state = GameState(game_map=mock_map)
+
+    # Enemy unit in an unseen location
+    enemy_id = game_state.create_entity()
+    game_state.add_component(enemy_id, Position(x=20, y=20))
+    game_state.add_component(enemy_id, Renderable(icon="C", color=(255, 0, 0)))
+    game_state.add_component(enemy_id, Player(player_id=2))
+
+    fog_of_war = FogOfWar(width=50, height=50)
+    # By default, all tiles are HIDDEN.
+
+    # Act
+    rendering_system.draw(game_state, paused=False, fog_of_war=fog_of_war)
+
+    # Assert
+    # Check that render was not called for the enemy icon 'C'
+    for call_args in mock_font.render.call_args_list:
+        assert call_args[0][0] != "C"

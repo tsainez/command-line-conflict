@@ -6,8 +6,8 @@ from ..components.health import Health
 from ..components.movable import Movable
 from ..components.selectable import Selectable
 from ..game_state import GameState
-from ..logger import \
-    log  # TODO: Expand logger usage, specifically for when in debug mode. Can we log more than just deaths?
+from ..logger import log
+from ..utils.logging import debug_log
 
 
 class HealthSystem:
@@ -32,8 +32,7 @@ class HealthSystem:
 
             if health.hp <= 0:
                 if not components.get(Dead):
-                    if config.DEBUG:
-                        log.info(f"Entity {entity_id} has died.")
+                    debug_log(f"Entity {entity_id} has died.")
                     game_state.add_component(entity_id, Dead())
                     game_state.remove_component(entity_id, Movable)
                     game_state.remove_component(entity_id, Attack)

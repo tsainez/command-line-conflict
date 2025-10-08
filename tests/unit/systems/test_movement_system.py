@@ -64,3 +64,33 @@ def test_intelligent_unit_moves_around_obstacle(game_state, movement_system):
 
     # The unit should have moved to the target
     assert int(unit1_pos.x) == 10 and int(unit1_pos.y) == 12
+
+
+def test_units_do_not_overlap(game_state, movement_system):
+    """Tests that two units do not move into the same space."""
+    # Create two intelligent 'rover' units
+    unit1_id = create_rover(game_state, x=10, y=10, player_id=1)
+    unit2_id = create_rover(game_state, x=12, y=10, player_id=2)
+
+    # Set the same target for both units
+    target_x, target_y = 11, 10
+    movement_system.set_target(game_state, unit1_id, target_x, target_y)
+    movement_system.set_target(game_state, unit2_id, target_x, target_y)
+
+    # Let the system update enough times for the units to move
+    for _ in range(10):
+        movement_system.update(game_state, dt=0.1)
+
+    unit1_pos = game_state.get_component(unit1_id, Position)
+    unit2_pos = game_state.get_component(unit2_id, Position)
+
+    # Check that the two units are not in the same grid cell
+    assert (int(unit1_pos.x), int(unit1_pos.y)) != (
+        int(unit2_pos.x),
+        int(unit2_pos.y),
+    )
+
+    # Check that one of them made it to the target
+    unit1_at_target = (int(unit1_pos.x), int(unit1_pos.y)) == (target_x, target_y)
+    unit2_at_target = (int(unit2_pos.x), int(unit2_pos.y)) == (target_x, target_y)
+    assert unit1_at_target or unit2_at_target

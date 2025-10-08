@@ -11,11 +11,15 @@ from command_line_conflict.components.factory import Factory
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.resource import Resource
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
+from command_line_conflict.utils.logging import debug_log
 from command_line_conflict.systems.build_system import BuildSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
@@ -74,6 +78,9 @@ class GameScene:
         self.confetti_system = ConfettiSystem()
         self.build_system = BuildSystem()
         self.factory_system = FactorySystem()
+        self.fog_of_war = FogOfWar(
+            self.game_state.map.width, self.game_state.map.height
+        )
         self._create_initial_units()
 
     def _create_initial_units(self):
@@ -134,19 +141,55 @@ class GameScene:
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-            log.debug(
-                f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
-            )
+            log.debug(f"Right-click command at grid coordinates: {(grid_x, grid_y)}")
+
+            # Determine the target ID, if any
+            target_entities = self.game_state.get_entities_at_position(grid_x, grid_y)
+            target_id = target_entities[0] if target_entities else None
+
+            # Command selected units
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
-                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
-                    self.movement_system.set_target(
-                        self.game_state, entity_id, grid_x, grid_y
-                    )
                     attack = components.get(Attack)
-                    if attack:
-                        attack.attack_target = None
+                    player = components.get(Player)
+
+                    if target_id is not None:
+                        target_components = self.game_state.entities.get(target_id)
+                        if not target_components:
+                            # Target might have been destroyed, treat as move
+                            self.movement_system.set_target(
+                                self.game_state, entity_id, grid_x, grid_y
+                            )
+                            if attack:
+                                attack.attack_target = None
+                            continue
+
+                        is_resource = target_components.get(Resource) is not None
+                        target_player = target_components.get(Player)
+                        is_enemy = (
+                            target_player
+                            and player
+                            and target_player.player_id != player.player_id
+                        )
+
+                        if attack and (is_resource or is_enemy):
+                            attack.attack_target = target_id
+                            debug_log(f"Unit {entity_id} targeting entity {target_id}")
+                        else:  # Not a valid attack target, so just move
+                            self.movement_system.set_target(
+                                self.game_state, entity_id, grid_x, grid_y
+                            )
+                            if attack:
+                                attack.attack_target = None
+                    else:
+                        # It's a move command to empty ground
+                        debug_log(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                        self.movement_system.set_target(
+                            self.game_state, entity_id, grid_x, grid_y
+                        )
+                        if attack:
+                            attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.camera_movement["up"] = True
@@ -289,6 +332,18 @@ class GameScene:
         self.factory_system.update(self.game_state, dt)
         self._check_win_condition()
 
+        # Update fog of war based on player 1's units
+        player1_units_with_vision = []
+        for entity_id, components in self.game_state.entities.items():
+            player = components.get(Player)
+            vision = components.get(Vision)
+            position = components.get(Position)
+            if player and player.player_id == 1 and vision and position:
+                player1_units_with_vision.append(
+                    type("Unit", (), {"x": position.x, "y": position.y, "vision_range": vision.vision_range})()
+                )
+        self.fog_of_war.update(player1_units_with_vision)
+
     def draw(self, screen):
         """Draws the entire game scene.
 
@@ -312,7 +367,8 @@ class GameScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
-        self.rendering_system.draw(self.game_state, self.paused)
+        self.rendering_system.draw(self.game_state, self.paused, self.fog_of_war)
+        self.fog_of_war.draw(screen, self.camera)
         self.ui_system.draw(
             self.game_state, self.paused, self.game_over, self.winner
         )

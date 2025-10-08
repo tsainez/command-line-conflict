@@ -11,10 +11,10 @@ from ..components.player import Player
 from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
+from ..fog_of_war import FogOfWar
 from ..game_state import GameState
 
 # TODO: Integrate logger for debug mode. Currently not used.
-
 
 
 class RenderingSystem:
@@ -31,7 +31,7 @@ class RenderingSystem:
         self.font = font
         self.camera = camera
 
-    def draw(self, game_state: GameState, paused: bool) -> None:
+    def draw(self, game_state: GameState, paused: bool, fog_of_war: FogOfWar) -> None:
         """Draws all renderable entities to the screen.
         This method iterates through all entities, drawing them based on their
         position and state (e.g., selected, dead). It also calls other
@@ -45,6 +45,18 @@ class RenderingSystem:
             player = components.get(Player)
 
             if position and renderable:
+                # Fog of War check
+                if player and player.player_id != 1:
+                    if (
+                        int(position.y) < len(fog_of_war.grid)
+                        and int(position.x) < len(fog_of_war.grid[0])
+                    ):
+                        tile_status = fog_of_war.grid[int(position.y)][int(position.x)]
+                        if tile_status != FogOfWar.VISIBLE:
+                            continue
+                    else:  # Out of bounds, don't draw
+                        continue
+
                 # Camera transform
                 cam_x = (
                     (int(position.x) - self.camera.x)

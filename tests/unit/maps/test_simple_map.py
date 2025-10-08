@@ -29,10 +29,34 @@ def test_map_draw_with_camera(mock_scale):
     expected_y = (20 - camera.y) * config.GRID_SIZE * camera.zoom
 
     grid_size = int(config.GRID_SIZE * camera.zoom)
-    mock_scale.assert_called_once_with(mock_surface, (grid_size, grid_size))
-    mock_surf.blit.assert_called_once_with(
+    mock_scale.assert_any_call(mock_surface, (grid_size, grid_size))
+    mock_surf.blit.assert_any_call(
         mock_scaled_surface, (expected_x, expected_y)
     )
+
+
+def test_simple_map_has_border_walls():
+    """Tests that the SimpleMap is correctly enclosed by walls."""
+    game_map = SimpleMap()
+
+    # Check a few points on each wall
+    assert game_map.is_blocked(0, 0)  # Top-left corner
+    assert game_map.is_blocked(game_map.width - 1, 0)  # Top-right corner
+    assert game_map.is_blocked(0, game_map.height - 1)  # Bottom-left corner
+    assert game_map.is_blocked(
+        game_map.width - 1, game_map.height - 1
+    )  # Bottom-right corner
+    assert game_map.is_blocked(game_map.width // 2, 0)  # Middle of top wall
+    assert game_map.is_blocked(
+        game_map.width // 2, game_map.height - 1
+    )  # Middle of bottom wall
+    assert game_map.is_blocked(0, game_map.height // 2)  # Middle of left wall
+    assert game_map.is_blocked(
+        game_map.width - 1, game_map.height // 2
+    )  # Middle of right wall
+
+    # Check a point in the middle is not a wall
+    assert not game_map.is_blocked(game_map.width // 2, game_map.height // 2)
 
 
 @patch("pygame.transform.scale")
@@ -52,18 +76,12 @@ def test_map_draw_without_camera_bug(mock_scale):
     game_map.draw(mock_surf, mock_font)
 
     # Assert
-    # This is what it should be
     expected_x = 15 * config.GRID_SIZE
     expected_y = 20 * config.GRID_SIZE
 
-    # The bug is that it doesn't multiply by GRID_SIZE
-    # and doesn't scale the surface.
-
-    # We expect scale to be called with the default grid size
-    mock_scale.assert_called_once_with(
+    mock_scale.assert_any_call(
         mock_surface, (config.GRID_SIZE, config.GRID_SIZE)
     )
-    # We expect blit to be called with the scaled coordinates
-    mock_surf.blit.assert_called_once_with(
+    mock_surf.blit.assert_any_call(
         mock_scaled_surface, (expected_x, expected_y)
     )

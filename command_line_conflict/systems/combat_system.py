@@ -9,6 +9,7 @@ from ..components.vision import Vision
 from ..factories import create_confetti
 from ..game_state import GameState
 from ..logger import log
+from ..utils.logging import debug_log
 
 
 class CombatSystem:
@@ -60,11 +61,10 @@ class CombatSystem:
                         movable.target_x, movable.target_y = my_pos.x, my_pos.y
 
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
-                        if config.DEBUG:
-                            log.info(  # TODO: Can we get the entity names here?
-                                f"Entity {entity_id} attacks {attack.attack_target} "
-                                f"for {attack.attack_damage} damage."
-                            )
+                        debug_log(  # TODO: Can we get the entity names here?
+                            f"Entity {entity_id} attacks {attack.attack_target} "
+                            f"for {attack.attack_damage} damage."
+                        )
                         # If target is a resource, gather it
                         target_resource = target_components.get(Resource)
                         my_player = components.get(Player)
@@ -73,15 +73,14 @@ class CombatSystem:
                             game_state.resources[my_player.player_id][target_resource.resource_type] += amount_gathered
                             target_resource.amount -= amount_gathered
                             target_health.hp -= amount_gathered
-                            log.info(f"Player {my_player.player_id} gathered {amount_gathered} {target_resource.resource_type}.")
+                            debug_log(f"Player {my_player.player_id} gathered {amount_gathered} {target_resource.resource_type}.")
                         else:
                             target_health.hp -= attack.attack_damage
                             if attack.attack_range > 1:
                                 create_confetti(game_state, target_pos.x, target_pos.y)
-                                if config.DEBUG:
-                                    log.info(
-                                        f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
-                                    )
+                                debug_log(
+                                    f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
+                                )
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target
