@@ -4,7 +4,6 @@ from ..components.health import Health
 from ..components.movable import Movable
 from ..components.player import Player
 from ..components.position import Position
-from ..components.resource import Resource
 from ..components.vision import Vision
 from ..factories import create_confetti
 from ..game_state import GameState
@@ -65,22 +64,12 @@ class CombatSystem:
                             f"Entity {entity_id} attacks {attack.attack_target} "
                             f"for {attack.attack_damage} damage."
                         )
-                        # If target is a resource, gather it
-                        target_resource = target_components.get(Resource)
-                        my_player = components.get(Player)
-                        if target_resource and my_player:
-                            amount_gathered = min(attack.attack_damage, target_resource.amount)
-                            game_state.resources[my_player.player_id][target_resource.resource_type] += amount_gathered
-                            target_resource.amount -= amount_gathered
-                            target_health.hp -= amount_gathered
-                            debug_log(f"Player {my_player.player_id} gathered {amount_gathered} {target_resource.resource_type}.")
-                        else:
-                            target_health.hp -= attack.attack_damage
-                            if attack.attack_range > 1:
-                                create_confetti(game_state, target_pos.x, target_pos.y)
-                                debug_log(
-                                    f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
-                                )
+                        target_health.hp -= attack.attack_damage
+                        if attack.attack_range > 1:
+                            create_confetti(game_state, target_pos.x, target_pos.y)
+                            debug_log(
+                                f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
+                            )
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target

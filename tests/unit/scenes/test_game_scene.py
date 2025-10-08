@@ -3,11 +3,10 @@ import pytest
 from unittest.mock import Mock
 
 from command_line_conflict import factories
-from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.building import Building
+from command_line_conflict.components.gatherer import Gatherer
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
-from command_line_conflict.components.resource import Resource
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.scenes.game import GameScene
 
@@ -27,14 +26,16 @@ def game_scene():
     pygame.font.init = lambda: None
     game = MockGame()
     scene = GameScene(game)
+    # Clear default units for clean test slate
+    scene.game_state.entities = {}
     return scene
 
 
 def test_win_condition(game_scene):
     """Tests that the game correctly identifies a winner when all buildings are destroyed."""
-    # Initially, no one has buildings
-    assert not game_scene.player1_has_buildings
-    assert not game_scene.player2_has_buildings
+    # Initially, no one has had buildings
+    assert not game_scene.player1_had_building
+    assert not game_scene.player2_had_building
     assert not game_scene.game_over
 
     # Player 1 builds a building
@@ -42,18 +43,18 @@ def test_win_condition(game_scene):
     game_scene.game_state.add_component(player1_building, Building())
     game_scene.game_state.add_component(player1_building, Player(player_id=1))
     game_scene.game_state.add_component(player1_building, Position(1, 1))
-    game_scene.player1_has_buildings = True
 
     # Player 2 builds a building
     player2_building = game_scene.game_state.create_entity()
     game_scene.game_state.add_component(player2_building, Building())
     game_scene.game_state.add_component(player2_building, Player(player_id=2))
     game_scene.game_state.add_component(player2_building, Position(2, 2))
-    game_scene.player2_has_buildings = True
 
-    # Game should not be over
+    # Game should not be over yet, but flags should be set
     game_scene._check_win_condition()
     assert not game_scene.game_over
+    assert game_scene.player1_had_building
+    assert game_scene.player2_had_building
 
     # Player 1 loses their building
     game_scene.game_state.remove_entity(player1_building)
@@ -86,12 +87,13 @@ def test_player_can_gather_minerals(game_scene):
     game_scene.handle_event(event)
 
     # Check that the extractor is targeting the minerals
-    extractor_attack = game_scene.game_state.get_component(extractor_id, Attack)
-    assert extractor_attack.attack_target == minerals_id
+    gatherer = game_scene.game_state.get_component(extractor_id, Gatherer)
+    assert gatherer.target_resource_id == minerals_id
 
-    # Let the combat system run for a bit to simulate gathering
-    # One second should be enough for one "attack"
-    game_scene.combat_system.update(game_scene.game_state, dt=1.0)
+    # Let the systems run for a bit to simulate gathering
+    for _ in range(10): # 1 second of game time
+        game_scene.movement_system.update(game_scene.game_state, dt=0.1)
+        game_scene.resource_system.update(game_scene.game_state, dt=0.1)
 
     # Check that the player's resources have increased
     final_resources = game_scene.game_state.resources[1]["minerals"]

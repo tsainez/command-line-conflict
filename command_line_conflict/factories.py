@@ -8,6 +8,7 @@ from .components.confetti import Confetti
 from .components.detection import Detection
 from .components.factory import Factory
 from .components.flee import Flee
+from .components.gatherer import Gatherer
 from .components.health import Health
 from .components.movable import Movable
 from .components.player import Player
@@ -226,10 +227,7 @@ def create_extractor(
     game_state.add_component(entity_id, Renderable(icon="E", color=color))
     game_state.add_component(entity_id, Movable(speed=1.5, intelligent=True))
     game_state.add_component(entity_id, Health(hp=50, max_hp=50))
-    # Attack component is used for gathering resources
-    game_state.add_component(
-        entity_id, Attack(attack_damage=5, attack_range=1, attack_speed=1.0)
-    )
+    game_state.add_component(entity_id, Gatherer())
     game_state.add_component(entity_id, Detection(detection_range=5))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())

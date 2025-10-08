@@ -1,13 +1,24 @@
 """
 This module contains integration tests that test the game's systems.
 """
+import pygame
+from unittest.mock import Mock, patch
 
-from command_line_conflict import factories
+from command_line_conflict import config, factories
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.builder import Builder
+from command_line_conflict.components.factory import Factory
+from command_line_conflict.components.gatherer import Gatherer
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
+from command_line_conflict.systems.factory_system import FactorySystem
 from command_line_conflict.systems.movement_system import MovementSystem
+from command_line_conflict.systems.resource_system import ResourceSystem
 
 
 def test_chassis_pathfinding_around_wall(game_state):
@@ -80,3 +91,71 @@ def test_unit_takes_damage_in_combat(game_state):
 
     # Check that the defender has taken damage
     assert defender_health.hp < initial_hp
+
+
+def test_extractor_gathers_minerals_with_resource_system(game_state):
+    """
+    Tests that an extractor with a Gatherer component can gather minerals
+    using the new ResourceSystem.
+    """
+    # Create an extractor and a mineral patch
+    extractor_id = factories.create_extractor(game_state, 5, 5, player_id=1)
+    minerals_id = factories.create_minerals(game_state, 10, 10)
+    initial_minerals = game_state.resources[1]["minerals"]
+    minerals_pos = game_state.get_component(minerals_id, Position)
+
+    # Initialize systems
+    movement_system = MovementSystem()
+    resource_system = ResourceSystem()
+
+    # Set the extractor's target to the minerals
+    gatherer = game_state.get_component(extractor_id, Gatherer)
+    gatherer.target_resource_id = minerals_id
+    movement_system.set_target(
+        game_state, extractor_id, minerals_pos.x, minerals_pos.y
+    )
+
+    # Run the systems for a few seconds to allow the unit to move and gather
+    for _ in range(50):  # 5 seconds of game time
+        movement_system.update(game_state, dt=0.1)
+        resource_system.update(game_state, dt=0.1)
+
+    # Check that the player's minerals have increased
+    final_minerals = game_state.resources[1]["minerals"]
+    assert final_minerals > initial_minerals
+
+
+def test_ai_builds_and_produces(game_state):
+    """Tests that the AI can build a factory and then produce a unit."""
+    # Create an AI extractor
+    factories.create_extractor(game_state, 42, 38, player_id=2, is_human=False)
+    game_state.resources[2]["minerals"] = 200 # Give AI plenty of resources
+
+    # Initialize AI and other relevant systems
+    ai_system = AISystem()
+    factory_system = FactorySystem()
+
+    # Run AI system to make it decide to build
+    ai_system.update(game_state)
+
+    # Check that a factory was created by the AI
+    factory_id = None
+    for entity_id, components in game_state.entities.items():
+        if components.get(Renderable, {}).icon == "F":
+            factory_id = entity_id
+            break
+    assert factory_id is not None, "AI did not build a factory"
+
+    # Run AI and factory systems to produce a unit
+    for _ in range(60): # 6 seconds of game time
+        ai_system.update(game_state)
+        factory_system.update(game_state, dt=0.1)
+
+    # Check that a new unit was created by the factory
+    new_unit_found = False
+    for entity_id, components in game_state.entities.items():
+        player = components.get(Player)
+        if player and player.player_id == 2 and components.get(Renderable, {}).icon == "C":
+            new_unit_found = True
+            break
+    assert new_unit_found, "AI factory did not produce a unit"
