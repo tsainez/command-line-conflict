@@ -25,3 +25,9 @@ PLAYER_COLORS = {
     1: (0, 128, 255),  # Blue
     2: (255, 0, 0),  # Red
 }
+
+UNIT_COSTS = {
+    "chassis": {"minerals": 50},
+    "extractor": {"minerals": 75},
+    "unit_factory": {"minerals": 100},
+}

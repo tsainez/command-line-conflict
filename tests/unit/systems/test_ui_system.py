@@ -45,7 +45,7 @@ def ui_system():
 @patch("pygame.draw.rect")
 def test_draw_aggregate_attack_range(mock_draw_rect, ui_system, game_state):
     """Test that the aggregate attack range is drawn."""
-    ui_system.draw(game_state, paused=False)
+    ui_system.draw(game_state, paused=False, game_over=False, winner=None)
 
     # For a radius of 5, 81 tiles should be in attack range.
     # For a radius of 5, 81 tiles should be in detection range.
@@ -69,7 +69,7 @@ def test_draw_aggregate_attack_range_multiple_units(
     }
     game_state.get_component(1, Selectable).is_selected = True
 
-    ui_system.draw(game_state, paused=False)
+    ui_system.draw(game_state, paused=False, game_over=False, winner=None)
 
     # Calculate expected tiles for unit 1 attack (radius 5)
     attack_tiles_1 = set()
@@ -125,7 +125,7 @@ def test_draw_observer_detection_range(mock_draw_rect, ui_system, game_state):
         Selectable: selectable,
     }
 
-    ui_system.draw(game_state, paused=False)
+    ui_system.draw(game_state, paused=False, game_over=False, winner=None)
 
     # Calculate expected tiles for observer detection (radius 15)
     detection_tiles = set()

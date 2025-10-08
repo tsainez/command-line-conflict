@@ -1,5 +1,6 @@
 from ..components.player import Player
 from ..components.position import Position
+from ..components.resource import Resource
 from ..components.vision import Vision
 from ..game_state import GameState
 
@@ -40,3 +41,30 @@ class Targeting:
                 min_dist = dist
                 closest_enemy = other_id
         return closest_enemy
+
+    @staticmethod
+    def find_closest_minerals(
+        my_id: int, my_pos: Position, vision: Vision, game_state: GameState
+    ) -> int | None:
+        """Finds the closest mineral patch within the vision range."""
+        closest_minerals = None
+        min_dist = float("inf")
+
+        for other_id, other_components in game_state.entities.items():
+            if other_id == my_id:
+                continue
+
+            if not other_components.get(Resource):
+                continue
+
+            other_pos = other_components.get(Position)
+            if not other_pos:
+                continue
+
+            dist = (
+                (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+            ) ** 0.5
+            if dist <= vision.vision_range and dist < min_dist:
+                min_dist = dist
+                closest_minerals = other_id
+        return closest_minerals

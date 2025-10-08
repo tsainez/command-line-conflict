@@ -16,6 +16,10 @@ class GameState:
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
+        self.resources: dict[int, dict[str, int]] = {
+            1: {"minerals": 50},
+            2: {"minerals": 50},
+        }
 
     def create_entity(self) -> int:
         """Creates a new entity and returns its ID."""

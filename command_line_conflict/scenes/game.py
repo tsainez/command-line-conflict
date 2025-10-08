@@ -5,15 +5,23 @@ import pygame
 from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.builder import Builder
+from command_line_conflict.components.building import Building
+from command_line_conflict.components.factory import Factory
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
+from command_line_conflict.systems.build_system import BuildSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
 from command_line_conflict.systems.corpse_removal_system import \
     CorpseRemovalSystem
+from command_line_conflict.systems.factory_system import FactorySystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
@@ -37,6 +45,10 @@ class GameScene:
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
         self.paused = False
+        self.game_over = False
+        self.winner = None
+        self.player1_has_buildings = False
+        self.player2_has_buildings = False
 
         # Camera
         self.camera = Camera()
@@ -60,19 +72,24 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.build_system = BuildSystem()
+        self.factory_system = FactorySystem()
         self._create_initial_units()
 
     def _create_initial_units(self):
-        """Creates the starting units for each player."""
-        # Player 1 units (human)
+        """Creates the starting units and mineral patches for each player."""
+        # Player 1 (human)
+        factories.create_minerals(self.game_state, 10, 10)
         for i in range(3):
-            factories.create_chassis(
-                self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
+            factories.create_extractor(
+                self.game_state, 8, 8 + i * 2, player_id=1, is_human=True
             )
-        # Player 2 units (AI)
+
+        # Player 2 (AI)
+        factories.create_minerals(self.game_state, 40, 40)
         for i in range(3):
-            factories.create_chassis(
-                self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
+            factories.create_extractor(
+                self.game_state, 42, 38 + i * 2, player_id=2, is_human=False
             )
 
     def handle_event(self, event):
@@ -131,7 +148,6 @@ class GameScene:
                     if attack:
                         attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
-            # Camera movement
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.camera_movement["up"] = True
             elif event.key in (pygame.K_DOWN, pygame.K_s):
@@ -140,37 +156,12 @@ class GameScene:
                 self.camera_movement["left"] = True
             elif event.key in (pygame.K_RIGHT, pygame.K_d):
                 self.camera_movement["right"] = True
+            elif event.key == pygame.K_p:
+                self.paused = not self.paused
+            elif event.key == pygame.K_ESCAPE:
+                self.game.scene_manager.switch_to("menu")
             else:
-                mx, my = pygame.mouse.get_pos()
-                gx, gy = self.camera.screen_to_grid(mx, my)
-                if event.key == pygame.K_1:
-                    factories.create_extractor(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_2:
-                    factories.create_chassis(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_3:
-                    factories.create_rover(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_4:
-                    factories.create_arachnotron(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_5:
-                    factories.create_observer(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_6:
-                    factories.create_immortal(
-                        self.game_state, gx, gy, player_id=1, is_human=True
-                    )
-                elif event.key == pygame.K_p:
-                    self.paused = not self.paused
-                elif event.key == pygame.K_ESCAPE:
-                    self.game.scene_manager.switch_to("menu")
+                self.handle_action_keys(event.key)
         elif event.type == pygame.KEYUP:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.camera_movement["up"] = False
@@ -187,6 +178,61 @@ class GameScene:
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
 
+    def handle_action_keys(self, key):
+        """Handles keyboard shortcuts for in-game actions."""
+        selected_units = []
+        for entity_id, components in self.game_state.entities.items():
+            selectable = components.get(Selectable)
+            if selectable and selectable.is_selected:
+                selected_units.append((entity_id, components))
+
+        if not selected_units:
+            return
+
+        # For now, commands apply to the first selected unit
+        entity_id, components = selected_units[0]
+        player = components.get(Player)
+        if not player or not player.is_human:
+            return
+
+        # Builder actions
+        builder = components.get(Builder)
+        if builder and key == pygame.K_f and "unit_factory" in builder.build_types:
+            cost = config.UNIT_COSTS["unit_factory"]
+            if self.game_state.resources[player.player_id]["minerals"] >= cost["minerals"]:
+                mx, my = pygame.mouse.get_pos()
+                gx, gy = self.camera.screen_to_grid(mx, my)
+                self.game_state.resources[player.player_id]["minerals"] -= cost["minerals"]
+                site_id = self.game_state.create_entity()
+                self.game_state.add_component(site_id, Position(gx, gy))
+                self.game_state.add_component(site_id, Renderable(icon="X", color=(128, 128, 128)))
+                self.game_state.add_component(site_id, Building())
+                self.game_state.add_component(site_id, Player(player.player_id, player.is_human))
+                builder.build_target = site_id
+                self.movement_system.set_target(self.game_state, entity_id, gx, gy)
+                log.info(f"Player {player.player_id} building a factory at {(gx, gy)}.")
+                if player.player_id == 1:
+                    self.player1_has_buildings = True
+                else:
+                    self.player2_has_buildings = True
+
+        # Factory actions
+        factory = components.get(Factory)
+        if factory:
+            unit_to_build = None
+            if key == pygame.K_c and "chassis" in factory.unit_types:
+                unit_to_build = "chassis"
+            elif key == pygame.K_e and "extractor" in factory.unit_types:
+                unit_to_build = "extractor"
+
+            if unit_to_build:
+                cost = config.UNIT_COSTS[unit_to_build]
+                if self.game_state.resources[player.player_id]["minerals"] >= cost["minerals"]:
+                    self.game_state.resources[player.player_id]["minerals"] -= cost["minerals"]
+                    factory.production_queue.append(unit_to_build)
+                    log.info(f"Factory {entity_id} queued a {unit_to_build}.")
+
+
     def _update_camera(self, dt):
         """Updates the camera position based on user input."""
         if self.camera_movement["up"]:
@@ -198,13 +244,38 @@ class GameScene:
         if self.camera_movement["right"]:
             self.camera.move(config.CAMERA_SPEED * dt, 0)
 
+    def _check_win_condition(self):
+        if self.game_over:
+            return
+
+        player1_building_count = 0
+        player2_building_count = 0
+
+        for entity_id, components in self.game_state.entities.items():
+            if components.get(Building):
+                player = components.get(Player)
+                if player:
+                    if player.player_id == 1:
+                        player1_building_count += 1
+                    elif player.player_id == 2:
+                        player2_building_count += 1
+
+        if self.player1_has_buildings and player1_building_count == 0:
+            self.game_over = True
+            self.winner = 2
+            log.info("Player 2 wins!")
+        elif self.player2_has_buildings and player2_building_count == 0:
+            self.game_over = True
+            self.winner = 1
+            log.info("Player 1 wins!")
+
     def update(self, dt):
         """Updates the state of all game systems.
 
         Args:
             dt: The time elapsed since the last frame.
         """
-        if self.paused:
+        if self.game_over or self.paused:
             return
         self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
@@ -214,6 +285,9 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+        self.build_system.update(self.game_state, dt)
+        self.factory_system.update(self.game_state, dt)
+        self._check_win_condition()
 
     def draw(self, screen):
         """Draws the entire game scene.
@@ -239,7 +313,9 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
-        self.ui_system.draw(self.game_state, self.paused)
+        self.ui_system.draw(
+            self.game_state, self.paused, self.game_over, self.winner
+        )
 
         # Highlight selected units
         if self.selection_start:

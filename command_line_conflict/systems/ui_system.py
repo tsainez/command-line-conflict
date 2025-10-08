@@ -32,32 +32,50 @@ class UISystem:
         self.camera = camera
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
-            "1: Extractor",
-            "2: Chassis",
-            "3: Rover",
-            "4: Arachnotron",
-            "5: Observer",
-            "6: Immortal",
-            "W: Wall",
+            "F: Build Factory",
+            "C: Build Chassis",
+            "E: Build Extractor",
         ]
 
-    def draw(self, game_state: GameState, paused: bool) -> None:
-        """Draws the main UI, including selected unit info and key options.
+    def _draw_resource_info(self, game_state: GameState) -> None:
+        """Draws the player's resource counts on the screen."""
+        # For now, only show player 1's resources
+        player_resources = game_state.resources.get(1, {})
+        minerals = player_resources.get("minerals", 0)
+        resource_text = f"Minerals: {minerals}"
+        text = self.font.render(resource_text, True, (255, 255, 255))
+        self.screen.blit(text, (10, 10))
 
+    def draw(
+        self,
+        game_state: GameState,
+        paused: bool,
+        game_over: bool,
+        winner: int | None,
+    ) -> None:
+        """Draws the main UI, including selected unit info and key options.
         Args:
             game_state: The current state of the game.
+            paused: Whether the game is paused.
+            game_over: Whether the game is over.
+            winner: The winning player's ID.
         """
+        self._draw_resource_info(game_state)
         self._draw_key_options()
-        selected_entities = self._get_selected_entities(game_state)
-        if len(selected_entities) == 1:
-            self._draw_single_unit_info(game_state, selected_entities[0])
-        elif len(selected_entities) > 1:
-            self._draw_multi_unit_info(game_state, selected_entities)
-            self._draw_aggregate_detection_range(game_state, selected_entities)
-            self._draw_aggregate_attack_range(game_state, selected_entities)
+        if not game_over:
+            selected_entities = self._get_selected_entities(game_state)
+            if len(selected_entities) == 1:
+                self._draw_single_unit_info(game_state, selected_entities[0])
+            elif len(selected_entities) > 1:
+                self._draw_multi_unit_info(game_state, selected_entities)
+                self._draw_aggregate_detection_range(game_state, selected_entities)
+                self._draw_aggregate_attack_range(game_state, selected_entities)
 
         if paused:
             self._draw_paused_message()
+
+        if game_over:
+            self._draw_game_over_message(winner)
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         """Gets a list of all currently selected entity IDs.
@@ -265,6 +283,18 @@ class UISystem:
     def _draw_paused_message(self) -> None:
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
+        text_rect = text.get_rect(
+            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
+        )
+        self.screen.blit(text, text_rect)
+
+    def _draw_game_over_message(self, winner: int | None) -> None:
+        """Draws the game over message on the screen."""
+        font = pygame.font.Font(None, 74)
+        if winner == 1:
+            text = font.render("You Win!", True, (0, 255, 0))
+        else:
+            text = font.render("You Lose!", True, (255, 0, 0))
         text_rect = text.get_rect(
             center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
         )

@@ -70,6 +70,9 @@ class FogOfWar:
             screen: The pygame screen surface to draw on.
             camera: The camera object for view/zoom (optional).
         """
+        if config.DEBUG:
+            return
+
         self.surface.fill((0, 0, 0, 0))  # Clear the surface with transparency
         grid_size = config.GRID_SIZE
         for y in range(self.height):

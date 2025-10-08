@@ -4,17 +4,21 @@ import logging
 import os
 import sys
 
+from . import config
+
 
 def setup_logger():
     """
     Sets up a logger that logs to both a file and the console.
 
-    The log level is determined by the `LOG_LEVEL` environment variable.
-    If the variable is not set, it defaults to INFO.
+    The log level is determined by the `LOG_LEVEL` environment variable,
+    but will be overridden by the `DEBUG` flag in `config.py`.
     """
     # Create a logger
     logger = logging.getLogger("Command Line Conflict")
     log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+    if config.DEBUG:
+        log_level = "DEBUG"
     logger.setLevel(log_level)
 
     # Create a formatter
