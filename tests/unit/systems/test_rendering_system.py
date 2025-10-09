@@ -127,4 +127,42 @@ def test_dead_unit_renders_as_skull(mock_scale):
     rendering_system.draw(game_state, paused=False)
 
     # Assert
-    mock_font.render.assert_any_call("☠", True, (128, 128, 128))
+    mock_font.render.assert_any_call("✖", True, (128, 128, 128))
+
+
+@patch("pygame.transform.scale")
+def test_zoom_does_not_misalign_units_with_fractional_positions(mock_scale):
+    # Arrange
+    mock_screen = Mock()
+    mock_font = Mock()
+    mock_surface = Mock()
+    mock_scaled_surface = Mock()
+    mock_surface.convert_alpha.return_value = mock_surface
+    mock_scale.return_value = mock_scaled_surface
+    mock_font.render.return_value = mock_surface
+
+    camera = Camera(x=0, y=0, zoom=2.0)
+    rendering_system = RenderingSystem(
+        screen=mock_screen, font=mock_font, camera=camera
+    )
+
+    mock_map = Mock()
+    game_state = GameState(game_map=mock_map)
+    entity_id = game_state.create_entity()
+
+    # Position with a fractional part to test the bug
+    unit_pos = Position(x=10.5, y=20.25)
+    game_state.add_component(entity_id, unit_pos)
+    game_state.add_component(entity_id, Renderable(icon="T"))
+
+    # Act
+    rendering_system.draw(game_state, paused=False)
+
+    # Assert
+    # The correct calculation should not cast the position to int prematurely.
+    # The error comes from (int(10.5) - 0) * 20 * 2.0 = 400, when it should be 420.
+    expected_x = (unit_pos.x - camera.x) * config.GRID_SIZE * camera.zoom
+    expected_y = (unit_pos.y - camera.y) * config.GRID_SIZE * camera.zoom
+
+    # Check that screen.blit was called with the correctly calculated coordinates
+    mock_screen.blit.assert_any_call(mock_scaled_surface, (expected_x, expected_y))

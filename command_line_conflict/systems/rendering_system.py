@@ -47,12 +47,12 @@ class RenderingSystem:
             if position and renderable:
                 # Camera transform
                 cam_x = (
-                    (int(position.x) - self.camera.x)
+                    (position.x - self.camera.x)
                     * config.GRID_SIZE
                     * self.camera.zoom
                 )
                 cam_y = (
-                    (int(position.y) - self.camera.y)
+                    (position.y - self.camera.y)
                     * config.GRID_SIZE
                     * self.camera.zoom
                 )
@@ -85,7 +85,7 @@ class RenderingSystem:
                 icon = renderable.icon
                 if dead:
                     color = (128, 128, 128)  # Grey for dead units
-                    icon = "☠"
+                    icon = "✖"
                 elif paused:
                     color = (128, 128, 128)  # Grey for paused units
                 else:
