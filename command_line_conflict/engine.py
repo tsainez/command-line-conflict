@@ -7,6 +7,7 @@ from . import config
 from .logger import \
     log  # TODO: Expand logger usage, specifically for when in debug mode.
 from .maps import Map
+from .scenes.campaign_menu import CampaignMenuScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
@@ -26,6 +27,7 @@ class SceneManager:
             "menu": MenuScene(game),
             "settings": SettingsScene(game),
             "game": GameScene(game),
+            "campaign_menu": CampaignMenuScene(game),
         }
         self.current_scene = self.scenes["menu"]
 
