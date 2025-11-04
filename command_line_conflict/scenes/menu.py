@@ -1,6 +1,8 @@
 import pygame
 
 from ..maps.mission_one import MissionOne
+from ..maps.mission_two import MissionTwo
+from ..maps.mission_three import MissionThree
 from ..save_game import load_game, save_game
 from .game import GameScene
 
@@ -20,6 +22,15 @@ class MenuScene:
         self.selected_option = 0
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
+
+    def _get_mission_map(self, mission_number):
+        if mission_number == 1:
+            return MissionOne()
+        elif mission_number == 2:
+            return MissionTwo()
+        elif mission_number == 3:
+            return MissionThree()
+        return MissionOne()
 
     def handle_event(self, event):
         """Handles user input for menu navigation.
@@ -44,10 +55,10 @@ class MenuScene:
                     self.game.scene_manager.switch_to("game")
                 elif self.selected_option == 1:
                     mission_number = load_game()
-                    if mission_number == 1:
-                        self.game.scene_manager.scenes["game"] = GameScene(
-                            self.game, MissionOne()
-                        )
+                    mission_map = self._get_mission_map(mission_number)
+                    self.game.scene_manager.scenes["game"] = GameScene(
+                        self.game, mission_map
+                    )
                     self.game.scene_manager.switch_to("game")
                 elif self.selected_option == 2:
                     self.game.scene_manager.switch_to("settings")

@@ -13,6 +13,7 @@ from .components.renderable import Renderable
 from .components.selectable import Selectable
 from .components.vision import Vision
 from .components.mineral import Mineral
+from .components.building import Building
 from .game_state import GameState
 
 # TODO: Integrate logger for debug mode. Currently not used.
@@ -198,6 +199,32 @@ def create_immortal(
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.2))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    return entity_id
+
+
+# TODO: Implement economy, resource UI, and extractor's ability to gather minerals.
+def create_unit_factory(
+    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
+) -> int:
+    """Creates a new unit factory.
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the building will be created.
+        y: The y-coordinate where the building will be created.
+        player_id: The ID of the player who owns this building.
+        is_human: True if the player is human-controlled.
+    Returns:
+        The entity ID of the newly created building.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="F", color=color))
+    game_state.add_component(entity_id, Health(hp=300, max_hp=300))
+    game_state.add_component(entity_id, Vision(vision_range=8))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, Building())
     return entity_id
 
 

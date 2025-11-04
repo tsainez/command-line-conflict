@@ -20,6 +20,8 @@ from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
+from command_line_conflict.systems.win_loss_system import WinLossSystem
+from command_line_conflict.systems.fog_of_war_system import FogOfWarSystem
 
 
 class GameScene:
@@ -60,6 +62,8 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.win_loss_system = WinLossSystem()
+        self.fog_of_war_system = FogOfWarSystem(self.game.screen, self.camera)
         if isinstance(self.game_state.map, SimpleMap):
             self._create_initial_units()
         else:
@@ -217,6 +221,8 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+        self.win_loss_system.update(self.game_state)
+        self.fog_of_war_system.update(self.game_state)
 
     def draw(self, screen):
         """Draws the entire game scene.
@@ -241,7 +247,8 @@ class GameScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
-        self.rendering_system.draw(self.game_state, self.paused)
+        self.rendering_system.draw(self.game_state, self.paused, self.fog_of_war_system.visible_tiles)
+        self.fog_of_war_system.draw(self.game_state)
         self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units
