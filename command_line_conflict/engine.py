@@ -114,18 +114,22 @@ class Game:
 
         self.scene_manager = SceneManager(self)
 
+    def tick(self) -> None:
+        """Runs a single frame of the game."""
+        dt = self.clock.tick(config.FPS) / 1000.0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            self.scene_manager.handle_event(event)
+        self.scene_manager.update(dt)
+        self.scene_manager.draw(self.screen)
+        pygame.display.flip()
+
     def run(self) -> None:
         """Starts and runs the main game loop."""
         log.info("Game starting...")
         while self.running:
-            dt = self.clock.tick(config.FPS) / 1000.0
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                self.scene_manager.handle_event(event)
-            self.scene_manager.update(dt)
-            self.scene_manager.draw(self.screen)
-            pygame.display.flip()
+            self.tick()
         pygame.quit()
 
 
