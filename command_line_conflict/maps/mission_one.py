@@ -1,4 +1,5 @@
 from .base import Map
+from .. import factories
 
 class MissionOne(Map):
     """The first mission of the campaign."""
@@ -7,17 +8,18 @@ class MissionOne(Map):
         """Initializes the MissionOne map."""
         super().__init__(width=30, height=20)
 
+    def initialize_entities(self, game_state) -> None:
+        """Initializes the entities for the map."""
         # Add some mineral patches
-        self.add_mineral_patch(5, 5)
-        self.add_mineral_patch(5, 6)
-        self.add_mineral_patch(6, 5)
-        self.add_mineral_patch(6, 6)
+        factories.create_mineral_patch(game_state, 5, 5)
+        factories.create_mineral_patch(game_state, 5, 6)
+        factories.create_mineral_patch(game_state, 6, 5)
+        factories.create_mineral_patch(game_state, 6, 6)
 
-        self.add_mineral_patch(23, 13)
-        self.add_mineral_patch(23, 14)
-        self.add_mineral_patch(24, 13)
-        self.add_mineral_patch(24, 14)
-
+        factories.create_mineral_patch(game_state, 23, 13)
+        factories.create_mineral_patch(game_state, 23, 14)
+        factories.create_mineral_patch(game_state, 24, 13)
+        factories.create_mineral_patch(game_state, 24, 14)
 
         # Add a pre-placed enemy unit
-        # self.add_unit(20, 10, "enemy_chassis", 2)
+        factories.create_chassis(game_state, 20, 10, player_id=2, is_human=False)

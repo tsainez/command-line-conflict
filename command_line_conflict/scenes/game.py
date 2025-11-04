@@ -25,7 +25,7 @@ from command_line_conflict.systems.ui_system import UISystem
 class GameScene:
     """Manages the main gameplay scene, including entities, systems, and events."""
 
-    def __init__(self, game):
+    def __init__(self, game, game_map=None):
         """Initializes the GameScene.
 
         Args:
@@ -34,7 +34,7 @@ class GameScene:
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(SimpleMap())
+        self.game_state = GameState(game_map or SimpleMap())
         self.selection_start = None
         self.paused = False
 
@@ -60,7 +60,10 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
-        self._create_initial_units()
+        if isinstance(self.game_state.map, SimpleMap):
+            self._create_initial_units()
+        else:
+            self.game_state.map.initialize_entities(self.game_state)
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
