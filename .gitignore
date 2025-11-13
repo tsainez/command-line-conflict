@@ -12,7 +12,9 @@ command_line_conflict/fonts/.DS_Store
 
 # Project generated files
 game.log
+save_game.json
 
 # Coverage files
 .coverage
 htmlcov/
+
