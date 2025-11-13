@@ -82,7 +82,7 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
     game_state.add_component(entity_id, Renderable(icon="E"))
 
     # Act
-    rendering_system.draw(game_state, paused=False, visible_tiles=set())
+    rendering_system.draw(game_state, paused=False)
 
     # Assert
     expected_x = (30 - camera.x) * config.GRID_SIZE * camera.zoom

@@ -11,7 +11,6 @@ from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
-from ..save_game import save_game, load_game
 
 # TODO: Integrate logger for debug mode. Currently not used.
 
@@ -59,9 +58,6 @@ class UISystem:
 
         if paused:
             self._draw_paused_message()
-
-        if game_state.winner:
-            self._draw_winner_message(game_state)
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         """Gets a list of all currently selected entity IDs.
@@ -269,22 +265,6 @@ class UISystem:
     def _draw_paused_message(self) -> None:
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
-        text_rect = text.get_rect(
-            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
-        )
-        self.screen.blit(text, text_rect)
-
-    def _draw_winner_message(self, game_state: GameState) -> None:
-        """Draws the winner message."""
-        if game_state.winner == 1:
-            message = "Victory!"
-            mission_number = load_game()
-            if mission_number < 3:
-                save_game(mission_number + 1)
-        else:
-            message = "Defeat!"
-        font = pygame.font.Font(None, 74)
-        text = font.render(message, True, (255, 255, 255))
         text_rect = text.get_rect(
             center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
         )

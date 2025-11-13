@@ -35,6 +35,8 @@ class SceneManager:
         Args:
             scene_name: The name of the scene to switch to.
         """
+        if scene_name == "game":
+            self.scenes["game"] = GameScene(self.game)
         self.current_scene = self.scenes[scene_name]
 
     def handle_event(self, event):
@@ -114,22 +116,18 @@ class Game:
 
         self.scene_manager = SceneManager(self)
 
-    def tick(self) -> None:
-        """Runs a single frame of the game."""
-        dt = self.clock.tick(config.FPS) / 1000.0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            self.scene_manager.handle_event(event)
-        self.scene_manager.update(dt)
-        self.scene_manager.draw(self.screen)
-        pygame.display.flip()
-
     def run(self) -> None:
         """Starts and runs the main game loop."""
         log.info("Game starting...")
         while self.running:
-            self.tick()
+            dt = self.clock.tick(config.FPS) / 1000.0
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                self.scene_manager.handle_event(event)
+            self.scene_manager.update(dt)
+            self.scene_manager.draw(self.screen)
+            pygame.display.flip()
         pygame.quit()
 
 

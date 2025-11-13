@@ -31,7 +31,7 @@ class RenderingSystem:
         self.font = font
         self.camera = camera
 
-    def draw(self, game_state: GameState, paused: bool, visible_tiles: set) -> None:
+    def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
         This method iterates through all entities, drawing them based on their
         position and state (e.g., selected, dead). It also calls other
@@ -45,8 +45,6 @@ class RenderingSystem:
             player = components.get(Player)
 
             if position and renderable:
-                if player and player.player_id == 2 and not config.DEBUG and (int(position.x), int(position.y)) not in visible_tiles:
-                    continue
                 # Camera transform
                 cam_x = (
                     (int(position.x) - self.camera.x)

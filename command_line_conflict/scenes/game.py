@@ -20,14 +20,14 @@ from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
-from command_line_conflict.systems.win_loss_system import WinLossSystem
-from command_line_conflict.systems.fog_of_war_system import FogOfWarSystem
+from command_line_conflict.systems.harvesting_system import HarvestingSystem
+from command_line_conflict.systems.production_system import ProductionSystem
 
 
 class GameScene:
     """Manages the main gameplay scene, including entities, systems, and events."""
 
-    def __init__(self, game, game_map=None):
+    def __init__(self, game):
         """Initializes the GameScene.
 
         Args:
@@ -36,7 +36,7 @@ class GameScene:
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(game_map or SimpleMap())
+        self.game_state = GameState(SimpleMap())
         self.selection_start = None
         self.paused = False
 
@@ -62,12 +62,9 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
-        self.win_loss_system = WinLossSystem()
-        self.fog_of_war_system = FogOfWarSystem(self.game.screen, self.camera)
-        if isinstance(self.game_state.map, SimpleMap):
-            self._create_initial_units()
-        else:
-            self.game_state.map.initialize_entities(self.game_state)
+        self.harvesting_system = HarvestingSystem()
+        self.production_system = ProductionSystem()
+        self._create_initial_units()
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
@@ -174,6 +171,13 @@ class GameScene:
                     factories.create_immortal(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                elif event.key == pygame.K_c:
+                    for entity_id, components in self.game_state.entities.items():
+                        selectable = components.get("Selectable")
+                        if selectable and selectable.is_selected:
+                            production = components.get("Production")
+                            if production:
+                                production.queue.append("chassis")
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
@@ -221,8 +225,8 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
-        self.win_loss_system.update(self.game_state)
-        self.fog_of_war_system.update(self.game_state)
+        self.harvesting_system.update(self.game_state)
+        self.production_system.update(self.game_state, dt)
 
     def draw(self, screen):
         """Draws the entire game scene.
@@ -247,8 +251,7 @@ class GameScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
-        self.rendering_system.draw(self.game_state, self.paused, self.fog_of_war_system.visible_tiles)
-        self.fog_of_war_system.draw(self.game_state)
+        self.rendering_system.draw(self.game_state, self.paused)
         self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units

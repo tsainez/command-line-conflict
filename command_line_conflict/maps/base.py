@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from heapq import heappop, heappush
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 import pygame
 
 from .. import config
-
-if TYPE_CHECKING:
-    from ..game_state import GameState
 
 
 class Map:
@@ -39,10 +36,6 @@ class Map:
             y: The y-coordinate of the wall.
         """
         self.walls.add((x, y))
-
-    def initialize_entities(self, game_state: "GameState") -> None:
-        """Initializes the entities for the map."""
-        pass
 
     def is_blocked(self, x: int, y: int) -> bool:
         """Checks if a tile is blocked by a wall.
