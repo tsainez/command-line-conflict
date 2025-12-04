@@ -40,13 +40,17 @@ class UISystem:
             "W: Wall",
         ]
 
-    def draw(self, game_state: GameState, paused: bool) -> None:
+    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
             game_state: The current state of the game.
+            paused: Whether the game is paused.
+            current_player_id: The ID of the player currently controlling the game.
         """
         self._draw_key_options()
+        self._draw_player_indicator(current_player_id)
+
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
@@ -57,6 +61,29 @@ class UISystem:
 
         if paused:
             self._draw_paused_message()
+
+    def _draw_player_indicator(self, current_player_id: int) -> None:
+        """Draws a visual indicator for the current player.
+
+        Args:
+            current_player_id: The ID of the player currently controlling the game.
+        """
+        indicator_size = 20
+        padding = 10
+        # Position at the bottom left, above the key options or next to them
+        x = padding
+        y = config.SCREEN_HEIGHT - indicator_size - padding
+
+        color = (0, 255, 0) if current_player_id == 1 else (255, 0, 0)
+
+        rect = pygame.Rect(x, y, indicator_size, indicator_size)
+        pygame.draw.rect(self.screen, color, rect)
+        pygame.draw.rect(self.screen, (255, 255, 255), rect, 2) # Border
+
+        # Label
+        text = self.small_font.render(f"P{current_player_id}", True, (255, 255, 255))
+        text_rect = text.get_rect(center=rect.center)
+        self.screen.blit(text, text_rect)
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         """Gets a list of all currently selected entity IDs.

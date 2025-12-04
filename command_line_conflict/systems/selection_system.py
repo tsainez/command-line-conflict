@@ -10,12 +10,24 @@ from ..game_state import GameState
 class SelectionSystem:
     """Handles entity selection via mouse clicks and drag-to-select."""
 
+    def clear_selection(self, game_state: GameState) -> None:
+        """Deselects all entities.
+
+        Args:
+            game_state: The current state of the game.
+        """
+        for entity_id, components in game_state.entities.items():
+            selectable = components.get(Selectable)
+            if selectable:
+                selectable.is_selected = False
+
     def update(
         self,
         game_state: GameState,
         grid_start: tuple[int, int] | None,
         grid_end: tuple[int, int],
         shift_pressed: bool = False,
+        current_player_id: int = 1,
     ) -> None:
         """Processes a drag-to-select action.
 
@@ -29,6 +41,7 @@ class SelectionSystem:
                         drag started. If None, no action is taken.
             grid_end: The current (x, y) grid coordinates of the mouse.
             shift_pressed: True if the shift key was held during the drag.
+            current_player_id: The ID of the player currently controlling the game.
         """
         if not grid_start:
             return
@@ -41,7 +54,9 @@ class SelectionSystem:
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
             player = components.get(Player)
-            if not selectable or not player or not player.is_human:
+
+            # Check if the unit belongs to the current player
+            if not selectable or not player or player.player_id != current_player_id:
                 continue
 
             position = components.get(Position)
@@ -56,7 +71,11 @@ class SelectionSystem:
                 selectable.is_selected = False
 
     def handle_click_selection(
-        self, game_state: GameState, grid_pos: tuple[int, int], shift_pressed: bool
+        self,
+        game_state: GameState,
+        grid_pos: tuple[int, int],
+        shift_pressed: bool,
+        current_player_id: int = 1,
     ) -> None:
         """Handles entity selection from a single mouse click.
 
@@ -68,6 +87,7 @@ class SelectionSystem:
             game_state: The current state of the game.
             grid_pos: The (x, y) grid coordinates of the mouse click.
             shift_pressed: True if the shift key was held during the click.
+            current_player_id: The ID of the player currently controlling the game.
         """
         gx, gy = grid_pos
 
@@ -80,7 +100,7 @@ class SelectionSystem:
                 and int(position.x) == gx
                 and int(position.y) == gy
                 and player
-                and player.is_human
+                and player.player_id == current_player_id
             ):
                 if components.get(Selectable):
                     clicked_entity_id = entity_id
@@ -94,10 +114,8 @@ class SelectionSystem:
             else:
                 for entity_id, components in game_state.entities.items():
                     selectable = components.get(Selectable)
+                    # Deselect other units unless they are the one clicked
                     if selectable:
                         selectable.is_selected = entity_id == clicked_entity_id
         elif not shift_pressed:
-            for entity_id, components in game_state.entities.items():
-                selectable = components.get(Selectable)
-                if selectable:
-                    selectable.is_selected = False
+            self.clear_selection(game_state)
