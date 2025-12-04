@@ -27,13 +27,17 @@ class AISystem:
                 continue
 
             # Find a target if we don't have one
-            if not attack.attack_target:
-                vision = components.get(Vision)
-                if vision:
-                    my_pos = components.get(Position)
-                    if my_pos:
-                        closest_enemy = Targeting.find_closest_enemy(
-                            entity_id, my_pos, player, vision, game_state
-                        )
-                        if closest_enemy:
-                            attack.attack_target = closest_enemy
+            # NOTE: Auto-targeting is disabled based on user requirements.
+            # Players and Neutrals will not automatically acquire targets.
+            # They will only attack if ordered or if retaliating (handled in CombatSystem).
+            #
+            # if not attack.attack_target:
+            #     vision = components.get(Vision)
+            #     if vision:
+            #         my_pos = components.get(Position)
+            #         if my_pos:
+            #             closest_enemy = Targeting.find_closest_enemy(
+            #                 entity_id, my_pos, player, vision, game_state
+            #             )
+            #             if closest_enemy:
+            #                 attack.attack_target = closest_enemy

@@ -25,6 +25,7 @@ class MockGame:
         # font.render returns a mock surface
         self.font.render.return_value = MagicMock()
         self.scene_manager = MagicMock()
+        self.music_manager = MagicMock()
 
 def test_day_night_cycle_update():
     game = MockGame()
