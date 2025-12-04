@@ -4,6 +4,8 @@ from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
+from unittest.mock import MagicMock
+
 from command_line_conflict.maps.simple_map import SimpleMap
 from command_line_conflict.scenes.game import GameScene
 
@@ -12,6 +14,7 @@ class MockGame:
     def __init__(self):
         self.screen = None
         self.font = None
+        self.music_manager = MagicMock()
 
 
 def test_move_command_interrupts_attack():
@@ -22,7 +25,9 @@ def test_move_command_interrupts_attack():
 
     attacker_id = game_state.create_entity()
     game_state.add_component(attacker_id, Position(0, 0))
-    game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
+    game_state.add_component(
+        attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0)
+    )
     game_state.add_component(attacker_id, Selectable())
     game_state.entities[attacker_id][Selectable].is_selected = True
 

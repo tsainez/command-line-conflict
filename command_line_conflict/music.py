@@ -1,7 +1,10 @@
 import os
+
 import pygame
+
 from . import config
 from .logger import log
+
 
 class MusicManager:
     """Manages background music playback."""
@@ -13,11 +16,11 @@ class MusicManager:
         self.current_track = None
 
         if not pygame.mixer.get_init():
-             try:
-                 pygame.mixer.init()
-             except pygame.error as e:
-                 log.error(f"Failed to initialize pygame mixer: {e}")
-                 self.enabled = False
+            try:
+                pygame.mixer.init()
+            except pygame.error as e:
+                log.error(f"Failed to initialize pygame mixer: {e}")
+                self.enabled = False
 
         if self.enabled:
             try:
@@ -36,8 +39,8 @@ class MusicManager:
             return
 
         if self.current_track == filepath:
-             if pygame.mixer.music.get_busy():
-                 return
+            if pygame.mixer.music.get_busy():
+                return
 
         if not os.path.exists(filepath):
             log.warning(f"Music file not found: {filepath}")
