@@ -6,6 +6,7 @@ from .. import config
 from ..camera import Camera
 from ..components.confetti import Confetti
 from ..components.dead import Dead
+from ..components.health import Health
 from ..components.movable import Movable
 from ..components.player import Player
 from ..components.position import Position
@@ -113,6 +114,27 @@ class RenderingSystem:
                         cam_y,
                     ),
                 )
+
+                health = components.get(Health)
+                if not dead and health and health.max_hp > 0:
+                    health_pct = health.hp / health.max_hp
+                    bar_width = grid_size
+                    bar_height = max(2, int(grid_size * 0.2))
+                    bar_x = cam_x
+                    bar_y = cam_y - bar_height - 2
+
+                    # Draw background (red)
+                    pygame.draw.rect(
+                        self.screen,
+                        (255, 0, 0),
+                        (bar_x, bar_y, bar_width, bar_height),
+                    )
+                    # Draw foreground (green)
+                    pygame.draw.rect(
+                        self.screen,
+                        (0, 255, 0),
+                        (bar_x, bar_y, int(bar_width * health_pct), bar_height),
+                    )
 
                 selectable = components.get(Selectable)
                 if not dead:
