@@ -27,4 +27,11 @@ PLAYER_COLORS = {
     2: (255, 0, 0),  # Red
 }
 
+# Music configuration
+MUSIC_VOLUME = 0.5
+MUSIC_ENABLED = True
+
+# Sound configuration
+SOUND_VOLUME = 0.5
+SOUND_ENABLED = True
 NEUTRAL_PLAYER_ID = 0

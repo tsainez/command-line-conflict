@@ -4,10 +4,11 @@ from pathlib import Path
 import pygame
 
 from . import config
-from .logger import (
+from .logger import (  # TODO: Expand logger usage, specifically for when in debug mode.
     log,
-)  # TODO: Expand logger usage, specifically for when in debug mode.
+)
 from .maps import Map
+from .music import MusicManager
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
@@ -94,6 +95,8 @@ class Game:
                 self.font = pygame.font.Font(str(bundled), 16)
             except Exception:
                 self.font = None
+
+        self.music_manager = MusicManager()
 
         if self.font is None:
             # Try common system fonts

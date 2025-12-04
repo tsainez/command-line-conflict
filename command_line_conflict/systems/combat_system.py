@@ -66,6 +66,19 @@ class CombatSystem:
                             )
                         target_health.hp -= attack.attack_damage
 
+                        # Trigger attack sound
+                        game_state.add_event(
+                            {
+                                "type": "sound",
+                                "data": {
+                                    "name": (
+                                        "attack_melee"
+                                        if attack.attack_range <= 1.5
+                                        else "attack_ranged"
+                                    )
+                                },
+                            }
+                        )
                         # Retaliation Logic:
                         # If the target has an Attack component and no current target, make them fight back.
                         target_attack = target_components.get(Attack)

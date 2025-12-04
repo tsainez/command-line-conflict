@@ -18,6 +18,7 @@ from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
+from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
@@ -61,9 +62,15 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.sound_system = SoundSystem()
         self.wander_system = WanderSystem()
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
+
+        # Start game music
+        # Assuming the music file is in the root or a music folder
+        # For now using a placeholder path
+        self.game.music_manager.play("music/game_theme.ogg")
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
@@ -218,6 +225,10 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+        self.sound_system.update(self.game_state)
+
+        # Clear event queue after all systems have processed events
+        self.game_state.event_queue.clear()
         self.spawn_system.update(self.game_state, dt)
 
     def draw(self, screen):

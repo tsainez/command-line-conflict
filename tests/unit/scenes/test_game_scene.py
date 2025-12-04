@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pygame
 
 from command_line_conflict.components.attack import Attack
@@ -12,6 +14,7 @@ class MockGame:
     def __init__(self):
         self.screen = None
         self.font = None
+        self.music_manager = MagicMock()
 
 
 def test_move_command_interrupts_attack():

@@ -6,9 +6,9 @@ from ..components.health import Health
 from ..components.movable import Movable
 from ..components.selectable import Selectable
 from ..game_state import GameState
-from ..logger import (
+from ..logger import (  # TODO: Expand logger usage, specifically for when in debug mode. Can we log more than just deaths?
     log,
-)  # TODO: Expand logger usage, specifically for when in debug mode. Can we log more than just deaths?
+)
 
 
 class HealthSystem:

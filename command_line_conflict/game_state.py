@@ -16,6 +16,15 @@ class GameState:
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
+        self.event_queue = []
+
+    def add_event(self, event: dict) -> None:
+        """Adds an event to the event queue.
+
+        Args:
+            event: A dictionary representing the event.
+        """
+        self.event_queue.append(event)
 
     def create_entity(self) -> int:
         """Creates a new entity and returns its ID."""
