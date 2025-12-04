@@ -1,3 +1,4 @@
+import functools
 import random
 
 import pygame
@@ -31,11 +32,23 @@ class RenderingSystem:
         self.font = font
         self.camera = camera
 
+    @functools.lru_cache(maxsize=1024)
+    def _get_rendered_surface(
+        self, char: str, color: tuple, size: int | None = None
+    ) -> pygame.Surface:
+        """Returns a cached surface for the character, optionally scaled."""
+        s = self.font.render(char, True, color)
+        if size is not None:
+            s = pygame.transform.scale(s, (size, size))
+        return s
+
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
+
         This method iterates through all entities, drawing them based on their
         position and state (e.g., selected, dead). It also calls other
         methods to draw additional UI elements like movement orders.
+
         Args:
             game_state: The current state of the game.
         """
@@ -70,8 +83,7 @@ class RenderingSystem:
                         (0, 255, 255),
                     ]
                     color = random.choice(colors)
-                    ch = self.font.render(renderable.icon, True, color)
-                    ch = pygame.transform.scale(ch, (grid_size, grid_size))
+                    ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                     self.screen.blit(
                         ch,
                         (
@@ -91,11 +103,8 @@ class RenderingSystem:
                     selectable = components.get(Selectable)
                     if selectable and selectable.is_selected:
                         color = (0, 255, 0)
-                        shadow_ch = self.font.render(
-                            renderable.icon, True, (128, 128, 128)
-                        )
-                        shadow_ch = pygame.transform.scale(
-                            shadow_ch, (grid_size, grid_size)
+                        shadow_ch = self._get_rendered_surface(
+                            renderable.icon, (128, 128, 128), grid_size
                         )
                         self.screen.blit(
                             shadow_ch,
@@ -105,8 +114,7 @@ class RenderingSystem:
                             ),
                         )
 
-                ch = self.font.render(renderable.icon, True, color)
-                ch = pygame.transform.scale(ch, (grid_size, grid_size))
+                ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                 self.screen.blit(
                     ch,
                     (
@@ -155,7 +163,7 @@ class RenderingSystem:
         prev_x, prev_y = int(position.x), int(position.y)
         for tx, ty in tiles[:-1]:
             arrow = self._arrow_char(tx - prev_x, ty - prev_y)
-            ch = self.font.render(arrow, True, (0, 255, 0))
+            ch = self._get_rendered_surface(arrow, (0, 255, 0))
             cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
             self.screen.blit(ch, (cam_x, cam_y))
@@ -163,7 +171,7 @@ class RenderingSystem:
 
         tx, ty = tiles[-1]
         final_char = "X"
-        ch = self.font.render(final_char, True, (255, 0, 0))
+        ch = self._get_rendered_surface(final_char, (255, 0, 0))
         cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
         cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
         self.screen.blit(ch, (cam_x, cam_y))
