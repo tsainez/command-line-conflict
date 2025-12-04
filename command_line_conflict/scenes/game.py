@@ -51,6 +51,8 @@ class GameScene:
             "left": False,
             "right": False,
         }
+        self.middle_mouse_pressed = False
+        self.last_mouse_pos = None
 
         # Initialize systems
         self.campaign_manager = CampaignManager()
@@ -164,13 +166,13 @@ class GameScene:
                         attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
-            if event.key in (pygame.K_UP, pygame.K_w):
+            if event.key == pygame.K_UP:
                 self.camera_movement["up"] = True
-            elif event.key in (pygame.K_DOWN, pygame.K_s):
+            elif event.key == pygame.K_DOWN:
                 self.camera_movement["down"] = True
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
+            elif event.key == pygame.K_LEFT:
                 self.camera_movement["left"] = True
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+            elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = True
             else:
                 mx, my = pygame.mouse.get_pos()
@@ -227,13 +229,13 @@ class GameScene:
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
-            if event.key in (pygame.K_UP, pygame.K_w):
+            if event.key == pygame.K_UP:
                 self.camera_movement["up"] = False
-            elif event.key in (pygame.K_DOWN, pygame.K_s):
+            elif event.key == pygame.K_DOWN:
                 self.camera_movement["down"] = False
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
+            elif event.key == pygame.K_LEFT:
                 self.camera_movement["left"] = False
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+            elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = False
         # Camera zoom (mouse wheel)
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -241,6 +243,13 @@ class GameScene:
                 self.camera.zoom_in(0.1)
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
+            elif event.button == 2:  # Middle mouse button
+                self.middle_mouse_pressed = True
+                self.last_mouse_pos = pygame.mouse.get_pos()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 2:
+                self.middle_mouse_pressed = False
+                self.last_mouse_pos = None
 
     def _handle_construction(self, key):
         """Handles building construction requests."""
@@ -299,6 +308,14 @@ class GameScene:
             self.camera.move(-config.CAMERA_SPEED * dt, 0)
         if self.camera_movement["right"]:
             self.camera.move(config.CAMERA_SPEED * dt, 0)
+
+        if self.middle_mouse_pressed:
+            current_mouse_pos = pygame.mouse.get_pos()
+            if self.last_mouse_pos:
+                dx = self.last_mouse_pos[0] - current_mouse_pos[0]
+                dy = self.last_mouse_pos[1] - current_mouse_pos[1]
+                self.camera.move(dx / (config.GRID_SIZE * self.camera.zoom), dy / (config.GRID_SIZE * self.camera.zoom))
+            self.last_mouse_pos = current_mouse_pos
 
     def update(self, dt):
         """Updates the state of all game systems.
