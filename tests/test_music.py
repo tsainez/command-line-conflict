@@ -1,13 +1,15 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch
-import os
 
 # Set dummy video driver for headless testing
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 import pygame
-from command_line_conflict.music import MusicManager
+
 from command_line_conflict import config
+from command_line_conflict.music import MusicManager
+
 
 class TestMusicManager(unittest.TestCase):
     def setUp(self):
@@ -15,10 +17,10 @@ class TestMusicManager(unittest.TestCase):
         # Since we are testing logic, mocking is better/safer for CI
         pass
 
-    @patch('pygame.mixer.music')
-    @patch('pygame.mixer.init')
-    @patch('pygame.mixer.get_init', return_value=False)
-    @patch('os.path.exists', return_value=True)
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=False)
+    @patch("os.path.exists", return_value=True)
     def test_play_music(self, mock_exists, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.play("test.ogg")
@@ -27,9 +29,9 @@ class TestMusicManager(unittest.TestCase):
         mock_music.play.assert_called_with(-1)
         self.assertEqual(manager.current_track, "test.ogg")
 
-    @patch('pygame.mixer.music')
-    @patch('pygame.mixer.init')
-    @patch('pygame.mixer.get_init', return_value=True)
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
     def test_stop_music(self, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.current_track = "something.ogg"
@@ -38,9 +40,9 @@ class TestMusicManager(unittest.TestCase):
         mock_music.stop.assert_called()
         self.assertIsNone(manager.current_track)
 
-    @patch('pygame.mixer.music')
-    @patch('pygame.mixer.init')
-    @patch('pygame.mixer.get_init', return_value=True)
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
     def test_set_volume(self, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.set_volume(0.8)
@@ -48,10 +50,10 @@ class TestMusicManager(unittest.TestCase):
         mock_music.set_volume.assert_called_with(0.8)
         self.assertEqual(manager.volume, 0.8)
 
-    @patch('pygame.mixer.music')
-    @patch('pygame.mixer.init')
-    @patch('pygame.mixer.get_init', return_value=True)
-    @patch('os.path.exists', return_value=False)
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
+    @patch("os.path.exists", return_value=False)
     def test_missing_file(self, mock_exists, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.play("missing.ogg")
@@ -59,5 +61,6 @@ class TestMusicManager(unittest.TestCase):
         mock_music.load.assert_not_called()
         self.assertIsNone(manager.current_track)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

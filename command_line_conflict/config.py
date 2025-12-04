@@ -29,3 +29,7 @@ PLAYER_COLORS = {
 # Music configuration
 MUSIC_VOLUME = 0.5
 MUSIC_ENABLED = True
+
+# Sound configuration
+SOUND_VOLUME = 0.5
+SOUND_ENABLED = True

@@ -65,6 +65,21 @@ class CombatSystem:
                                 f"for {attack.attack_damage} damage."
                             )
                         target_health.hp -= attack.attack_damage
+
+                        # Trigger attack sound
+                        game_state.add_event(
+                            {
+                                "type": "sound",
+                                "data": {
+                                    "name": (
+                                        "attack_melee"
+                                        if attack.attack_range <= 1.5
+                                        else "attack_ranged"
+                                    )
+                                },
+                            }
+                        )
+
                         if attack.attack_range > 1:
                             create_confetti(game_state, target_pos.x, target_pos.y)
                             if config.DEBUG:

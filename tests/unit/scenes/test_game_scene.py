@@ -1,11 +1,11 @@
+from unittest.mock import MagicMock
+
 import pygame
 
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
-from unittest.mock import MagicMock
-
 from command_line_conflict.maps.simple_map import SimpleMap
 from command_line_conflict.scenes.game import GameScene
 
