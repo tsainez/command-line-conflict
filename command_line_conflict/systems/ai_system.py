@@ -22,22 +22,23 @@ class AISystem:
             if not player:
                 continue
 
+            # Neutral units (Player 0) are passive and do not auto-acquire targets.
+            if player.player_id == 0:
+                continue
+
             attack = components.get(Attack)
             if not attack:
                 continue
 
             # Find a target if we don't have one
-            # NOTE: Auto-targeting is disabled based on user requirements.
-            # Players and Neutrals will not automatically acquire targets.
-            # They will only attack if ordered or if retaliating (handled in CombatSystem).
-            #
-            # if not attack.attack_target:
-            #     vision = components.get(Vision)
-            #     if vision:
-            #         my_pos = components.get(Position)
-            #         if my_pos:
-            #             closest_enemy = Targeting.find_closest_enemy(
-            #                 entity_id, my_pos, player, vision, game_state
-            #             )
-            #             if closest_enemy:
-            #                 attack.attack_target = closest_enemy
+            # Auto-targeting enabled for FFA behavior.
+            if not attack.attack_target:
+                vision = components.get(Vision)
+                if vision:
+                    my_pos = components.get(Position)
+                    if my_pos:
+                        closest_enemy = Targeting.find_closest_enemy(
+                            entity_id, my_pos, player, vision, game_state
+                        )
+                        if closest_enemy:
+                            attack.attack_target = closest_enemy
