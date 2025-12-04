@@ -19,7 +19,9 @@ from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
+from command_line_conflict.systems.wander_system import WanderSystem
 
 
 class GameScene:
@@ -61,6 +63,8 @@ class GameScene:
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
         self.sound_system = SoundSystem()
+        self.wander_system = WanderSystem()
+        self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
 
         # Start game music
@@ -216,6 +220,7 @@ class GameScene:
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.ai_system.update(self.game_state)
+        self.wander_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
@@ -224,6 +229,7 @@ class GameScene:
 
         # Clear event queue after all systems have processed events
         self.game_state.event_queue.clear()
+        self.spawn_system.update(self.game_state, dt)
 
     def draw(self, screen):
         """Draws the entire game scene.

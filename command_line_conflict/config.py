@@ -22,6 +22,7 @@ CAMERA_SPEED = 10
 
 # A dictionary mapping player IDs to their colors.
 PLAYER_COLORS = {
+    0: (128, 128, 128),  # Grey (Neutral)
     1: (0, 128, 255),  # Blue
     2: (255, 0, 0),  # Red
 }
@@ -33,3 +34,4 @@ MUSIC_ENABLED = True
 # Sound configuration
 SOUND_VOLUME = 0.5
 SOUND_ENABLED = True
+NEUTRAL_PLAYER_ID = 0
