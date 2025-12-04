@@ -8,6 +8,11 @@ import pygame
 from .. import config
 
 
+TERRAIN_NORMAL = 0
+TERRAIN_ROUGH = 1
+TERRAIN_HIGH_GROUND = 2
+
+
 class Map:
     """Represents the game map, including walls and pathfinding.
 
@@ -15,6 +20,7 @@ class Map:
         width: The width of the map in grid cells.
         height: The height of the map in grid cells.
         walls: A set of (x, y) tuples representing wall locations.
+        terrain: A dictionary mapping (x, y) tuples to terrain types.
     """
 
     def __init__(self, width: int = 40, height: int = 30) -> None:
@@ -27,6 +33,29 @@ class Map:
         self.width = width
         self.height = height
         self.walls: set[Tuple[int, int]] = set()
+        self.terrain: Dict[Tuple[int, int], int] = {}
+
+    def set_terrain(self, x: int, y: int, terrain_type: int) -> None:
+        """Sets the terrain type at the specified coordinates.
+
+        Args:
+            x: The x-coordinate.
+            y: The y-coordinate.
+            terrain_type: The type of terrain (TERRAIN_* constant).
+        """
+        self.terrain[(x, y)] = terrain_type
+
+    def get_terrain(self, x: int, y: int) -> int:
+        """Gets the terrain type at the specified coordinates.
+
+        Args:
+            x: The x-coordinate.
+            y: The y-coordinate.
+
+        Returns:
+            The terrain type, defaulting to TERRAIN_NORMAL.
+        """
+        return self.terrain.get((x, y), TERRAIN_NORMAL)
 
     def add_wall(self, x: int, y: int) -> None:
         """Adds a wall at the specified coordinates.
@@ -99,7 +128,11 @@ class Map:
                     or (extra_obstacles and (nx, ny) in extra_obstacles)
                 ):
                     continue
-                tentative_g = g_score[current] + 1
+                movement_cost = 1
+                if self.get_terrain(nx, ny) == TERRAIN_ROUGH:
+                    movement_cost = 1.33
+
+                tentative_g = g_score[current] + movement_cost
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
                     g_score[(nx, ny)] = tentative_g
                     f = tentative_g + abs(nx - goal[0]) + abs(ny - goal[1])
@@ -116,15 +149,43 @@ class Map:
             font: The pygame font to use for rendering the walls.
             camera: The camera object for view/zoom (optional).
         """
+        grid_size = config.GRID_SIZE
+        if camera:
+            grid_size = int(config.GRID_SIZE * camera.zoom)
+
+        # Draw terrain
+        for (x, y), terrain_type in self.terrain.items():
+            if terrain_type == TERRAIN_NORMAL:
+                continue
+
+            char = ""
+            color = (255, 255, 255)
+            if terrain_type == TERRAIN_ROUGH:
+                char = ","
+                color = (150, 100, 50)
+            elif terrain_type == TERRAIN_HIGH_GROUND:
+                char = "^"
+                color = (200, 200, 200)
+
+            if char:
+                if camera:
+                    draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
+                    draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
+                else:
+                    draw_x = x * config.GRID_SIZE
+                    draw_y = y * config.GRID_SIZE
+
+                ch = font.render(char, True, color)
+                ch = pygame.transform.scale(ch, (grid_size, grid_size))
+                surf.blit(ch, (draw_x, draw_y))
+
         for x, y in self.walls:
-            grid_size = config.GRID_SIZE
             if camera:
                 draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
                 draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
-                grid_size = int(config.GRID_SIZE * camera.zoom)
             else:
-                draw_x = x * grid_size
-                draw_y = y * grid_size
+                draw_x = x * config.GRID_SIZE
+                draw_y = y * config.GRID_SIZE
             ch = font.render("#", True, (100, 100, 100))
             ch = pygame.transform.scale(ch, (grid_size, grid_size))
             surf.blit(ch, (draw_x, draw_y))

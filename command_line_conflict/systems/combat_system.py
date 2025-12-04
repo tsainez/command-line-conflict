@@ -1,3 +1,5 @@
+import random
+
 from .. import config
 from ..components.attack import Attack
 from ..components.health import Health
@@ -8,6 +10,7 @@ from ..components.vision import Vision
 from ..factories import create_confetti
 from ..game_state import GameState
 from ..logger import log
+from ..maps.base import TERRAIN_HIGH_GROUND
 
 
 class CombatSystem:
@@ -59,18 +62,40 @@ class CombatSystem:
                         movable.target_x, movable.target_y = my_pos.x, my_pos.y
 
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
-                        if config.DEBUG:
-                            log.info(  # TODO: Can we get the entity names here?
-                                f"Entity {entity_id} attacks {attack.attack_target} "
-                                f"for {attack.attack_damage} damage."
-                            )
-                        target_health.hp -= attack.attack_damage
+                        missed = False
                         if attack.attack_range > 1:
-                            create_confetti(game_state, target_pos.x, target_pos.y)
+                            # Check High Ground Miss Chance
+                            # If target is on high ground and attacker is NOT on high ground
+                            attacker_terrain = game_state.map.get_terrain(
+                                int(my_pos.x), int(my_pos.y)
+                            )
+                            target_terrain = game_state.map.get_terrain(
+                                int(target_pos.x), int(target_pos.y)
+                            )
+                            if (
+                                target_terrain == TERRAIN_HIGH_GROUND
+                                and attacker_terrain != TERRAIN_HIGH_GROUND
+                            ):
+                                if random.random() < 0.5:
+                                    missed = True
+                                    if config.DEBUG:
+                                        log.info(
+                                            f"Entity {entity_id} missed {attack.attack_target} due to High Ground."
+                                        )
+
+                        if not missed:
                             if config.DEBUG:
-                                log.info(
-                                    f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
+                                log.info(  # TODO: Can we get the entity names here?
+                                    f"Entity {entity_id} attacks {attack.attack_target} "
+                                    f"for {attack.attack_damage} damage."
                                 )
+                            target_health.hp -= attack.attack_damage
+                            if attack.attack_range > 1:
+                                create_confetti(game_state, target_pos.x, target_pos.y)
+                                if config.DEBUG:
+                                    log.info(
+                                        f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
+                                    )
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target

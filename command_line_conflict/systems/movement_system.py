@@ -1,6 +1,7 @@
 from ..components.movable import Movable
 from ..components.position import Position
 from ..game_state import GameState
+from ..maps.base import TERRAIN_ROUGH
 
 # TODO: Integrate logger for debug mode. Currently not used.
 #       Consider logging movement issues or pathfinding failures for debugging.
@@ -82,7 +83,14 @@ class MovementSystem:
                     position.y = movable.target_y
                     movable.path.pop(0)
                 else:
-                    step = movable.speed * dt
+                    current_terrain = game_state.map.get_terrain(
+                        int(position.x), int(position.y)
+                    )
+                    speed_multiplier = 1.0
+                    if current_terrain == TERRAIN_ROUGH and not movable.can_fly:
+                        speed_multiplier = 0.75
+
+                    step = movable.speed * speed_multiplier * dt
                     if step > dist:
                         step = dist
                     position.x += step * dx / dist
@@ -94,7 +102,14 @@ class MovementSystem:
                 if dist < 0.01:
                     continue
 
-                step = movable.speed * dt
+                current_terrain = game_state.map.get_terrain(
+                    int(position.x), int(position.y)
+                )
+                speed_multiplier = 1.0
+                if current_terrain == TERRAIN_ROUGH and not movable.can_fly:
+                    speed_multiplier = 0.75
+
+                step = movable.speed * speed_multiplier * dt
                 if step > dist:
                     step = dist
 
