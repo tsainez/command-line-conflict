@@ -16,6 +16,18 @@ class GameState:
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
+        self.event_queue: list[dict] = []
+
+    def add_event(self, event_type: str, data: dict = None) -> None:
+        """Adds an event to the event queue.
+
+        Args:
+            event_type: The type of event (e.g., "sound").
+            data: Additional data associated with the event (e.g., {"name": "attack"}).
+        """
+        if data is None:
+            data = {}
+        self.event_queue.append({"type": event_type, "data": data})
 
     def create_entity(self) -> int:
         """Creates a new entity and returns its ID."""

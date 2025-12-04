@@ -19,6 +19,7 @@ from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
+from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.ui_system import UISystem
 
 
@@ -60,6 +61,7 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.sound_system = SoundSystem()
         self._create_initial_units()
 
     def _create_initial_units(self):
@@ -120,6 +122,7 @@ class GameScene:
             log.debug(
                 f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
             )
+            any_moved = False
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
@@ -130,6 +133,9 @@ class GameScene:
                     attack = components.get(Attack)
                     if attack:
                         attack.attack_target = None
+                    any_moved = True
+            if any_moved:
+                self.game_state.add_event("sound", {"name": "move"})
         elif event.type == pygame.KEYDOWN:
             # Camera movement
             if event.key in (pygame.K_UP, pygame.K_w):
@@ -147,26 +153,32 @@ class GameScene:
                     factories.create_extractor(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_2:
                     factories.create_chassis(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_3:
                     factories.create_rover(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_4:
                     factories.create_arachnotron(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_5:
                     factories.create_observer(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_6:
                     factories.create_immortal(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                    self.game_state.add_event("sound", {"name": "create"})
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
@@ -214,6 +226,7 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+        self.sound_system.update(self.game_state)
 
     def draw(self, screen):
         """Draws the entire game scene.

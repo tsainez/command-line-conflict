@@ -71,6 +71,7 @@ class CombatSystem:
                                 log.info(
                                     f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
                                 )
+                        game_state.add_event("sound", {"name": "attack"})
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target
