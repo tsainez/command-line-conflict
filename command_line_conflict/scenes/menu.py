@@ -18,6 +18,11 @@ class MenuScene:
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
 
+        # Start menu music
+        # Assuming the music file is in the root or a music folder
+        # For now using a placeholder path
+        self.game.music_manager.play("music/menu_theme.ogg")
+
     def handle_event(self, event):
         """Handles user input for menu navigation.
 

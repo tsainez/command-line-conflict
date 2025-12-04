@@ -22,11 +22,16 @@ class AISystem:
             if not player:
                 continue
 
+            # Neutral units (Player 0) are passive and do not auto-acquire targets.
+            if player.player_id == 0:
+                continue
+
             attack = components.get(Attack)
             if not attack:
                 continue
 
             # Find a target if we don't have one
+            # Auto-targeting enabled for FFA behavior.
             if not attack.attack_target:
                 vision = components.get(Vision)
                 if vision:
