@@ -124,6 +124,13 @@ class GameScene:
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                    # Moving clears hold position
+                    from command_line_conflict.components.movable import Movable
+
+                    movable = components.get(Movable)
+                    if movable:
+                        movable.hold_position = False
+
                     self.movement_system.set_target(
                         self.game_state, entity_id, grid_x, grid_y
                     )
@@ -167,6 +174,21 @@ class GameScene:
                     factories.create_immortal(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                elif event.key == pygame.K_h:
+                    # Hold Position
+                    from command_line_conflict.components.movable import Movable
+
+                    for entity_id, components in self.game_state.entities.items():
+                        selectable = components.get(Selectable)
+                        if selectable and selectable.is_selected:
+                            movable = components.get(Movable)
+                            if movable:
+                                movable.hold_position = True
+                                movable.path = []
+                                movable.target_x = None
+                                movable.target_y = None
+                                log.info(f"Entity {entity_id} holding position")
+
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:

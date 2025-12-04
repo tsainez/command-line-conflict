@@ -75,6 +75,6 @@ class CombatSystem:
                 else:
                     # Move towards target
                     movable = components.get(Movable)
-                    if movable:
+                    if movable and not movable.hold_position:
                         movable.target_x = target_pos.x
                         movable.target_y = target_pos.y

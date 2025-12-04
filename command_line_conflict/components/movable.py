@@ -19,3 +19,4 @@ class Movable(Component):
         self.path: list[tuple[int, int]] = []
         self.can_fly = can_fly
         self.intelligent = intelligent
+        self.hold_position: bool = False
