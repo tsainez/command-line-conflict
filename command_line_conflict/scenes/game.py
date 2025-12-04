@@ -18,6 +18,9 @@ from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
+from command_line_conflict.systems.chat_system import ChatSystem
+from command_line_conflict.systems.corpse_removal_system import \
+    CorpseRemovalSystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
@@ -86,6 +89,7 @@ class GameScene:
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
+        self.chat_system = ChatSystem(self.game.screen, self.font)
         # Pass the cheats dictionary by reference so UISystem can see changes
         self.ui_system.cheats = self.cheats
         self.corpse_removal_system = CorpseRemovalSystem()
@@ -128,6 +132,10 @@ class GameScene:
         Args:
             event: The pygame event to handle.
         """
+        # Pass event to chat system first
+        if self.chat_system.handle_event(event):
+            return
+
         log.debug(f"Handling event: {event}")
 
         # Handle construction hotkeys if a chassis is selected
@@ -337,6 +345,8 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.chat_system.update(dt)
+
         if self.paused:
             return
 
@@ -416,6 +426,8 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
+        self.ui_system.draw(self.game_state, self.paused)
+        self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
 
         # Highlight selected units
