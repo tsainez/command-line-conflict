@@ -5,7 +5,12 @@ import pygame
 from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
@@ -20,6 +25,15 @@ from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.ui_system import UISystem
+
+
+class UnitView:
+    """A simple object to satisfy the FogOfWar interface."""
+
+    def __init__(self, x, y, vision_range):
+        self.x = x
+        self.y = y
+        self.vision_range = vision_range
 
 
 class GameScene:
@@ -37,6 +51,15 @@ class GameScene:
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
         self.paused = False
+
+        # Cheats
+        self.cheats = {
+            "reveal_map": False,
+            "god_mode": False,
+        }
+
+        # Fog of War
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
 
         # Camera
         self.camera = Camera()
@@ -169,6 +192,12 @@ class GameScene:
                     )
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
+                elif event.key == pygame.K_F1:
+                    self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                    log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                elif event.key == pygame.K_F2:
+                    self.cheats["god_mode"] = not self.cheats["god_mode"]
+                    log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
@@ -206,6 +235,15 @@ class GameScene:
         """
         if self.paused:
             return
+
+        # God Mode Cheat
+        if self.cheats["god_mode"]:
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                health = components.get(Health)
+                if player and player.is_human and health:
+                    health.hp = health.max_hp
+
         self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
@@ -214,6 +252,17 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+
+        # Update Fog of War
+        if not self.cheats["reveal_map"]:
+            visible_units = []
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                position = components.get(Position)
+                vision = components.get(Vision)
+                if player and player.is_human and position and vision:
+                    visible_units.append(UnitView(position.x, position.y, vision.vision_range))
+            self.fog_of_war.update(visible_units)
 
     def draw(self, screen):
         """Draws the entire game scene.
@@ -239,7 +288,11 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
-        self.ui_system.draw(self.game_state, self.paused)
+
+        if not self.cheats["reveal_map"]:
+            self.fog_of_war.draw(screen, self.camera)
+
+        self.ui_system.draw(self.game_state, self.paused, cheats=self.cheats)
 
         # Highlight selected units
         if self.selection_start:

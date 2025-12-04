@@ -41,13 +41,17 @@ class UISystem:
             "W: Wall",
         ]
 
-    def draw(self, game_state: GameState, paused: bool) -> None:
+    def draw(self, game_state: GameState, paused: bool, cheats: dict = None) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
             game_state: The current state of the game.
+            paused: Whether the game is paused.
+            cheats: Dictionary of cheat states.
         """
         self._draw_key_options()
+        if cheats:
+            self._draw_active_cheats(cheats)
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
@@ -261,6 +265,24 @@ class UISystem:
 
             text = self.font.render(option, True, (255, 255, 255))
             self.screen.blit(text, (x_pos, y_pos))
+
+    def _draw_active_cheats(self, cheats: dict) -> None:
+        """Draws a list of active cheats."""
+        active_cheats = [k.replace('_', ' ').title() for k, v in cheats.items() if v]
+        if not active_cheats:
+            return
+
+        y_offset = 10
+        x_offset = config.SCREEN_WIDTH - 200
+
+        title = self.font.render("Active Cheats:", True, (255, 255, 0))
+        self.screen.blit(title, (x_offset, y_offset))
+        y_offset += 25
+
+        for cheat in active_cheats:
+            text = self.small_font.render(cheat, True, (255, 255, 0))
+            self.screen.blit(text, (x_offset + 10, y_offset))
+            y_offset += 20
 
     def _draw_paused_message(self) -> None:
         font = pygame.font.Font(None, 74)
