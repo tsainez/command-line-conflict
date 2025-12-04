@@ -7,6 +7,7 @@ from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
@@ -18,6 +19,9 @@ from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
+from command_line_conflict.systems.chat_system import ChatSystem
+from command_line_conflict.systems.corpse_removal_system import \
+    CorpseRemovalSystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
@@ -29,6 +33,15 @@ from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
+
+
+class UnitView:
+    """A simple object to satisfy the FogOfWar interface."""
+
+    def __init__(self, x, y, vision_range):
+        self.x = x
+        self.y = y
+        self.vision_range = vision_range
 
 
 class GameScene:
@@ -51,6 +64,15 @@ class GameScene:
         self.paused = False
         self.current_player_id = 1
 
+        # Cheats
+        self.cheats = {
+            "reveal_map": False,
+            "god_mode": False,
+        }
+
+        # Fog of War
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
+
         # Camera
         self.camera = Camera()
         self.camera_movement = {
@@ -71,6 +93,9 @@ class GameScene:
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
+        self.chat_system = ChatSystem(self.game.screen, self.font)
+        # Pass the cheats dictionary by reference so UISystem can see changes
+        self.ui_system.cheats = self.cheats
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
@@ -111,6 +136,10 @@ class GameScene:
         Args:
             event: The pygame event to handle.
         """
+        # Pass event to chat system first
+        if self.chat_system.handle_event(event):
+            return
+
         log.debug(f"Handling event: {event}")
 
         # Handle construction hotkeys if a chassis is selected
@@ -224,6 +253,12 @@ class GameScene:
 
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
+                elif event.key == pygame.K_F1:
+                    self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                    log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                elif event.key == pygame.K_F2:
+                    self.cheats["god_mode"] = not self.cheats["god_mode"]
+                    log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
                 elif event.key == pygame.K_TAB:
                     # Switch sides
                     self.selection_system.clear_selection(self.game_state)
@@ -256,6 +291,7 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
+            unit_identity = components.get(Selectable) # Typo check? Wait, Selectable doesn't have name.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 
@@ -313,8 +349,19 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.chat_system.update(dt)
+
         if self.paused:
             return
+
+        # God Mode Cheat
+        if self.cheats["god_mode"]:
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                health = components.get(Health)
+                if player and player.is_human and health:
+                    health.hp = health.max_hp
+
         self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
@@ -360,6 +407,17 @@ class GameScene:
             log.info("Victory! Mission Complete.")
             self.campaign_manager.complete_mission(self.current_mission_id)
 
+        # Update Fog of War
+        if not self.cheats["reveal_map"]:
+            visible_units = []
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                position = components.get(Position)
+                vision = components.get(Vision)
+                if player and player.is_human and position and vision:
+                    visible_units.append(UnitView(position.x, position.y, vision.vision_range))
+            self.fog_of_war.update(visible_units)
+
     def draw(self, screen):
         """Draws the entire game scene.
 
@@ -388,6 +446,8 @@ class GameScene:
         if not config.DEBUG:
             self.fog_of_war.draw(screen, self.camera)
 
+        self.ui_system.draw(self.game_state, self.paused)
+        self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
 
         # Highlight selected units
