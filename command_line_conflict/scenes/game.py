@@ -12,6 +12,7 @@ from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
+from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.corpse_removal_system import \
     CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
@@ -57,6 +58,7 @@ class GameScene:
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
+        self.chat_system = ChatSystem(self.game.screen, self.font)
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
@@ -84,6 +86,10 @@ class GameScene:
         Args:
             event: The pygame event to handle.
         """
+        # Pass event to chat system first
+        if self.chat_system.handle_event(event):
+            return
+
         log.debug(f"Handling event: {event}")
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
@@ -204,6 +210,8 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.chat_system.update(dt)
+
         if self.paused:
             return
         self._update_camera(dt)
@@ -240,6 +248,7 @@ class GameScene:
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
         self.ui_system.draw(self.game_state, self.paused)
+        self.chat_system.draw()
 
         # Highlight selected units
         if self.selection_start:
