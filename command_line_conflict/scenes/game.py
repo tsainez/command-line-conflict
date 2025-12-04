@@ -12,8 +12,7 @@ from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem

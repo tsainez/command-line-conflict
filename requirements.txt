@@ -3,3 +3,4 @@ asciimatics
 pytest-mock
 black
 isort
+pytest-xdist

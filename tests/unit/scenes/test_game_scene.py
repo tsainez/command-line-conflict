@@ -22,7 +22,9 @@ def test_move_command_interrupts_attack():
 
     attacker_id = game_state.create_entity()
     game_state.add_component(attacker_id, Position(0, 0))
-    game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
+    game_state.add_component(
+        attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0)
+    )
     game_state.add_component(attacker_id, Selectable())
     game_state.entities[attacker_id][Selectable].is_selected = True
 
