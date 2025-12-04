@@ -6,7 +6,12 @@ from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
@@ -26,6 +31,15 @@ from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
 
 
+class UnitView:
+    """A simple object to satisfy the FogOfWar interface."""
+
+    def __init__(self, x, y, vision_range):
+        self.x = x
+        self.y = y
+        self.vision_range = vision_range
+
+
 class GameScene:
     """Manages the main gameplay scene, including entities, systems, and events."""
 
@@ -42,6 +56,15 @@ class GameScene:
         self.selection_start = None
         self.paused = False
         self.current_player_id = 1
+
+        # Cheats
+        self.cheats = {
+            "reveal_map": False,
+            "god_mode": False,
+        }
+
+        # Fog of War
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
 
         # Camera
         self.camera = Camera()
@@ -63,6 +86,8 @@ class GameScene:
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
+        # Pass the cheats dictionary by reference so UISystem can see changes
+        self.ui_system.cheats = self.cheats
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
@@ -216,6 +241,12 @@ class GameScene:
 
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
+                elif event.key == pygame.K_F1:
+                    self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                    log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                elif event.key == pygame.K_F2:
+                    self.cheats["god_mode"] = not self.cheats["god_mode"]
+                    log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
                 elif event.key == pygame.K_TAB:
                     # Switch sides
                     self.selection_system.clear_selection(self.game_state)
@@ -308,6 +339,15 @@ class GameScene:
         """
         if self.paused:
             return
+
+        # God Mode Cheat
+        if self.cheats["god_mode"]:
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                health = components.get(Health)
+                if player and player.is_human and health:
+                    health.hp = health.max_hp
+
         self._update_camera(dt)
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
@@ -340,6 +380,17 @@ class GameScene:
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
             self.campaign_manager.complete_mission(self.current_mission_id)
+
+        # Update Fog of War
+        if not self.cheats["reveal_map"]:
+            visible_units = []
+            for entity_id, components in self.game_state.entities.items():
+                player = components.get(Player)
+                position = components.get(Position)
+                vision = components.get(Vision)
+                if player and player.is_human and position and vision:
+                    visible_units.append(UnitView(position.x, position.y, vision.vision_range))
+            self.fog_of_war.update(visible_units)
 
     def draw(self, screen):
         """Draws the entire game scene.
