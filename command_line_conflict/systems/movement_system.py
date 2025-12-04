@@ -58,6 +58,12 @@ class MovementSystem:
             if not position or not movable:
                 continue
 
+            if movable.hold_position:
+                movable.path = []
+                movable.target_x = None
+                movable.target_y = None
+                continue
+
             # This logic is adapted from the Unit._move method
             if movable.path:
                 next_x, next_y = movable.path[0]
