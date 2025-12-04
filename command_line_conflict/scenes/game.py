@@ -1,4 +1,5 @@
 import math
+from types import SimpleNamespace
 
 import pygame
 
@@ -56,6 +57,9 @@ class GameScene:
         self.game = game
         self.font = game.font
         self.game_state = GameState(SimpleMap())
+        self.fog_of_war = FogOfWar(
+            self.game_state.map.width, self.game_state.map.height
+        )
         self.selection_start = None
         self.paused = False
         self.current_player_id = 1
@@ -374,6 +378,18 @@ class GameScene:
         self.game_state.event_queue.clear()
         self.spawn_system.update(self.game_state, dt)
 
+        # Update Fog of War
+        vision_units = []
+        for entity_id, components in self.game_state.entities.items():
+            pos = components.get(Position)
+            vis = components.get(Vision)
+            player = components.get(Player)
+            if pos and vis and player and player.is_human:
+                vision_units.append(
+                    SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range)
+                )
+        self.fog_of_war.update(vision_units)
+
         self.check_win_condition()
 
     def check_win_condition(self):
@@ -426,6 +442,10 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
+
+        if not config.DEBUG:
+            self.fog_of_war.draw(screen, self.camera)
+
         self.ui_system.draw(self.game_state, self.paused)
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)

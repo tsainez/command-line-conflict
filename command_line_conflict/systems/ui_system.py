@@ -47,6 +47,11 @@ class UISystem:
         Args:
             game_state: The current state of the game.
             paused: Whether the game is paused.
+            current_player_id: The ID of the player currently controlling the game.
+        """
+        self._draw_key_options()
+        self._draw_player_indicator(current_player_id)
+
         """
         self._draw_key_options()
         if self.cheats:
