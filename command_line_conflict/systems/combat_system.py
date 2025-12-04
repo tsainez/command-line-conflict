@@ -65,6 +65,13 @@ class CombatSystem:
                                 f"for {attack.attack_damage} damage."
                             )
                         target_health.hp -= attack.attack_damage
+
+                        # Retaliation Logic:
+                        # If the target has an Attack component and no current target, make them fight back.
+                        target_attack = target_components.get(Attack)
+                        if target_attack and target_attack.attack_target is None:
+                            target_attack.attack_target = entity_id
+
                         if attack.attack_range > 1:
                             create_confetti(game_state, target_pos.x, target_pos.y)
                             if config.DEBUG:
