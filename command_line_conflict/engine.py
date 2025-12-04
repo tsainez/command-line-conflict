@@ -4,8 +4,9 @@ from pathlib import Path
 import pygame
 
 from . import config
-from .logger import \
-    log  # TODO: Expand logger usage, specifically for when in debug mode.
+from .logger import (
+    log,
+)  # TODO: Expand logger usage, specifically for when in debug mode.
 from .maps import Map
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene

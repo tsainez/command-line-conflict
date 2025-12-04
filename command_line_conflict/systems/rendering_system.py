@@ -16,7 +16,6 @@ from ..game_state import GameState
 # TODO: Integrate logger for debug mode. Currently not used.
 
 
-
 class RenderingSystem:
     """Handles rendering all entities and UI elements to the screen."""
 
