@@ -4,6 +4,7 @@ from . import config
 from .components.attack import Attack
 from .components.confetti import Confetti
 from .components.detection import Detection
+from .components.factory import Factory
 from .components.flee import Flee
 from .components.health import Health
 from .components.movable import Movable
@@ -11,6 +12,7 @@ from .components.player import Player
 from .components.position import Position
 from .components.renderable import Renderable
 from .components.selectable import Selectable
+from .components.unit_identity import UnitIdentity
 from .components.vision import Vision
 from .components.wander import Wander
 from .game_state import GameState
@@ -45,6 +47,7 @@ def create_chassis(
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="chassis"))
     return entity_id
 
 
@@ -117,6 +120,7 @@ def create_rover(
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="rover"))
     return entity_id
 
 
@@ -148,6 +152,7 @@ def create_arachnotron(
     game_state.add_component(entity_id, Vision(vision_range=6))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="arachnotron"))
     return entity_id
 
 
@@ -177,6 +182,7 @@ def create_observer(
     game_state.add_component(entity_id, Flee(flees_from_enemies=True))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="observer"))
     return entity_id
 
 
@@ -209,6 +215,7 @@ def create_immortal(
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.2))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="immortal"))
     return entity_id
 
 
@@ -235,4 +242,67 @@ def create_extractor(
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, UnitIdentity(name="extractor"))
     return entity_id
+
+
+def create_rover_factory(
+    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
+) -> int:
+    """Creates a factory that converts Chassis to Rovers.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+        player_id: The ID of the player who owns this unit.
+        is_human: True if the player is human-controlled.
+    Returns:
+        The entity ID of the newly created unit.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="F", color=color))
+    game_state.add_component(entity_id, Health(hp=200, max_hp=200))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
+    game_state.add_component(entity_id, UnitIdentity(name="rover_factory"))
+    return entity_id
+
+
+def create_arachnotron_factory(
+    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
+) -> int:
+    """Creates a factory that converts Rovers to Arachnotrons.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+        player_id: The ID of the player who owns this unit.
+        is_human: True if the player is human-controlled.
+    Returns:
+        The entity ID of the newly created unit.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
+    game_state.add_component(entity_id, Renderable(icon="f", color=color))
+    game_state.add_component(entity_id, Health(hp=300, max_hp=300))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
+    game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))
+    game_state.add_component(entity_id, UnitIdentity(name="arachnotron_factory"))
+    return entity_id
+
+
+UNIT_NAME_TO_FACTORY = {
+    "chassis": create_chassis,
+    "rover": create_rover,
+    "arachnotron": create_arachnotron,
+    "observer": create_observer,
+    "immortal": create_immortal,
+    "extractor": create_extractor,
+}

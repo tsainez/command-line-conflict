@@ -4,6 +4,7 @@ import pygame
 
 from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
+from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
@@ -16,6 +17,7 @@ from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSys
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
+from command_line_conflict.systems.production_system import ProductionSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.sound_system import SoundSystem
@@ -50,6 +52,7 @@ class GameScene:
         }
 
         # Initialize systems
+        self.campaign_manager = CampaignManager()
         self.movement_system = MovementSystem()
         self.rendering_system = RenderingSystem(
             self.game.screen, self.font, self.camera
@@ -62,6 +65,11 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.production_system = ProductionSystem(self.campaign_manager)
+
+        # Current Mission ID - In a full game this would be passed from a mission select screen
+        self.current_mission_id = "mission_1"
+
         self.sound_system = SoundSystem()
         self.wander_system = WanderSystem()
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
@@ -95,6 +103,12 @@ class GameScene:
             event: The pygame event to handle.
         """
         log.debug(f"Handling event: {event}")
+
+        # Handle construction hotkeys if a chassis is selected
+        if event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_r, pygame.K_a):
+                 self._handle_construction(event.key)
+
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
         elif (
@@ -219,6 +233,53 @@ class GameScene:
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
 
+    def _handle_construction(self, key):
+        """Handles building construction requests."""
+        # Find selected chassis
+        selected_chassis_ids = []
+        for entity_id, components in self.game_state.entities.items():
+            selectable = components.get(Selectable)
+            unit_identity = components.get(Selectable) # Typo check? Wait, Selectable doesn't have name.
+            # I need to get UnitIdentity from components
+            identity = components.get(factories.UnitIdentity)
+
+            if selectable and selectable.is_selected:
+                if identity and identity.name == "chassis":
+                    selected_chassis_ids.append(entity_id)
+
+        if not selected_chassis_ids:
+            return
+
+        # Simple logic: First selected chassis builds the factory
+        builder_id = selected_chassis_ids[0]
+        pos = self.game_state.get_component(builder_id, factories.Position)
+        player = self.game_state.get_component(builder_id, factories.Player)
+
+        if not pos or not player:
+            return
+
+        # Check unlock requirements and build
+        if key == pygame.K_r: # Build Rover Factory
+            # Check if Rover is unlocked (implied requirement for Rover Factory)
+            if self.campaign_manager.is_unit_unlocked("rover"):
+                log.info("Building Rover Factory")
+                self.game_state.remove_entity(builder_id)
+                factories.create_rover_factory(
+                    self.game_state, pos.x, pos.y, player.player_id, player.is_human
+                )
+            else:
+                log.info("Rover tech not unlocked!")
+
+        elif key == pygame.K_a: # Build Arachnotron Factory
+            if self.campaign_manager.is_unit_unlocked("arachnotron"):
+                log.info("Building Arachnotron Factory")
+                self.game_state.remove_entity(builder_id)
+                factories.create_arachnotron_factory(
+                    self.game_state, pos.x, pos.y, player.player_id, player.is_human
+                )
+            else:
+                log.info("Arachnotron tech not unlocked!")
+
     def _update_camera(self, dt):
         """Updates the camera position based on user input."""
         if self.camera_movement["up"]:
@@ -246,12 +307,30 @@ class GameScene:
         self.combat_system.update(self.game_state, dt)
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
+        self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
         self.sound_system.update(self.game_state)
 
         # Clear event queue after all systems have processed events
         self.game_state.event_queue.clear()
         self.spawn_system.update(self.game_state, dt)
+
+        self.check_win_condition()
+
+    def check_win_condition(self):
+        """Checks if the player has won the level."""
+        # Simple win condition: No enemy units remaining
+        enemy_count = 0
+        for entity_id, components in self.game_state.entities.items():
+            player = components.get(factories.Player)
+            if player and not player.is_human:
+                # Exclude dead things just in case, though corpse removal should handle it
+                if factories.Health in components:
+                     enemy_count += 1
+
+        if enemy_count == 0:
+            log.info("Victory! Mission Complete.")
+            self.campaign_manager.complete_mission(self.current_mission_id)
 
     def draw(self, screen):
         """Draws the entire game scene.
