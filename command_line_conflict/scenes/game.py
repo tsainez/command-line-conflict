@@ -13,15 +13,17 @@ from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.production_system import ProductionSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
+from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
+from command_line_conflict.systems.wander_system import WanderSystem
 
 
 class GameScene:
@@ -68,7 +70,15 @@ class GameScene:
         # Current Mission ID - In a full game this would be passed from a mission select screen
         self.current_mission_id = "mission_1"
 
+        self.sound_system = SoundSystem()
+        self.wander_system = WanderSystem()
+        self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
+
+        # Start game music
+        # Assuming the music file is in the root or a music folder
+        # For now using a placeholder path
+        self.game.music_manager.play("music/game_theme.ogg")
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
@@ -138,6 +148,13 @@ class GameScene:
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                    # Moving clears hold position
+                    from command_line_conflict.components.movable import Movable
+
+                    movable = components.get(Movable)
+                    if movable:
+                        movable.hold_position = False
+
                     self.movement_system.set_target(
                         self.game_state, entity_id, grid_x, grid_y
                     )
@@ -181,6 +198,21 @@ class GameScene:
                     factories.create_immortal(
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
+                elif event.key == pygame.K_h:
+                    # Hold Position
+                    from command_line_conflict.components.movable import Movable
+
+                    for entity_id, components in self.game_state.entities.items():
+                        selectable = components.get(Selectable)
+                        if selectable and selectable.is_selected:
+                            movable = components.get(Movable)
+                            if movable:
+                                movable.hold_position = True
+                                movable.path = []
+                                movable.target_x = None
+                                movable.target_y = None
+                                log.info(f"Entity {entity_id} holding position")
+
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
@@ -271,11 +303,17 @@ class GameScene:
         self.health_system.update(self.game_state, dt)
         self.flee_system.update(self.game_state, dt)
         self.ai_system.update(self.game_state)
+        self.wander_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
+        self.sound_system.update(self.game_state)
+
+        # Clear event queue after all systems have processed events
+        self.game_state.event_queue.clear()
+        self.spawn_system.update(self.game_state, dt)
 
         self.check_win_condition()
 

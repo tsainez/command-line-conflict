@@ -2,8 +2,7 @@ from unittest.mock import Mock
 
 from command_line_conflict.components.dead import Dead
 from command_line_conflict.game_state import GameState
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 
 
 def test_corpse_removal_system():

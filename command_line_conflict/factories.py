@@ -14,6 +14,7 @@ from .components.renderable import Renderable
 from .components.selectable import Selectable
 from .components.unit_identity import UnitIdentity
 from .components.vision import Vision
+from .components.wander import Wander
 from .game_state import GameState
 
 # TODO: Integrate logger for debug mode. Currently not used.
@@ -47,6 +48,33 @@ def create_chassis(
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="chassis"))
+    return entity_id
+
+
+def create_wildlife(
+    game_state: GameState, x: float, y: float
+) -> int:
+    """Creates a new wildlife unit (Neutral).
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the unit will be created.
+        y: The y-coordinate where the unit will be created.
+    Returns:
+        The entity ID of the newly created unit.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    color = config.PLAYER_COLORS.get(config.NEUTRAL_PLAYER_ID, (128, 128, 128))
+    game_state.add_component(entity_id, Renderable(icon="w", color=color))
+    game_state.add_component(entity_id, Movable(speed=1.0, intelligent=False))
+    game_state.add_component(entity_id, Health(hp=40, max_hp=40))
+    game_state.add_component(
+        entity_id, Attack(attack_damage=8, attack_range=1, attack_speed=0.8)
+    )
+    game_state.add_component(entity_id, Vision(vision_range=4))
+    game_state.add_component(entity_id, Selectable())
+    game_state.add_component(entity_id, Player(player_id=config.NEUTRAL_PLAYER_ID, is_human=False))
+    game_state.add_component(entity_id, Wander(wander_radius=5, move_interval=4.0))
     return entity_id
 
 
