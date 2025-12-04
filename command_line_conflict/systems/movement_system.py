@@ -9,7 +9,14 @@ from ..game_state import GameState
 class MovementSystem:
     """Handles the movement of entities."""
 
-    def set_target(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
+    def set_target(
+        self,
+        game_state: GameState,
+        entity_id: int,
+        x: int,
+        y: int,
+        keep_patrol: bool = False,
+    ) -> None:
         """Sets a new movement target for an entity and calculates the path.
 
         Args:
@@ -17,11 +24,17 @@ class MovementSystem:
             entity_id: The ID of the entity to move.
             x: The target x-coordinate.
             y: The target y-coordinate.
+            keep_patrol: If True, does not clear patrol state.
         """
         movable = game_state.get_component(entity_id, Movable)
         position = game_state.get_component(entity_id, Position)
         if not movable or not position:
             return
+
+        if not keep_patrol:
+            movable.is_patrolling = False
+            movable.patrol_start = None
+            movable.patrol_end = None
 
         movable.target_x = x
         movable.target_y = y
@@ -41,6 +54,26 @@ class MovementSystem:
             extra_obstacles=extra_obstacles,
         )
 
+    def patrol(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
+        """Orders an entity to patrol between its current location and a target.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the entity to patrol.
+            x: The target x-coordinate.
+            y: The target y-coordinate.
+        """
+        movable = game_state.get_component(entity_id, Movable)
+        position = game_state.get_component(entity_id, Position)
+        if not movable or not position:
+            return
+
+        movable.is_patrolling = True
+        movable.patrol_start = (position.x, position.y)
+        movable.patrol_end = (x, y)
+
+        self.set_target(game_state, entity_id, x, y, keep_patrol=True)
+
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes entity movement based on their current path or target.
 
@@ -57,6 +90,33 @@ class MovementSystem:
 
             if not position or not movable:
                 continue
+
+            # Check if patrol target reached and switch if necessary
+            if movable.is_patrolling and not movable.path:
+                # If path is empty, we might have reached the destination or stuck
+                # Check distance to current target
+                if (
+                    movable.target_x is not None
+                    and movable.target_y is not None
+                    and abs(position.x - movable.target_x) < 0.1
+                    and abs(position.y - movable.target_y) < 0.1
+                ):
+                    # We reached the target. Swap.
+                    if (
+                        abs(movable.target_x - movable.patrol_end[0]) < 0.1
+                        and abs(movable.target_y - movable.patrol_end[1]) < 0.1
+                    ):
+                        new_target = movable.patrol_start
+                    else:
+                        new_target = movable.patrol_end
+
+                    self.set_target(
+                        game_state,
+                        entity_id,
+                        int(new_target[0]),
+                        int(new_target[1]),
+                        keep_patrol=True,
+                    )
 
             # This logic is adapted from the Unit._move method
             if movable.path:

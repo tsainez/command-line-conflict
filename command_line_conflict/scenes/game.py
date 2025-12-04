@@ -37,6 +37,7 @@ class GameScene:
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
         self.paused = False
+        self.command_mode = "NONE"
 
         # Camera
         self.camera = Camera()
@@ -86,7 +87,24 @@ class GameScene:
         """
         log.debug(f"Handling event: {event}")
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            self.selection_start = event.pos
+            if self.command_mode == "PATROL":
+                grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+                log.debug(
+                    f"Patrol command at grid coordinates: {(grid_x, grid_y)}"
+                )
+                for entity_id, components in self.game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        log.info(f"Patrolling entity {entity_id} to {(grid_x, grid_y)}")
+                        self.movement_system.patrol(
+                            self.game_state, entity_id, grid_x, grid_y
+                        )
+                        attack = components.get(Attack)
+                        if attack:
+                            attack.attack_target = None
+                self.command_mode = "NONE"
+            else:
+                self.selection_start = event.pos
         elif (
             event.type == pygame.MOUSEBUTTONUP
             and event.button == 1
@@ -116,20 +134,23 @@ class GameScene:
                 )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-            log.debug(
-                f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
-            )
-            for entity_id, components in self.game_state.entities.items():
-                selectable = components.get(Selectable)
-                if selectable and selectable.is_selected:
-                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
-                    self.movement_system.set_target(
-                        self.game_state, entity_id, grid_x, grid_y
-                    )
-                    attack = components.get(Attack)
-                    if attack:
-                        attack.attack_target = None
+            if self.command_mode == "PATROL":
+                self.command_mode = "NONE"
+            else:
+                grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+                log.debug(
+                    f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
+                )
+                for entity_id, components in self.game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                        self.movement_system.set_target(
+                            self.game_state, entity_id, grid_x, grid_y
+                        )
+                        attack = components.get(Attack)
+                        if attack:
+                            attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
             if event.key in (pygame.K_UP, pygame.K_w):
@@ -168,9 +189,22 @@ class GameScene:
                         self.game_state, gx, gy, player_id=1, is_human=True
                     )
                 elif event.key == pygame.K_p:
+                    # Enter patrol mode if units are selected
+                    has_selection = False
+                    for _, components in self.game_state.entities.items():
+                        selectable = components.get(Selectable)
+                        if selectable and selectable.is_selected:
+                            has_selection = True
+                            break
+                    if has_selection:
+                        self.command_mode = "PATROL"
+                elif event.key == pygame.K_SPACE:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
-                    self.game.scene_manager.switch_to("menu")
+                    if self.command_mode != "NONE":
+                        self.command_mode = "NONE"
+                    else:
+                        self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
             if event.key in (pygame.K_UP, pygame.K_w):
                 self.camera_movement["up"] = False

@@ -19,3 +19,8 @@ class Movable(Component):
         self.path: list[tuple[int, int]] = []
         self.can_fly = can_fly
         self.intelligent = intelligent
+
+        # Patrol logic
+        self.is_patrolling: bool = False
+        self.patrol_start: tuple[float, float] | None = None
+        self.patrol_end: tuple[float, float] | None = None
