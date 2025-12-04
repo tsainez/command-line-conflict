@@ -62,6 +62,11 @@ class GameScene:
         self.confetti_system = ConfettiSystem()
         self._create_initial_units()
 
+        # Start game music
+        # Assuming the music file is in the root or a music folder
+        # For now using a placeholder path
+        self.game.music_manager.play("music/game_theme.ogg")
+
     def _create_initial_units(self):
         """Creates the starting units for each player."""
         # Player 1 units (human)

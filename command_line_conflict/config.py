@@ -25,3 +25,7 @@ PLAYER_COLORS = {
     1: (0, 128, 255),  # Blue
     2: (255, 0, 0),  # Red
 }
+
+# Music configuration
+MUSIC_VOLUME = 0.5
+MUSIC_ENABLED = True
