@@ -30,6 +30,7 @@ class UISystem:
         self.screen = screen
         self.font = font
         self.camera = camera
+        self.cheats = {}
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
             "1: Extractor",
@@ -41,17 +42,16 @@ class UISystem:
             "W: Wall",
         ]
 
-    def draw(self, game_state: GameState, paused: bool, cheats: dict = None) -> None:
+    def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
             game_state: The current state of the game.
             paused: Whether the game is paused.
-            cheats: Dictionary of cheat states.
         """
         self._draw_key_options()
-        if cheats:
-            self._draw_active_cheats(cheats)
+        if self.cheats:
+            self._draw_active_cheats(self.cheats)
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])

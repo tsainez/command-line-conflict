@@ -80,6 +80,8 @@ class GameScene:
         self.health_system = HealthSystem()
         self.selection_system = SelectionSystem()
         self.ui_system = UISystem(self.game.screen, self.font, self.camera)
+        # Pass the cheats dictionary by reference so UISystem can see changes
+        self.ui_system.cheats = self.cheats
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
@@ -292,7 +294,7 @@ class GameScene:
         if not self.cheats["reveal_map"]:
             self.fog_of_war.draw(screen, self.camera)
 
-        self.ui_system.draw(self.game_state, self.paused, cheats=self.cheats)
+        self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units
         if self.selection_start:
