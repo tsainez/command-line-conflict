@@ -49,6 +49,20 @@ class Map:
         """
         return (x, y) in self.walls
 
+    def is_walkable(self, x: int, y: int) -> bool:
+        """Checks if a tile is valid and not blocked.
+
+        Args:
+            x: The x-coordinate to check.
+            y: The y-coordinate to check.
+
+        Returns:
+            True if the tile is walkable, False otherwise.
+        """
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            return False
+        return not self.is_blocked(x, y)
+
     def find_path(
         self,
         start: Tuple[int, int],

@@ -49,8 +49,8 @@ def test_draw_aggregate_attack_range(mock_draw_rect, ui_system, game_state):
 
     # For a radius of 5, 81 tiles should be in attack range.
     # For a radius of 5, 81 tiles should be in detection range.
-    # +1 for the key options panel
-    assert mock_draw_rect.call_count == 81 + 81 + 1
+    # +1 for the key options panel, +2 for player indicator (box + border)
+    assert mock_draw_rect.call_count == 81 + 81 + 1 + 2
 
 
 @patch("pygame.draw.rect")
@@ -108,8 +108,8 @@ def test_draw_aggregate_attack_range_multiple_units(
     # The total number of calls should be the size of the union of the two sets
     total_attack_tiles = len(attack_tiles_1.union(attack_tiles_2))
     total_detection_tiles = len(detection_tiles_1.union(detection_tiles_2))
-    # +1 for the key options panel
-    assert mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1
+    # +1 for the key options panel, +2 for player indicator (box + border)
+    assert mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1 + 2
 
 
 @patch("pygame.draw.rect")
@@ -136,5 +136,5 @@ def test_draw_observer_detection_range(mock_draw_rect, ui_system, game_state):
             if (x - unit_pos[0]) ** 2 + (y - unit_pos[1]) ** 2 <= radius**2:
                 detection_tiles.add((x, y))
 
-    # The total number of calls should be the size of the detection range + 1 for the panel
-    assert mock_draw_rect.call_count == len(detection_tiles) + 1
+    # The total number of calls should be the size of the detection range + 1 for the panel, +2 for player indicator
+    assert mock_draw_rect.call_count == len(detection_tiles) + 1 + 2

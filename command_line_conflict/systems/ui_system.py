@@ -15,7 +15,6 @@ from command_line_conflict.game_state import GameState
 # TODO: Integrate logger for debug mode. Currently not used.
 
 
-
 class UISystem:
     """Handles rendering the user interface, including unit info and key options."""
 
@@ -30,6 +29,7 @@ class UISystem:
         self.screen = screen
         self.font = font
         self.camera = camera
+        self.cheats = {}
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
             "1: Extractor",
@@ -41,13 +41,16 @@ class UISystem:
             "W: Wall",
         ]
 
-    def draw(self, game_state: GameState, paused: bool) -> None:
+    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
             game_state: The current state of the game.
+            paused: Whether the game is paused.
         """
         self._draw_key_options()
+        if self.cheats:
+            self._draw_active_cheats(self.cheats)
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
@@ -58,6 +61,29 @@ class UISystem:
 
         if paused:
             self._draw_paused_message()
+
+    def _draw_player_indicator(self, current_player_id: int) -> None:
+        """Draws a visual indicator for the current player.
+
+        Args:
+            current_player_id: The ID of the player currently controlling the game.
+        """
+        indicator_size = 20
+        padding = 10
+        # Position at the bottom left, above the key options or next to them
+        x = padding
+        y = config.SCREEN_HEIGHT - indicator_size - padding
+
+        color = (0, 255, 0) if current_player_id == 1 else (255, 0, 0)
+
+        rect = pygame.Rect(x, y, indicator_size, indicator_size)
+        pygame.draw.rect(self.screen, color, rect)
+        pygame.draw.rect(self.screen, (255, 255, 255), rect, 2) # Border
+
+        # Label
+        text = self.small_font.render(f"P{current_player_id}", True, (255, 255, 255))
+        text_rect = text.get_rect(center=rect.center)
+        self.screen.blit(text, text_rect)
 
     def _get_selected_entities(self, game_state: GameState) -> list[int]:
         """Gets a list of all currently selected entity IDs.
@@ -261,6 +287,24 @@ class UISystem:
 
             text = self.font.render(option, True, (255, 255, 255))
             self.screen.blit(text, (x_pos, y_pos))
+
+    def _draw_active_cheats(self, cheats: dict) -> None:
+        """Draws a list of active cheats."""
+        active_cheats = [k.replace('_', ' ').title() for k, v in cheats.items() if v]
+        if not active_cheats:
+            return
+
+        y_offset = 10
+        x_offset = config.SCREEN_WIDTH - 200
+
+        title = self.font.render("Active Cheats:", True, (255, 255, 0))
+        self.screen.blit(title, (x_offset, y_offset))
+        y_offset += 25
+
+        for cheat in active_cheats:
+            text = self.small_font.render(cheat, True, (255, 255, 0))
+            self.screen.blit(text, (x_offset + 10, y_offset))
+            y_offset += 20
 
     def _draw_paused_message(self) -> None:
         font = pygame.font.Font(None, 74)
