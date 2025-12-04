@@ -25,3 +25,6 @@ PLAYER_COLORS = {
     1: (0, 128, 255),  # Blue
     2: (255, 0, 0),  # Red
 }
+
+# The duration of a full day/night cycle in seconds.
+DAY_NIGHT_CYCLE_DURATION = 300

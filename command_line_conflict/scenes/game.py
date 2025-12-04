@@ -60,6 +60,10 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+
+        # Initialize day/night overlay surface
+        self.day_night_overlay = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
+
         self._create_initial_units()
 
     def _create_initial_units(self):
@@ -215,6 +219,10 @@ class GameScene:
         self.movement_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
 
+        # Update day/night cycle
+        self.game_state.time_elapsed += dt
+        self.game_state.time_elapsed %= self.game_state.day_night_cycle_duration
+
     def draw(self, screen):
         """Draws the entire game scene.
 
@@ -239,6 +247,28 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
+
+        # Day/Night Cycle Overlay
+        # Calculate opacity based on time_elapsed
+        # Cycle: 0 -> day, 0.5 -> night, 1 -> day
+        progress = self.game_state.time_elapsed / self.game_state.day_night_cycle_duration
+        # Use cosine to smooth the transition.
+        # cos(0) = 1 (Day), cos(pi) = -1 (Night), cos(2pi) = 1 (Day)
+        angle = progress * 2 * math.pi
+        # Opacity: 0 (Day) to MAX (Night)
+        # (1 - cos(angle)) goes from 0 to 2. Divide by 2 to get 0-1.
+        opacity_factor = (1 - math.cos(angle)) / 2
+        max_darkness = 180  # Max opacity for the night overlay
+        opacity = int(opacity_factor * max_darkness)
+
+        if opacity > 0:
+            # Resize overlay if screen size changed
+            if self.day_night_overlay.get_size() != screen.get_size():
+                self.day_night_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+
+            self.day_night_overlay.fill((0, 0, 20, opacity))  # Slightly blue tint for night
+            screen.blit(self.day_night_overlay, (0, 0))
+
         self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units
