@@ -15,7 +15,6 @@ from command_line_conflict.game_state import GameState
 # TODO: Integrate logger for debug mode. Currently not used.
 
 
-
 class UISystem:
     """Handles rendering the user interface, including unit info and key options."""
 
