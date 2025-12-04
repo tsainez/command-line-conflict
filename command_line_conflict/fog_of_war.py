@@ -22,10 +22,7 @@ class FogOfWar:
         self.width = width
         self.height = height
         self.grid = [[self.HIDDEN for _ in range(width)] for _ in range(height)]
-        self.surface = pygame.Surface(
-            (width * config.GRID_SIZE, height * config.GRID_SIZE),
-            pygame.SRCALPHA,
-        )
+        self.surface = None
 
     def update(self, units: list) -> None:
         """Updates the fog of war based on unit positions and vision.
@@ -70,25 +67,46 @@ class FogOfWar:
             screen: The pygame screen surface to draw on.
             camera: The camera object for view/zoom (optional).
         """
-        self.surface.fill((0, 0, 0, 0))  # Clear the surface with transparency
+        if self.surface is None or self.surface.get_size() != screen.get_size():
+            self.surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+
+        # Fill with opaque black (HIDDEN)
+        self.surface.fill((0, 0, 0, 255))
+
         grid_size = config.GRID_SIZE
+        screen_w, screen_h = screen.get_size()
+
         for y in range(self.height):
             for x in range(self.width):
+                state = self.grid[y][x]
+                if state == self.HIDDEN:
+                    continue
+
                 draw_x, draw_y = x, y
                 size = grid_size
                 if camera:
                     draw_x = (x - camera.x) * grid_size * camera.zoom
                     draw_y = (y - camera.y) * grid_size * camera.zoom
                     size = int(grid_size * camera.zoom)
-                rect = (
-                    draw_x,
-                    draw_y,
-                    size,
-                    size,
-                )
-                if self.grid[y][x] == self.HIDDEN:
-                    pygame.draw.rect(self.surface, (0, 0, 0, 255), rect)
-                elif self.grid[y][x] == self.EXPLORED:
-                    pygame.draw.rect(self.surface, (0, 0, 0, 180), rect)
+                else:
+                    draw_x *= grid_size
+                    draw_y *= grid_size
+
+                # Simple culling
+                if (
+                    draw_x >= screen_w
+                    or draw_y >= screen_h
+                    or draw_x + size <= 0
+                    or draw_y + size <= 0
+                ):
+                    continue
+
+                # Ensure we draw integers for rect
+                rect = (int(draw_x), int(draw_y), size + 1, size + 1)
+
+                if state == self.VISIBLE:
+                    self.surface.fill((0, 0, 0, 0), rect)
+                elif state == self.EXPLORED:
+                    self.surface.fill((0, 0, 0, 180), rect)
 
         screen.blit(self.surface, (0, 0))

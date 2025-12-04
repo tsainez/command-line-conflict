@@ -1,11 +1,16 @@
 import math
+from types import SimpleNamespace
 
 import pygame
 
 from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
@@ -37,6 +42,9 @@ class GameScene:
         self.game = game
         self.font = game.font
         self.game_state = GameState(SimpleMap())
+        self.fog_of_war = FogOfWar(
+            self.game_state.map.width, self.game_state.map.height
+        )
         self.selection_start = None
         self.paused = False
 
@@ -253,6 +261,18 @@ class GameScene:
         self.game_state.event_queue.clear()
         self.spawn_system.update(self.game_state, dt)
 
+        # Update Fog of War
+        vision_units = []
+        for entity_id, components in self.game_state.entities.items():
+            pos = components.get(Position)
+            vis = components.get(Vision)
+            player = components.get(Player)
+            if pos and vis and player and player.is_human:
+                vision_units.append(
+                    SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range)
+                )
+        self.fog_of_war.update(vision_units)
+
     def draw(self, screen):
         """Draws the entire game scene.
 
@@ -277,6 +297,10 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
+
+        if not config.DEBUG:
+            self.fog_of_war.draw(screen, self.camera)
+
         self.ui_system.draw(self.game_state, self.paused)
 
         # Highlight selected units

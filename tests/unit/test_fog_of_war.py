@@ -21,11 +21,7 @@ class TestFogOfWar:
             for cell in row:
                 assert cell == FogOfWar.HIDDEN
 
-        # Check that pygame.Surface was called with correct dimensions
-        # Note: default_api:read_file on fog_of_war.py shows
-        # pygame.Surface((width * config.GRID_SIZE, height * config.GRID_SIZE), pygame.SRCALPHA)
-        # We need to ensure config.GRID_SIZE is available or mocked if it's not a constant.
-        # config.GRID_SIZE is likely a constant.
+        assert fog.surface is None
 
     def test_update_visibility(self):
         width, height = 10, 10
@@ -68,74 +64,98 @@ class TestFogOfWar:
         # New position should be VISIBLE
         assert fog.grid[0][0] == FogOfWar.VISIBLE
 
-    def test_draw_hidden(self, mocker):
-        # Mock pygame.draw.rect
-        mock_draw_rect = mocker.patch("pygame.draw.rect")
+    def test_draw_initial_fill(self, mocker):
+        # Test that we create a surface and fill it with black
         mocker.patch("pygame.Surface")
+        import pygame
 
-        width, height = 2, 2
+        width, height = 10, 10
         fog = FogOfWar(width, height)
 
         screen = Mock()
+        screen.get_size.return_value = (800, 600)
+
+        mock_fog_surface = Mock()
+        mock_fog_surface.get_size.return_value = (800, 600)
+        pygame.Surface.return_value = mock_fog_surface
+
         fog.draw(screen)
 
-        # Should draw rectangles for hidden tiles (black, alpha 255)
-        # Grid is all hidden initially.
-        # 2x2 grid = 4 calls.
-        assert mock_draw_rect.call_count == 4
+        # Verify surface creation
+        pygame.Surface.assert_called_with((800, 600), pygame.SRCALPHA)
 
-        # Inspect arguments of first call
-        # args: (surface, color, rect)
-        args, _ = mock_draw_rect.call_args_list[0]
-        color = args[1]
-        assert color == (0, 0, 0, 255)
+        # Verify fill with black (HIDDEN)
+        mock_fog_surface.fill.assert_any_call((0, 0, 0, 255))
 
-    def test_draw_explored(self, mocker):
-        mock_draw_rect = mocker.patch("pygame.draw.rect")
+        # Verify blit to screen
+        screen.blit.assert_called_with(mock_fog_surface, (0, 0))
+
+    def test_draw_visible_and_explored(self, mocker):
         mocker.patch("pygame.Surface")
+        import pygame
 
         width, height = 2, 2
         fog = FogOfWar(width, height)
 
-        # Manually set a tile to EXPLORED
-        fog.grid[0][0] = FogOfWar.EXPLORED
-
-        screen = Mock()
-        fog.draw(screen)
-
-        # One tile is EXPLORED, others are HIDDEN. All drawn.
-        assert mock_draw_rect.call_count == 4
-
-        # Check calls for the explored tile
-        # We need to find the call corresponding to (0,0)
-        # Rect is x, y, size, size.
-        # x=0, y=0 -> rect should be (0, 0, GRID_SIZE, GRID_SIZE)
-
-        grid_size = config.GRID_SIZE
-        found_explored = False
-        for call_args in mock_draw_rect.call_args_list:
-            args, _ = call_args
-            color = args[1]
-            rect = args[2]
-            if rect[0] == 0 and rect[1] == 0:
-                 if color == (0, 0, 0, 180):
-                     found_explored = True
-
-        assert found_explored
-
-    def test_draw_visible(self, mocker):
-        mock_draw_rect = mocker.patch("pygame.draw.rect")
-        mocker.patch("pygame.Surface")
-
-        width, height = 2, 2
-        fog = FogOfWar(width, height)
-
-        # Manually set a tile to VISIBLE
+        # Set states
         fog.grid[0][0] = FogOfWar.VISIBLE
+        fog.grid[0][1] = FogOfWar.EXPLORED
+        # (1,0) and (1,1) are HIDDEN
 
         screen = Mock()
+        screen.get_size.return_value = (100, 100)
+
+        mock_fog_surface = Mock()
+        mock_fog_surface.get_size.return_value = (100, 100)
+        pygame.Surface.return_value = mock_fog_surface
+
         fog.draw(screen)
 
-        # Visible tiles are NOT drawn (transparent)
-        # So we expect 3 calls (for the 3 hidden tiles) instead of 4
-        assert mock_draw_rect.call_count == 3
+        # Verify fill black
+        mock_fog_surface.fill.assert_any_call((0, 0, 0, 255))
+
+        # Verify visible (0,0) -> Transparent
+        size = config.GRID_SIZE + 1
+        visible_rect = (0, 0, size, size)
+        mock_fog_surface.fill.assert_any_call((0, 0, 0, 0), visible_rect)
+
+        # Verify explored (0,1) -> y=0, x=1 -> Semi-transparent
+        explored_rect = (config.GRID_SIZE, 0, size, size)
+        mock_fog_surface.fill.assert_any_call((0, 0, 0, 180), explored_rect)
+
+        # Verify we only have 2 rect fills (plus the initial full fill)
+        # 1 initial fill: (0,0,0,255) without rect
+        # 2 rect fills: with rect
+        calls = mock_fog_surface.fill.call_args_list
+        rect_fills = [c for c in calls if len(c[0]) == 2] # fill(color, rect)
+        assert len(rect_fills) == 2
+
+    def test_draw_resize_surface(self, mocker):
+        # If screen size changes, surface should be recreated
+        mocker.patch("pygame.Surface")
+        import pygame
+
+        fog = FogOfWar(10, 10)
+
+        screen1 = Mock()
+        screen1.get_size.return_value = (800, 600)
+
+        mock_surf1 = Mock()
+        mock_surf1.get_size.return_value = (800, 600)
+
+        mock_surf2 = Mock()
+        mock_surf2.get_size.return_value = (1024, 768)
+
+        pygame.Surface.side_effect = [mock_surf1, mock_surf2]
+
+        fog.draw(screen1)
+        assert fog.surface == mock_surf1
+
+        # Resize screen
+        screen2 = Mock()
+        screen2.get_size.return_value = (1024, 768)
+
+        fog.draw(screen2)
+        assert fog.surface == mock_surf2
+
+        assert pygame.Surface.call_count == 2
