@@ -39,6 +39,7 @@ class GameScene:
         self.game_state = GameState(SimpleMap())
         self.selection_start = None
         self.paused = False
+        self.current_player_id = 1
 
         # Camera
         self.camera = Camera()
@@ -111,7 +112,7 @@ class GameScene:
                 grid_pos = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 log.debug(f"Click selection at {grid_pos}. Shift: {shift_pressed}")
                 self.selection_system.handle_click_selection(
-                    self.game_state, grid_pos, shift_pressed
+                    self.game_state, grid_pos, shift_pressed, self.current_player_id
                 )
             else:
                 log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
@@ -122,7 +123,7 @@ class GameScene:
                 )
                 grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 self.selection_system.update(
-                    self.game_state, grid_start, grid_end, shift_pressed
+                    self.game_state, grid_start, grid_end, shift_pressed, self.current_player_id
                 )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
@@ -162,27 +163,27 @@ class GameScene:
                 gx, gy = self.camera.screen_to_grid(mx, my)
                 if event.key == pygame.K_1:
                     factories.create_extractor(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_2:
                     factories.create_chassis(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_3:
                     factories.create_rover(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_4:
                     factories.create_arachnotron(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_5:
                     factories.create_observer(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_6:
                     factories.create_immortal(
-                        self.game_state, gx, gy, player_id=1, is_human=True
+                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
                     )
                 elif event.key == pygame.K_h:
                     # Hold Position
@@ -201,6 +202,14 @@ class GameScene:
 
                 elif event.key == pygame.K_p:
                     self.paused = not self.paused
+                elif event.key == pygame.K_TAB:
+                    # Switch sides
+                    self.selection_system.clear_selection(self.game_state)
+                    if self.current_player_id == 1:
+                        self.current_player_id = 2
+                    else:
+                        self.current_player_id = 1
+                    log.info(f"Switched to player {self.current_player_id}")
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
@@ -277,7 +286,7 @@ class GameScene:
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
-        self.ui_system.draw(self.game_state, self.paused)
+        self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
 
         # Highlight selected units
         if self.selection_start:
