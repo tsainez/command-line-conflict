@@ -16,3 +16,4 @@ game.log
 # Coverage files
 .coverage
 htmlcov/
+save_game.json
