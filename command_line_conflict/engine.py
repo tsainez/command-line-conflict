@@ -12,6 +12,8 @@ from .music import MusicManager
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
+from .scenes.victory import VictoryScene
+from .scenes.defeat import DefeatScene
 
 
 class SceneManager:
@@ -28,6 +30,8 @@ class SceneManager:
             "menu": MenuScene(game),
             "settings": SettingsScene(game),
             "game": GameScene(game),
+            "victory": VictoryScene(game),
+            "defeat": DefeatScene(game),
         }
         self.current_scene = self.scenes["menu"]
 

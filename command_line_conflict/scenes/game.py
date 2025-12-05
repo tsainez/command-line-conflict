@@ -390,22 +390,50 @@ class GameScene:
                 )
         self.fog_of_war.update(vision_units)
 
-        self.check_win_condition()
+        if self.check_win_condition():
+            self.game.scene_manager.switch_to("victory")
+        elif self.check_loss_condition():
+            self.game.scene_manager.switch_to("defeat")
 
-    def check_win_condition(self):
-        """Checks if the player has won the level."""
+    def check_win_condition(self) -> bool:
+        """Checks if the player has won the level.
+
+        Returns:
+            True if the win condition is met, False otherwise.
+        """
         # Simple win condition: No enemy units remaining
         enemy_count = 0
         for entity_id, components in self.game_state.entities.items():
-            player = components.get(factories.Player)
+            player = components.get(Player)
             if player and not player.is_human:
                 # Exclude dead things just in case, though corpse removal should handle it
-                if factories.Health in components:
-                     enemy_count += 1
+                if Health in components:
+                    enemy_count += 1
 
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
             self.campaign_manager.complete_mission(self.current_mission_id)
+            return True
+        return False
+
+    def check_loss_condition(self) -> bool:
+        """Checks if the player has lost the level.
+
+        Returns:
+            True if the loss condition is met, False otherwise.
+        """
+        player_entity_count = 0
+        for entity_id, components in self.game_state.entities.items():
+            player = components.get(Player)
+            if player and player.is_human:
+                # Check for any player-controlled entity (unit or building)
+                if Health in components:
+                    player_entity_count += 1
+
+        if player_entity_count == 0:
+            log.info("Defeat! Mission Failed.")
+            return True
+        return False
 
         # Update Fog of War
         if not self.cheats["reveal_map"]:
