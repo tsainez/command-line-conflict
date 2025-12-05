@@ -1,3 +1,4 @@
+from ..components.health import Health
 from ..components.player import Player
 from ..components.position import Position
 from ..components.vision import Vision
@@ -31,6 +32,10 @@ class Targeting:
 
             other_pos = other_components.get(Position)
             if not other_pos:
+                continue
+
+            other_health = other_components.get(Health)
+            if other_health and other_health.hp <= 0:
                 continue
 
             dist = (

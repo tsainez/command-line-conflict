@@ -117,15 +117,24 @@ class GameScene:
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+            mods = pygame.key.get_mods()
+            ctrl_pressed = mods & pygame.KMOD_CTRL
+            command_type = "Attack Move" if ctrl_pressed else "Move"
             log.debug(
-                f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
+                f"{command_type} command at grid coordinates: {(grid_x, grid_y)}"
             )
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
-                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                    log.info(
+                        f"Issuing {command_type} for entity {entity_id} to {(grid_x, grid_y)}"
+                    )
                     self.movement_system.set_target(
-                        self.game_state, entity_id, grid_x, grid_y
+                        self.game_state,
+                        entity_id,
+                        grid_x,
+                        grid_y,
+                        is_attack_move=bool(ctrl_pressed),
                     )
                     attack = components.get(Attack)
                     if attack:

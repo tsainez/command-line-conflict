@@ -16,6 +16,7 @@ class Movable(Component):
         self.speed = speed
         self.target_x: float | None = None
         self.target_y: float | None = None
+        self.attack_move_target: tuple[int, int] | None = None
         self.path: list[tuple[int, int]] = []
         self.can_fly = can_fly
         self.intelligent = intelligent

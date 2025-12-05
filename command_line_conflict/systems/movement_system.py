@@ -9,7 +9,14 @@ from ..game_state import GameState
 class MovementSystem:
     """Handles the movement of entities."""
 
-    def set_target(self, game_state: GameState, entity_id: int, x: int, y: int) -> None:
+    def set_target(
+        self,
+        game_state: GameState,
+        entity_id: int,
+        x: int,
+        y: int,
+        is_attack_move: bool = False,
+    ) -> None:
         """Sets a new movement target for an entity and calculates the path.
 
         Args:
@@ -17,11 +24,17 @@ class MovementSystem:
             entity_id: The ID of the entity to move.
             x: The target x-coordinate.
             y: The target y-coordinate.
+            is_attack_move: Whether this is an attack-move command.
         """
         movable = game_state.get_component(entity_id, Movable)
         position = game_state.get_component(entity_id, Position)
         if not movable or not position:
             return
+
+        if is_attack_move:
+            movable.attack_move_target = (x, y)
+        else:
+            movable.attack_move_target = None
 
         movable.target_x = x
         movable.target_y = y
@@ -81,6 +94,8 @@ class MovementSystem:
                     position.x = movable.target_x
                     position.y = movable.target_y
                     movable.path.pop(0)
+                    if not movable.path:
+                        movable.attack_move_target = None
                 else:
                     step = movable.speed * dt
                     if step > dist:

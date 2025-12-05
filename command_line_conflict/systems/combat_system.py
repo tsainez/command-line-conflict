@@ -8,10 +8,15 @@ from ..components.vision import Vision
 from ..factories import create_confetti
 from ..game_state import GameState
 from ..logger import log
+from ..systems.movement_system import MovementSystem
+from ..utils.targeting import Targeting
 
 
 class CombatSystem:
     """Handles combat interactions between entities."""
+
+    def __init__(self):
+        self.movement_system = MovementSystem()
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes combat logic for all entities.
@@ -30,17 +35,76 @@ class CombatSystem:
             if attack.attack_cooldown > 0:
                 attack.attack_cooldown -= dt
 
-            # Attack the target if we have one
+            # Validate current target
             if attack.attack_target:
                 target_components = game_state.entities.get(attack.attack_target)
                 if not target_components:
                     attack.attack_target = None
-                    continue
+                else:
+                    target_health = target_components.get(Health)
+                    if not target_health or target_health.hp <= 0:
+                        attack.attack_target = None
 
-                target_health = target_components.get(Health)
-                if not target_health or target_health.hp <= 0:
-                    attack.attack_target = None
+            # Auto-acquire target if needed
+            if not attack.attack_target:
+                movable = components.get(Movable)
+                # Check if we should scan for targets
+                # Scan if:
+                # 1. Idle (no path) - Auto-attack (Standard RTS behavior)
+                # 2. Attack Moving (path exists AND attack_move_target is set)
+                should_scan = False
+                if movable:
+                    if not movable.path:
+                        should_scan = True
+                    elif movable.attack_move_target:
+                        should_scan = True
+                else:
+                    # Immobile units (turrets) always scan
+                    should_scan = True
+
+                if should_scan:
+                    vision = components.get(Vision)
+                    player = components.get(Player)
+                    my_pos = components.get(Position)
+                    if vision and player and my_pos:
+                        closest_enemy = Targeting.find_closest_enemy(
+                            entity_id, my_pos, player, vision, game_state
+                        )
+                        if closest_enemy:
+                            attack.attack_target = closest_enemy
+                            if movable:
+                                movable.path = []
+                                movable.target_x, movable.target_y = my_pos.x, my_pos.y
+
+            # Resume Attack Move if idle and have a pending target
+            if not attack.attack_target:
+                movable = components.get(Movable)
+                if (
+                    movable
+                    and movable.attack_move_target
+                    and not movable.path
+                ):
+                    # We have an attack move target, but no path (stopped).
+                    # Check if we are at the target
+                    curr_pos = components.get(Position)
+                    tx, ty = movable.attack_move_target
+                    if curr_pos:
+                        dx = curr_pos.x - tx
+                        dy = curr_pos.y - ty
+                        if (dx * dx + dy * dy) > 0.01:
+                            # Not at target, resume movement
+                            # We use the pre-instantiated MovementSystem.
+                            self.movement_system.set_target(
+                                game_state, entity_id, tx, ty, is_attack_move=True
+                            )
+
+            # Attack the target if we have one
+            if attack.attack_target:
+                target_components = game_state.entities.get(attack.attack_target)
+                # Validation already done above, but we need target_health
+                if not target_components:
                     continue
+                target_health = target_components.get(Health)
 
                 my_pos = components.get(Position)
                 target_pos = target_components.get(Position)
