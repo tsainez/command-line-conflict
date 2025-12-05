@@ -114,6 +114,17 @@ class GameScene:
         # For now using a placeholder path
         self.game.music_manager.play("music/game_theme.ogg")
 
+        if config.DEBUG:
+            cheats_list = [
+                "Debug Cheats:",
+                "F1: Toggle Reveal Map",
+                "F2: Toggle God Mode",
+                "TAB: Switch Player",
+                "1-6: Spawn Units",
+            ]
+            for cheat in cheats_list:
+                log.info(cheat)
+
     def _create_initial_units(self):
         """Creates the starting units for each player."""
         # Player 1 units (human)

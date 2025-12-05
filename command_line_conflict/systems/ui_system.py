@@ -52,8 +52,6 @@ class UISystem:
         self._draw_key_options()
         self._draw_player_indicator(current_player_id)
 
-        """
-        self._draw_key_options()
         if self.cheats:
             self._draw_active_cheats(self.cheats)
         selected_entities = self._get_selected_entities(game_state)
