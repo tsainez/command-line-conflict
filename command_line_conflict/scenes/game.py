@@ -81,6 +81,8 @@ class GameScene:
             "left": False,
             "right": False,
         }
+        self.drag_start_pos = None  # For middle mouse drag
+        self.camera_start_pos = None
 
         # Initialize systems
         self.campaign_manager = CampaignManager()
@@ -201,13 +203,13 @@ class GameScene:
                         attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
-            if event.key in (pygame.K_UP, pygame.K_w):
+            if event.key == pygame.K_UP:
                 self.camera_movement["up"] = True
-            elif event.key in (pygame.K_DOWN, pygame.K_s):
+            elif event.key == pygame.K_DOWN:
                 self.camera_movement["down"] = True
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
+            elif event.key == pygame.K_LEFT:
                 self.camera_movement["left"] = True
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+            elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = True
             else:
                 mx, my = pygame.mouse.get_pos()
@@ -270,20 +272,42 @@ class GameScene:
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
-            if event.key in (pygame.K_UP, pygame.K_w):
+            if event.key == pygame.K_UP:
                 self.camera_movement["up"] = False
-            elif event.key in (pygame.K_DOWN, pygame.K_s):
+            elif event.key == pygame.K_DOWN:
                 self.camera_movement["down"] = False
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
+            elif event.key == pygame.K_LEFT:
                 self.camera_movement["left"] = False
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+            elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = False
-        # Camera zoom (mouse wheel)
+        # Camera zoom (mouse wheel) and middle mouse drag
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:  # Scroll up
                 self.camera.zoom_in(0.1)
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
+            elif event.button == 2:  # Middle mouse click (start drag)
+                self.drag_start_pos = event.pos
+                self.camera_start_pos = (self.camera.x, self.camera.y)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 2:  # Middle mouse release (end drag)
+                self.drag_start_pos = None
+                self.camera_start_pos = None
+        elif event.type == pygame.MOUSEMOTION:
+            if self.drag_start_pos and self.camera_start_pos:
+                # Middle mouse drag logic
+                dx = event.pos[0] - self.drag_start_pos[0]
+                dy = event.pos[1] - self.drag_start_pos[1]
+
+                # Convert screen delta to grid delta
+                # When dragging the "world", if I move mouse RIGHT (positive dx),
+                # the camera should move LEFT (decrease x) to "pull" the world.
+
+                grid_dx = dx / (config.GRID_SIZE * self.camera.zoom)
+                grid_dy = dy / (config.GRID_SIZE * self.camera.zoom)
+
+                self.camera.x = self.camera_start_pos[0] - grid_dx
+                self.camera.y = self.camera_start_pos[1] - grid_dy
 
     def _handle_construction(self, key):
         """Handles building construction requests."""

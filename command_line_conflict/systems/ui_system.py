@@ -38,7 +38,7 @@ class UISystem:
             "4: Arachnotron",
             "5: Observer",
             "6: Immortal",
-            "W: Wall",
+            "Arrow Keys: Move Camera",
         ]
 
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
@@ -52,10 +52,9 @@ class UISystem:
         self._draw_key_options()
         self._draw_player_indicator(current_player_id)
 
-        """
-        self._draw_key_options()
         if self.cheats:
             self._draw_active_cheats(self.cheats)
+
         selected_entities = self._get_selected_entities(game_state)
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
