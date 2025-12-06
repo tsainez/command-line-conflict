@@ -109,6 +109,11 @@ class GameScene:
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
 
+        self.has_player_2_opponent = any(
+            c.get(Player) and c.get(Player).player_id == 2
+            for _, c in self.game_state.entities.items()
+        )
+
         # Start game music
         # Assuming the music file is in the root or a music folder
         # For now using a placeholder path
@@ -210,33 +215,36 @@ class GameScene:
             elif event.key in (pygame.K_RIGHT, pygame.K_d):
                 self.camera_movement["right"] = True
             else:
-                mx, my = pygame.mouse.get_pos()
-                gx, gy = self.camera.screen_to_grid(mx, my)
-                if event.key == pygame.K_1:
-                    factories.create_extractor(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_2:
-                    factories.create_chassis(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_3:
-                    factories.create_rover(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_4:
-                    factories.create_arachnotron(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_5:
-                    factories.create_observer(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_6:
-                    factories.create_immortal(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_h:
+                if config.DEBUG:
+                    mods = pygame.key.get_mods()
+                    if mods & pygame.KMOD_CTRL:
+                        mx, my = pygame.mouse.get_pos()
+                        gx, gy = self.camera.screen_to_grid(mx, my)
+                        if event.key == pygame.K_1:
+                            factories.create_extractor(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_2:
+                            factories.create_chassis(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_3:
+                            factories.create_rover(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_4:
+                            factories.create_arachnotron(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_5:
+                            factories.create_observer(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_6:
+                            factories.create_immortal(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                if event.key == pygame.K_h:
                     # Hold Position
                     from command_line_conflict.components.movable import Movable
 
@@ -401,12 +409,12 @@ class GameScene:
         Returns:
             True if the win condition is met, False otherwise.
         """
-        # Simple win condition: No enemy units remaining
         enemy_count = 0
-        for entity_id, components in self.game_state.entities.items():
+        for _, components in self.game_state.entities.items():
             player = components.get(Player)
             if player and not player.is_human:
-                # Exclude dead things just in case, though corpse removal should handle it
+                if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
+                    continue
                 if Health in components:
                     enemy_count += 1
 
