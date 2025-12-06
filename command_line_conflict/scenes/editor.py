@@ -138,15 +138,57 @@ class EditorScene:
         screen.blit(surf2, (10, 30))
 
     def save_map(self):
+        """Opens a file dialog to save the map."""
         try:
-            self.map.save_to_file(self.map_path)
-            log.info("Map saved.")
+            import tkinter as tk
+            from tkinter import filedialog
+
+            root = tk.Tk()
+            root.withdraw()  # Hide the main window
+
+            # Default directory
+            initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+            if not os.path.exists(initial_dir):
+                os.makedirs(initial_dir)
+
+            file_path = filedialog.asksaveasfilename(
+                initialdir=initial_dir,
+                title="Save Map",
+                filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+                defaultextension=".json",
+            )
+            root.destroy()
+
+            if file_path:
+                self.map.save_to_file(file_path)
+                self.map_path = file_path  # Update current path
+                log.info(f"Map saved to {file_path}.")
         except Exception as e:
             log.error(f"Failed to save map: {e}")
 
     def load_map(self):
+        """Opens a file dialog to load a map."""
         try:
-            self.map = Map.load_from_file(self.map_path)
-            log.info("Map loaded.")
+            import tkinter as tk
+            from tkinter import filedialog
+
+            root = tk.Tk()
+            root.withdraw()
+
+            initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+            if not os.path.exists(initial_dir):
+                os.makedirs(initial_dir)
+
+            file_path = filedialog.askopenfilename(
+                initialdir=initial_dir,
+                title="Load Map",
+                filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+            )
+            root.destroy()
+
+            if file_path:
+                self.map = Map.load_from_file(file_path)
+                self.map_path = file_path
+                log.info(f"Map loaded from {file_path}.")
         except Exception as e:
             log.error(f"Failed to load map: {e}")

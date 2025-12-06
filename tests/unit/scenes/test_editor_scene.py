@@ -36,6 +36,41 @@ class TestEditorScene(unittest.TestCase):
         self.assertFalse(self.scene.map.is_blocked(5, 5))
 
     @patch('command_line_conflict.maps.base.Map.save_to_file')
-    def test_save_map(self, mock_save):
+    @patch('tkinter.filedialog.asksaveasfilename')
+    @patch('tkinter.Tk')
+    def test_save_map(self, mock_tk, mock_asksave, mock_save):
+        mock_asksave.return_value = "path/to/save.json"
+
+        # Setup mock Tk instance
+        mock_root = MagicMock()
+        mock_tk.return_value = mock_root
+
         self.scene.save_map()
-        mock_save.assert_called_once()
+
+        mock_tk.assert_called()
+        mock_root.withdraw.assert_called()
+        mock_asksave.assert_called()
+        mock_root.destroy.assert_called()
+        mock_save.assert_called_with("path/to/save.json")
+
+    @patch('command_line_conflict.maps.base.Map.save_to_file')
+    @patch('tkinter.filedialog.asksaveasfilename')
+    @patch('tkinter.Tk')
+    def test_save_map_cancel(self, mock_tk, mock_asksave, mock_save):
+        mock_asksave.return_value = "" # User cancelled
+        mock_tk.return_value = MagicMock()
+
+        self.scene.save_map()
+
+        mock_save.assert_not_called()
+
+    @patch('command_line_conflict.maps.base.Map.load_from_file')
+    @patch('tkinter.filedialog.askopenfilename')
+    @patch('tkinter.Tk')
+    def test_load_map(self, mock_tk, mock_askopen, mock_load):
+        mock_askopen.return_value = "path/to/load.json"
+        mock_tk.return_value = MagicMock()
+
+        self.scene.load_map()
+
+        mock_load.assert_called_with("path/to/load.json")
