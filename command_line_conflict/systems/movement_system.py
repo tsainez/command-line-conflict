@@ -25,14 +25,9 @@ class MovementSystem:
 
         movable.target_x = x
         movable.target_y = y
-        extra_obstacles = set()
-        if movable.intelligent:
-            for other_entity_id, other_components in game_state.entities.items():
-                if other_entity_id == entity_id:
-                    continue
-                other_position = other_components.get(Position)
-                if other_position:
-                    extra_obstacles.add((int(other_position.x), int(other_position.y)))
+        extra_obstacles = self._get_obstacles(game_state, entity_id) if movable.intelligent else set()
+        if (x, y) in extra_obstacles:
+            extra_obstacles.remove((x, y))
 
         movable.path = game_state.map.find_path(
             (int(position.x), int(position.y)),
@@ -40,6 +35,17 @@ class MovementSystem:
             can_fly=movable.can_fly,
             extra_obstacles=extra_obstacles,
         )
+
+    def _get_obstacles(self, game_state: GameState, entity_id: int) -> set[tuple[int, int]]:
+        """Collects obstacle positions from other entities."""
+        extra_obstacles = set()
+        for other_entity_id, other_components in game_state.entities.items():
+            if other_entity_id == entity_id:
+                continue
+            other_position = other_components.get(Position)
+            if other_position:
+                extra_obstacles.add((int(other_position.x), int(other_position.y)))
+        return extra_obstacles
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes entity movement based on their current path or target.
@@ -65,6 +71,26 @@ class MovementSystem:
                 continue
 
             # This logic is adapted from the Unit._move method
+            # If intelligent and we have a target but no path, try to find one
+            if not movable.path and movable.target_x is not None and movable.target_y is not None:
+                if movable.intelligent:
+                    start_node = (int(position.x), int(position.y))
+                    end_node = (int(movable.target_x), int(movable.target_y))
+                    if start_node != end_node:
+                        extra_obstacles = self._get_obstacles(game_state, entity_id)
+                        if end_node in extra_obstacles:
+                            extra_obstacles.remove(end_node)
+                        movable.path = game_state.map.find_path(
+                            start_node,
+                            end_node,
+                            can_fly=movable.can_fly,
+                            extra_obstacles=extra_obstacles,
+                        )
+                        if not movable.path:
+                            # No path found to target, stop to avoid clipping
+                            movable.target_x = None
+                            movable.target_y = None
+
             if movable.path:
                 next_x, next_y = movable.path[0]
 

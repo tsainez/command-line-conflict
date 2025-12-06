@@ -64,3 +64,40 @@ def test_intelligent_unit_moves_around_obstacle(game_state, movement_system):
 
     # The unit should have moved to the target
     assert int(unit1_pos.x) == 10 and int(unit1_pos.y) == 12
+
+
+def test_intelligent_unit_avoids_clipping_when_target_set_directly(game_state, movement_system):
+    # This simulates CombatSystem setting target directly, bypassing set_target()
+
+    # Create an intelligent 'rover' unit
+    unit1_id = create_rover(game_state, x=4, y=5, player_id=1)
+    movable = game_state.get_component(unit1_id, Movable)
+
+    # Add a wall at (5, 5)
+    game_state.map.add_wall(5, 5)
+
+    # Set target directly (as CombatSystem does) beyond the wall
+    movable.target_x = 7.0
+    movable.target_y = 5.0
+    movable.path = []  # Ensure path is empty initially
+
+    # Run update loop
+    # If bug exists, unit moves straight into wall at (5,5).
+    # If fixed, unit pathfinds around.
+
+    hit_wall = False
+    for _ in range(20):
+        movement_system.update(game_state, dt=0.5)
+
+        pos = game_state.get_component(unit1_id, Position)
+        # Verify it never enters the wall
+        if int(pos.x) == 5 and int(pos.y) == 5:
+            hit_wall = True
+            break
+
+    assert not hit_wall, "Unit clipped into wall!"
+
+    # Verify it successfully navigated around
+    pos = game_state.get_component(unit1_id, Position)
+    # It should have moved towards the target, likely reaching (6, 5) or similar
+    assert pos.x > 5, "Unit failed to navigate past the wall"
