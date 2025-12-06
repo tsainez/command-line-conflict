@@ -11,6 +11,53 @@ This guide will walk you through setting up and running the game on your local m
 - Python 3.8 or higher
 - `pip` and `venv`
 
+### Cross-Platform Environment Setup
+
+To run the game manually, your system must know where to find Python. If running `python --version` or `pip --version` fails, follow these steps to add Python to your system's PATH.
+
+#### Windows 11
+1.  **Search for "Environment Variables"**: Open the Start menu, type "env", and select **"Edit the system environment variables"**.
+2.  **Environment Variables**: Click the **"Environment Variables..."** button.
+3.  **Edit Path**: In the "User variables" section, locate the row named **"Path"** and double-click it.
+4.  **Add Python Paths**: Click **"New"** and add the paths to your Python executable and Scripts folder. They usually look like this (replace `YourUsername` and version number):
+    *   `C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\`
+    *   `C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\Scripts\`
+5.  **Apply**: Click OK on all dialogs and restart your terminal (PowerShell or Command Prompt).
+
+#### macOS
+If you installed Python via the official installer, it likely set the PATH for you. If not, or if using Homebrew:
+1.  Open your terminal.
+2.  Edit your shell profile (e.g., `~/.zshrc` or `~/.bash_profile`):
+    ```bash
+    nano ~/.zshrc
+    ```
+3.  Add the following line (adjusting for your specific installation path):
+    ```bash
+    export PATH="/usr/local/bin:$PATH"
+    # or for Homebrew on Apple Silicon:
+    export PATH="/opt/homebrew/bin:$PATH"
+    ```
+4.  Save and exit (`Ctrl+O`, `Enter`, `Ctrl+X`), then reload:
+    ```bash
+    source ~/.zshrc
+    ```
+
+#### Linux
+Most Linux distributions come with Python installed. If you installed a custom version:
+1.  Open your terminal.
+2.  Edit your `.bashrc` or `.zshrc`:
+    ```bash
+    nano ~/.bashrc
+    ```
+3.  Add the export line pointing to your Python bin directory:
+    ```bash
+    export PATH="/path/to/python/bin:$PATH"
+    ```
+4.  Reload the configuration:
+    ```bash
+    source ~/.bashrc
+    ```
+
 ### Installation
 
 1.  **Clone the repository:**
