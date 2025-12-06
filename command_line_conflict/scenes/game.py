@@ -454,7 +454,7 @@ class GameScene:
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
 
-        if not config.DEBUG:
+        if not self.cheats["reveal_map"]:
             self.fog_of_war.draw(screen, self.camera)
 
         self.ui_system.draw(self.game_state, self.paused)
