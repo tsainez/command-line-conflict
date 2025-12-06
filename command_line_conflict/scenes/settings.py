@@ -1,14 +1,17 @@
+from typing import TYPE_CHECKING
 import pygame
 
 from command_line_conflict import config
-
 from ..logger import log
+
+if TYPE_CHECKING:
+    from ..engine import Game
 
 
 class SettingsScene:
     """Manages the settings menu, allowing players to change game options."""
 
-    def __init__(self, game):
+    def __init__(self, game: "Game") -> None:
         """Initializes the SettingsScene.
 
         Args:
@@ -29,7 +32,7 @@ class SettingsScene:
         except ValueError:
             self.current_screen_size_index = 0
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """Handles user input for changing settings.
 
         Args:
@@ -59,15 +62,15 @@ class SettingsScene:
                 elif self.selected_option == 2:
                     self.game.scene_manager.switch_to("menu")
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         """Updates the settings scene. This scene has no dynamic elements.
 
         Args:
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         pass
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         """Draws the settings options and title to the screen.
 
         Args:

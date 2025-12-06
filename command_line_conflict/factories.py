@@ -25,14 +25,16 @@ def create_chassis(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new chassis unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -55,12 +57,14 @@ def create_wildlife(
     game_state: GameState, x: float, y: float
 ) -> int:
     """Creates a new wildlife unit (Neutral).
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -80,12 +84,14 @@ def create_wildlife(
 
 def create_confetti(game_state: GameState, x: float, y: float) -> int:
     """Creates a new confetti effect.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the effect will be created.
         y: The y-coordinate where the effect will be created.
+
     Returns:
-        The entity ID of the newly created effect.
+        int: The entity ID of the newly created effect.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -98,14 +104,16 @@ def create_rover(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new rover unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -128,14 +136,16 @@ def create_arachnotron(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new arachnotron unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -160,14 +170,16 @@ def create_observer(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new observer unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -190,14 +202,16 @@ def create_immortal(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new immortal unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -223,14 +237,16 @@ def create_extractor(
     game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
 ) -> int:
     """Creates a new extractor unit.
+
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -257,8 +273,9 @@ def create_rover_factory(
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))
@@ -283,8 +300,9 @@ def create_arachnotron_factory(
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
         is_human: True if the player is human-controlled.
+
     Returns:
-        The entity ID of the newly created unit.
+        int: The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Position(x, y))

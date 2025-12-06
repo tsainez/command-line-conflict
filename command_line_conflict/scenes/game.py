@@ -1,5 +1,6 @@
 import math
 from types import SimpleNamespace
+from typing import TYPE_CHECKING, List, Dict, Any
 
 import pygame
 
@@ -20,8 +21,6 @@ from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
 from command_line_conflict.systems.chat_system import ChatSystem
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
@@ -34,11 +33,21 @@ from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
 
+if TYPE_CHECKING:
+    from ..engine import Game
+
 
 class UnitView:
     """A simple object to satisfy the FogOfWar interface."""
 
-    def __init__(self, x, y, vision_range):
+    def __init__(self, x: float, y: float, vision_range: int) -> None:
+        """Initializes the UnitView.
+
+        Args:
+            x: The x-coordinate of the unit.
+            y: The y-coordinate of the unit.
+            vision_range: The vision range of the unit.
+        """
         self.x = x
         self.y = y
         self.vision_range = vision_range
@@ -47,7 +56,7 @@ class UnitView:
 class GameScene:
     """Manages the main gameplay scene, including entities, systems, and events."""
 
-    def __init__(self, game):
+    def __init__(self, game: "Game") -> None:
         """Initializes the GameScene.
 
         Args:
@@ -116,7 +125,7 @@ class GameScene:
         # For now using a placeholder path
         self.game.music_manager.play("music/game_theme.ogg")
 
-    def _create_initial_units(self):
+    def _create_initial_units(self) -> None:
         """Creates the starting units for each player."""
         # Player 1 units (human)
         for i in range(3):
@@ -129,7 +138,7 @@ class GameScene:
                 self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
             )
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """Handles user input and other events for the game scene.
 
         This includes mouse clicks for selection and movement, as well as
@@ -309,13 +318,16 @@ class GameScene:
                 self.camera.x = self.camera_start_pos[0] - grid_dx
                 self.camera.y = self.camera_start_pos[1] - grid_dy
 
-    def _handle_construction(self, key):
-        """Handles building construction requests."""
+    def _handle_construction(self, key: int) -> None:
+        """Handles building construction requests.
+
+        Args:
+            key: The key pressed (e.g., pygame.K_r).
+        """
         # Find selected chassis
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            unit_identity = components.get(Selectable) # Typo check? Wait, Selectable doesn't have name.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 
@@ -356,8 +368,12 @@ class GameScene:
             else:
                 log.info("Arachnotron tech not unlocked!")
 
-    def _update_camera(self, dt):
-        """Updates the camera position based on user input."""
+    def _update_camera(self, dt: float) -> None:
+        """Updates the camera position based on user input.
+
+        Args:
+            dt: The time elapsed since the last frame in seconds.
+        """
         if self.camera_movement["up"]:
             self.camera.move(0, -config.CAMERA_SPEED * dt)
         if self.camera_movement["down"]:
@@ -367,11 +383,11 @@ class GameScene:
         if self.camera_movement["right"]:
             self.camera.move(config.CAMERA_SPEED * dt, 0)
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         """Updates the state of all game systems.
 
         Args:
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         self.chat_system.update(dt)
 
@@ -416,7 +432,7 @@ class GameScene:
 
         self.check_win_condition()
 
-    def check_win_condition(self):
+    def check_win_condition(self) -> None:
         """Checks if the player has won the level."""
         # Simple win condition: No enemy units remaining
         enemy_count = 0
@@ -442,7 +458,7 @@ class GameScene:
                     visible_units.append(UnitView(position.x, position.y, vision.vision_range))
             self.fog_of_war.update(visible_units)
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         """Draws the entire game scene.
 
         This includes the background grid, the map, all entities, and the UI.

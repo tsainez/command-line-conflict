@@ -4,7 +4,7 @@ from .base import Component
 class Movable(Component):
     """A component that allows an entity to move."""
 
-    def __init__(self, speed: float, can_fly: bool = False, intelligent: bool = True):
+    def __init__(self, speed: float, can_fly: bool = False, intelligent: bool = True) -> None:
         """Initializes the Movable component.
 
         Args:

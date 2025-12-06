@@ -2,11 +2,9 @@ from .base import Component
 
 
 class Dead(Component):
-    """
-    A component that marks an entity as dead.
-    """
+    """A component that marks an entity as dead."""
 
-    def __init__(self, timer: float = 0.0):
+    def __init__(self, timer: float = 0.0) -> None:
         """Initializes the Dead component.
 
         Args:

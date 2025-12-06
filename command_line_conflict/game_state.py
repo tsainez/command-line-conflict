@@ -11,7 +11,7 @@ class GameState:
         """Initializes the GameState.
 
         Args:
-            game_map: The game map object.
+            game_map: The game map object containing terrain and other map data.
         """
         self.map = game_map
         self.entities: dict[int, dict] = {}
@@ -21,13 +21,19 @@ class GameState:
     def add_event(self, event: dict) -> None:
         """Adds an event to the event queue.
 
+        Events are processed by systems to trigger side effects like sound or visual effects.
+
         Args:
-            event: A dictionary representing the event.
+            event: A dictionary representing the event (e.g., {'type': 'sound', 'data': ...}).
         """
         self.event_queue.append(event)
 
     def create_entity(self) -> int:
-        """Creates a new entity and returns its ID."""
+        """Creates a new entity and returns its ID.
+
+        Returns:
+            int: The unique ID of the newly created entity.
+        """
         entity_id = self.next_entity_id
         self.entities[entity_id] = {}
         self.next_entity_id += 1
@@ -37,7 +43,7 @@ class GameState:
         """Adds a component to an entity.
 
         Args:
-            entity_id: The ID of the entity.
+            entity_id: The unique ID of the entity.
             component: The component instance to add.
         """
         component_type = type(component)
@@ -47,12 +53,11 @@ class GameState:
         """Gets a component from an entity.
 
         Args:
-            entity_id: The ID of the entity.
-            component_type: The type of the component to get.
+            entity_id: The unique ID of the entity.
+            component_type: The class/type of the component to retrieve.
 
         Returns:
-            The component instance, or None if the entity does not have the
-            component.
+            The component instance if found, or None if the entity does not have the component.
         """
         return self.entities[entity_id].get(component_type)
 
@@ -60,8 +65,8 @@ class GameState:
         """Removes a component from an entity.
 
         Args:
-            entity_id: The ID of the entity.
-            component_type: The type of the component to remove.
+            entity_id: The unique ID of the entity.
+            component_type: The class/type of the component to remove.
         """
         if component_type in self.entities[entity_id]:
             del self.entities[entity_id][component_type]
@@ -70,13 +75,21 @@ class GameState:
         """Removes an entity and all its components from the game.
 
         Args:
-            entity_id: The ID of the entity to remove.
+            entity_id: The unique ID of the entity to remove.
         """
         if entity_id in self.entities:
             del self.entities[entity_id]
 
     def get_entities_at_position(self, x: int, y: int) -> list[int]:
-        """Returns a list of entity IDs at a given position."""
+        """Returns a list of entity IDs at a given position.
+
+        Args:
+            x: The x-coordinate to check.
+            y: The y-coordinate to check.
+
+        Returns:
+            list[int]: A list of IDs for entities present at the specified coordinates.
+        """
         entities_at_pos = []
         for entity_id, components in self.entities.items():
             position = components.get(Position)

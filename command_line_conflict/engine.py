@@ -31,17 +31,17 @@ class SceneManager:
         }
         self.current_scene = self.scenes["menu"]
 
-    def switch_to(self, scene_name):
+    def switch_to(self, scene_name: str) -> None:
         """Switches the active scene.
 
         Args:
-            scene_name: The name of the scene to switch to.
+            scene_name: The name of the scene to switch to (e.g., "game", "menu").
         """
         if scene_name == "game":
             self.scenes["game"] = GameScene(self.game)
         self.current_scene = self.scenes[scene_name]
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """Passes events to the current scene's event handler.
 
         Args:
@@ -49,15 +49,15 @@ class SceneManager:
         """
         self.current_scene.handle_event(event)
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         """Updates the current scene.
 
         Args:
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         self.current_scene.update(dt)
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         """Draws the current scene to the screen.
 
         Args:

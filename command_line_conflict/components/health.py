@@ -2,11 +2,9 @@ from .base import Component
 
 
 class Health(Component):
-    """
-    A component that gives an entity health.
-    """
+    """A component that gives an entity health."""
 
-    def __init__(self, hp: int, max_hp: int, health_regen_rate: float = 0.0):
+    def __init__(self, hp: int, max_hp: int, health_regen_rate: float = 0.0) -> None:
         """Initializes the Health component.
 
         Args:

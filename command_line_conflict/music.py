@@ -28,7 +28,7 @@ class MusicManager:
             except pygame.error:
                 pass
 
-    def play(self, filepath, loop=-1):
+    def play(self, filepath: str, loop: int = -1) -> None:
         """Plays a music file.
 
         Args:
@@ -54,17 +54,17 @@ class MusicManager:
         except pygame.error as e:
             log.error(f"Failed to play music {filepath}: {e}")
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the currently playing music."""
         if self.enabled:
             pygame.mixer.music.stop()
             self.current_track = None
 
-    def set_volume(self, volume):
+    def set_volume(self, volume: float) -> None:
         """Sets the music volume.
 
         Args:
-            volume: A float between 0.0 and 1.0.
+            volume: A float between 0.0 (silent) and 1.0 (max volume).
         """
         self.volume = max(0.0, min(1.0, volume))
         if self.enabled:

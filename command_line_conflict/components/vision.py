@@ -2,11 +2,9 @@ from .base import Component
 
 
 class Vision(Component):
-    """
-    A component that gives an entity vision.
-    """
+    """A component that gives an entity vision."""
 
-    def __init__(self, vision_range: int):
+    def __init__(self, vision_range: int) -> None:
         """Initializes the Vision component.
 
         Args:

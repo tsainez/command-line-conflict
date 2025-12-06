@@ -4,7 +4,7 @@ from .base import Component
 class Player(Component):
     """A component that identifies an entity as belonging to a player."""
 
-    def __init__(self, player_id: int, is_human: bool = False):
+    def __init__(self, player_id: int, is_human: bool = False) -> None:
         """Initializes the Player component.
 
         Args:

@@ -5,12 +5,14 @@ import os
 import sys
 
 
-def setup_logger():
-    """
-    Sets up a logger that logs to both a file and the console.
+def setup_logger() -> logging.Logger:
+    """Sets up a logger that logs to both a file and the console.
 
     The log level is determined by the `LOG_LEVEL` environment variable.
     If the variable is not set, it defaults to INFO.
+
+    Returns:
+        logging.Logger: The configured logger instance.
     """
     # Create a logger
     logger = logging.getLogger("Command Line Conflict")

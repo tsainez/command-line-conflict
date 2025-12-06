@@ -6,7 +6,7 @@ from command_line_conflict import config
 class ChatSystem:
     """Handles the in-game chat system, including message history and input."""
 
-    def __init__(self, screen, font):
+    def __init__(self, screen: pygame.Surface, font: pygame.font.Font) -> None:
         """Initializes the ChatSystem.
 
         Args:
@@ -24,7 +24,7 @@ class ChatSystem:
         self.cursor_blink_timer = 0
         self.cursor_visible = True
 
-    def add_message(self, text: str, color: tuple[int, int, int] = (255, 255, 255)):
+    def add_message(self, text: str, color: tuple[int, int, int] = (255, 255, 255)) -> None:
         """Adds a message to the chat history.
 
         Args:
@@ -36,14 +36,14 @@ class ChatSystem:
             self.messages.pop(0)
         self.last_message_time = pygame.time.get_ticks()
 
-    def handle_event(self, event) -> bool:
+    def handle_event(self, event: pygame.event.Event) -> bool:
         """Handles user input for the chat system.
 
         Args:
             event: The pygame event to handle.
 
         Returns:
-            True if the event was consumed by the chat system, False otherwise.
+            bool: True if the event was consumed by the chat system, False otherwise.
         """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
@@ -74,11 +74,11 @@ class ChatSystem:
 
         return False
 
-    def update(self, dt: float):
+    def update(self, dt: float) -> None:
         """Updates the chat system state.
 
         Args:
-            dt: Time elapsed since last frame.
+            dt: Time elapsed since last frame in seconds.
         """
         if self.input_active:
             self.cursor_blink_timer += dt
@@ -88,7 +88,7 @@ class ChatSystem:
             # Keep history visible while typing
             self.last_message_time = pygame.time.get_ticks()
 
-    def draw(self):
+    def draw(self) -> None:
         """Draws the chat overlay and input box."""
         current_time = pygame.time.get_ticks()
 

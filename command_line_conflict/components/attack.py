@@ -2,11 +2,9 @@ from .base import Component
 
 
 class Attack(Component):
-    """
-    A component that gives an entity the ability to attack.
-    """
+    """A component that gives an entity the ability to attack."""
 
-    def __init__(self, attack_damage: int, attack_range: int, attack_speed: float):
+    def __init__(self, attack_damage: int, attack_range: int, attack_speed: float) -> None:
         """Initializes the Attack component.
 
         Args:

@@ -2,11 +2,9 @@ from .base import Component
 
 
 class Detection(Component):
-    """
-    A component that gives an entity a detection range.
-    """
+    """A component that gives an entity a detection range."""
 
-    def __init__(self, detection_range: int):
+    def __init__(self, detection_range: int) -> None:
         """Initializes the Detection component.
 
         Args:

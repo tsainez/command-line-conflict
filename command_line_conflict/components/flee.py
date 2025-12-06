@@ -2,13 +2,11 @@ from .base import Component
 
 
 class Flee(Component):
-    """
-    A component that gives an entity the ability to flee.
-    """
+    """A component that gives an entity the ability to flee."""
 
     def __init__(
         self, flee_health_threshold: float | None = None, flees_from_enemies=False
-    ):
+    ) -> None:
         """Initializes the Flee component.
 
         Args:

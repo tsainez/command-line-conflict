@@ -1,5 +1,9 @@
+"""This module contains the Factory component."""
 
-class Factory:
+from .base import Component
+
+
+class Factory(Component):
     """Component that defines a factory's production capability.
 
     Attributes:
@@ -7,6 +11,12 @@ class Factory:
         output_unit (str): The name of the unit type produced (e.g., 'rover').
     """
 
-    def __init__(self, input_unit: str, output_unit: str):
+    def __init__(self, input_unit: str, output_unit: str) -> None:
+        """Initializes the Factory component.
+
+        Args:
+            input_unit: The name of the unit type required as input.
+            output_unit: The name of the unit type produced.
+        """
         self.input_unit = input_unit
         self.output_unit = output_unit

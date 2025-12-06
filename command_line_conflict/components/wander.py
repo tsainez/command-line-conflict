@@ -4,7 +4,7 @@ from .base import Component
 class Wander(Component):
     """A component that causes an entity to wander randomly."""
 
-    def __init__(self, wander_radius: int = 5, move_interval: float = 3.0):
+    def __init__(self, wander_radius: int = 5, move_interval: float = 3.0) -> None:
         """Initializes the Wander component.
 
         Args:

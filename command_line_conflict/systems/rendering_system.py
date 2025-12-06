@@ -21,8 +21,9 @@ from ..game_state import GameState
 class RenderingSystem:
     """Handles rendering all entities and UI elements to the screen."""
 
-    def __init__(self, screen, font, camera: Camera):
+    def __init__(self, screen: pygame.Surface, font: pygame.font.Font, camera: Camera) -> None:
         """Initializes the RenderingSystem.
+
         Args:
             screen: The pygame screen surface to draw on.
             font: The pygame font to use for rendering text.
@@ -36,7 +37,16 @@ class RenderingSystem:
     def _get_rendered_surface(
         self, char: str, color: tuple, size: int | None = None
     ) -> pygame.Surface:
-        """Returns a cached surface for the character, optionally scaled."""
+        """Returns a cached surface for the character, optionally scaled.
+
+        Args:
+            char: The character string to render.
+            color: The color tuple (R, G, B) for the text.
+            size: The optional font size to scale to.
+
+        Returns:
+            pygame.Surface: The rendered surface.
+        """
         s = self.font.render(char, True, color)
         if size is not None:
             s = pygame.transform.scale(s, (size, size))
@@ -51,6 +61,7 @@ class RenderingSystem:
 
         Args:
             game_state: The current state of the game.
+            paused: Whether the game is paused.
         """
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
@@ -151,7 +162,7 @@ class RenderingSystem:
                     elif config.DEBUG:
                         self.draw_orders(components)
 
-    def draw_orders(self, components) -> None:
+    def draw_orders(self, components: dict) -> None:
         """Draws the movement path and target for a selected entity.
 
         Args:
@@ -201,7 +212,15 @@ class RenderingSystem:
     def _direct_line(
         start: tuple[int, int], end: tuple[int, int]
     ) -> list[tuple[int, int]]:
-        """Return a simple diagonal path from ``start`` to ``end``."""
+        """Return a simple diagonal path from ``start`` to ``end``.
+
+        Args:
+            start: The (x, y) start coordinates.
+            end: The (x, y) end coordinates.
+
+        Returns:
+            list[tuple[int, int]]: A list of coordinates forming the line.
+        """
         x, y = start
         path: list[tuple[int, int]] = []
         while (x, y) != end:
@@ -218,7 +237,15 @@ class RenderingSystem:
 
     @staticmethod
     def _arrow_char(dx: int, dy: int) -> str:
-        """Return a character representing movement direction."""
+        """Return a character representing movement direction.
+
+        Args:
+            dx: The x component of the direction.
+            dy: The y component of the direction.
+
+        Returns:
+            str: A single character arrow or line.
+        """
         dx = (dx > 0) - (dx < 0)
         dy = (dy > 0) - (dy < 0)
         if dx == 1 and dy == 0:

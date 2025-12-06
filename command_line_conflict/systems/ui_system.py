@@ -18,7 +18,7 @@ from command_line_conflict.game_state import GameState
 class UISystem:
     """Handles rendering the user interface, including unit info and key options."""
 
-    def __init__(self, screen, font, camera: Camera):
+    def __init__(self, screen: pygame.Surface, font: pygame.font.Font, camera: Camera) -> None:
         """Initializes the UISystem.
 
         Args:
@@ -96,7 +96,7 @@ class UISystem:
             game_state: The current state of the game.
 
         Returns:
-            A list of entity IDs for all selected entities.
+            list[int]: A list of entity IDs for all selected entities.
         """
         selected_entities = []
         for entity_id, components in game_state.entities.items():
@@ -145,7 +145,12 @@ class UISystem:
     def _draw_aggregate_detection_range(
         self, game_state: GameState, entity_ids: list[int]
     ) -> None:
-        """Draws a combined detection range for multiple units."""
+        """Draws a combined detection range for multiple units.
+
+        Args:
+            game_state: The current state of the game.
+            entity_ids: A list of IDs for the selected entities.
+        """
         detection_tiles = set()
         for entity_id in entity_ids:
             position = game_state.get_component(entity_id, Position)
@@ -182,7 +187,12 @@ class UISystem:
     def _draw_aggregate_attack_range(
         self, game_state: GameState, entity_ids: list[int]
     ) -> None:
-        """Draws a combined attack range for multiple units."""
+        """Draws a combined attack range for multiple units.
+
+        Args:
+            game_state: The current state of the game.
+            entity_ids: A list of IDs for the selected entities.
+        """
         attack_tiles = set()
         for entity_id in entity_ids:
             position = game_state.get_component(entity_id, Position)
@@ -293,7 +303,11 @@ class UISystem:
             self.screen.blit(text, (x_pos, y_pos))
 
     def _draw_active_cheats(self, cheats: dict) -> None:
-        """Draws a list of active cheats."""
+        """Draws a list of active cheats.
+
+        Args:
+            cheats: A dictionary mapping cheat names to booleans.
+        """
         active_cheats = [k.replace('_', ' ').title() for k, v in cheats.items() if v]
         if not active_cheats:
             return
@@ -311,6 +325,7 @@ class UISystem:
             y_offset += 20
 
     def _draw_paused_message(self) -> None:
+        """Draws the 'Paused' message on the screen."""
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
         text_rect = text.get_rect(

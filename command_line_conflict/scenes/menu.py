@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
 import pygame
+
+if TYPE_CHECKING:
+    from ..engine import Game
 
 
 class MenuScene:
     """Manages the main menu scene, allowing navigation to other scenes."""
 
-    def __init__(self, game):
+    def __init__(self, game: "Game") -> None:
         """Initializes the MenuScene.
 
         Args:
@@ -23,7 +27,7 @@ class MenuScene:
         # For now using a placeholder path
         self.game.music_manager.play("music/menu_theme.ogg")
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         """Handles user input for menu navigation.
 
         Args:
@@ -46,15 +50,15 @@ class MenuScene:
                 elif self.selected_option == 2:
                     self.game.running = False
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         """Updates the menu scene. This scene has no dynamic elements.
 
         Args:
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         pass
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
         """Draws the menu options and title to the screen.
 
         Args:

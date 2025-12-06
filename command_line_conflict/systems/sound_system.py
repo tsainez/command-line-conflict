@@ -9,7 +9,7 @@ from command_line_conflict.logger import log
 class SoundSystem:
     """Manages sound effects playback."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the SoundSystem."""
         self.enabled = config.SOUND_ENABLED
         self.volume = config.SOUND_VOLUME
@@ -22,7 +22,7 @@ class SoundSystem:
                 log.error(f"Failed to initialize pygame mixer: {e}")
                 self.enabled = False
 
-    def update(self, game_state):
+    def update(self, game_state) -> None:
         """Processes sound events from the game state.
 
         Args:
@@ -36,7 +36,7 @@ class SoundSystem:
                 sound_name = event["data"].get("name")
                 self.play_sound(sound_name)
 
-    def play_sound(self, name):
+    def play_sound(self, name: str) -> None:
         """Plays a sound effect.
 
         Args:
@@ -55,7 +55,7 @@ class SoundSystem:
             except pygame.error as e:
                 log.error(f"Failed to play sound {name}: {e}")
 
-    def _load_sound(self, name):
+    def _load_sound(self, name: str) -> None:
         """Loads a sound file into memory.
 
         Args:

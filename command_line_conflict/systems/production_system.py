@@ -10,15 +10,20 @@ from command_line_conflict.logger import log
 class ProductionSystem:
     """System that handles unit production via factories."""
 
-    def __init__(self, campaign_manager: CampaignManager):
+    def __init__(self, campaign_manager: CampaignManager) -> None:
+        """Initializes the ProductionSystem.
+
+        Args:
+            campaign_manager: The campaign manager to check for unlocked units.
+        """
         self.campaign_manager = campaign_manager
 
-    def update(self, game_state, dt):
+    def update(self, game_state, dt: float) -> None:
         """Checks for units entering factories and handles transformation.
 
         Args:
             game_state: The current state of the game.
-            dt: Delta time (unused for this check, but required by interface).
+            dt: The time elapsed since the last frame in seconds.
         """
         # Find all entities with Factory component
         factory_entities = []
@@ -70,8 +75,16 @@ class ProductionSystem:
                             # Optional: Feedback that tech is not unlocked
                             pass
 
-    def _transform_unit(self, game_state, input_unit_id, input_player, factory, position):
-        """Performs the transformation from input unit to output unit."""
+    def _transform_unit(self, game_state, input_unit_id: int, input_player: Player, factory: Factory, position: Position) -> None:
+        """Performs the transformation from input unit to output unit.
+
+        Args:
+            game_state: The current state of the game.
+            input_unit_id: The ID of the unit being transformed.
+            input_player: The player component of the input unit.
+            factory: The factory component doing the work.
+            position: The position where the transformation happens.
+        """
         log.info(f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}")
 
         # Remove input unit

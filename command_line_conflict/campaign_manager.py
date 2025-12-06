@@ -1,7 +1,6 @@
 import json
 import os
-from pathlib import Path
-from typing import List, Set, Dict
+from typing import Dict, List, Set
 
 from .logger import log
 
@@ -23,13 +22,21 @@ class CampaignManager:
     """Manages campaign progress, including completed missions and unlocked units."""
 
     def __init__(self, save_file: str = SAVE_FILE):
+        """Initializes the CampaignManager.
+
+        Args:
+            save_file: The path to the JSON file where progress is saved. Defaults to "save_game.json".
+        """
         self.save_file = save_file
         self.completed_missions: List[str] = []
         self.unlocked_units: Set[str] = {"chassis", "extractor"}  # Default unlocks
         self.load_progress()
 
     def load_progress(self) -> None:
-        """Loads progress from the save file."""
+        """Loads progress from the save file.
+
+        Populates `completed_missions` and updates `unlocked_units`.
+        """
         if not os.path.exists(self.save_file):
             log.info("No save file found. Starting new campaign.")
             return
@@ -45,7 +52,10 @@ class CampaignManager:
             log.error(f"Failed to load save file: {e}")
 
     def save_progress(self) -> None:
-        """Saves current progress to the save file."""
+        """Saves current progress to the save file.
+
+        Writes the list of completed missions to disk.
+        """
         data = {
             "completed_missions": self.completed_missions,
         }

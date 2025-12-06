@@ -82,7 +82,7 @@ class Map:
                              as obstacles for this pathfinding request.
 
         Returns:
-            A list of (x, y) tuples representing the path from start to goal.
+            List[Tuple[int, int]]: A list of (x, y) tuples representing the path from start to goal.
             Returns an empty list if no path is found.
         """
         if not can_fly and self.is_blocked(*goal):
@@ -122,7 +122,7 @@ class Map:
 
         return []
 
-    def draw(self, surf, font, camera=None) -> None:
+    def draw(self, surf: pygame.Surface, font: pygame.font.Font, camera=None) -> None:
         """Draws the map walls to a surface, using camera if provided.
 
         Args:

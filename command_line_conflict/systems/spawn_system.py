@@ -7,7 +7,7 @@ from ..game_state import GameState
 class SpawnSystem:
     """Manages spawning of neutral units."""
 
-    def __init__(self, spawn_interval: float = 10.0):
+    def __init__(self, spawn_interval: float = 10.0) -> None:
         """Initializes the SpawnSystem.
 
         Args:
@@ -21,7 +21,7 @@ class SpawnSystem:
 
         Args:
             game_state: The current state of the game.
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         self.time_since_last_spawn += dt
 
@@ -30,7 +30,11 @@ class SpawnSystem:
             self.time_since_last_spawn = 0.0
 
     def spawn_wildlife(self, game_state: GameState) -> None:
-        """Spawns a wildlife unit at a random valid location."""
+        """Spawns a wildlife unit at a random valid location.
+
+        Args:
+            game_state: The current state of the game.
+        """
         width = game_state.map.width
         height = game_state.map.height
 

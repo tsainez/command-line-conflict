@@ -15,11 +15,13 @@ class CombatSystem:
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes combat logic for all entities.
+
         This method iterates through all entities with an Attack component,
         manages attack cooldowns, finds targets, and executes attacks.
+
         Args:
             game_state: The current state of the game.
-            dt: The time elapsed since the last frame.
+            dt: The time elapsed since the last frame in seconds.
         """
         for entity_id, components in list(game_state.entities.items()):
             attack = components.get(Attack)
