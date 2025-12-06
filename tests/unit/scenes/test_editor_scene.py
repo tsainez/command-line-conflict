@@ -1,0 +1,41 @@
+import unittest
+from unittest.mock import MagicMock, patch
+import pygame
+from command_line_conflict.scenes.editor import EditorScene
+from command_line_conflict.maps.base import Map
+
+class TestEditorScene(unittest.TestCase):
+    def setUp(self):
+        self.mock_game = MagicMock()
+        self.mock_game.font = MagicMock()
+        self.mock_game.screen.get_size.return_value = (800, 600)
+
+        # Patch Map.load_from_file to fail so we get a blank map
+        # Also patch pygame.font.SysFont
+        with patch('command_line_conflict.maps.base.Map.load_from_file', side_effect=FileNotFoundError), \
+             patch('pygame.font.SysFont'):
+            self.scene = EditorScene(self.mock_game)
+
+    def test_initialization(self):
+        self.assertIsInstance(self.scene.map, Map)
+        self.assertEqual(self.scene.map.width, 40)
+
+    def test_handle_click_toggle_wall(self):
+        # Mock camera to return 5, 5
+        self.scene.camera.screen_to_grid = MagicMock(return_value=(5, 5))
+
+        # Initial state: no wall
+        self.assertFalse(self.scene.map.is_blocked(5, 5))
+
+        # Click
+        self.scene.handle_click((100, 100))
+        self.assertTrue(self.scene.map.is_blocked(5, 5))
+
+        # Click again
+        self.scene.handle_click((100, 100))
+        self.assertFalse(self.scene.map.is_blocked(5, 5))
+
+    @patch('command_line_conflict.maps.base.Map.save_to_file')
+    def test_save_map(self, mock_save):
+        self.scene.save_map()
+        mock_save.assert_called_once()
