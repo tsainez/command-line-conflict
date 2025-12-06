@@ -111,6 +111,11 @@ class GameScene:
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
 
+        self.has_player_2_opponent = any(
+            c.get(Player) and c.get(Player).player_id == 2
+            for _, c in self.game_state.entities.items()
+        )
+
         # Start game music
         # Assuming the music file is in the root or a music folder
         # For now using a placeholder path
@@ -212,33 +217,36 @@ class GameScene:
             elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = True
             else:
-                mx, my = pygame.mouse.get_pos()
-                gx, gy = self.camera.screen_to_grid(mx, my)
-                if event.key == pygame.K_1:
-                    factories.create_extractor(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_2:
-                    factories.create_chassis(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_3:
-                    factories.create_rover(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_4:
-                    factories.create_arachnotron(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_5:
-                    factories.create_observer(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_6:
-                    factories.create_immortal(
-                        self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
-                    )
-                elif event.key == pygame.K_h:
+                if config.DEBUG:
+                    mods = pygame.key.get_mods()
+                    if mods & pygame.KMOD_CTRL:
+                        mx, my = pygame.mouse.get_pos()
+                        gx, gy = self.camera.screen_to_grid(mx, my)
+                        if event.key == pygame.K_1:
+                            factories.create_extractor(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_2:
+                            factories.create_chassis(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_3:
+                            factories.create_rover(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_4:
+                            factories.create_arachnotron(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_5:
+                            factories.create_observer(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                        elif event.key == pygame.K_6:
+                            factories.create_immortal(
+                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                            )
+                if event.key == pygame.K_h:
                     # Hold Position
                     from command_line_conflict.components.movable import Movable
 
@@ -414,22 +422,50 @@ class GameScene:
                 )
         self.fog_of_war.update(vision_units)
 
-        self.check_win_condition()
+        if self.check_win_condition():
+            self.game.scene_manager.switch_to("victory")
+        elif self.check_loss_condition():
+            self.game.scene_manager.switch_to("defeat")
 
-    def check_win_condition(self):
-        """Checks if the player has won the level."""
-        # Simple win condition: No enemy units remaining
+    def check_win_condition(self) -> bool:
+        """Checks if the player has won the level.
+
+        Returns:
+            True if the win condition is met, False otherwise.
+        """
         enemy_count = 0
-        for entity_id, components in self.game_state.entities.items():
-            player = components.get(factories.Player)
+        for _, components in self.game_state.entities.items():
+            player = components.get(Player)
             if player and not player.is_human:
-                # Exclude dead things just in case, though corpse removal should handle it
-                if factories.Health in components:
-                     enemy_count += 1
+                if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
+                    continue
+                if Health in components:
+                    enemy_count += 1
 
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
             self.campaign_manager.complete_mission(self.current_mission_id)
+            return True
+        return False
+
+    def check_loss_condition(self) -> bool:
+        """Checks if the player has lost the level.
+
+        Returns:
+            True if the loss condition is met, False otherwise.
+        """
+        player_entity_count = 0
+        for entity_id, components in self.game_state.entities.items():
+            player = components.get(Player)
+            if player and player.is_human:
+                # Check for any player-controlled entity (unit or building)
+                if Health in components:
+                    player_entity_count += 1
+
+        if player_entity_count == 0:
+            log.info("Defeat! Mission Failed.")
+            return True
+        return False
 
         # Update Fog of War
         if not self.cheats["reveal_map"]:

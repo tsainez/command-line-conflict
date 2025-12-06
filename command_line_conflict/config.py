@@ -1,7 +1,7 @@
 """This file contains the main configuration variables for the game."""
 
 # A boolean that turns on/off debug mode.
-DEBUG = False
+DEBUG = True
 
 # The width of the screen in pixels.
 SCREEN_WIDTH = 800
