@@ -142,3 +142,60 @@ class Map:
             ch = font.render("#", True, (100, 100, 100))
             ch = pygame.transform.scale(ch, (grid_size, grid_size))
             surf.blit(ch, (draw_x, draw_y))
+
+    def to_dict(self) -> dict:
+        """Converts the map data to a dictionary for serialization.
+
+        Returns:
+            A dictionary representation of the map.
+        """
+        return {
+            "width": self.width,
+            "height": self.height,
+            "walls": list(self.walls),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Map":
+        """Creates a Map instance from a dictionary.
+
+        Args:
+            data: The dictionary containing map data.
+
+        Returns:
+            A new Map instance.
+        """
+        m = cls(width=data["width"], height=data["height"])
+        m.walls = set(tuple(w) for w in data["walls"])
+        return m
+
+    def save_to_file(self, filename: str) -> None:
+        """Saves the map to a JSON file.
+
+        Args:
+            filename: The path to the file to save to.
+        """
+        import json
+        import os
+
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
+
+        with open(filename, "w") as f:
+            json.dump(self.to_dict(), f, indent=4)
+
+    @classmethod
+    def load_from_file(cls, filename: str) -> "Map":
+        """Loads a map from a JSON file.
+
+        Args:
+            filename: The path to the file to load from.
+
+        Returns:
+            The loaded Map instance.
+        """
+        import json
+
+        with open(filename, "r") as f:
+            data = json.load(f)
+        return cls.from_dict(data)
