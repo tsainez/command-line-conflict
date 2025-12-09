@@ -2,6 +2,14 @@ import math
 import os
 import pygame
 
+try:
+    import tkinter as tk
+    from tkinter import filedialog
+
+    HAS_TKINTER = True
+except ImportError:
+    HAS_TKINTER = False
+
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.maps.base import Map
@@ -138,57 +146,108 @@ class EditorScene:
         screen.blit(surf2, (10, 30))
 
     def save_map(self):
-        """Opens a file dialog to save the map."""
-        try:
-            import tkinter as tk
-            from tkinter import filedialog
+        """Opens a file dialog (or console input) to save the map."""
+        # Default directory
+        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        if not os.path.exists(initial_dir):
+            os.makedirs(initial_dir)
 
-            root = tk.Tk()
-            root.withdraw()  # Hide the main window
+        file_path = None
+        use_console = not HAS_TKINTER
 
-            # Default directory
-            initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-            if not os.path.exists(initial_dir):
-                os.makedirs(initial_dir)
+        if HAS_TKINTER:
+            try:
+                root = tk.Tk()
+                root.withdraw()  # Hide the main window
+                file_path = filedialog.asksaveasfilename(
+                    initialdir=initial_dir,
+                    title="Save Map",
+                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+                    defaultextension=".json",
+                )
+                root.destroy()
+            except Exception as e:
+                log.error(f"Tkinter error: {e}. Falling back to console.")
+                print(f"Tkinter error: {e}")
+                use_console = True
 
-            file_path = filedialog.asksaveasfilename(
-                initialdir=initial_dir,
-                title="Save Map",
-                filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-                defaultextension=".json",
-            )
-            root.destroy()
+        if use_console and not file_path:
+            print("\n--- Save Map ---")
+            print(f"Default directory: {initial_dir}")
+            try:
+                name = input(
+                    "Enter filename (e.g. mymap.json) or blank to cancel: "
+                ).strip()
+                if name:
+                    file_path = os.path.join(initial_dir, name)
+                    if not file_path.endswith(".json"):
+                        file_path += ".json"
+            except EOFError:
+                pass
 
-            if file_path:
+        if file_path:
+            try:
                 self.map.save_to_file(file_path)
                 self.map_path = file_path  # Update current path
                 log.info(f"Map saved to {file_path}.")
-        except Exception as e:
-            log.error(f"Failed to save map: {e}")
+                print(f"Map saved to {file_path}.")
+            except Exception as e:
+                log.error(f"Failed to save map: {e}")
 
     def load_map(self):
-        """Opens a file dialog to load a map."""
-        try:
-            import tkinter as tk
-            from tkinter import filedialog
+        """Opens a file dialog (or console input) to load a map."""
+        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        if not os.path.exists(initial_dir):
+            os.makedirs(initial_dir)
 
-            root = tk.Tk()
-            root.withdraw()
+        file_path = None
+        use_console = not HAS_TKINTER
 
-            initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-            if not os.path.exists(initial_dir):
-                os.makedirs(initial_dir)
+        if HAS_TKINTER:
+            try:
+                root = tk.Tk()
+                root.withdraw()
+                file_path = filedialog.askopenfilename(
+                    initialdir=initial_dir,
+                    title="Load Map",
+                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+                )
+                root.destroy()
+            except Exception as e:
+                log.error(f"Tkinter error: {e}. Falling back to console.")
+                print(f"Tkinter error: {e}")
+                use_console = True
 
-            file_path = filedialog.askopenfilename(
-                initialdir=initial_dir,
-                title="Load Map",
-                filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-            )
-            root.destroy()
+        if use_console and not file_path:
+            print("\n--- Load Map ---")
+            print(f"Directory: {initial_dir}")
+            # List files
+            try:
+                files = [f for f in os.listdir(initial_dir) if f.endswith(".json")]
+                if not files:
+                    print("No maps found in custom folder.")
+                else:
+                    print("Available maps:")
+                    for f in files:
+                        print(f" - {f}")
+            except OSError:
+                pass
 
-            if file_path:
+            try:
+                name = input("Enter filename to load or blank to cancel: ").strip()
+                if name:
+                    file_path = os.path.join(initial_dir, name)
+                    if not file_path.endswith(".json"):
+                        file_path += ".json"
+            except EOFError:
+                pass
+
+        if file_path:
+            try:
                 self.map = Map.load_from_file(file_path)
                 self.map_path = file_path
                 log.info(f"Map loaded from {file_path}.")
-        except Exception as e:
-            log.error(f"Failed to load map: {e}")
+                print(f"Map loaded from {file_path}.")
+            except Exception as e:
+                log.error(f"Failed to load map: {e}")
+                print(f"Failed to load map: {e}")

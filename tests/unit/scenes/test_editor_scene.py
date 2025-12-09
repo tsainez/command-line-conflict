@@ -36,9 +36,10 @@ class TestEditorScene(unittest.TestCase):
         self.assertFalse(self.scene.map.is_blocked(5, 5))
 
     @patch('command_line_conflict.maps.base.Map.save_to_file')
-    @patch('tkinter.filedialog.asksaveasfilename')
-    @patch('tkinter.Tk')
-    def test_save_map(self, mock_tk, mock_asksave, mock_save):
+    @patch('command_line_conflict.scenes.editor.filedialog.asksaveasfilename')
+    @patch('command_line_conflict.scenes.editor.tk.Tk')
+    @patch('command_line_conflict.scenes.editor.HAS_TKINTER', True)
+    def test_save_map_tkinter(self, mock_tk, mock_asksave, mock_save):
         mock_asksave.return_value = "path/to/save.json"
 
         # Setup mock Tk instance
@@ -54,8 +55,9 @@ class TestEditorScene(unittest.TestCase):
         mock_save.assert_called_with("path/to/save.json")
 
     @patch('command_line_conflict.maps.base.Map.save_to_file')
-    @patch('tkinter.filedialog.asksaveasfilename')
-    @patch('tkinter.Tk')
+    @patch('command_line_conflict.scenes.editor.filedialog.asksaveasfilename')
+    @patch('command_line_conflict.scenes.editor.tk.Tk')
+    @patch('command_line_conflict.scenes.editor.HAS_TKINTER', True)
     def test_save_map_cancel(self, mock_tk, mock_asksave, mock_save):
         mock_asksave.return_value = "" # User cancelled
         mock_tk.return_value = MagicMock()
@@ -64,13 +66,35 @@ class TestEditorScene(unittest.TestCase):
 
         mock_save.assert_not_called()
 
+    @patch('command_line_conflict.maps.base.Map.save_to_file')
+    @patch('builtins.input', return_value="console_save")
+    @patch('command_line_conflict.scenes.editor.HAS_TKINTER', False)
+    def test_save_map_console(self, mock_input, mock_save):
+        self.scene.save_map()
+
+        mock_input.assert_called()
+        # Should save to default_dir/console_save.json
+        args, _ = mock_save.call_args
+        self.assertTrue(args[0].endswith("console_save.json"))
+
     @patch('command_line_conflict.maps.base.Map.load_from_file')
-    @patch('tkinter.filedialog.askopenfilename')
-    @patch('tkinter.Tk')
-    def test_load_map(self, mock_tk, mock_askopen, mock_load):
+    @patch('command_line_conflict.scenes.editor.filedialog.askopenfilename')
+    @patch('command_line_conflict.scenes.editor.tk.Tk')
+    @patch('command_line_conflict.scenes.editor.HAS_TKINTER', True)
+    def test_load_map_tkinter(self, mock_tk, mock_askopen, mock_load):
         mock_askopen.return_value = "path/to/load.json"
         mock_tk.return_value = MagicMock()
 
         self.scene.load_map()
 
         mock_load.assert_called_with("path/to/load.json")
+
+    @patch('command_line_conflict.maps.base.Map.load_from_file')
+    @patch('builtins.input', return_value="console_load")
+    @patch('command_line_conflict.scenes.editor.HAS_TKINTER', False)
+    def test_load_map_console(self, mock_input, mock_load):
+        self.scene.load_map()
+
+        mock_input.assert_called()
+        args, _ = mock_load.call_args
+        self.assertTrue(args[0].endswith("console_load.json"))
