@@ -9,6 +9,7 @@ from .logger import (  # TODO: Expand logger usage, specifically for when in deb
 )
 from .maps import Map
 from .music import MusicManager
+from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
@@ -30,6 +31,7 @@ class SceneManager:
             "menu": MenuScene(game),
             "settings": SettingsScene(game),
             "game": GameScene(game),
+            "editor": EditorScene(game),
             "victory": VictoryScene(game),
             "defeat": DefeatScene(game),
         }
@@ -43,6 +45,8 @@ class SceneManager:
         """
         if scene_name == "game":
             self.scenes["game"] = GameScene(self.game)
+        elif scene_name == "editor":
+            self.scenes["editor"] = EditorScene(self.game)
         self.current_scene = self.scenes[scene_name]
 
     def handle_event(self, event):
