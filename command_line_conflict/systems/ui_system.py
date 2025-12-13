@@ -41,7 +41,9 @@ class UISystem:
             "Arrow Keys: Move Camera",
         ]
 
-    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
+    def draw(
+        self, game_state: GameState, paused: bool, current_player_id: int = 1
+    ) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
@@ -82,7 +84,7 @@ class UISystem:
 
         rect = pygame.Rect(x, y, indicator_size, indicator_size)
         pygame.draw.rect(self.screen, color, rect)
-        pygame.draw.rect(self.screen, (255, 255, 255), rect, 2) # Border
+        pygame.draw.rect(self.screen, (255, 255, 255), rect, 2)  # Border
 
         # Label
         text = self.small_font.render(f"P{current_player_id}", True, (255, 255, 255))
@@ -294,7 +296,7 @@ class UISystem:
 
     def _draw_active_cheats(self, cheats: dict) -> None:
         """Draws a list of active cheats."""
-        active_cheats = [k.replace('_', ' ').title() for k, v in cheats.items() if v]
+        active_cheats = [k.replace("_", " ").title() for k, v in cheats.items() if v]
         if not active_cheats:
             return
 

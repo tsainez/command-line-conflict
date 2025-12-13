@@ -4,17 +4,17 @@ from pathlib import Path
 import pygame
 
 from . import config
-from .logger import (  # TODO: Expand logger usage, specifically for when in debug mode.
-    log,
+from .logger import (
+    log,  # TODO: Expand logger usage, specifically for when in debug mode.
 )
 from .maps import Map
 from .music import MusicManager
+from .scenes.defeat import DefeatScene
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
 from .scenes.victory import VictoryScene
-from .scenes.defeat import DefeatScene
 
 
 class SceneManager:

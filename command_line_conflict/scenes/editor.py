@@ -1,5 +1,6 @@
 import math
 import os
+
 import pygame
 
 try:
@@ -12,8 +13,8 @@ except ImportError:
 
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
-from command_line_conflict.maps.base import Map
 from command_line_conflict.logger import log
+from command_line_conflict.maps.base import Map
 
 
 class EditorScene:
@@ -141,7 +142,9 @@ class EditorScene:
         surf = self.ui_font.render(text, True, (255, 255, 255))
         screen.blit(surf, (10, 10))
 
-        status = f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
+        status = (
+            f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
+        )
         surf2 = self.ui_font.render(status, True, (200, 200, 200))
         screen.blit(surf2, (10, 30))
 

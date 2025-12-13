@@ -1,4 +1,3 @@
-
 class Factory:
     """Component that defines a factory's production capability.
 

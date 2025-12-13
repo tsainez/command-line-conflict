@@ -31,7 +31,9 @@ class ChatSystem:
             text: The message text.
             color: The color of the text (RGB tuple).
         """
-        self.messages.append({"text": text, "color": color, "time": pygame.time.get_ticks()})
+        self.messages.append(
+            {"text": text, "color": color, "time": pygame.time.get_ticks()}
+        )
         if len(self.messages) > self.max_messages:
             self.messages.pop(0)
         self.last_message_time = pygame.time.get_ticks()
@@ -56,7 +58,9 @@ class ChatSystem:
                     self.input_active = False
                 else:
                     self.input_active = True
-                    self.last_message_time = pygame.time.get_ticks() # Keep history visible while typing
+                    self.last_message_time = (
+                        pygame.time.get_ticks()
+                    )  # Keep history visible while typing
                 return True
 
             if self.input_active:
@@ -69,7 +73,7 @@ class ChatSystem:
                     # Filter out non-printable characters if necessary,
                     # but event.unicode usually handles it.
                     if len(event.unicode) > 0 and event.unicode.isprintable():
-                         self.input_text += event.unicode
+                        self.input_text += event.unicode
                 return True
 
         return False
@@ -93,7 +97,9 @@ class ChatSystem:
         current_time = pygame.time.get_ticks()
 
         # Determine if we should show history
-        show_history = self.input_active or (current_time - self.last_message_time < self.chat_history_duration)
+        show_history = self.input_active or (
+            current_time - self.last_message_time < self.chat_history_duration
+        )
 
         if not show_history and not self.input_active:
             return
@@ -110,7 +116,7 @@ class ChatSystem:
 
                 y_pos = chat_bottom - (i + 1) * line_height
                 if self.input_active:
-                     y_pos -= line_height + 5 # Make room for input box
+                    y_pos -= line_height + 5  # Make room for input box
 
                 self.screen.blit(shadow_surface, (12, y_pos + 2))
                 self.screen.blit(text_surface, (10, y_pos))

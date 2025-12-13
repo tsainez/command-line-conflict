@@ -51,9 +51,7 @@ def create_chassis(
     return entity_id
 
 
-def create_wildlife(
-    game_state: GameState, x: float, y: float
-) -> int:
+def create_wildlife(game_state: GameState, x: float, y: float) -> int:
     """Creates a new wildlife unit (Neutral).
     Args:
         game_state: The current state of the game.
@@ -73,7 +71,9 @@ def create_wildlife(
     )
     game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
-    game_state.add_component(entity_id, Player(player_id=config.NEUTRAL_PLAYER_ID, is_human=False))
+    game_state.add_component(
+        entity_id, Player(player_id=config.NEUTRAL_PLAYER_ID, is_human=False)
+    )
     game_state.add_component(entity_id, Wander(wander_radius=5, move_interval=4.0))
     return entity_id
 
@@ -267,7 +267,9 @@ def create_rover_factory(
     game_state.add_component(entity_id, Health(hp=200, max_hp=200))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
+    game_state.add_component(
+        entity_id, Factory(input_unit="chassis", output_unit="rover")
+    )
     game_state.add_component(entity_id, UnitIdentity(name="rover_factory"))
     return entity_id
 
@@ -293,7 +295,9 @@ def create_arachnotron_factory(
     game_state.add_component(entity_id, Health(hp=300, max_hp=300))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))
+    game_state.add_component(
+        entity_id, Factory(input_unit="rover", output_unit="arachnotron")
+    )
     game_state.add_component(entity_id, UnitIdentity(name="arachnotron_factory"))
     return entity_id
 
