@@ -32,13 +32,12 @@ class UISystem:
         self.cheats = {}
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
-            "1: Extractor",
-            "2: Chassis",
-            "3: Rover",
-            "4: Arachnotron",
-            "5: Observer",
-            "6: Immortal",
-            "Arrow Keys: Move Camera",
+            "L-Click: Select",
+            "R-Click: Move",
+            "H: Hold Position",
+            "P / Space: Pause",
+            "Cam: Arrows / Drag",
+            "ESC: Menu",
         ]
 
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
@@ -276,9 +275,9 @@ class UISystem:
         self.screen.blit(overlay, panel_rect.topleft)
         pygame.draw.rect(self.screen, (255, 255, 255), panel_rect, 1)
 
-        x_offset = 410
+        x_offset = 380
         y_offset = panel_y + 10
-        column_width = 150
+        column_width = 180
         row_height = 20
         items_per_row = 2
 

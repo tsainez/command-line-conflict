@@ -272,7 +272,7 @@ class GameScene:
                                 movable.target_y = None
                                 log.info(f"Entity {entity_id} holding position")
 
-                elif event.key == pygame.K_p:
+                elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
                 elif event.key == pygame.K_F1:
                     self.cheats["reveal_map"] = not self.cheats["reveal_map"]
