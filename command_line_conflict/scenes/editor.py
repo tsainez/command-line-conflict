@@ -179,6 +179,8 @@ class EditorScene:
                     "Enter filename (e.g. mymap.json) or blank to cancel: "
                 ).strip()
                 if name:
+                    # Security: sanitize filename to prevent path traversal
+                    name = os.path.basename(name)
                     file_path = os.path.join(initial_dir, name)
                     if not file_path.endswith(".json"):
                         file_path += ".json"
@@ -236,6 +238,8 @@ class EditorScene:
             try:
                 name = input("Enter filename to load or blank to cancel: ").strip()
                 if name:
+                    # Security: sanitize filename to prevent path traversal
+                    name = os.path.basename(name)
                     file_path = os.path.join(initial_dir, name)
                     if not file_path.endswith(".json"):
                         file_path += ".json"
