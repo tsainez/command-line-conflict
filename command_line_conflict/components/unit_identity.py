@@ -1,4 +1,3 @@
-
 class UnitIdentity:
     """Component that identifies a unit's type (e.g., 'chassis', 'rover')."""
 

@@ -51,14 +51,16 @@ class MovementSystem:
         self, game_state: GameState, entity_id: int
     ) -> set[tuple[int, int]]:
         """Collects obstacle positions from other entities."""
-        extra_obstacles = set()
-        for other_entity_id, other_components in game_state.entities.items():
-            if other_entity_id == entity_id:
-                continue
-            other_position = other_components.get(Position)
-            if other_position:
-                extra_obstacles.add((int(other_position.x), int(other_position.y)))
-        return extra_obstacles
+        # Use spatial map for O(K) lookup instead of O(N)
+        obstacles = set()
+        for pos, entities in game_state.spatial_map.items():
+            if entity_id in entities:
+                # If the entity is at this position, only add if shared with others
+                if len(entities) > 1:
+                    obstacles.add(pos)
+            else:
+                obstacles.add(pos)
+        return obstacles
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes entity movement based on their current path or target.
@@ -133,15 +135,17 @@ class MovementSystem:
                 dy = movable.target_y - position.y
                 dist = (dx * dx + dy * dy) ** 0.5
                 if dist < 0.01:
-                    position.x = movable.target_x
-                    position.y = movable.target_y
+                    game_state.update_entity_position(
+                        entity_id, movable.target_x, movable.target_y
+                    )
                     movable.path.pop(0)
                 else:
                     step = movable.speed * dt
                     if step > dist:
                         step = dist
-                    position.x += step * dx / dist
-                    position.y += step * dy / dist
+                    new_x = position.x + step * dx / dist
+                    new_y = position.y + step * dy / dist
+                    game_state.update_entity_position(entity_id, new_x, new_y)
             elif movable.target_x is not None and movable.target_y is not None:
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
@@ -169,5 +173,4 @@ class MovementSystem:
                         movable.target_y = None
                         continue
 
-                position.x = proposed_x
-                position.y = proposed_y
+                game_state.update_entity_position(entity_id, proposed_x, proposed_y)

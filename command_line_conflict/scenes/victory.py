@@ -1,5 +1,6 @@
 import pygame
 
+
 class VictoryScene:
     """A scene to display when the player wins the game."""
 
@@ -38,10 +39,19 @@ class VictoryScene:
         """
         screen.fill((0, 0, 0))
         text = self.font.render("Victory!", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2))
+        text_rect = text.get_rect(
+            center=(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2)
+        )
         screen.blit(text, text_rect)
 
         # Instructions to go back to menu
-        instruction_text = self.font.render("Press Enter to return to the menu", True, (255, 255, 255))
-        instruction_rect = instruction_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2 + 50))
+        instruction_text = self.font.render(
+            "Press Enter to return to the menu", True, (255, 255, 255)
+        )
+        instruction_rect = instruction_text.get_rect(
+            center=(
+                self.game.screen.get_width() / 2,
+                self.game.screen.get_height() / 2 + 50,
+            )
+        )
         screen.blit(instruction_text, instruction_rect)

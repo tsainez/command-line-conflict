@@ -45,18 +45,18 @@ class WanderSystem:
 
                 # Simple check if target is valid (not a wall)
                 if game_state.map.is_walkable(target_x, target_y):
-                     # Use MovementSystem logic indirectly by setting path (or relying on MovementSystem to calculate it)
-                     # But MovementSystem.set_target is a method on the system instance, not available here easily
-                     # unless we pass the system or duplicate logic.
-                     # However, Movable component has target_x/target_y which MovementSystem reads.
-                     # But MovementSystem usually calculates path *once* in set_target.
-                     # If we just set target_x/y, MovementSystem might just move in straight line.
-                     # Let's use game_state.map.find_path here to be safe and set the path.
+                    # Use MovementSystem logic indirectly by setting path (or relying on MovementSystem to calculate it)
+                    # But MovementSystem.set_target is a method on the system instance, not available here easily
+                    # unless we pass the system or duplicate logic.
+                    # However, Movable component has target_x/target_y which MovementSystem reads.
+                    # But MovementSystem usually calculates path *once* in set_target.
+                    # If we just set target_x/y, MovementSystem might just move in straight line.
+                    # Let's use game_state.map.find_path here to be safe and set the path.
 
                     path = game_state.map.find_path(
                         (int(position.x), int(position.y)),
                         (target_x, target_y),
-                        can_fly=movable.can_fly
+                        can_fly=movable.can_fly,
                     )
 
                     if path:

@@ -17,11 +17,9 @@ from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
 from command_line_conflict.systems.ai_system import AISystem
+from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.chat_system import ChatSystem
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
@@ -71,7 +69,9 @@ class GameScene:
         }
 
         # Fog of War
-        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
+        self.fog_of_war = FogOfWar(
+            self.game_state.map.width, self.game_state.map.height
+        )
 
         # Camera
         self.camera = Camera()
@@ -163,7 +163,7 @@ class GameScene:
         # Handle construction hotkeys if a chassis is selected
         if event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_r, pygame.K_a):
-                 self._handle_construction(event.key)
+                self._handle_construction(event.key)
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
@@ -192,7 +192,11 @@ class GameScene:
                 )
                 grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 self.selection_system.update(
-                    self.game_state, grid_start, grid_end, shift_pressed, self.current_player_id
+                    self.game_state,
+                    grid_start,
+                    grid_end,
+                    shift_pressed,
+                    self.current_player_id,
                 )
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
@@ -235,27 +239,51 @@ class GameScene:
                         gx, gy = self.camera.screen_to_grid(mx, my)
                         if event.key == pygame.K_1:
                             factories.create_extractor(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                         elif event.key == pygame.K_2:
                             factories.create_chassis(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                         elif event.key == pygame.K_3:
                             factories.create_rover(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                         elif event.key == pygame.K_4:
                             factories.create_arachnotron(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                         elif event.key == pygame.K_5:
                             factories.create_observer(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                         elif event.key == pygame.K_6:
                             factories.create_immortal(
-                                self.game_state, gx, gy, player_id=self.current_player_id, is_human=True
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
                             )
                 if event.key == pygame.K_h:
                     # Hold Position
@@ -334,7 +362,9 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            unit_identity = components.get(Selectable) # Typo check? Wait, Selectable doesn't have name.
+            unit_identity = components.get(
+                Selectable
+            )  # Typo check? Wait, Selectable doesn't have name.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 
@@ -354,7 +384,7 @@ class GameScene:
             return
 
         # Check unlock requirements and build
-        if key == pygame.K_r: # Build Rover Factory
+        if key == pygame.K_r:  # Build Rover Factory
             # Check if Rover is unlocked (implied requirement for Rover Factory)
             if self.campaign_manager.is_unit_unlocked("rover"):
                 log.info("Building Rover Factory")
@@ -365,7 +395,7 @@ class GameScene:
             else:
                 log.info("Rover tech not unlocked!")
 
-        elif key == pygame.K_a: # Build Arachnotron Factory
+        elif key == pygame.K_a:  # Build Arachnotron Factory
             if self.campaign_manager.is_unit_unlocked("arachnotron"):
                 log.info("Building Arachnotron Factory")
                 self.game_state.remove_entity(builder_id)
@@ -448,7 +478,10 @@ class GameScene:
         for _, components in self.game_state.entities.items():
             player = components.get(Player)
             if player and not player.is_human:
-                if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
+                if (
+                    self.has_player_2_opponent
+                    and player.player_id == config.NEUTRAL_PLAYER_ID
+                ):
                     continue
                 if Health in components:
                     enemy_count += 1
@@ -486,7 +519,9 @@ class GameScene:
                 position = components.get(Position)
                 vision = components.get(Vision)
                 if player and player.is_human and position and vision:
-                    visible_units.append(UnitView(position.x, position.y, vision.vision_range))
+                    visible_units.append(
+                        UnitView(position.x, position.y, vision.vision_range)
+                    )
             self.fog_of_war.update(visible_units)
 
     def draw(self, screen):
