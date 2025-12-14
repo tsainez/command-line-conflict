@@ -1,8 +1,7 @@
 import pygame
 
 from . import config
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from .logger import log
 
 
 class FogOfWar:
@@ -23,6 +22,7 @@ class FogOfWar:
         self.height = height
         self.grid = [[self.HIDDEN for _ in range(width)] for _ in range(height)]
         self.surface = None
+        log.info(f"Initialized FogOfWar with grid size {width}x{height}")
 
     def update(self, units: list) -> None:
         """Updates the fog of war based on unit positions and vision.
@@ -68,6 +68,7 @@ class FogOfWar:
             camera: The camera object for view/zoom (optional).
         """
         if self.surface is None or self.surface.get_size() != screen.get_size():
+            log.debug(f"Creating FogOfWar surface with size {screen.get_size()}")
             self.surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
 
         # Fill with opaque black (HIDDEN)
