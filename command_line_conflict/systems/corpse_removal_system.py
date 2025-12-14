@@ -1,8 +1,6 @@
 from ..components.dead import Dead
 from ..game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
-#       Consider logging when corpses are removed for debugging purposes.
+from ..logger import log
 
 
 class CorpseRemovalSystem:
@@ -29,3 +27,4 @@ class CorpseRemovalSystem:
                 dead.timer += dt
                 if dead.timer >= self.corpse_lifetime:
                     game_state.remove_entity(entity_id)
+                    log.debug(f"Removed corpse of entity {entity_id}.")
