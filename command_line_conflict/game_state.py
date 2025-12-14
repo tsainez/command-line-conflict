@@ -1,6 +1,7 @@
 from .components.position import Position
 from .logger import log
 from .maps.base import Map
+from . import config
 
 
 class GameState:
@@ -16,6 +17,8 @@ class GameState:
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
         self.event_queue = []
+        if config.DEBUG:
+            log.debug("GameState initialized")
 
     def add_event(self, event: dict) -> None:
         """Adds an event to the event queue.
@@ -24,14 +27,16 @@ class GameState:
             event: A dictionary representing the event.
         """
         self.event_queue.append(event)
-        log.debug(f"Event added: {event}")
+        if config.DEBUG:
+            log.debug(f"Event added: {event}")
 
     def create_entity(self) -> int:
         """Creates a new entity and returns its ID."""
         entity_id = self.next_entity_id
         self.entities[entity_id] = {}
         self.next_entity_id += 1
-        log.debug(f"Entity created with ID: {entity_id}")
+        if config.DEBUG:
+            log.debug(f"Created entity: {entity_id}")
         return entity_id
 
     def add_component(self, entity_id: int, component) -> None:
@@ -43,7 +48,8 @@ class GameState:
         """
         component_type = type(component)
         self.entities[entity_id][component_type] = component
-        log.debug(f"Component {component_type.__name__} added to entity {entity_id}")
+        if config.DEBUG:
+            log.debug(f"Added component {component_type.__name__} to entity {entity_id}")
 
     def get_component(self, entity_id: int, component_type):
         """Gets a component from an entity.
@@ -67,9 +73,8 @@ class GameState:
         """
         if component_type in self.entities[entity_id]:
             del self.entities[entity_id][component_type]
-            log.debug(
-                f"Component {component_type.__name__} removed from entity {entity_id}"
-            )
+            if config.DEBUG:
+                log.debug(f"Removed component {component_type.__name__} from entity {entity_id}")
 
     def remove_entity(self, entity_id: int) -> None:
         """Removes an entity and all its components from the game.
@@ -79,7 +84,8 @@ class GameState:
         """
         if entity_id in self.entities:
             del self.entities[entity_id]
-            log.debug(f"Entity {entity_id} removed")
+            if config.DEBUG:
+                log.debug(f"Removed entity {entity_id}")
 
     def get_entities_at_position(self, x: int, y: int) -> list[int]:
         """Returns a list of entity IDs at a given position."""
