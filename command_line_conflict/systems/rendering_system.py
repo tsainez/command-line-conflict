@@ -14,8 +14,7 @@ from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
 from ..game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from ..logger import log
 
 
 class RenderingSystem:
@@ -31,6 +30,7 @@ class RenderingSystem:
         self.screen = screen
         self.font = font
         self.camera = camera
+        log.debug("RenderingSystem initialized")
 
     @functools.lru_cache(maxsize=1024)
     def _get_rendered_surface(

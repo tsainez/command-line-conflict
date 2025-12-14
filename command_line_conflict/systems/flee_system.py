@@ -1,3 +1,4 @@
+from .. import config
 from ..components.attack import Attack
 from ..components.flee import Flee
 from ..components.health import Health
@@ -6,9 +7,8 @@ from ..components.player import Player
 from ..components.position import Position
 from ..components.vision import Vision
 from ..game_state import GameState
+from ..logger import log
 from ..utils.targeting import Targeting
-
-# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class FleeSystem:
@@ -54,12 +54,19 @@ class FleeSystem:
             if not flee.is_fleeing:
                 if (is_low_health or flee.flees_from_enemies) and sees_enemy:
                     flee.is_fleeing = True
+                    if config.DEBUG:
+                        reason = "low health" if is_low_health else "enemy proximity"
+                        log.info(
+                            f"Entity {entity_id} started fleeing due to {reason}."
+                        )
                     attack = components.get(Attack)
                     if attack:
                         attack.attack_target = None
             else:  # is fleeing
                 if not sees_enemy and not is_low_health:
                     flee.is_fleeing = False
+                    if config.DEBUG:
+                        log.info(f"Entity {entity_id} stopped fleeing.")
 
             if flee.is_fleeing:
                 attack = components.get(Attack)

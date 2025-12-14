@@ -1,6 +1,6 @@
 from .components.position import Position
-from .maps.base import Map
 from .logger import log
+from .maps.base import Map
 from . import config
 
 
