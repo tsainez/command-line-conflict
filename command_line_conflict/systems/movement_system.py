@@ -1,9 +1,7 @@
 from ..components.movable import Movable
 from ..components.position import Position
 from ..game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
-#       Consider logging movement issues or pathfinding failures for debugging.
+from ..logger import log
 
 
 class MovementSystem:
@@ -23,9 +21,15 @@ class MovementSystem:
         if not movable or not position:
             return
 
+        log.debug(
+            f"Setting target for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})"
+        )
+
         movable.target_x = x
         movable.target_y = y
-        extra_obstacles = self._get_obstacles(game_state, entity_id) if movable.intelligent else set()
+        extra_obstacles = (
+            self._get_obstacles(game_state, entity_id) if movable.intelligent else set()
+        )
         if (x, y) in extra_obstacles:
             extra_obstacles.remove((x, y))
 
@@ -36,7 +40,16 @@ class MovementSystem:
             extra_obstacles=extra_obstacles,
         )
 
-    def _get_obstacles(self, game_state: GameState, entity_id: int) -> set[tuple[int, int]]:
+        if movable.path:
+            log.debug(f"Path found for entity {entity_id}: {movable.path}")
+        else:
+            log.warning(
+                f"No path found for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})"
+            )
+
+    def _get_obstacles(
+        self, game_state: GameState, entity_id: int
+    ) -> set[tuple[int, int]]:
         """Collects obstacle positions from other entities."""
         extra_obstacles = set()
         for other_entity_id, other_components in game_state.entities.items():
@@ -72,7 +85,11 @@ class MovementSystem:
 
             # This logic is adapted from the Unit._move method
             # If intelligent and we have a target but no path, try to find one
-            if not movable.path and movable.target_x is not None and movable.target_y is not None:
+            if (
+                not movable.path
+                and movable.target_x is not None
+                and movable.target_y is not None
+            ):
                 if movable.intelligent:
                     start_node = (int(position.x), int(position.y))
                     end_node = (int(movable.target_x), int(movable.target_y))
@@ -88,6 +105,9 @@ class MovementSystem:
                         )
                         if not movable.path:
                             # No path found to target, stop to avoid clipping
+                            log.debug(
+                                f"Intelligent pathfinding failed for entity {entity_id} to ({movable.target_x}, {movable.target_y})"
+                            )
                             movable.target_x = None
                             movable.target_y = None
 
@@ -100,6 +120,9 @@ class MovementSystem:
                         next_x, next_y
                     )
                     if any(e != entity_id for e in entities_at_next_pos):
+                        log.debug(
+                            f"Collision detected for non-intelligent entity {entity_id} at ({next_x}, {next_y})"
+                        )
                         movable.path = []
                         movable.target_x = None
                         movable.target_y = None
@@ -139,6 +162,9 @@ class MovementSystem:
                         int(proposed_x), int(proposed_y)
                     )
                     if any(e != entity_id for e in entities_at_proposed_pos):
+                        log.debug(
+                            f"Collision detected for non-intelligent entity {entity_id} at ({proposed_x}, {proposed_y})"
+                        )
                         movable.target_x = None
                         movable.target_y = None
                         continue
