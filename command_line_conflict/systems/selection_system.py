@@ -3,8 +3,7 @@ from ..components.player import Player
 from ..components.position import Position
 from ..components.selectable import Selectable
 from ..game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from ..logger import log
 
 
 class SelectionSystem:
@@ -16,10 +15,15 @@ class SelectionSystem:
         Args:
             game_state: The current state of the game.
         """
+        count = 0
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
-            if selectable:
+            if selectable and selectable.is_selected:
                 selectable.is_selected = False
+                count += 1
+
+        if count > 0:
+            log.debug(f"Cleared selection of {count} entities.")
 
     def update(
         self,
@@ -31,9 +35,9 @@ class SelectionSystem:
     ) -> None:
         """Processes a drag-to-select action.
 
-        This method is called when a selection box is being drawn. It selects
-        all selectable entities within the rectangular area. If shift is
-        pressed, it adds to the selection. Otherwise, it replaces the selection.
+        This method is called when a drag selection event is completed.
+        It selects all selectable entities within the rectangular area.
+        If shift is pressed, it adds to the selection. Otherwise, it replaces the selection.
 
         Args:
             game_state: The current state of the game.
@@ -69,6 +73,23 @@ class SelectionSystem:
                 selectable.is_selected = True
             elif not shift_pressed:
                 selectable.is_selected = False
+
+        selected_count = 0
+        for entity_id, components in game_state.entities.items():
+            selectable = components.get(Selectable)
+            player = components.get(Player)
+            if (
+                selectable
+                and selectable.is_selected
+                and player
+                and player.player_id == current_player_id
+            ):
+                selected_count += 1
+
+        if selected_count > 0:
+            log.debug(f"Drag selection complete. Total selected: {selected_count}")
+        elif not shift_pressed:
+            log.debug("Drag selection cleared all units.")
 
     def handle_click_selection(
         self,
@@ -111,11 +132,15 @@ class SelectionSystem:
                 selectable = game_state.get_component(clicked_entity_id, Selectable)
                 if selectable:
                     selectable.is_selected = not selectable.is_selected
+                    status = "selected" if selectable.is_selected else "deselected"
+                    log.debug(f"Shift-clicked unit {clicked_entity_id}: {status}")
             else:
                 for entity_id, components in game_state.entities.items():
                     selectable = components.get(Selectable)
                     # Deselect other units unless they are the one clicked
                     if selectable:
                         selectable.is_selected = entity_id == clicked_entity_id
+                log.debug(f"Selected unit {clicked_entity_id}")
         elif not shift_pressed:
+            log.debug("Clicked on empty space, clearing selection")
             self.clear_selection(game_state)

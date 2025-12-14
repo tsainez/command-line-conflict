@@ -3,9 +3,8 @@ from ..components.player import Player
 from ..components.position import Position
 from ..components.vision import Vision
 from ..game_state import GameState
+from ..logger import log
 from ..utils.targeting import Targeting
-
-# TODO: Integrate logger for debug mode. Currently not used.
 
 
 class AISystem:
@@ -41,4 +40,8 @@ class AISystem:
                             entity_id, my_pos, player, vision, game_state
                         )
                         if closest_enemy:
+                            log.debug(
+                                f"Entity {entity_id} (Player {player.player_id}) "
+                                f"acquired target {closest_enemy} at {my_pos}"
+                            )
                             attack.attack_target = closest_enemy
