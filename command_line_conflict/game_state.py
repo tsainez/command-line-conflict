@@ -13,6 +13,9 @@ class GameState:
         Args:
             game_map: The game map object.
         """
+        if config.DEBUG:
+            log.debug("GameState initialized")
+
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
@@ -32,8 +35,6 @@ class GameState:
             self.spatial_map[pos].discard(entity_id)
             if not self.spatial_map[pos]:
                 del self.spatial_map[pos]
-        if config.DEBUG:
-            log.debug("GameState initialized")
 
     def add_event(self, event: dict) -> None:
         """Adds an event to the event queue.
