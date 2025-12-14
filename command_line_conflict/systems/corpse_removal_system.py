@@ -26,5 +26,6 @@ class CorpseRemovalSystem:
             if dead:
                 dead.timer += dt
                 if dead.timer >= self.corpse_lifetime:
+                    log.debug(f"Removing corpse of entity {entity_id}")
                     game_state.remove_entity(entity_id)
                     log.debug(f"Removed corpse of entity {entity_id}.")
