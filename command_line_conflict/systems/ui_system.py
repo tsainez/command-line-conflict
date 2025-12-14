@@ -11,8 +11,7 @@ from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from command_line_conflict.logger import log
 
 
 class UISystem:
@@ -41,9 +40,13 @@ class UISystem:
             "Arrow Keys: Move Camera",
         ]
 
-    def draw(
-        self, game_state: GameState, paused: bool, current_player_id: int = 1
-    ) -> None:
+        # State tracking for logging
+        self.last_selected_count = -1
+        self.last_active_cheats_count = -1
+
+        log.debug("UISystem initialized")
+
+    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
@@ -57,7 +60,19 @@ class UISystem:
         if self.cheats:
             self._draw_active_cheats(self.cheats)
 
+            # Log changes in active cheats
+            active_cheats_count = sum(1 for v in self.cheats.values() if v)
+            if active_cheats_count != self.last_active_cheats_count:
+                log.debug(f"UI: Active cheats count changed to {active_cheats_count}")
+                self.last_active_cheats_count = active_cheats_count
+
         selected_entities = self._get_selected_entities(game_state)
+
+        # Log changes in selection
+        if len(selected_entities) != self.last_selected_count:
+            log.debug(f"UI: Selection changed. Count: {len(selected_entities)}")
+            self.last_selected_count = len(selected_entities)
+
         if len(selected_entities) == 1:
             self._draw_single_unit_info(game_state, selected_entities[0])
         elif len(selected_entities) > 1:

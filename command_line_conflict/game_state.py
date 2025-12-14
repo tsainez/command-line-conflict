@@ -1,7 +1,7 @@
 from .components.position import Position
+from .logger import log
 from .maps.base import Map
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from . import config
 
 
 class GameState:
@@ -32,6 +32,8 @@ class GameState:
             self.spatial_map[pos].discard(entity_id)
             if not self.spatial_map[pos]:
                 del self.spatial_map[pos]
+        if config.DEBUG:
+            log.debug("GameState initialized")
 
     def add_event(self, event: dict) -> None:
         """Adds an event to the event queue.
@@ -40,12 +42,16 @@ class GameState:
             event: A dictionary representing the event.
         """
         self.event_queue.append(event)
+        if config.DEBUG:
+            log.debug(f"Event added: {event}")
 
     def create_entity(self) -> int:
         """Creates a new entity and returns its ID."""
         entity_id = self.next_entity_id
         self.entities[entity_id] = {}
         self.next_entity_id += 1
+        if config.DEBUG:
+            log.debug(f"Created entity: {entity_id}")
         return entity_id
 
     def add_component(self, entity_id: int, component) -> None:
@@ -59,6 +65,8 @@ class GameState:
         self.entities[entity_id][component_type] = component
         if isinstance(component, Position):
             self._add_to_spatial_map(entity_id, int(component.x), int(component.y))
+        if config.DEBUG:
+            log.debug(f"Added component {component_type.__name__} to entity {entity_id}")
 
     def get_component(self, entity_id: int, component_type):
         """Gets a component from an entity.
@@ -87,6 +95,8 @@ class GameState:
                     entity_id, int(component.x), int(component.y)
                 )
             del self.entities[entity_id][component_type]
+            if config.DEBUG:
+                log.debug(f"Removed component {component_type.__name__} from entity {entity_id}")
 
     def remove_entity(self, entity_id: int) -> None:
         """Removes an entity and all its components from the game.
@@ -101,6 +111,8 @@ class GameState:
                     entity_id, int(position.x), int(position.y)
                 )
             del self.entities[entity_id]
+            if config.DEBUG:
+                log.debug(f"Removed entity {entity_id}")
 
     def update_entity_position(self, entity_id: int, x: float, y: float) -> None:
         """Updates the position of an entity and the spatial map.
