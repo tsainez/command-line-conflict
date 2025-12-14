@@ -44,6 +44,12 @@ class UISystem:
         self.last_selected_count = -1
         self.last_active_cheats_count = -1
 
+        # Pre-create the pause overlay
+        self.pause_overlay = pygame.Surface(
+            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
+        )
+        self.pause_overlay.fill((0, 0, 0, 150))
+
         log.debug("UISystem initialized")
 
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
@@ -328,9 +334,21 @@ class UISystem:
             y_offset += 20
 
     def _draw_paused_message(self) -> None:
+        # Dim the background
+        self.screen.blit(self.pause_overlay, (0, 0))
+
+        # Draw "Paused" text
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
         text_rect = text.get_rect(
             center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
         )
         self.screen.blit(text, text_rect)
+
+        # Draw instruction text
+        small_font = pygame.font.Font(None, 36)
+        instruction = small_font.render("Press P to Resume", True, (200, 200, 200))
+        instruction_rect = instruction.get_rect(
+            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50)
+        )
+        self.screen.blit(instruction, instruction_rect)
