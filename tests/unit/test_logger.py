@@ -7,11 +7,22 @@ from command_line_conflict.logger import setup_logger
 
 def test_setup_logger_default_level():
     """
-    Tests that the logger is created with the default log level (INFO)
+    Tests that the logger is created with the default log level based on config.DEBUG
     when the LOG_LEVEL environment variable is not set.
     """
-    logger = setup_logger()
-    assert logger.level == logging.INFO
+    with patch.dict(os.environ):
+        if "LOG_LEVEL" in os.environ:
+            del os.environ["LOG_LEVEL"]
+
+        # Case 1: DEBUG is False -> INFO
+        with patch("command_line_conflict.config.DEBUG", False):
+            logger = setup_logger()
+            assert logger.level == logging.INFO
+
+        # Case 2: DEBUG is True -> DEBUG
+        with patch("command_line_conflict.config.DEBUG", True):
+            logger = setup_logger()
+            assert logger.level == logging.DEBUG
 
 
 @patch.dict(os.environ, {"LOG_LEVEL": "DEBUG"})
