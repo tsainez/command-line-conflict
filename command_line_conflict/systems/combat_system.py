@@ -4,6 +4,7 @@ from ..components.health import Health
 from ..components.movable import Movable
 from ..components.player import Player
 from ..components.position import Position
+from ..components.unit_identity import UnitIdentity
 from ..components.vision import Vision
 from ..factories import create_confetti
 from ..game_state import GameState
@@ -60,8 +61,23 @@ class CombatSystem:
 
                     if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
                         if config.DEBUG:
-                            log.info(  # TODO: Can we get the entity names here?
-                                f"Entity {entity_id} attacks {attack.attack_target} "
+                            # Get entity names for logging
+                            attacker_identity = components.get(UnitIdentity)
+                            attacker_name = (
+                                attacker_identity.name
+                                if attacker_identity
+                                else f"Entity {entity_id}"
+                            )
+
+                            target_identity = target_components.get(UnitIdentity)
+                            target_name = (
+                                target_identity.name
+                                if target_identity
+                                else f"Entity {attack.attack_target}"
+                            )
+
+                            log.info(
+                                f"{attacker_name} attacks {target_name} "
                                 f"for {attack.attack_damage} damage."
                             )
                         target_health.hp -= attack.attack_damage
