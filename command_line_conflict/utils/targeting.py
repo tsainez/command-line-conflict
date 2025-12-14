@@ -1,9 +1,9 @@
 from ..components.player import Player
 from ..components.position import Position
 from ..components.vision import Vision
+from ..config import DEBUG
 from ..game_state import GameState
-
-# TODO: Integrate logger for debug mode. Currently not used.
+from ..logger import log
 
 
 class Targeting:
@@ -18,6 +18,11 @@ class Targeting:
         game_state: GameState,
     ) -> int | None:
         """Finds the closest enemy entity within the vision range."""
+        if DEBUG:
+            log.debug(
+                f"Targeting: Searching for enemy for unit {my_id} at ({my_pos.x}, {my_pos.y})"
+            )
+
         closest_enemy = None
         min_dist = float("inf")
 
@@ -39,4 +44,10 @@ class Targeting:
             if dist <= vision.vision_range and dist < min_dist:
                 min_dist = dist
                 closest_enemy = other_id
+
+        if DEBUG and closest_enemy:
+            log.debug(
+                f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist:.2f}"
+            )
+
         return closest_enemy
