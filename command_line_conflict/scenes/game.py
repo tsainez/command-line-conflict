@@ -16,6 +16,7 @@ from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
+from command_line_conflict.maps.factory_map import FactoryMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
@@ -54,7 +55,8 @@ class GameScene:
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(SimpleMap())
+        # TODO: Allow map selection. For now, defaulting to FactoryMap as requested.
+        self.game_state = GameState(FactoryMap())
         self.fog_of_war = FogOfWar(
             self.game_state.map.width, self.game_state.map.height
         )
@@ -109,7 +111,7 @@ class GameScene:
         self.sound_system = SoundSystem()
         self.wander_system = WanderSystem()
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
-        self._create_initial_units()
+        self.game_state.map.initialize_entities(self.game_state)
 
         self.has_player_2_opponent = any(
             c.get(Player) and c.get(Player).player_id == 2
@@ -131,19 +133,6 @@ class GameScene:
             ]
             for cheat in cheats_list:
                 log.info(cheat)
-
-    def _create_initial_units(self):
-        """Creates the starting units for each player."""
-        # Player 1 units (human)
-        for i in range(3):
-            factories.create_chassis(
-                self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
-            )
-        # Player 2 units (AI)
-        for i in range(3):
-            factories.create_chassis(
-                self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
-            )
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.

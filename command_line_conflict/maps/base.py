@@ -199,3 +199,13 @@ class Map:
         with open(filename, "r") as f:
             data = json.load(f)
         return cls.from_dict(data)
+
+    def initialize_entities(self, game_state) -> None:
+        """Initializes entities specific to this map.
+
+        Override this method in subclasses to spawn map-specific units or buildings.
+
+        Args:
+            game_state: The game state where entities will be created.
+        """
+        pass
