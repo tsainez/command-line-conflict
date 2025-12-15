@@ -15,8 +15,8 @@ class TestMenuScene(unittest.TestCase):
         self.assertIn("Map Editor", self.scene.menu_options)
 
     def test_switch_to_editor(self):
-        # Select "Map Editor" (index 1)
-        self.scene.selected_option = 1
+        # Select "Map Editor" (index 2 in new menu)
+        self.scene.selected_option = 2
 
         event = MagicMock()
         event.type = pygame.KEYDOWN
