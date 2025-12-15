@@ -91,6 +91,7 @@ class TestGame:
 
     def test_run_loop(self, mocker):
         import pygame
+
         # Mock pygame stuff
         mocker.patch("pygame.display.set_mode")
         mocker.patch("pygame.init")

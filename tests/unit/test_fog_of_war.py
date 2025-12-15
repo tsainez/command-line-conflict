@@ -127,7 +127,7 @@ class TestFogOfWar:
         # 1 initial fill: (0,0,0,255) without rect
         # 2 rect fills: with rect
         calls = mock_fog_surface.fill.call_args_list
-        rect_fills = [c for c in calls if len(c[0]) == 2] # fill(color, rect)
+        rect_fills = [c for c in calls if len(c[0]) == 2]  # fill(color, rect)
         assert len(rect_fills) == 2
 
     def test_draw_resize_surface(self, mocker):

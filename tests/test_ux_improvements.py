@@ -1,8 +1,11 @@
-import pygame
 from unittest.mock import MagicMock
-from command_line_conflict.systems.ui_system import UISystem
-from command_line_conflict.scenes.game import GameScene
+
+import pygame
+
 from command_line_conflict.camera import Camera
+from command_line_conflict.scenes.game import GameScene
+from command_line_conflict.systems.ui_system import UISystem
+
 
 class MockGame:
     def __init__(self):
@@ -10,6 +13,7 @@ class MockGame:
         self.font = MagicMock()
         self.music_manager = MagicMock()
         self.scene_manager = MagicMock()
+
 
 def test_ui_system_help_text_content():
     screen = MagicMock()
@@ -29,6 +33,7 @@ def test_ui_system_help_text_content():
 
     # We allow some variation but key elements must be present
     assert ui.key_options == expected_options
+
 
 def test_game_scene_space_pause():
     game = MockGame()

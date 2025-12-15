@@ -56,9 +56,7 @@ class FleeSystem:
                     flee.is_fleeing = True
                     if config.DEBUG:
                         reason = "low health" if is_low_health else "enemy proximity"
-                        log.info(
-                            f"Entity {entity_id} started fleeing due to {reason}."
-                        )
+                        log.info(f"Entity {entity_id} started fleeing due to {reason}.")
                     attack = components.get(Attack)
                     if attack:
                         attack.attack_target = None

@@ -1,13 +1,16 @@
 import logging
-import pytest
 from unittest.mock import MagicMock
-from command_line_conflict.systems.ui_system import UISystem
+
+import pytest
+
 from command_line_conflict.camera import Camera
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.simple_map import SimpleMap
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.health import Health
+from command_line_conflict.systems.ui_system import UISystem
+
 
 class TestUILogging:
 

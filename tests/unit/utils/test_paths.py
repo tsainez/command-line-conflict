@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
-from command_line_conflict.utils.paths import get_user_data_dir, APP_NAME
+from command_line_conflict.utils.paths import APP_NAME, get_user_data_dir
 
 
 def test_get_user_data_dir_linux():

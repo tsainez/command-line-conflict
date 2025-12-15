@@ -17,6 +17,7 @@ from command_line_conflict.systems.production_system import ProductionSystem
 # Since we import factories in production_system, we should be careful.
 # But existing tests use factories, so it should be fine with the conftest.
 
+
 class TestCampaignManager(unittest.TestCase):
     def setUp(self):
         self.save_file = "test_save_game.json"
@@ -76,7 +77,10 @@ class TestProductionSystem(unittest.TestCase):
         self.game_state.add_component(unit_id, Player(1, True))
 
         # Run Update
-        with patch.dict("command_line_conflict.factories.UNIT_NAME_TO_FACTORY", {"rover": MagicMock()}) as mock_dict:
+        with patch.dict(
+            "command_line_conflict.factories.UNIT_NAME_TO_FACTORY",
+            {"rover": MagicMock()},
+        ) as mock_dict:
             mock_create_rover = mock_dict["rover"]
             self.system.update(self.game_state, 0.1)
 

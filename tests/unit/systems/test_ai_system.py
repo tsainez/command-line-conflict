@@ -23,7 +23,7 @@ class TestAISystem:
 
         # Entity with all necessary components
         entity_id = 1
-        player = Player(1) # AI player
+        player = Player(1)  # AI player
         # Attack(attack_damage, attack_range, attack_speed)
         attack = Attack(attack_damage=10, attack_range=1, attack_speed=1)
         # Vision(vision_range)
@@ -62,7 +62,7 @@ class TestAISystem:
 
         entity_id = 1
         attack = Attack(attack_damage=10, attack_range=1, attack_speed=1)
-        attack.attack_target = 999 # Already has a target
+        attack.attack_target = 999  # Already has a target
 
         game_state.entities[entity_id] = {
             Player: Player(1),

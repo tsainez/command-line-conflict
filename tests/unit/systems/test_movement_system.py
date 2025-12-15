@@ -66,7 +66,9 @@ def test_intelligent_unit_moves_around_obstacle(game_state, movement_system):
     assert int(unit1_pos.x) == 10 and int(unit1_pos.y) == 12
 
 
-def test_intelligent_unit_avoids_clipping_when_target_set_directly(game_state, movement_system):
+def test_intelligent_unit_avoids_clipping_when_target_set_directly(
+    game_state, movement_system
+):
     # This simulates CombatSystem setting target directly, bypassing set_target()
 
     # Create an intelligent 'rover' unit

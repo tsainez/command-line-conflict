@@ -134,11 +134,17 @@ class SettingsScene:
             elif option == "Debug Mode":
                 text_to_render = f"{option}: {'On' if config.DEBUG else 'Off'}"
             elif option == "Master Volume":
-                text_to_render = f"{option}: {self._get_volume_bar(config.MASTER_VOLUME)}"
+                text_to_render = (
+                    f"{option}: {self._get_volume_bar(config.MASTER_VOLUME)}"
+                )
             elif option == "Music Volume":
-                text_to_render = f"{option}: {self._get_volume_bar(config.MUSIC_VOLUME)}"
+                text_to_render = (
+                    f"{option}: {self._get_volume_bar(config.MUSIC_VOLUME)}"
+                )
             elif option == "SFX Volume":
-                text_to_render = f"{option}: {self._get_volume_bar(config.SOUND_VOLUME)}"
+                text_to_render = (
+                    f"{option}: {self._get_volume_bar(config.SOUND_VOLUME)}"
+                )
             else:
                 text_to_render = option
 

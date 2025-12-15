@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import MagicMock
+
 import pygame
+
 from command_line_conflict.scenes.menu import MenuScene
+
 
 class TestMenuScene(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,10 @@
 from unittest.mock import MagicMock
+
 import pytest
-from command_line_conflict.scenes.game import GameScene
+
 import command_line_conflict.config as config
+from command_line_conflict.scenes.game import GameScene
+
 
 class MockGame:
     def __init__(self):
@@ -10,6 +13,7 @@ class MockGame:
         self.music_manager = MagicMock()
         # Mock screen get_size for grid drawing logic
         self.screen.get_size.return_value = (800, 600)
+
 
 def test_debug_mode_logs_cheats(mocker):
     # Arrange
@@ -33,6 +37,7 @@ def test_debug_mode_logs_cheats(mocker):
     assert "TAB: Switch Player" in combined_log
     assert "1-6: Spawn Units" in combined_log
 
+
 def test_no_debug_mode_no_cheats_log(mocker):
     # Arrange
     mocker.patch("command_line_conflict.config.DEBUG", False)
@@ -51,6 +56,7 @@ def test_no_debug_mode_no_cheats_log(mocker):
     combined_log = "\n".join(messages)
 
     assert "F1: Toggle Reveal Map" not in combined_log
+
 
 def test_debug_mode_does_not_disable_fog_of_war(mocker):
     # Arrange
@@ -72,6 +78,7 @@ def test_debug_mode_does_not_disable_fog_of_war(mocker):
     # Assert
     # Fog of war SHOULD be drawn (active) even in debug mode, unless cheat is on
     scene.fog_of_war.draw.assert_called_once()
+
 
 def test_reveal_map_cheat_disables_fog_of_war(mocker):
     # Arrange
