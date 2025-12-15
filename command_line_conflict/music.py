@@ -68,4 +68,8 @@ class MusicManager:
         """
         self.volume = max(0.0, min(1.0, volume))
         if self.enabled:
-            pygame.mixer.music.set_volume(self.volume)
+            pygame.mixer.music.set_volume(self.volume * config.MASTER_VOLUME)
+
+    def refresh_volume(self):
+        """Refreshes the music volume based on the master volume."""
+        self.set_volume(self.volume)

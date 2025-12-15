@@ -18,7 +18,14 @@ class SettingsScene:
         self.game = game
         self.option_font = pygame.font.Font(None, 50)
         self.title_font = pygame.font.Font(None, 74)
-        self.settings_options = ["Screen Size", "Debug Mode", "Back"]
+        self.settings_options = [
+            "Screen Size",
+            "Debug Mode",
+            "Master Volume",
+            "Music Volume",
+            "SFX Volume",
+            "Back",
+        ]
         self.selected_option = 0
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
         self.current_screen_size_index = 0
@@ -36,6 +43,8 @@ class SettingsScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.KEYDOWN:
+            option_name = self.settings_options[self.selected_option]
+
             if event.key == pygame.K_UP:
                 self.selected_option = (self.selected_option - 1) % len(
                     self.settings_options
@@ -44,8 +53,27 @@ class SettingsScene:
                 self.selected_option = (self.selected_option + 1) % len(
                     self.settings_options
                 )
+            elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                direction = -1 if event.key == pygame.K_LEFT else 1
+                change = direction * 0.1
+
+                if option_name == "Master Volume":
+                    config.MASTER_VOLUME = max(
+                        0.0, min(1.0, config.MASTER_VOLUME + change)
+                    )
+                    self.game.music_manager.refresh_volume()
+                elif option_name == "Music Volume":
+                    config.MUSIC_VOLUME = max(
+                        0.0, min(1.0, config.MUSIC_VOLUME + change)
+                    )
+                    self.game.music_manager.set_volume(config.MUSIC_VOLUME)
+                elif option_name == "SFX Volume":
+                    config.SOUND_VOLUME = max(
+                        0.0, min(1.0, config.SOUND_VOLUME + change)
+                    )
+
             elif event.key == pygame.K_RETURN:
-                if self.selected_option == 0:
+                if option_name == "Screen Size":
                     self.current_screen_size_index = (
                         self.current_screen_size_index + 1
                     ) % len(self.screen_sizes)
@@ -53,10 +81,10 @@ class SettingsScene:
                     config.SCREEN["width"] = width
                     config.SCREEN["height"] = height
                     self.game.screen = pygame.display.set_mode((width, height))
-                elif self.selected_option == 1:
+                elif option_name == "Debug Mode":
                     config.DEBUG = not config.DEBUG
                     log.info(f"Debug mode set to {config.DEBUG}")
-                elif self.selected_option == 2:
+                elif option_name == "Back":
                     self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
@@ -66,6 +94,20 @@ class SettingsScene:
             dt: The time elapsed since the last frame.
         """
         pass
+
+    def _get_volume_bar(self, volume):
+        """Returns a string representation of a volume bar.
+
+        Args:
+            volume: Float between 0.0 and 1.0.
+
+        Returns:
+            A string like '[|||||     ] 50%'
+        """
+        blocks = int(round(volume * 10))
+        # Ensure blocks is between 0 and 10
+        blocks = max(0, min(10, blocks))
+        return f"[{'|' * blocks}{' ' * (10 - blocks)}] {int(round(volume * 100))}%"
 
     def draw(self, screen):
         """Draws the settings options and title to the screen.
@@ -85,17 +127,23 @@ class SettingsScene:
             else:
                 color = (255, 255, 255)
 
-            if i == 0:
+            if option == "Screen Size":
                 text_to_render = (
                     f"{option}: {config.SCREEN['width']}x{config.SCREEN['height']}"
                 )
-            elif i == 1:
+            elif option == "Debug Mode":
                 text_to_render = f"{option}: {'On' if config.DEBUG else 'Off'}"
+            elif option == "Master Volume":
+                text_to_render = f"{option}: {self._get_volume_bar(config.MASTER_VOLUME)}"
+            elif option == "Music Volume":
+                text_to_render = f"{option}: {self._get_volume_bar(config.MUSIC_VOLUME)}"
+            elif option == "SFX Volume":
+                text_to_render = f"{option}: {self._get_volume_bar(config.SOUND_VOLUME)}"
             else:
                 text_to_render = option
 
             text = self.option_font.render(text_to_render, True, color)
             text_rect = text.get_rect(
-                center=(self.game.screen.get_width() / 2, 300 + i * 60)
+                center=(self.game.screen.get_width() / 2, 250 + i * 60)
             )
             screen.blit(text, text_rect)
