@@ -17,12 +17,12 @@ def ai_system():
     return AISystem()
 
 def create_unit(game_state, entity_id, player_id, x, y):
-    game_state.entities[entity_id] = {
-        Player: Player(player_id=player_id),
-        Position: Position(x, y),
-        Attack: Attack(attack_damage=10, attack_range=5, attack_speed=1),
-        Vision: Vision(vision_range=10),
-    }
+    # Use add_component to ensure spatial_map is populated
+    game_state.entities[entity_id] = {}
+    game_state.add_component(entity_id, Player(player_id=player_id))
+    game_state.add_component(entity_id, Position(x, y))
+    game_state.add_component(entity_id, Attack(attack_damage=10, attack_range=5, attack_speed=1))
+    game_state.add_component(entity_id, Vision(vision_range=10))
 
 def test_ffa_combat_auto_targeting(game_state, ai_system):
     """Test that units from different players automatically target each other."""
