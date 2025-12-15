@@ -552,7 +552,6 @@ class GameScene:
         if not self.cheats["reveal_map"]:
             self.fog_of_war.draw(screen, self.camera)
 
-        self.ui_system.draw(self.game_state, self.paused)
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
 
