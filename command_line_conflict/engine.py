@@ -4,12 +4,11 @@ from pathlib import Path
 import pygame
 
 from . import config
-from .logger import (
-    log,  # TODO: Expand logger usage, specifically for when in debug mode.
-)
+from .logger import log
 from .maps import Map
 from .music import MusicManager
 from .scenes.defeat import DefeatScene
+from .steam_integration import SteamIntegration
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
@@ -36,6 +35,7 @@ class SceneManager:
             "defeat": DefeatScene(game),
         }
         self.current_scene = self.scenes["menu"]
+        log.debug("SceneManager initialized with scenes: %s", list(self.scenes.keys()))
 
     def switch_to(self, scene_name):
         """Switches the active scene.
@@ -43,6 +43,7 @@ class SceneManager:
         Args:
             scene_name: The name of the scene to switch to.
         """
+        log.debug(f"Switching scene to: {scene_name}")
         if scene_name == "game":
             self.scenes["game"] = GameScene(self.game)
         elif scene_name == "editor":
@@ -88,10 +89,14 @@ class Game:
         """
         pygame.init()
         flags = pygame.FULLSCREEN if config.FULLSCREEN else 0
+        log.debug("Pygame initialized")
         self.screen = pygame.display.set_mode(
             (config.SCREEN["width"], config.SCREEN["height"]), flags
         )
         pygame.display.set_caption("ASCII RTS")
+        log.debug(
+            f"Screen created with resolution: {config.SCREEN['width']}x{config.SCREEN['height']}"
+        )
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -102,10 +107,16 @@ class Game:
         if bundled.exists():
             try:
                 self.font = pygame.font.Font(str(bundled), 16)
-            except Exception:
+                log.debug(f"Loaded bundled font: {bundled}")
+            except Exception as e:
+                log.warning(f"Failed to load bundled font: {e}")
                 self.font = None
+        else:
+            log.debug("Bundled font not found.")
 
         self.music_manager = MusicManager()
+        self.steam = SteamIntegration()
+        self.steam.unlock_achievement("GAME_START")
 
         if self.font is None:
             # Try common system fonts
@@ -123,9 +134,11 @@ class Game:
 
             if font_path:
                 self.font = pygame.font.Font(font_path, 16)
+                log.debug(f"Loaded system font: {font_path}")
             else:
                 # Final fallback to generic monospace and ASCII graphics
                 self.font = pygame.font.SysFont("monospace", 16)
+                log.warning("No suitable font found, using generic monospace.")
 
         self.scene_manager = SceneManager(self)
 
@@ -134,13 +147,17 @@ class Game:
         log.info("Game starting...")
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
+            self.steam.update()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    log.info("Quit event received. Stopping game loop...")
                     self.running = False
                 self.scene_manager.handle_event(event)
             self.scene_manager.update(dt)
             self.scene_manager.draw(self.screen)
             pygame.display.flip()
+        log.info("Game loop finished. Quitting...")
         pygame.quit()
 
 
