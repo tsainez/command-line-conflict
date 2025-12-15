@@ -95,6 +95,6 @@ class TestMovementSystemLogging(unittest.TestCase):
         self.movement_system.update(self.game_state, dt=0.1)
 
         # Should log failure
-        mock_log.debug.assert_any_call(
+        mock_log.warning.assert_any_call(
             f"Intelligent pathfinding failed for entity {unit_id} to (7.0, 5.0)"
         )
