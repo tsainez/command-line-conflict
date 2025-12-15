@@ -1,0 +1,17 @@
+site_name: Command Line Conflict
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: green
+    accent: light green
+
+plugins:
+  - include-markdown
+
+nav:
+  - Home: index.md
+  - Contributing: Contributing.md
+  - Maps: Maps.md
+  - Project Structure: ProjectStructure.md
+  - Agent Tasks: agents.md
