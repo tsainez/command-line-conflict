@@ -1,11 +1,13 @@
 import json
 import os
+import shutil
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from .logger import log
+from .utils.paths import get_user_data_dir
 
-SAVE_FILE = "save_game.json"
+DEFAULT_SAVE_FILENAME = "save_game.json"
 
 # Define the Tech Tree: Mission ID -> List of Unlocked Units
 # Mission 1 unlocks Rover
@@ -22,8 +24,27 @@ MISSION_REWARDS: Dict[str, List[str]] = {
 class CampaignManager:
     """Manages campaign progress, including completed missions and unlocked units."""
 
-    def __init__(self, save_file: str = SAVE_FILE):
-        self.save_file = save_file
+    def __init__(self, save_file: Optional[str] = None):
+        if save_file:
+            self.save_file = save_file
+        else:
+            data_dir = get_user_data_dir()
+            try:
+                data_dir.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                log.error(f"Failed to create data directory {data_dir}: {e}")
+
+            self.save_file = str(data_dir / DEFAULT_SAVE_FILENAME)
+
+            # Check for legacy save file in current directory and migrate if needed
+            legacy_file = Path(DEFAULT_SAVE_FILENAME)
+            if legacy_file.exists() and not Path(self.save_file).exists():
+                log.info(f"Migrating save file from {legacy_file} to {self.save_file}")
+                try:
+                    shutil.move(str(legacy_file), self.save_file)
+                except OSError as e:
+                    log.error(f"Failed to migrate save file: {e}")
+
         self.completed_missions: List[str] = []
         self.unlocked_units: Set[str] = {"chassis", "extractor"}  # Default unlocks
         self.load_progress()
