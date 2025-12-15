@@ -139,11 +139,10 @@ class GameScene:
             factories.create_chassis(
                 self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
             )
-        # Player 2 units (AI)
-        for i in range(3):
-            factories.create_chassis(
-                self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
-            )
+        # Player 2 units (AI) - Mission 1: Single Rover in center
+        factories.create_rover(
+            self.game_state, 20, 15, player_id=2, is_human=False
+        )
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
