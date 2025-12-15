@@ -17,3 +17,9 @@ game.log
 .coverage
 htmlcov/
 save_game.json
+
+# PyInstaller artifacts
+build/
+dist/
+*.spec
+icon.ico
