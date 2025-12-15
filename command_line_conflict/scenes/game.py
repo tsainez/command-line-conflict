@@ -161,7 +161,11 @@ class GameScene:
 
         # Handle construction hotkeys if a chassis is selected
         if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_r, pygame.K_a):
+            if event.key == self.game.input_manager.get_key(
+                "build_rover_factory"
+            ) or event.key == self.game.input_manager.get_key(
+                "build_arachnotron_factory"
+            ):
                 self._handle_construction(event.key)
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -222,13 +226,13 @@ class GameScene:
                         attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
-            if event.key == pygame.K_UP:
+            if event.key == self.game.input_manager.get_key("camera_up"):
                 self.camera_movement["up"] = True
-            elif event.key == pygame.K_DOWN:
+            elif event.key == self.game.input_manager.get_key("camera_down"):
                 self.camera_movement["down"] = True
-            elif event.key == pygame.K_LEFT:
+            elif event.key == self.game.input_manager.get_key("camera_left"):
                 self.camera_movement["left"] = True
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == self.game.input_manager.get_key("camera_right"):
                 self.camera_movement["right"] = True
             else:
                 if config.DEBUG:
@@ -236,7 +240,9 @@ class GameScene:
                     if mods & pygame.KMOD_CTRL:
                         mx, my = pygame.mouse.get_pos()
                         gx, gy = self.camera.screen_to_grid(mx, my)
-                        if event.key == pygame.K_1:
+                        if event.key == self.game.input_manager.get_key(
+                            "spawn_extractor"
+                        ):
                             factories.create_extractor(
                                 self.game_state,
                                 gx,
@@ -244,7 +250,9 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                        elif event.key == pygame.K_2:
+                        elif event.key == self.game.input_manager.get_key(
+                            "spawn_chassis"
+                        ):
                             factories.create_chassis(
                                 self.game_state,
                                 gx,
@@ -252,7 +260,9 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                        elif event.key == pygame.K_3:
+                        elif event.key == self.game.input_manager.get_key(
+                            "spawn_rover"
+                        ):
                             factories.create_rover(
                                 self.game_state,
                                 gx,
@@ -260,7 +270,9 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                        elif event.key == pygame.K_4:
+                        elif event.key == self.game.input_manager.get_key(
+                            "spawn_arachnotron"
+                        ):
                             factories.create_arachnotron(
                                 self.game_state,
                                 gx,
@@ -268,7 +280,9 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                        elif event.key == pygame.K_5:
+                        elif event.key == self.game.input_manager.get_key(
+                            "spawn_observer"
+                        ):
                             factories.create_observer(
                                 self.game_state,
                                 gx,
@@ -276,7 +290,9 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                        elif event.key == pygame.K_6:
+                        elif event.key == self.game.input_manager.get_key(
+                            "spawn_immortal"
+                        ):
                             factories.create_immortal(
                                 self.game_state,
                                 gx,
@@ -284,7 +300,7 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
-                if event.key == pygame.K_h:
+                if event.key == self.game.input_manager.get_key("hold_position"):
                     # Hold Position
                     from command_line_conflict.components.movable import Movable
 
@@ -299,15 +315,17 @@ class GameScene:
                                 movable.target_y = None
                                 log.info(f"Entity {entity_id} holding position")
 
-                elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
+                elif event.key == self.game.input_manager.get_key(
+                    "pause"
+                ) or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
-                elif event.key == pygame.K_F1:
+                elif event.key == self.game.input_manager.get_key("toggle_reveal_map"):
                     self.cheats["reveal_map"] = not self.cheats["reveal_map"]
                     log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
-                elif event.key == pygame.K_F2:
+                elif event.key == self.game.input_manager.get_key("toggle_god_mode"):
                     self.cheats["god_mode"] = not self.cheats["god_mode"]
                     log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
-                elif event.key == pygame.K_TAB:
+                elif event.key == self.game.input_manager.get_key("switch_player"):
                     # Switch sides
                     self.selection_system.clear_selection(self.game_state)
                     if self.current_player_id == 1:
@@ -315,16 +333,16 @@ class GameScene:
                     else:
                         self.current_player_id = 1
                     log.info(f"Switched to player {self.current_player_id}")
-                elif event.key == pygame.K_ESCAPE:
+                elif event.key == self.game.input_manager.get_key("menu"):
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP:
+            if event.key == self.game.input_manager.get_key("camera_up"):
                 self.camera_movement["up"] = False
-            elif event.key == pygame.K_DOWN:
+            elif event.key == self.game.input_manager.get_key("camera_down"):
                 self.camera_movement["down"] = False
-            elif event.key == pygame.K_LEFT:
+            elif event.key == self.game.input_manager.get_key("camera_left"):
                 self.camera_movement["left"] = False
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == self.game.input_manager.get_key("camera_right"):
                 self.camera_movement["right"] = False
         # Camera zoom (mouse wheel) and middle mouse drag
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -383,7 +401,9 @@ class GameScene:
             return
 
         # Check unlock requirements and build
-        if key == pygame.K_r:  # Build Rover Factory
+        if key == self.game.input_manager.get_key(
+            "build_rover_factory"
+        ):  # Build Rover Factory
             # Check if Rover is unlocked (implied requirement for Rover Factory)
             if self.campaign_manager.is_unit_unlocked("rover"):
                 log.info("Building Rover Factory")
@@ -394,7 +414,9 @@ class GameScene:
             else:
                 log.info("Rover tech not unlocked!")
 
-        elif key == pygame.K_a:  # Build Arachnotron Factory
+        elif key == self.game.input_manager.get_key(
+            "build_arachnotron_factory"
+        ):  # Build Arachnotron Factory
             if self.campaign_manager.is_unit_unlocked("arachnotron"):
                 log.info("Building Arachnotron Factory")
                 self.game_state.remove_entity(builder_id)

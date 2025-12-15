@@ -12,6 +12,23 @@ class TestGameSceneCamera(unittest.TestCase):
         self.mock_game.screen = MagicMock()
         self.mock_game.music_manager = MagicMock()
 
+        # Mock InputManager
+        self.mock_game.input_manager = MagicMock()
+        self.mock_game.input_manager.get_key.side_effect = lambda action: {
+            "camera_up": pygame.K_UP,
+            "camera_down": pygame.K_DOWN,
+            "camera_left": pygame.K_LEFT,
+            "camera_right": pygame.K_RIGHT,
+            "build_rover_factory": pygame.K_r,
+            "build_arachnotron_factory": pygame.K_a,
+            "hold_position": pygame.K_h,
+            "pause": pygame.K_p,
+            "toggle_reveal_map": pygame.K_F1,
+            "toggle_god_mode": pygame.K_F2,
+            "switch_player": pygame.K_TAB,
+            "menu": pygame.K_ESCAPE,
+        }.get(action, 0)
+
         # Patch factories to avoid actual game state complexity
         with patch('command_line_conflict.scenes.game.factories') as mock_factories:
             with patch('command_line_conflict.scenes.game.SimpleMap'):

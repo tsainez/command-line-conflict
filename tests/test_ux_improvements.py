@@ -32,6 +32,12 @@ def test_ui_system_help_text_content():
 
 def test_game_scene_space_pause():
     game = MockGame()
+    # Mock InputManager for the test
+    game.input_manager = MagicMock()
+    game.input_manager.get_key.side_effect = lambda action: {
+        "pause": pygame.K_p,
+    }.get(action, 0)
+
     scene = GameScene(game)
     scene.paused = False
 

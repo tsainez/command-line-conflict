@@ -18,7 +18,7 @@ class SettingsScene:
         self.game = game
         self.option_font = pygame.font.Font(None, 50)
         self.title_font = pygame.font.Font(None, 74)
-        self.settings_options = ["Screen Size", "Debug Mode", "Back"]
+        self.settings_options = ["Screen Size", "Debug Mode", "Controls", "Back"]
         self.selected_option = 0
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
         self.current_screen_size_index = 0
@@ -57,6 +57,8 @@ class SettingsScene:
                     config.DEBUG = not config.DEBUG
                     log.info(f"Debug mode set to {config.DEBUG}")
                 elif self.selected_option == 2:
+                    self.game.scene_manager.switch_to("controls")
+                elif self.selected_option == 3:
                     self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):

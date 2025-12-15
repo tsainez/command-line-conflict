@@ -4,11 +4,13 @@ from pathlib import Path
 import pygame
 
 from . import config
+from .input_manager import InputManager
 from .logger import (
     log,  # TODO: Expand logger usage, specifically for when in debug mode.
 )
 from .maps import Map
 from .music import MusicManager
+from .scenes.controls import ControlsScene
 from .scenes.defeat import DefeatScene
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
@@ -30,6 +32,7 @@ class SceneManager:
         self.scenes = {
             "menu": MenuScene(game),
             "settings": SettingsScene(game),
+            "controls": ControlsScene(game),
             "game": GameScene(game),
             "editor": EditorScene(game),
             "victory": VictoryScene(game),
@@ -47,6 +50,8 @@ class SceneManager:
             self.scenes["game"] = GameScene(self.game)
         elif scene_name == "editor":
             self.scenes["editor"] = EditorScene(self.game)
+        elif scene_name == "controls":
+            self.scenes["controls"] = ControlsScene(self.game)
         self.current_scene = self.scenes[scene_name]
 
     def handle_event(self, event):
@@ -104,6 +109,7 @@ class Game:
             except Exception:
                 self.font = None
 
+        self.input_manager = InputManager()
         self.music_manager = MusicManager()
 
         if self.font is None:
