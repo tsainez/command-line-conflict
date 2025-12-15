@@ -8,6 +8,7 @@ from .logger import log
 from .maps import Map
 from .music import MusicManager
 from .scenes.defeat import DefeatScene
+from .steam_integration import SteamIntegration
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
@@ -113,6 +114,8 @@ class Game:
             log.debug("Bundled font not found.")
 
         self.music_manager = MusicManager()
+        self.steam = SteamIntegration()
+        self.steam.unlock_achievement("GAME_START")
 
         if self.font is None:
             # Try common system fonts
@@ -143,6 +146,8 @@ class Game:
         log.info("Game starting...")
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
+            self.steam.update()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     log.info("Quit event received. Stopping game loop...")
