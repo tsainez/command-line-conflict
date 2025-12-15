@@ -17,7 +17,10 @@ class Targeting:
         vision: Vision,
         game_state: GameState,
     ) -> int | None:
-        """Finds the closest enemy entity within the vision range."""
+        """Finds the closest enemy entity within the vision range.
+
+        Optimized to use spatial hashing to avoid O(N) iteration over all entities.
+        """
         if DEBUG:
             log.debug(
                 f"Targeting: Searching for enemy for unit {my_id} at ({my_pos.x}, {my_pos.y})"
@@ -25,25 +28,49 @@ class Targeting:
 
         closest_enemy = None
         min_dist = float("inf")
+        vision_range = vision.vision_range
 
-        for other_id, other_components in game_state.entities.items():
-            if other_id == my_id:
-                continue
+        # Calculate search bounds based on vision range
+        min_x = int(my_pos.x - vision_range)
+        max_x = int(my_pos.x + vision_range)
+        min_y = int(my_pos.y - vision_range)
+        max_y = int(my_pos.y + vision_range)
 
-            other_player = other_components.get(Player)
-            if not other_player or other_player.player_id == my_player.player_id:
-                continue
+        # Iterate only over the grid cells within the vision range
+        for x in range(min_x, max_x + 1):
+            for y in range(min_y, max_y + 1):
+                # Retrieve potential targets from the spatial map
+                cell_entities = game_state.spatial_map.get((x, y))
+                if not cell_entities:
+                    continue
 
-            other_pos = other_components.get(Position)
-            if not other_pos:
-                continue
+                for other_id in cell_entities:
+                    if other_id == my_id:
+                        continue
 
-            dist = (
-                (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
-            ) ** 0.5
-            if dist <= vision.vision_range and dist < min_dist:
-                min_dist = dist
-                closest_enemy = other_id
+                    # Retrieve components directly for performance
+                    other_components = game_state.entities.get(other_id)
+                    if not other_components:
+                        continue
+
+                    other_player = other_components.get(Player)
+                    if (
+                        not other_player
+                        or other_player.player_id == my_player.player_id
+                    ):
+                        continue
+
+                    other_pos = other_components.get(Position)
+                    if not other_pos:
+                        continue
+
+                    dist = (
+                        (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+                    ) ** 0.5
+
+                    if dist <= vision_range and dist < min_dist:
+                        min_dist = dist
+                        closest_enemy = other_id
 
         if DEBUG and closest_enemy:
             log.debug(

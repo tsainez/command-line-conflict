@@ -139,11 +139,10 @@ class GameScene:
             factories.create_chassis(
                 self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
             )
-        # Player 2 units (AI)
-        for i in range(3):
-            factories.create_chassis(
-                self.game_state, 40 + i * 2, 40, player_id=2, is_human=False
-            )
+        # Player 2 units (AI) - Mission 1: Single Rover in center
+        factories.create_rover(
+            self.game_state, 20, 15, player_id=2, is_human=False
+        )
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -300,7 +299,7 @@ class GameScene:
                                 movable.target_y = None
                                 log.info(f"Entity {entity_id} holding position")
 
-                elif event.key == pygame.K_p:
+                elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
                 elif event.key == pygame.K_F1:
                     self.cheats["reveal_map"] = not self.cheats["reveal_map"]
@@ -392,6 +391,7 @@ class GameScene:
                 factories.create_rover_factory(
                     self.game_state, pos.x, pos.y, player.player_id, player.is_human
                 )
+                self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Rover tech not unlocked!")
 
@@ -402,6 +402,7 @@ class GameScene:
                 factories.create_arachnotron_factory(
                     self.game_state, pos.x, pos.y, player.player_id, player.is_human
                 )
+                self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Arachnotron tech not unlocked!")
 
@@ -488,6 +489,7 @@ class GameScene:
 
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
+            self.game.steam.unlock_achievement("VICTORY")
             self.campaign_manager.complete_mission(self.current_mission_id)
             return True
         return False
@@ -508,6 +510,7 @@ class GameScene:
 
         if player_entity_count == 0:
             log.info("Defeat! Mission Failed.")
+            self.game.steam.unlock_achievement("DEFEAT")
             return True
         return False
 
@@ -552,7 +555,6 @@ class GameScene:
         if not self.cheats["reveal_map"]:
             self.fog_of_war.draw(screen, self.camera)
 
-        self.ui_system.draw(self.game_state, self.paused)
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
 
