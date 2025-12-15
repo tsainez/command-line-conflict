@@ -20,7 +20,8 @@ from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import \
+    CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
@@ -140,9 +141,7 @@ class GameScene:
                 self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
             )
         # Player 2 units (AI) - Mission 1: Single Rover in center
-        factories.create_rover(
-            self.game_state, 20, 15, player_id=2, is_human=False
-        )
+        factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -208,7 +207,8 @@ class GameScene:
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
                     # Moving clears hold position
-                    from command_line_conflict.components.movable import Movable
+                    from command_line_conflict.components.movable import \
+                        Movable
 
                     movable = components.get(Movable)
                     if movable:
@@ -286,8 +286,10 @@ class GameScene:
                             )
                 if event.key == pygame.K_h:
                     # Hold Position
-                    from command_line_conflict.components.movable import Movable
+                    from command_line_conflict.components.movable import \
+                        Movable
 
+                    units_ordered = 0
                     for entity_id, components in self.game_state.entities.items():
                         selectable = components.get(Selectable)
                         if selectable and selectable.is_selected:
@@ -298,15 +300,29 @@ class GameScene:
                                 movable.target_x = None
                                 movable.target_y = None
                                 log.info(f"Entity {entity_id} holding position")
+                                units_ordered += 1
+
+                    if units_ordered > 0:
+                        self.chat_system.add_message(
+                            "Command: Hold Position", (200, 200, 200)
+                        )
 
                 elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
                 elif event.key == pygame.K_F1:
                     self.cheats["reveal_map"] = not self.cheats["reveal_map"]
                     log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                    status = "ON" if self.cheats["reveal_map"] else "OFF"
+                    self.chat_system.add_message(
+                        f"Cheat: Reveal Map {status}", (255, 255, 0)
+                    )
                 elif event.key == pygame.K_F2:
                     self.cheats["god_mode"] = not self.cheats["god_mode"]
                     log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
+                    status = "ON" if self.cheats["god_mode"] else "OFF"
+                    self.chat_system.add_message(
+                        f"Cheat: God Mode {status}", (255, 255, 0)
+                    )
                 elif event.key == pygame.K_TAB:
                     # Switch sides
                     self.selection_system.clear_selection(self.game_state)
@@ -315,6 +331,9 @@ class GameScene:
                     else:
                         self.current_player_id = 1
                     log.info(f"Switched to player {self.current_player_id}")
+                    self.chat_system.add_message(
+                        f"Switched to Player {self.current_player_id}", (0, 255, 255)
+                    )
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
@@ -361,9 +380,6 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            unit_identity = components.get(
-                Selectable
-            )  # Typo check? Wait, Selectable doesn't have name.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 
@@ -372,6 +388,7 @@ class GameScene:
                     selected_chassis_ids.append(entity_id)
 
         if not selected_chassis_ids:
+            self.chat_system.add_message("Select a Chassis to build.", (255, 100, 100))
             return
 
         # Simple logic: First selected chassis builds the factory
@@ -386,6 +403,9 @@ class GameScene:
         if key == pygame.K_r:  # Build Rover Factory
             # Check if Rover is unlocked (implied requirement for Rover Factory)
             if self.campaign_manager.is_unit_unlocked("rover"):
+                self.chat_system.add_message(
+                    "Construction started: Rover Factory", (0, 255, 0)
+                )
                 log.info("Building Rover Factory")
                 self.game_state.remove_entity(builder_id)
                 factories.create_rover_factory(
@@ -393,10 +413,16 @@ class GameScene:
                 )
                 self.game.steam.unlock_achievement("BUILDER")
             else:
+                self.chat_system.add_message(
+                    "Cannot build: Rover tech locked", (255, 100, 100)
+                )
                 log.info("Rover tech not unlocked!")
 
         elif key == pygame.K_a:  # Build Arachnotron Factory
             if self.campaign_manager.is_unit_unlocked("arachnotron"):
+                self.chat_system.add_message(
+                    "Construction started: Arachnotron Factory", (0, 255, 0)
+                )
                 log.info("Building Arachnotron Factory")
                 self.game_state.remove_entity(builder_id)
                 factories.create_arachnotron_factory(
@@ -404,6 +430,9 @@ class GameScene:
                 )
                 self.game.steam.unlock_achievement("BUILDER")
             else:
+                self.chat_system.add_message(
+                    "Cannot build: Arachnotron tech locked", (255, 100, 100)
+                )
                 log.info("Arachnotron tech not unlocked!")
 
     def _update_camera(self, dt):
