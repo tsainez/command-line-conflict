@@ -9,11 +9,14 @@ from .logger import (
 )
 from .maps import Map
 from .music import MusicManager
+from .scenes.briefing import BriefingScene
 from .scenes.defeat import DefeatScene
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
+from .scenes.mission_select import MissionSelectScene
 from .scenes.settings import SettingsScene
+from .scenes.tech_database import TechDatabaseScene
 from .scenes.victory import VictoryScene
 
 
@@ -34,6 +37,9 @@ class SceneManager:
             "editor": EditorScene(game),
             "victory": VictoryScene(game),
             "defeat": DefeatScene(game),
+            "tech_database": TechDatabaseScene(game),
+            "mission_select": MissionSelectScene(game),
+            "briefing": BriefingScene(game),
         }
         self.current_scene = self.scenes["menu"]
 
@@ -43,10 +49,18 @@ class SceneManager:
         Args:
             scene_name: The name of the scene to switch to.
         """
+        # Re-initialize scenes that need fresh state
         if scene_name == "game":
             self.scenes["game"] = GameScene(self.game)
         elif scene_name == "editor":
             self.scenes["editor"] = EditorScene(self.game)
+        elif scene_name == "briefing":
+            self.scenes["briefing"] = BriefingScene(self.game)
+        elif scene_name == "mission_select":
+            self.scenes["mission_select"] = MissionSelectScene(self.game)
+        elif scene_name == "tech_database":
+            self.scenes["tech_database"] = TechDatabaseScene(self.game)
+
         self.current_scene = self.scenes[scene_name]
 
     def handle_event(self, event):

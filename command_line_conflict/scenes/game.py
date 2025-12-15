@@ -103,8 +103,10 @@ class GameScene:
         self.confetti_system = ConfettiSystem()
         self.production_system = ProductionSystem(self.campaign_manager)
 
-        # Current Mission ID - In a full game this would be passed from a mission select screen
-        self.current_mission_id = "mission_1"
+        # Current Mission ID
+        # Check if the game object has a selected mission (from Mission Select scene)
+        self.current_mission_id = getattr(self.game, "current_mission_id", "mission_1")
+        log.info(f"Starting Mission: {self.current_mission_id}")
 
         self.sound_system = SoundSystem()
         self.wander_system = WanderSystem()
@@ -133,16 +135,41 @@ class GameScene:
                 log.info(cheat)
 
     def _create_initial_units(self):
-        """Creates the starting units for each player."""
-        # Player 1 units (human)
+        """Creates the starting units for each player based on the current mission."""
+
+        # Default Player 1 Start
         for i in range(3):
             factories.create_chassis(
                 self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
             )
-        # Player 2 units (AI) - Mission 1: Single Rover in center
-        factories.create_rover(
-            self.game_state, 20, 15, player_id=2, is_human=False
-        )
+
+        # Mission Specific Enemy Setup
+        if self.current_mission_id == "mission_1":
+            # Mission 1: Light resistance (Rovers)
+            factories.create_rover(self.game_state, 25, 15, player_id=2, is_human=False)
+            factories.create_rover(self.game_state, 30, 20, player_id=2, is_human=False)
+
+        elif self.current_mission_id == "mission_2":
+            # Mission 2: Air threat (Arachnotrons)
+            factories.create_arachnotron(self.game_state, 30, 10, player_id=2, is_human=False)
+            factories.create_arachnotron(self.game_state, 35, 25, player_id=2, is_human=False)
+            factories.create_rover(self.game_state, 20, 20, player_id=2, is_human=False)
+
+        elif self.current_mission_id == "mission_3":
+             # Mission 3: Stealth detection needed (Observers/Immortals vs hidden units?)
+             # Since we don't have stealth mechanics fully exposed in factory args yet, just mix units.
+             factories.create_rover_factory(self.game_state, 35, 5, player_id=2, is_human=False)
+             factories.create_immortal(self.game_state, 30, 20, player_id=2, is_human=False)
+
+        elif self.current_mission_id == "mission_4":
+            # Mission 4: Heavy Resistance (Immortals + Factories)
+            factories.create_immortal(self.game_state, 30, 15, player_id=2, is_human=False)
+            factories.create_immortal(self.game_state, 32, 17, player_id=2, is_human=False)
+            factories.create_arachnotron_factory(self.game_state, 35, 25, player_id=2, is_human=False)
+
+        else:
+            # Default/Fallback
+            factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.

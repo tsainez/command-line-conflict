@@ -13,7 +13,7 @@ class MenuScene:
         """
         self.game = game
         self.font = game.font
-        self.menu_options = ["New Game", "Map Editor", "Options", "Quit"]
+        self.menu_options = ["Campaign", "Tech Database", "Map Editor", "Options", "Quit"]
         self.selected_option = 0
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
@@ -40,12 +40,14 @@ class MenuScene:
                 )
             elif event.key == pygame.K_RETURN:
                 if self.selected_option == 0:
-                    self.game.scene_manager.switch_to("game")
+                    self.game.scene_manager.switch_to("mission_select")
                 elif self.selected_option == 1:
-                    self.game.scene_manager.switch_to("editor")
+                    self.game.scene_manager.switch_to("tech_database")
                 elif self.selected_option == 2:
-                    self.game.scene_manager.switch_to("settings")
+                    self.game.scene_manager.switch_to("editor")
                 elif self.selected_option == 3:
+                    self.game.scene_manager.switch_to("settings")
+                elif self.selected_option == 4:
                     self.game.running = False
 
     def update(self, dt):

@@ -18,6 +18,33 @@ MISSION_REWARDS: Dict[str, List[str]] = {
     "mission_4": ["immortal"],
 }
 
+MISSIONS = [
+    {
+        "id": "mission_1",
+        "title": "Mission 1: First Contact",
+        "briefing": "Commander, we have established a foothold on the surface. Enemy rovers have been detected in the sector. Your orders are to eliminate all hostile threats. Our scanners indicate a small scout force. Do not let them report back.",
+        "unlocks": ["rover"],
+    },
+    {
+        "id": "mission_2",
+        "title": "Mission 2: Escalation",
+        "briefing": "The enemy knows we are here. They have deployed Arachnotrons to counter our ground forces. We are authorizing the production of Arachnotrons to combat this aerial threat. Secure the area.",
+        "unlocks": ["arachnotron"],
+    },
+    {
+        "id": "mission_3",
+        "title": "Mission 3: The Eye in the Sky",
+        "briefing": "We need better intelligence. The enemy is moving in the shadows. We are unlocking the Observer schematic. Use it to scout ahead and reveal cloaked units. Eliminate the enemy base.",
+        "unlocks": ["observer"],
+    },
+    {
+        "id": "mission_4",
+        "title": "Mission 4: Heavy Metal",
+        "briefing": "It's time to finish this. We are deploying the Immortal. This heavy assault walker will crush their defenses. Destroy their main command center. Victory is at hand.",
+        "unlocks": ["immortal"],
+    },
+]
+
 
 class CampaignManager:
     """Manages campaign progress, including completed missions and unlocked units."""
@@ -89,3 +116,39 @@ class CampaignManager:
             True if the unit is unlocked, False otherwise.
         """
         return unit_name in self.unlocked_units
+
+    def get_mission(self, mission_id: str) -> dict:
+        """Retrieves mission metadata by ID.
+
+        Args:
+            mission_id: The ID of the mission.
+
+        Returns:
+            The mission dictionary, or None if not found.
+        """
+        for mission in MISSIONS:
+            if mission["id"] == mission_id:
+                return mission
+        return None
+
+    def get_all_missions(self) -> List[dict]:
+        """Returns a list of all defined missions."""
+        return MISSIONS
+
+    def is_mission_unlocked(self, mission_id: str) -> bool:
+        """Checks if a mission is unlocked (previous mission completed)."""
+        if mission_id == "mission_1":
+            return True
+
+        # Find index
+        idx = -1
+        for i, m in enumerate(MISSIONS):
+            if m["id"] == mission_id:
+                idx = i
+                break
+
+        if idx > 0:
+            prev_mission_id = MISSIONS[idx - 1]["id"]
+            return prev_mission_id in self.completed_missions
+
+        return False
