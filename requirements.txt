@@ -4,5 +4,8 @@ pytest-mock
 black
 isort
 pytest-xdist
+mkdocs
+mkdocs-material
+mkdocs-include-markdown-plugin
 pyinstaller
 pillow
