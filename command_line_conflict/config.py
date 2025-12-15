@@ -3,6 +3,9 @@
 # A boolean that turns on/off debug mode.
 DEBUG = True
 
+# A boolean that turns on/off fullscreen mode.
+FULLSCREEN = False
+
 # The width of the screen in pixels.
 SCREEN_WIDTH = 800
 # The height of the screen in pixels.

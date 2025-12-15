@@ -18,7 +18,7 @@ class SettingsScene:
         self.game = game
         self.option_font = pygame.font.Font(None, 50)
         self.title_font = pygame.font.Font(None, 74)
-        self.settings_options = ["Screen Size", "Debug Mode", "Back"]
+        self.settings_options = ["Screen Size", "Fullscreen", "Debug Mode", "Back"]
         self.selected_option = 0
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
         self.current_screen_size_index = 0
@@ -52,11 +52,18 @@ class SettingsScene:
                     width, height = self.screen_sizes[self.current_screen_size_index]
                     config.SCREEN["width"] = width
                     config.SCREEN["height"] = height
-                    self.game.screen = pygame.display.set_mode((width, height))
+                    flags = pygame.FULLSCREEN if config.FULLSCREEN else 0
+                    self.game.screen = pygame.display.set_mode((width, height), flags)
                 elif self.selected_option == 1:
+                    config.FULLSCREEN = not config.FULLSCREEN
+                    flags = pygame.FULLSCREEN if config.FULLSCREEN else 0
+                    width = config.SCREEN["width"]
+                    height = config.SCREEN["height"]
+                    self.game.screen = pygame.display.set_mode((width, height), flags)
+                elif self.selected_option == 2:
                     config.DEBUG = not config.DEBUG
                     log.info(f"Debug mode set to {config.DEBUG}")
-                elif self.selected_option == 2:
+                elif self.selected_option == 3:
                     self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
@@ -90,6 +97,8 @@ class SettingsScene:
                     f"{option}: {config.SCREEN['width']}x{config.SCREEN['height']}"
                 )
             elif i == 1:
+                text_to_render = f"{option}: {'On' if config.FULLSCREEN else 'Off'}"
+            elif i == 2:
                 text_to_render = f"{option}: {'On' if config.DEBUG else 'Off'}"
             else:
                 text_to_render = option

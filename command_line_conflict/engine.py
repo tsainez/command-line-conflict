@@ -87,8 +87,9 @@ class Game:
             game_map: An optional map object to start the game with.
         """
         pygame.init()
+        flags = pygame.FULLSCREEN if config.FULLSCREEN else 0
         self.screen = pygame.display.set_mode(
-            (config.SCREEN["width"], config.SCREEN["height"])
+            (config.SCREEN["width"], config.SCREEN["height"]), flags
         )
         pygame.display.set_caption("ASCII RTS")
         self.clock = pygame.time.Clock()
