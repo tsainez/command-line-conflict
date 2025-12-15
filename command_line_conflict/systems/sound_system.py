@@ -73,7 +73,7 @@ class SoundSystem:
 
         try:
             sound = pygame.mixer.Sound(filepath)
-            sound.set_volume(self.volume * config.MASTER_VOLUME)
+            sound.set_volume(self.volume)
             self.sounds[name] = sound
         except pygame.error as e:
             log.error(f"Failed to load sound {filepath}: {e}")

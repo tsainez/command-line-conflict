@@ -391,7 +391,6 @@ class GameScene:
                 factories.create_rover_factory(
                     self.game_state, pos.x, pos.y, player.player_id, player.is_human
                 )
-                self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Rover tech not unlocked!")
 
@@ -402,7 +401,6 @@ class GameScene:
                 factories.create_arachnotron_factory(
                     self.game_state, pos.x, pos.y, player.player_id, player.is_human
                 )
-                self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Arachnotron tech not unlocked!")
 
@@ -489,7 +487,6 @@ class GameScene:
 
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
-            self.game.steam.unlock_achievement("VICTORY")
             self.campaign_manager.complete_mission(self.current_mission_id)
             return True
         return False
@@ -510,7 +507,6 @@ class GameScene:
 
         if player_entity_count == 0:
             log.info("Defeat! Mission Failed.")
-            self.game.steam.unlock_achievement("DEFEAT")
             return True
         return False
 
