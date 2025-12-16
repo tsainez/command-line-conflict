@@ -1,11 +1,12 @@
-import pytest
 from unittest.mock import Mock
 
+import pytest
+
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.vision import Vision
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.player import Player
-from command_line_conflict.components.vision import Vision
 from command_line_conflict.utils.targeting import Targeting
 
 

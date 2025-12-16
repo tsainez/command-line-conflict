@@ -1,7 +1,9 @@
-import os
 import json
+import os
 import unittest
+
 from command_line_conflict.maps.base import Map
+
 
 class TestMapSerialization(unittest.TestCase):
     def test_to_dict(self):
@@ -18,11 +20,7 @@ class TestMapSerialization(unittest.TestCase):
         self.assertIn([2, 2], walls_list)
 
     def test_from_dict(self):
-        data = {
-            "width": 15,
-            "height": 20,
-            "walls": [[5, 5], [6, 6]]
-        }
+        data = {"width": 15, "height": 20, "walls": [[5, 5], [6, 6]]}
         m = Map.from_dict(data)
         self.assertEqual(m.width, 15)
         self.assertEqual(m.height, 20)

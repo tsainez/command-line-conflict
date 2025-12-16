@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from command_line_conflict.components.movable import Movable
+from command_line_conflict.factories import create_chassis, create_rover
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.simple_map import SimpleMap
 from command_line_conflict.systems.movement_system import MovementSystem
-from command_line_conflict.factories import create_chassis, create_rover
 
 
 class TestMovementSystemLogging(unittest.TestCase):
@@ -28,7 +28,10 @@ class TestMovementSystemLogging(unittest.TestCase):
 
         # Check that debug log was called for path found
         self.assertTrue(
-            any("Path found for entity" in str(call) for call in mock_log.debug.mock_calls)
+            any(
+                "Path found for entity" in str(call)
+                for call in mock_log.debug.mock_calls
+            )
         )
 
     @patch("command_line_conflict.systems.movement_system.log")
@@ -67,7 +70,9 @@ class TestMovementSystemLogging(unittest.TestCase):
         collision_logged = any(
             "Collision detected" in str(call) for call in mock_log.debug.mock_calls
         )
-        self.assertTrue(collision_logged, "Should log collision for non-intelligent unit")
+        self.assertTrue(
+            collision_logged, "Should log collision for non-intelligent unit"
+        )
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_update_logs_intelligent_pathfinding_failure(self, mock_log):

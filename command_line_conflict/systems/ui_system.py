@@ -51,7 +51,9 @@ class UISystem:
 
         log.debug("UISystem initialized")
 
-    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
+    def draw(
+        self, game_state: GameState, paused: bool, current_player_id: int = 1
+    ) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:

@@ -1,7 +1,10 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from command_line_conflict.game_state import GameState
+
+import pytest
+
 from command_line_conflict import config
+from command_line_conflict.game_state import GameState
+
 
 class TestGameStateLogging:
     @pytest.fixture(autouse=True)
@@ -29,10 +32,13 @@ class TestGameStateLogging:
         # Test add_component logging
         class MockComponent:
             pass
+
         component = MockComponent()
         mock_log.reset_mock()
         game_state.add_component(entity_id, component)
-        mock_log.debug.assert_called_with(f"Added component MockComponent to entity {entity_id}")
+        mock_log.debug.assert_called_with(
+            f"Added component MockComponent to entity {entity_id}"
+        )
 
         # Test add_event logging
         event = {"type": "test"}
@@ -43,7 +49,9 @@ class TestGameStateLogging:
         # Test remove_component logging
         mock_log.reset_mock()
         game_state.remove_component(entity_id, MockComponent)
-        mock_log.debug.assert_called_with(f"Removed component MockComponent from entity {entity_id}")
+        mock_log.debug.assert_called_with(
+            f"Removed component MockComponent from entity {entity_id}"
+        )
 
         # Test remove_entity logging
         mock_log.reset_mock()

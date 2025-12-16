@@ -8,12 +8,12 @@ from .logger import log
 from .maps import Map
 from .music import MusicManager
 from .scenes.defeat import DefeatScene
-from .steam_integration import SteamIntegration
 from .scenes.editor import EditorScene
 from .scenes.game import GameScene
 from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
 from .scenes.victory import VictoryScene
+from .steam_integration import SteamIntegration
 
 
 class SceneManager:

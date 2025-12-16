@@ -1,28 +1,36 @@
-import pytest
 from unittest.mock import MagicMock
-from command_line_conflict.systems.ai_system import AISystem
-from command_line_conflict.game_state import GameState
+
+import pytest
+
+from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
-from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.vision import Vision
+from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map
+from command_line_conflict.systems.ai_system import AISystem
+
 
 @pytest.fixture
 def game_state():
     return GameState(MagicMock(spec=Map))
 
+
 @pytest.fixture
 def ai_system():
     return AISystem()
+
 
 def create_unit(game_state, entity_id, player_id, x, y):
     # Use add_component to ensure spatial_map is populated
     game_state.entities[entity_id] = {}
     game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(entity_id, Attack(attack_damage=10, attack_range=5, attack_speed=1))
+    game_state.add_component(
+        entity_id, Attack(attack_damage=10, attack_range=5, attack_speed=1)
+    )
     game_state.add_component(entity_id, Vision(vision_range=10))
+
 
 def test_ffa_combat_auto_targeting(game_state, ai_system):
     """Test that units from different players automatically target each other."""
@@ -48,6 +56,7 @@ def test_ffa_combat_auto_targeting(game_state, ai_system):
     # Unit 3 should target 1 or 2
     unit3_attack = game_state.get_component(3, Attack)
     assert unit3_attack.attack_target in [1, 2]
+
 
 def test_neutral_units_passive(game_state, ai_system):
     """Test that neutral units (Player 0) do not auto-acquire targets."""

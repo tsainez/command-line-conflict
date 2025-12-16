@@ -9,9 +9,7 @@ class Camera:
         self.zoom = zoom
         self.min_zoom = min_zoom
         self.max_zoom = max_zoom
-        log.debug(
-            f"Camera initialized at ({self.x}, {self.y}) with zoom {self.zoom}"
-        )
+        log.debug(f"Camera initialized at ({self.x}, {self.y}) with zoom {self.zoom}")
 
     def move(self, dx, dy):
         self.x += dx

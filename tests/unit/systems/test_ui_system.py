@@ -109,7 +109,9 @@ def test_draw_aggregate_attack_range_multiple_units(
     total_attack_tiles = len(attack_tiles_1.union(attack_tiles_2))
     total_detection_tiles = len(detection_tiles_1.union(detection_tiles_2))
     # +1 for the key options panel, +2 for player indicator (box + border)
-    assert mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1 + 2
+    assert (
+        mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1 + 2
+    )
 
 
 @patch("pygame.draw.rect")

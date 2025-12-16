@@ -140,9 +140,7 @@ class GameScene:
                 self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
             )
         # Player 2 units (AI) - Mission 1: Single Rover in center
-        factories.create_rover(
-            self.game_state, 20, 15, player_id=2, is_human=False
-        )
+        factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -284,6 +282,25 @@ class GameScene:
                                 player_id=self.current_player_id,
                                 is_human=True,
                             )
+
+                    # Debug cheats
+                    if event.key == pygame.K_F1:
+                        self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                        log.info(
+                            f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}"
+                        )
+                    elif event.key == pygame.K_F2:
+                        self.cheats["god_mode"] = not self.cheats["god_mode"]
+                        log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
+                    elif event.key == pygame.K_TAB:
+                        # Switch sides
+                        self.selection_system.clear_selection(self.game_state)
+                        if self.current_player_id == 1:
+                            self.current_player_id = 2
+                        else:
+                            self.current_player_id = 1
+                        log.info(f"Switched to player {self.current_player_id}")
+
                 if event.key == pygame.K_h:
                     # Hold Position
                     from command_line_conflict.components.movable import Movable
@@ -301,20 +318,6 @@ class GameScene:
 
                 elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
-                elif event.key == pygame.K_F1:
-                    self.cheats["reveal_map"] = not self.cheats["reveal_map"]
-                    log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
-                elif event.key == pygame.K_F2:
-                    self.cheats["god_mode"] = not self.cheats["god_mode"]
-                    log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
-                elif event.key == pygame.K_TAB:
-                    # Switch sides
-                    self.selection_system.clear_selection(self.game_state)
-                    if self.current_player_id == 1:
-                        self.current_player_id = 2
-                    else:
-                        self.current_player_id = 1
-                    log.info(f"Switched to player {self.current_player_id}")
                 elif event.key == pygame.K_ESCAPE:
                     self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
