@@ -20,7 +20,8 @@ from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import \
+    CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
@@ -201,12 +202,16 @@ class GameScene:
             log.debug(
                 f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
             )
+            # Add visual feedback (green ripple)
+            self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
+
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
                     # Moving clears hold position
-                    from command_line_conflict.components.movable import Movable
+                    from command_line_conflict.components.movable import \
+                        Movable
 
                     movable = components.get(Movable)
                     if movable:
@@ -303,7 +308,8 @@ class GameScene:
 
                 if event.key == pygame.K_h:
                     # Hold Position
-                    from command_line_conflict.components.movable import Movable
+                    from command_line_conflict.components.movable import \
+                        Movable
 
                     for entity_id, components in self.game_state.entities.items():
                         selectable = components.get(Selectable)

@@ -5,10 +5,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from command_line_conflict.campaign_manager import (
-    DEFAULT_SAVE_FILENAME,
-    CampaignManager,
-)
+from command_line_conflict.campaign_manager import (DEFAULT_SAVE_FILENAME,
+                                                    CampaignManager)
 
 
 class TestCampaignManagerMigration(unittest.TestCase):
