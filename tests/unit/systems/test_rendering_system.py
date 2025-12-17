@@ -61,6 +61,8 @@ def test_draw_orders_are_affected_by_camera():
 def test_draw_entities_are_affected_by_camera(mock_scale):
     # Arrange
     mock_screen = Mock()
+    mock_screen.get_width.return_value = 800
+    mock_screen.get_height.return_value = 600
     mock_font = Mock()
     mock_surface = Mock()
     # This mock surface will be scaled, so we need a mock for the scaled surface too

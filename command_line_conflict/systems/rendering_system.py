@@ -52,12 +52,28 @@ class RenderingSystem:
         Args:
             game_state: The current state of the game.
         """
+        # Pre-calculate viewport bounds for culling
+        view_w = self.screen.get_width()
+        view_h = self.screen.get_height()
+        current_zoom = max(0.1, self.camera.zoom)
+        tile_size = config.GRID_SIZE * current_zoom
+
+        # Calculate visible grid bounds with a small margin
+        min_x = self.camera.x - 2
+        min_y = self.camera.y - 2
+        max_x = self.camera.x + (view_w / tile_size) + 2
+        max_y = self.camera.y + (view_h / tile_size) + 2
+
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
             player = components.get(Player)
 
             if position and renderable:
+                # Optimization: Skip entities outside the camera view
+                if not (min_x <= position.x <= max_x and min_y <= position.y <= max_y):
+                    continue
+
                 # Camera transform
                 cam_x = (
                     (int(position.x) - self.camera.x)
