@@ -7,6 +7,8 @@ import pygame
 
 from .. import config
 
+MAX_MAP_DIMENSION = 256
+
 
 class Map:
     """Represents the game map, including walls and pathfinding.
@@ -23,7 +25,19 @@ class Map:
         Args:
             width: The width of the map.
             height: The height of the map.
+
+        Raises:
+            ValueError: If dimensions are invalid or exceed MAX_MAP_DIMENSION.
         """
+        if not (0 < width <= MAX_MAP_DIMENSION):
+            raise ValueError(
+                f"Width {width} is invalid. Must be between 1 and {MAX_MAP_DIMENSION}."
+            )
+        if not (0 < height <= MAX_MAP_DIMENSION):
+            raise ValueError(
+                f"Height {height} is invalid. Must be between 1 and {MAX_MAP_DIMENSION}."
+            )
+
         self.width = width
         self.height = height
         self.walls: set[Tuple[int, int]] = set()
@@ -166,7 +180,17 @@ class Map:
             A new Map instance.
         """
         m = cls(width=data["width"], height=data["height"])
-        m.walls = set(tuple(w) for w in data["walls"])
+
+        # Validate and add walls, discarding invalid ones
+        for w in data["walls"]:
+            if len(w) != 2:
+                continue
+            x, y = w
+            if isinstance(x, int) and isinstance(y, int):
+                # Ensure wall is within bounds
+                if 0 <= x < m.width and 0 <= y < m.height:
+                    m.walls.add((x, y))
+
         return m
 
     def save_to_file(self, filename: str) -> None:
