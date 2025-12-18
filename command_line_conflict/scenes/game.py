@@ -202,6 +202,9 @@ class GameScene:
             log.debug(
                 f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
             )
+            # Add visual feedback (green ripple)
+            self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
+
             for entity_id, components in self.game_state.entities.items():
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:

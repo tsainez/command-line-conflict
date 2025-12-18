@@ -17,13 +17,23 @@ class Map:
         walls: A set of (x, y) tuples representing wall locations.
     """
 
+    MAX_MAP_DIMENSION = 256  # Security limit to prevent DoS via memory exhaustion
+
     def __init__(self, width: int = 40, height: int = 30) -> None:
         """Initializes the map.
 
         Args:
             width: The width of the map.
             height: The height of the map.
+
+        Raises:
+            ValueError: If dimensions exceed MAX_MAP_DIMENSION.
         """
+        if width > self.MAX_MAP_DIMENSION or height > self.MAX_MAP_DIMENSION:
+            raise ValueError(
+                f"Map dimensions exceed maximum allowed size ({self.MAX_MAP_DIMENSION})"
+            )
+
         self.width = width
         self.height = height
         self.walls: set[Tuple[int, int]] = set()
@@ -35,7 +45,8 @@ class Map:
             x: The x-coordinate of the wall.
             y: The y-coordinate of the wall.
         """
-        self.walls.add((x, y))
+        if 0 <= x < self.width and 0 <= y < self.height:
+            self.walls.add((x, y))
 
     def is_blocked(self, x: int, y: int) -> bool:
         """Checks if a tile is blocked by a wall.
@@ -166,7 +177,25 @@ class Map:
             A new Map instance.
         """
         m = cls(width=data["width"], height=data["height"])
-        m.walls = set(tuple(w) for w in data["walls"])
+
+        # Security: Validate walls are within bounds and well-formed
+        walls = set()
+        raw_walls = data.get("walls", [])
+        if not isinstance(raw_walls, list):
+             raw_walls = []
+
+        for w in raw_walls:
+            if isinstance(w, (list, tuple)) and len(w) >= 2:
+                # Ensure coordinates are integers
+                try:
+                    x = int(w[0])
+                    y = int(w[1])
+                    if 0 <= x < m.width and 0 <= y < m.height:
+                        walls.add((x, y))
+                except (ValueError, TypeError):
+                    continue
+
+        m.walls = walls
         return m
 
     def save_to_file(self, filename: str) -> None:

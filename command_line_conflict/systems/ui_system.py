@@ -49,6 +49,10 @@ class UISystem:
         )
         self.pause_overlay.fill((0, 0, 0, 150))
 
+        # List of active click effects (ripples)
+        # Each effect is a dict: {x, y, time, color, duration}
+        self.click_effects = []
+
         log.debug("UISystem initialized")
 
     def draw(
@@ -87,8 +91,67 @@ class UISystem:
             self._draw_aggregate_detection_range(game_state, selected_entities)
             self._draw_aggregate_attack_range(game_state, selected_entities)
 
+        self._draw_click_effects()
+
         if paused:
             self._draw_paused_message()
+
+    def add_click_effect(
+        self, grid_x: int, grid_y: int, color: tuple[int, int, int] = (0, 255, 0)
+    ) -> None:
+        """Adds a visual click effect at the specified grid coordinates.
+
+        Args:
+            grid_x: The X coordinate on the grid.
+            grid_y: The Y coordinate on the grid.
+            color: The RGB color of the effect.
+        """
+        self.click_effects.append(
+            {
+                "x": grid_x,
+                "y": grid_y,
+                "time": pygame.time.get_ticks(),
+                "color": color,
+                "duration": 500,  # ms
+            }
+        )
+
+    def _draw_click_effects(self) -> None:
+        """Draws and updates active click effects (ripples)."""
+        current_time = pygame.time.get_ticks()
+        # Filter out expired effects
+        self.click_effects = [
+            e for e in self.click_effects if current_time - e["time"] < e["duration"]
+        ]
+
+        for effect in self.click_effects:
+            elapsed = current_time - effect["time"]
+            progress = elapsed / effect["duration"]
+
+            # Calculate screen position
+            cam_x = (
+                (effect["x"] - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+            ) + (config.GRID_SIZE * self.camera.zoom / 2)
+            cam_y = (
+                (effect["y"] - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+            ) + (config.GRID_SIZE * self.camera.zoom / 2)
+
+            # Draw expanding ring
+            max_radius = config.GRID_SIZE * self.camera.zoom
+            radius = int(max_radius * progress)
+            if radius < 1:
+                radius = 1
+
+            # Fade out alpha (simulated by not drawing if too faint,
+            # or we could use a surface, but circles are cheap.
+            # Pygame's draw.circle doesn't support alpha directly on main screen
+            # unless we blit a surface. For simplicity, just draw.
+            # Maybe width decreases?
+            width = max(1, int(3 * (1 - progress)))
+
+            pygame.draw.circle(
+                self.screen, effect["color"], (int(cam_x), int(cam_y)), radius, width
+            )
 
     def _draw_player_indicator(self, current_player_id: int) -> None:
         """Draws a visual indicator for the current player.
