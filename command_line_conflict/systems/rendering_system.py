@@ -45,12 +45,8 @@ class RenderingSystem:
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
 
-        This method iterates through all entities, drawing them based on their
-        position and state (e.g., selected, dead). It also calls other
-        methods to draw additional UI elements like movement orders.
-
-        Args:
-            game_state: The current state of the game.
+        This method iterates through visible entities using the spatial map,
+        drawing them based on their position and state.
         """
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
@@ -83,6 +79,93 @@ class RenderingSystem:
                         (0, 255, 255),
                     ]
                     color = random.choice(colors)
+        screen_width = self.screen.get_width()
+        screen_height = self.screen.get_height()
+        tile_size = config.GRID_SIZE * self.camera.zoom
+
+        # Calculate visible grid bounds with buffer
+        start_x = int(self.camera.x) - 1
+        end_x = int(self.camera.x + screen_width / tile_size) + 2
+        start_y = int(self.camera.y) - 1
+        end_y = int(self.camera.y + screen_height / tile_size) + 2
+
+        # Iterate through visible tiles
+        for y in range(start_y, end_y):
+            for x in range(start_x, end_x):
+                entity_ids = game_state.spatial_map.get((x, y))
+                if not entity_ids:
+                    continue
+
+                for entity_id in entity_ids:
+                    components = game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+
+                    position = components.get(Position)
+                    renderable = components.get(Renderable)
+                    player = components.get(Player)
+
+                    if not position or not renderable:
+                        continue
+
+                    # Camera transform
+                    cam_x = (
+                        (int(position.x) - self.camera.x)
+                        * config.GRID_SIZE
+                        * self.camera.zoom
+                    )
+                    cam_y = (
+                        (int(position.y) - self.camera.y)
+                        * config.GRID_SIZE
+                        * self.camera.zoom
+                    )
+                    grid_size = int(config.GRID_SIZE * self.camera.zoom)
+
+                    confetti = components.get(Confetti)
+                    if confetti:
+                        # Confetti is just a particle, so it should be simple
+                        colors = [
+                            (255, 0, 0),
+                            (0, 255, 0),
+                            (0, 0, 255),
+                            (255, 255, 0),
+                            (255, 0, 255),
+                            (0, 255, 255),
+                        ]
+                        color = random.choice(colors)
+                        ch = self._get_rendered_surface(
+                            renderable.icon, color, grid_size
+                        )
+                        self.screen.blit(
+                            ch,
+                            (
+                                cam_x,
+                                cam_y,
+                            ),
+                        )
+                        continue
+
+                    dead = components.get(Dead)
+                    if dead:
+                        color = (128, 128, 128)  # Grey for dead units
+                    elif paused:
+                        color = (128, 128, 128)  # Grey for paused units
+                    else:
+                        color = renderable.color
+                        selectable = components.get(Selectable)
+                        if selectable and selectable.is_selected:
+                            color = (0, 255, 0)
+                            shadow_ch = self._get_rendered_surface(
+                                renderable.icon, (128, 128, 128), grid_size
+                            )
+                            self.screen.blit(
+                                shadow_ch,
+                                (
+                                    cam_x + 2,
+                                    cam_y + 2,
+                                ),
+                            )
+
                     ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                     self.screen.blit(
                         ch,
@@ -91,29 +174,34 @@ class RenderingSystem:
                             cam_y,
                         ),
                     )
-                    continue
 
-                dead = components.get(Dead)
-                if dead:
-                    color = (128, 128, 128)  # Grey for dead units
-                elif paused:
-                    color = (128, 128, 128)  # Grey for paused units
-                else:
-                    color = renderable.color
+                    health = components.get(Health)
+                    if not dead and health and health.max_hp > 0:
+                        health_pct = health.hp / health.max_hp
+                        bar_width = grid_size
+                        bar_height = max(2, int(grid_size * 0.2))
+                        bar_x = cam_x
+                        bar_y = cam_y - bar_height - 2
+
+                        # Draw background (red)
+                        pygame.draw.rect(
+                            self.screen,
+                            (255, 0, 0),
+                            (bar_x, bar_y, bar_width, bar_height),
+                        )
+                        # Draw foreground (green)
+                        pygame.draw.rect(
+                            self.screen,
+                            (0, 255, 0),
+                            (bar_x, bar_y, int(bar_width * health_pct), bar_height),
+                        )
+
                     selectable = components.get(Selectable)
-                    if selectable and selectable.is_selected:
-                        color = (0, 255, 0)
-                        shadow_ch = self._get_rendered_surface(
-                            renderable.icon, (128, 128, 128), grid_size
-                        )
-                        self.screen.blit(
-                            shadow_ch,
-                            (
-                                cam_x + 2,
-                                cam_y + 2,
-                            ),
-                        )
-
+                    if not dead:
+                        if selectable and selectable.is_selected:
+                            self.draw_orders(components)
+                        elif config.DEBUG:
+                            self.draw_orders(components)
                 ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                 self.screen.blit(
                     ch,
