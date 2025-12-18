@@ -1,5 +1,7 @@
 import unittest
+
 from command_line_conflict.maps.base import Map
+
 
 class TestMapSecurity(unittest.TestCase):
     def test_map_dimensions_limit(self):
@@ -31,16 +33,16 @@ class TestMapSecurity(unittest.TestCase):
             "width": width,
             "height": height,
             "walls": [
-                [5, 5],         # Valid
-                [-1, 5],        # Invalid: Negative X
-                [5, -1],        # Invalid: Negative Y
-                [10, 5],        # Invalid: Out of bounds X (width=10, max index 9)
-                [5, 10],        # Invalid: Out of bounds Y
-                "invalid",      # Invalid: Not a list
-                [1],            # Invalid: Too short
-                ["a", "b"],     # Invalid: Non-integers
-                [1.5, 1.5]      # Invalid: Floats (cast to int 1, 1)
-            ]
+                [5, 5],  # Valid
+                [-1, 5],  # Invalid: Negative X
+                [5, -1],  # Invalid: Negative Y
+                [10, 5],  # Invalid: Out of bounds X (width=10, max index 9)
+                [5, 10],  # Invalid: Out of bounds Y
+                "invalid",  # Invalid: Not a list
+                [1],  # Invalid: Too short
+                ["a", "b"],  # Invalid: Non-integers
+                [1.5, 1.5],  # Invalid: Floats (cast to int 1, 1)
+            ],
         }
 
         m = Map.from_dict(data)

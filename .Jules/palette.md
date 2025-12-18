@@ -10,3 +10,7 @@
 ## 2025-05-20 - Context-Aware Health Bars
 **Learning:** Color-coding health bars (Green/Yellow/Red) combined with neutral backgrounds drastically improves "at-a-glance" status reading compared to simple foreground/background fills, especially for color-blind users who struggle with Red/Green contrast.
 **Action:** Whenever displaying status meters, use multi-stage coloring and high-contrast borders to convey urgency without relying solely on length.
+
+## 2025-05-21 - Unicode Directional Indicators
+**Learning:** In text-heavy or retro interfaces, replacing reused ASCII characters (like `\` for both diagonals) with distinct Unicode arrows (e.g., `↘`, `↖`) significantly reduces cognitive load and ambiguity. It elevates the aesthetic without requiring asset pipeline changes.
+**Action:** Audit text-based UI elements for ambiguous ASCII fallback characters and replace them with specific Unicode equivalents where font support allows.
