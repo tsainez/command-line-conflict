@@ -16,6 +16,8 @@ from command_line_conflict.systems.rendering_system import RenderingSystem
 def test_draw_health_bar(mock_scale, mock_draw_rect):
     # Arrange
     mock_screen = Mock()
+    mock_screen.get_width.return_value = 800
+    mock_screen.get_height.return_value = 600
     mock_font = Mock()
     mock_surface = Mock()
     mock_scaled_surface = Mock()
