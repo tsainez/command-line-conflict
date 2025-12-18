@@ -14,3 +14,8 @@
 **Vulnerability:** The `Map` class allowed arbitrary width/height, which led to massive memory allocation in the `FogOfWar` system (O(N^2)), causing Denial of Service.
 **Learning:** Generic data structures should enforce sensible limits on their dimensions to prevent resource exhaustion, even if the "business logic" implies safety. Trusting input JSON structure blindly allows malformed data to crash the application.
 **Prevention:** Implement explicit `MAX_` limits in constructors and deserialization methods (`from_dict`). Validate array dimensions and coordinate bounds during data loading.
+
+## 2025-12-18 - Unbounded List Processing in Map Deserialization
+**Vulnerability:** The `Map.from_dict` method iterated over an arbitrarily long list of walls before validating them, allowing CPU exhaustion via malicious JSON files with millions of items.
+**Learning:** Validating individual items in a loop is expensive if the input size is unchecked. Resource consumption (CPU) can be attacked even if the final state (memory) is bounded.
+**Prevention:** Verify list lengths against expected bounds (e.g., `width * height`) *before* processing elements. Truncate or reject excessive input early.
