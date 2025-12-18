@@ -1,4 +1,4 @@
-import math
+import math  # TODO: Remove unused import.
 
 import pygame
 

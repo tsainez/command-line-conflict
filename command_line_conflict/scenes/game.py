@@ -372,7 +372,7 @@ class GameScene:
             selectable = components.get(Selectable)
             unit_identity = components.get(
                 Selectable
-            )  # Typo check? Wait, Selectable doesn't have name.
+            )  # TODO: Fix bug - should likely get UnitIdentity, or remove if unused.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 

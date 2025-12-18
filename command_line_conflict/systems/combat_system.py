@@ -2,10 +2,10 @@ from .. import config
 from ..components.attack import Attack
 from ..components.health import Health
 from ..components.movable import Movable
-from ..components.player import Player
+from ..components.player import Player  # TODO: Remove unused import.
 from ..components.position import Position
 from ..components.unit_identity import UnitIdentity
-from ..components.vision import Vision
+from ..components.vision import Vision  # TODO: Remove unused import.
 from ..factories import create_confetti
 from ..game_state import GameState
 from ..logger import log

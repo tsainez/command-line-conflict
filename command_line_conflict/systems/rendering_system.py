@@ -55,7 +55,7 @@ class RenderingSystem:
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
-            player = components.get(Player)
+            player = components.get(Player)  # TODO: Remove unused variable.
 
             if position and renderable:
                 # Camera transform
