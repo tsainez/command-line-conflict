@@ -72,7 +72,11 @@ class ChatSystem:
                 else:
                     # Filter out non-printable characters if necessary,
                     # but event.unicode usually handles it.
-                    if len(event.unicode) > 0 and event.unicode.isprintable():
+                    if (
+                        len(event.unicode) > 0
+                        and event.unicode.isprintable()
+                        and len(self.input_text) < config.MAX_CHAT_INPUT_LENGTH
+                    ):
                         self.input_text += event.unicode
                 return True
 
