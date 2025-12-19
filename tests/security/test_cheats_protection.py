@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pygame
-import pytest
 
 from command_line_conflict.scenes.game import GameScene
 
@@ -33,18 +32,14 @@ def test_cheats_disabled_when_debug_false():
         scene.handle_event(event)
 
         # This assertion should fail before the fix
-        assert (
-            scene.cheats["reveal_map"] is False
-        ), "Reveal Map cheat should not toggle when DEBUG is False"
+        assert scene.cheats["reveal_map"] is False, "Reveal Map cheat should not toggle when DEBUG is False"
 
         # Simulate F2 (God Mode)
         event.key = pygame.K_F2
         scene.handle_event(event)
 
         # This assertion should fail before the fix
-        assert (
-            scene.cheats["god_mode"] is False
-        ), "God Mode cheat should not toggle when DEBUG is False"
+        assert scene.cheats["god_mode"] is False, "God Mode cheat should not toggle when DEBUG is False"
 
 
 def test_cheats_enabled_when_debug_true():
@@ -59,6 +54,4 @@ def test_cheats_enabled_when_debug_true():
         event.key = pygame.K_F1
         scene.handle_event(event)
 
-        assert (
-            scene.cheats["reveal_map"] is True
-        ), "Reveal Map cheat should toggle when DEBUG is True"
+        assert scene.cheats["reveal_map"] is True, "Reveal Map cheat should toggle when DEBUG is True"

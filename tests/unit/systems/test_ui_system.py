@@ -8,7 +8,6 @@ from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.config import GRID_SIZE
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map
 from command_line_conflict.systems.ui_system import UISystem
@@ -54,9 +53,7 @@ def test_draw_aggregate_attack_range(mock_draw_rect, ui_system, game_state):
 
 
 @patch("pygame.draw.rect")
-def test_draw_aggregate_attack_range_multiple_units(
-    mock_draw_rect, ui_system, game_state
-):
+def test_draw_aggregate_attack_range_multiple_units(mock_draw_rect, ui_system, game_state):
     """Test that the aggregate attack range is drawn for multiple units."""
     # Add a second unit
     selectable = Selectable()
@@ -109,9 +106,7 @@ def test_draw_aggregate_attack_range_multiple_units(
     total_attack_tiles = len(attack_tiles_1.union(attack_tiles_2))
     total_detection_tiles = len(detection_tiles_1.union(detection_tiles_2))
     # +1 for the key options panel, +2 for player indicator (box + border)
-    assert (
-        mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1 + 2
-    )
+    assert mock_draw_rect.call_count == total_attack_tiles + total_detection_tiles + 1 + 2
 
 
 @patch("pygame.draw.rect")

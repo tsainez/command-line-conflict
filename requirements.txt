@@ -9,3 +9,7 @@ mkdocs-material
 mkdocs-include-markdown-plugin
 pyinstaller
 pillow
+pytest
+flake8
+pytest-cov
+pylint

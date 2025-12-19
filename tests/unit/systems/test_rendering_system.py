@@ -1,7 +1,5 @@
 from unittest.mock import Mock, call, patch
 
-import pygame
-
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.movable import Movable
@@ -21,9 +19,7 @@ def test_draw_orders_are_affected_by_camera():
     mock_font.render.return_value = mock_surface
 
     camera = Camera(x=10, y=5, zoom=2.0)
-    rendering_system = RenderingSystem(
-        screen=mock_screen, font=mock_font, camera=camera
-    )
+    rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
 
     mock_map = Mock()
     game_state = GameState(game_map=mock_map)
@@ -74,9 +70,7 @@ def test_draw_entities_are_affected_by_camera(mock_scale):
     mock_font.render.return_value = mock_surface
 
     camera = Camera(x=15, y=25, zoom=1.5)
-    rendering_system = RenderingSystem(
-        screen=mock_screen, font=mock_font, camera=camera
-    )
+    rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
 
     mock_map = Mock()
     game_state = GameState(game_map=mock_map)

@@ -1,6 +1,4 @@
-from unittest.mock import Mock, call
-
-import pytest
+from unittest.mock import Mock
 
 from command_line_conflict.engine import Game, SceneManager
 from command_line_conflict.scenes.game import GameScene

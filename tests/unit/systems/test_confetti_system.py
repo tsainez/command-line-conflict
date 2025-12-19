@@ -1,4 +1,3 @@
-from command_line_conflict.components.confetti import Confetti
 from command_line_conflict.factories import create_confetti
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.simple_map import SimpleMap

@@ -5,9 +5,7 @@ from unittest.mock import MagicMock, patch
 # Set dummy video driver for headless testing
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-import pygame
 
-from command_line_conflict import config
 from command_line_conflict.systems.sound_system import SoundSystem
 
 
@@ -24,9 +22,7 @@ class TestSoundSystem(unittest.TestCase):
         system = SoundSystem()
 
         # Setup event
-        self.game_state.event_queue = [
-            {"type": "sound", "data": {"name": "test_sound"}}
-        ]
+        self.game_state.event_queue = [{"type": "sound", "data": {"name": "test_sound"}}]
 
         # Mock sound object
         mock_sound_instance = MagicMock()
@@ -41,15 +37,11 @@ class TestSoundSystem(unittest.TestCase):
     @patch("pygame.mixer.init")
     @patch("pygame.mixer.get_init", return_value=True)
     @patch("os.path.exists", return_value=False)
-    def test_missing_sound_file(
-        self, mock_exists, mock_get_init, mock_init, mock_sound_class
-    ):
+    def test_missing_sound_file(self, mock_exists, mock_get_init, mock_init, mock_sound_class):
         system = SoundSystem()
 
         # Setup event
-        self.game_state.event_queue = [
-            {"type": "sound", "data": {"name": "missing_sound"}}
-        ]
+        self.game_state.event_queue = [{"type": "sound", "data": {"name": "missing_sound"}}]
 
         system.update(self.game_state)
 

@@ -67,9 +67,7 @@ class GameState:
         if isinstance(component, Position):
             self._add_to_spatial_map(entity_id, int(component.x), int(component.y))
         if config.DEBUG:
-            log.debug(
-                f"Added component {component_type.__name__} to entity {entity_id}"
-            )
+            log.debug(f"Added component {component_type.__name__} to entity {entity_id}")
 
     def get_component(self, entity_id: int, component_type):
         """Gets a component from an entity.
@@ -94,14 +92,10 @@ class GameState:
         if component_type in self.entities[entity_id]:
             component = self.entities[entity_id][component_type]
             if isinstance(component, Position):
-                self._remove_from_spatial_map(
-                    entity_id, int(component.x), int(component.y)
-                )
+                self._remove_from_spatial_map(entity_id, int(component.x), int(component.y))
             del self.entities[entity_id][component_type]
             if config.DEBUG:
-                log.debug(
-                    f"Removed component {component_type.__name__} from entity {entity_id}"
-                )
+                log.debug(f"Removed component {component_type.__name__} from entity {entity_id}")
 
     def remove_entity(self, entity_id: int) -> None:
         """Removes an entity and all its components from the game.
@@ -112,9 +106,7 @@ class GameState:
         if entity_id in self.entities:
             position = self.entities[entity_id].get(Position)
             if position:
-                self._remove_from_spatial_map(
-                    entity_id, int(position.x), int(position.y)
-                )
+                self._remove_from_spatial_map(entity_id, int(position.x), int(position.y))
             del self.entities[entity_id]
             if config.DEBUG:
                 log.debug(f"Removed entity {entity_id}")

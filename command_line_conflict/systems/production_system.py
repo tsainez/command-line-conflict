@@ -52,39 +52,27 @@ class ProductionSystem:
                 factory_player = factory_components.get(Player)
 
                 # Check player ownership compatibility (can only use own factories)
-                if (
-                    unit_player
-                    and factory_player
-                    and unit_player.player_id != factory_player.player_id
-                ):
+                if unit_player and factory_player and unit_player.player_id != factory_player.player_id:
                     continue
 
                 # Check Position Overlap
                 # Using simple integer grid comparison as movement snaps to grid or close enough
-                if int(unit_pos.x) == int(factory_pos.x) and int(unit_pos.y) == int(
-                    factory_pos.y
-                ):
+                if int(unit_pos.x) == int(factory_pos.x) and int(unit_pos.y) == int(factory_pos.y):
 
                     # Check Input Type Match
                     if unit_identity.name == factory.input_unit:
 
                         # Check Campaign Unlock
                         if self.campaign_manager.is_unit_unlocked(factory.output_unit):
-                            self._transform_unit(
-                                game_state, unit_id, unit_player, factory, factory_pos
-                            )
+                            self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
                             break  # Consumed unit, stop checking factories for this unit
                         else:
                             # Optional: Feedback that tech is not unlocked
                             pass
 
-    def _transform_unit(
-        self, game_state, input_unit_id, input_player, factory, position
-    ):
+    def _transform_unit(self, game_state, input_unit_id, input_player, factory, position):
         """Performs the transformation from input unit to output unit."""
-        log.info(
-            f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}"
-        )
+        log.info(f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}")
 
         # Remove input unit
         game_state.remove_entity(input_unit_id)

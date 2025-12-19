@@ -89,13 +89,9 @@ class Game:
         """
         pygame.init()
         log.debug("Pygame initialized")
-        self.screen = pygame.display.set_mode(
-            (config.SCREEN["width"], config.SCREEN["height"])
-        )
+        self.screen = pygame.display.set_mode((config.SCREEN["width"], config.SCREEN["height"]))
         pygame.display.set_caption("ASCII RTS")
-        log.debug(
-            f"Screen created with resolution: {config.SCREEN['width']}x{config.SCREEN['height']}"
-        )
+        log.debug(f"Screen created with resolution: {config.SCREEN['width']}x{config.SCREEN['height']}")
         self.clock = pygame.time.Clock()
         self.running = True
 

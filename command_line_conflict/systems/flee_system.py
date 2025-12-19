@@ -16,7 +16,6 @@ class FleeSystem:
 
     def __init__(self):
         """Initializes the FleeSystem."""
-        pass
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes the fleeing logic for all entities.
@@ -42,13 +41,8 @@ class FleeSystem:
             if not health or not vision or not my_pos or not my_player:
                 continue
 
-            is_low_health = (
-                flee.flee_health_threshold is not None
-                and health.hp / health.max_hp <= flee.flee_health_threshold
-            )
-            closest_enemy = Targeting.find_closest_enemy(
-                entity_id, my_pos, my_player, vision, game_state
-            )
+            is_low_health = flee.flee_health_threshold is not None and health.hp / health.max_hp <= flee.flee_health_threshold
+            closest_enemy = Targeting.find_closest_enemy(entity_id, my_pos, my_player, vision, game_state)
             sees_enemy = closest_enemy is not None
 
             if not flee.is_fleeing:

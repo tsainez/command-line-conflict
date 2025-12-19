@@ -30,9 +30,7 @@ class EditorScene:
         self.font = game.font
 
         # Load custom map if exists, else create new
-        self.map_path = os.path.join(
-            "command_line_conflict", "maps", "custom", "custom_map.json"
-        )
+        self.map_path = os.path.join("command_line_conflict", "maps", "custom", "custom_map.json")
         try:
             self.map = Map.load_from_file(self.map_path)
             log.info(f"Loaded map from {self.map_path}")
@@ -143,9 +141,7 @@ class EditorScene:
         surf = self.ui_font.render(text, True, (255, 255, 255))
         screen.blit(surf, (10, 10))
 
-        status = (
-            f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
-        )
+        status = f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
         surf2 = self.ui_font.render(status, True, (200, 200, 200))
         screen.blit(surf2, (10, 30))
 
@@ -180,9 +176,7 @@ class EditorScene:
             print("\n--- Save Map ---")
             print(f"Default directory: {initial_dir}")
             try:
-                name = input(
-                    "Enter filename (e.g. mymap.json) or blank to cancel: "
-                ).strip()
+                name = input("Enter filename (e.g. mymap.json) or blank to cancel: ").strip()
                 if name:
                     # Security: Prevent path traversal
                     name = os.path.basename(name)

@@ -1,10 +1,8 @@
-import json
 import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from command_line_conflict.campaign_manager import (MISSION_REWARDS,
-                                                    CampaignManager)
+from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.factory import Factory
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
