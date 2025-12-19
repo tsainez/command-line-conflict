@@ -2,13 +2,13 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-# Set dummy video driver for headless testing
-os.environ["SDL_VIDEODRIVER"] = "dummy"
-
 import pygame
 
 from command_line_conflict import config
 from command_line_conflict.systems.sound_system import SoundSystem
+
+# Set dummy video driver for headless testing
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 class TestSoundSystem(unittest.TestCase):

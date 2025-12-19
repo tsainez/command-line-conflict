@@ -370,9 +370,6 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            unit_identity = components.get(
-                Selectable
-            )  # TODO: Fix bug - should likely get UnitIdentity, or remove if unused.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 

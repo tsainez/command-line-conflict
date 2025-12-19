@@ -1,4 +1,3 @@
-from .. import config  # TODO: Remove unused import.
 from ..components.player import Player
 from ..components.position import Position
 from ..components.selectable import Selectable

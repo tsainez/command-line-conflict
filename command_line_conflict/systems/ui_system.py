@@ -1,5 +1,3 @@
-import math  # TODO: Remove unused import.
-
 import pygame
 
 from command_line_conflict import config

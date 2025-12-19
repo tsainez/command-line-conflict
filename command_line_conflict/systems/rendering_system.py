@@ -9,7 +9,6 @@ from ..components.confetti import Confetti
 from ..components.dead import Dead
 from ..components.health import Health
 from ..components.movable import Movable
-from ..components.player import Player
 from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
@@ -51,7 +50,6 @@ class RenderingSystem:
         for entity_id, components in game_state.entities.items():
             position = components.get(Position)
             renderable = components.get(Renderable)
-            player = components.get(Player)  # TODO: Remove unused variable.
 
             if position and renderable:
                 # Camera transform
@@ -103,7 +101,6 @@ class RenderingSystem:
 
                     position = components.get(Position)
                     renderable = components.get(Renderable)
-                    player = components.get(Player)
 
                     if not position or not renderable:
                         continue

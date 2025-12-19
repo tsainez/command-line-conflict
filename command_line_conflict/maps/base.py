@@ -182,7 +182,7 @@ class Map:
         walls = set()
         raw_walls = data.get("walls", [])
         if not isinstance(raw_walls, list):
-             raw_walls = []
+            raw_walls = []
 
         for w in raw_walls:
             if isinstance(w, (list, tuple)) and len(w) >= 2:

@@ -123,7 +123,8 @@ class MovementSystem:
                         if not movable.path:
                             # No path found to target, stop to avoid clipping
                             log.warning(
-                                f"Intelligent pathfinding failed for entity {entity_id} to ({movable.target_x}, {movable.target_y})"
+                                f"Intelligent pathfinding failed for entity {entity_id} "
+                                f"to ({movable.target_x}, {movable.target_y})"
                             )
                             movable.target_x = None
                             movable.target_y = None

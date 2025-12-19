@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 
 import pygame
 
-from command_line_conflict import config
 from command_line_conflict.scenes.game import GameScene
 
 
@@ -15,14 +14,12 @@ class TestGameSceneCamera(unittest.TestCase):
         self.mock_game.music_manager = MagicMock()
 
         # Patch factories to avoid actual game state complexity
-        with patch("command_line_conflict.scenes.game.factories") as mock_factories:
+        with patch("command_line_conflict.scenes.game.factories"):
             with patch("command_line_conflict.scenes.game.SimpleMap"):
                 with patch("command_line_conflict.scenes.game.FogOfWar"):
                     with patch("command_line_conflict.scenes.game.RenderingSystem"):
                         with patch("command_line_conflict.scenes.game.UISystem"):
-                            with patch(
-                                "command_line_conflict.scenes.game.ChatSystem"
-                            ) as mock_chat:
+                            with patch("command_line_conflict.scenes.game.ChatSystem"):
                                 self.scene = GameScene(self.mock_game)
                                 self.scene.chat_system.handle_event.return_value = False
 
@@ -70,14 +67,18 @@ class TestGameSceneCamera(unittest.TestCase):
 
         # 2. Mouse Motion while dragging
         end_pos = (150, 120)  # Moved right 50, down 20
-        # When dragging camera, moving mouse right usually moves camera left (drag the world) OR moves camera right (push the edge).
+        # When dragging camera, moving mouse right usually moves camera left (drag the world)
+        # OR moves camera right (push the edge).
         # Standard RTS drag: Click and drag the map. If I pull mouse right, map moves right, so camera moves left.
         # Delta: +50x, +20y.
         # Camera move: -50x, -20y (converted to grid coordinates).
 
         # Note: Pygame MOUSEMOTION has `rel` (relative movement).
         event_motion = MagicMock(
-            type=pygame.MOUSEMOTION, pos=end_pos, rel=(50, 20), buttons=(0, 1, 0)
+            type=pygame.MOUSEMOTION,
+            pos=end_pos,
+            rel=(50, 20),
+            buttons=(0, 1, 0),
         )  # Middle button pressed?
         # Actually `buttons` tuple is (left, middle, right) usually. Wait, button 2 is middle.
 

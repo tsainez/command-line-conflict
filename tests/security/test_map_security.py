@@ -1,6 +1,7 @@
 import unittest
 from command_line_conflict.maps.base import Map
 
+
 class TestMapSecurity(unittest.TestCase):
     def test_map_dimensions_limit(self):
         """Verify that maps exceeding MAX_MAP_DIMENSION cannot be created."""

@@ -21,6 +21,8 @@ def test_health_bar_colors(mock_scale, mock_draw_rect):
     mock_surface = Mock()
     mock_scale.return_value = Mock()
     mock_font.render.return_value = mock_surface
+    mock_screen.get_width.return_value = 800
+    mock_screen.get_height.return_value = 600
 
     camera = Camera(x=0, y=0, zoom=1.0)
     rendering_system = RenderingSystem(

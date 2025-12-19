@@ -1,4 +1,3 @@
-import os  # TODO: Remove unused import.
 from pathlib import Path
 
 import pygame

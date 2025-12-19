@@ -1,6 +1,4 @@
-import os
-
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 
 def create_icon(filepath="icon.ico"):
