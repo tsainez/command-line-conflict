@@ -370,9 +370,6 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            unit_identity = components.get(
-                Selectable
-            )  # TODO: Fix bug - should likely get UnitIdentity, or remove if unused.
             # I need to get UnitIdentity from components
             identity = components.get(factories.UnitIdentity)
 
@@ -439,7 +436,7 @@ class GameScene:
 
         # God Mode Cheat
         if self.cheats["god_mode"]:
-            for entity_id, components in self.game_state.entities.items():
+            for _, components in self.game_state.entities.items():
                 player = components.get(Player)
                 health = components.get(Health)
                 if player and player.is_human and health:
@@ -510,7 +507,7 @@ class GameScene:
             True if the loss condition is met, False otherwise.
         """
         player_entity_count = 0
-        for entity_id, components in self.game_state.entities.items():
+        for _, components in self.game_state.entities.items():
             player = components.get(Player)
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)
@@ -522,19 +519,6 @@ class GameScene:
             self.game.steam.unlock_achievement("DEFEAT")
             return True
         return False
-
-        # Update Fog of War
-        if not self.cheats["reveal_map"]:
-            visible_units = []
-            for entity_id, components in self.game_state.entities.items():
-                player = components.get(Player)
-                position = components.get(Position)
-                vision = components.get(Vision)
-                if player and player.is_human and position and vision:
-                    visible_units.append(
-                        UnitView(position.x, position.y, vision.vision_range)
-                    )
-            self.fog_of_war.update(visible_units)
 
     def draw(self, screen):
         """Draws the entire game scene.
