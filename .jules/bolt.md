@@ -18,3 +18,11 @@
 ## 2025-12-16 - Duck Typing in Tight Loops
 **Learning:** Replacing a standard `set` with a custom "proxy" object (implementing `__contains__`) to lazily calculate membership inside a hot path (like A* pathfinding) degraded performance by ~10-15%. The overhead of Python method calls in the tight inner loop outweighed the savings from avoiding the initial set construction.
 **Action:** Avoid complex proxy objects in tight computational loops (like pathfinding or rendering). Pay the upfront cost for a native data structure if the loop count is high.
+
+## 2025-12-19 - FogOfWar Optimization
+**Learning:** Iterating over the entire map (O(MapSize)) for Fog of War updates and rendering is a major bottleneck on large maps (e.g., 256x256). By restricting updates to previously visible cells and rendering to the camera viewport, we achieved massive gains.
+**Action:**
+1. Optimized `update`: Track `visible_cells` to only downgrade relevant tiles (O(Visible)) instead of scanning the whole map.
+2. Optimized `update`: Cached vision circle offsets to avoid repeated distance calculations (O(1) lookup vs O(R^2) math).
+3. Optimized `draw`: Intersect camera viewport with map bounds to render only visible tiles (O(View) vs O(MapSize)).
+**Result:** Reduced FogOfWar processing time from ~27ms to ~10.8ms (60% reduction) on a 256x256 map with 50 units.

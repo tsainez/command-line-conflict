@@ -22,7 +22,20 @@ class FogOfWar:
         self.height = height
         self.grid = [[self.HIDDEN for _ in range(width)] for _ in range(height)]
         self.surface = None
+        self.visible_cells = set()
+        self._vision_cache = {}
         log.info(f"Initialized FogOfWar with grid size {width}x{height}")
+
+    def _get_vision_offsets(self, radius: int) -> list[tuple[int, int]]:
+        if radius not in self._vision_cache:
+            offsets = []
+            r2 = radius * radius
+            for dy in range(-radius, radius + 1):
+                for dx in range(-radius, radius + 1):
+                    if dx * dx + dy * dy <= r2:
+                        offsets.append((dx, dy))
+            self._vision_cache[radius] = offsets
+        return self._vision_cache[radius]
 
     def update(self, units: list) -> None:
         """Updates the fog of war based on unit positions and vision.
@@ -34,27 +47,23 @@ class FogOfWar:
             units: A list of unit objects that have vision. Each unit must have
                    x, y, and vision_range attributes.
         """
-        # Step 1: Downgrade all VISIBLE tiles to EXPLORED
-        for y in range(self.height):
-            for x in range(self.width):
-                if self.grid[y][x] == self.VISIBLE:
-                    self.grid[y][x] = self.EXPLORED
+        # Step 1: Downgrade all previously VISIBLE tiles to EXPLORED
+        for x, y in self.visible_cells:
+            self.grid[y][x] = self.EXPLORED
+        self.visible_cells.clear()
 
         # Step 2: Mark tiles within unit vision as VISIBLE
         for unit in units:
             ux, uy = int(unit.x), int(unit.y)
-            vision_radius = unit.vision_range
-            # Iterate over a square bounding box around the unit's vision circle
-            for x in range(
-                max(0, ux - vision_radius), min(self.width, ux + vision_radius + 1)
-            ):
-                for y in range(
-                    max(0, uy - vision_radius), min(self.height, uy + vision_radius + 1)
-                ):
-                    # Use squared distance to avoid expensive sqrt
-                    dist_sq = (x - ux) ** 2 + (y - uy) ** 2
-                    if dist_sq <= vision_radius**2:
-                        self.grid[y][x] = self.VISIBLE
+            vision_range = int(unit.vision_range)
+
+            offsets = self._get_vision_offsets(vision_range)
+
+            for dx, dy in offsets:
+                x, y = ux + dx, uy + dy
+                if 0 <= x < self.width and 0 <= y < self.height:
+                    self.grid[y][x] = self.VISIBLE
+                    self.visible_cells.add((x, y))
 
     def draw(self, screen: pygame.Surface, camera=None) -> None:
         """Draws the fog of war overlay onto the screen, using camera if provided.
@@ -77,8 +86,30 @@ class FogOfWar:
         grid_size = config.GRID_SIZE
         screen_w, screen_h = screen.get_size()
 
-        for y in range(self.height):
-            for x in range(self.width):
+        # Calculate visible grid bounds to avoid iterating over the entire map
+        start_x, start_y = 0, 0
+        end_x, end_y = self.width, self.height
+
+        if camera:
+            scaled_grid_size = int(grid_size * camera.zoom)
+            if scaled_grid_size > 0:
+                start_x = int(camera.x)
+                end_x = int(camera.x + screen_w / scaled_grid_size) + 2
+                start_y = int(camera.y)
+                end_y = int(camera.y + screen_h / scaled_grid_size) + 2
+        else:
+            if grid_size > 0:
+                end_x = int(screen_w / grid_size) + 2
+                end_y = int(screen_h / grid_size) + 2
+
+        # Clamp to map bounds
+        start_x = max(0, start_x)
+        end_x = min(self.width, end_x)
+        start_y = max(0, start_y)
+        end_y = min(self.height, end_y)
+
+        for y in range(start_y, end_y):
+            for x in range(start_x, end_x):
                 state = self.grid[y][x]
                 if state == self.HIDDEN:
                     continue
@@ -92,15 +123,6 @@ class FogOfWar:
                 else:
                     draw_x *= grid_size
                     draw_y *= grid_size
-
-                # Simple culling
-                if (
-                    draw_x >= screen_w
-                    or draw_y >= screen_h
-                    or draw_x + size <= 0
-                    or draw_y + size <= 0
-                ):
-                    continue
 
                 # Ensure we draw integers for rect
                 rect = (int(draw_x), int(draw_y), size + 1, size + 1)
