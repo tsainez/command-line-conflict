@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 import pygame
 
 from .. import config
+from ..logger import log
 
 
 class Map:
@@ -182,7 +183,15 @@ class Map:
         walls = set()
         raw_walls = data.get("walls", [])
         if not isinstance(raw_walls, list):
-             raw_walls = []
+            raw_walls = []
+
+        # Security: Prevent CPU exhaustion from excessive wall definitions
+        max_walls = m.width * m.height
+        if len(raw_walls) > max_walls:
+            log.warning(
+                f"Too many walls defined ({len(raw_walls)}). Truncating to {max_walls}."
+            )
+            raw_walls = raw_walls[:max_walls]
 
         for w in raw_walls:
             if isinstance(w, (list, tuple)) and len(w) >= 2:

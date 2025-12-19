@@ -1,5 +1,8 @@
 import unittest
+from unittest.mock import patch
+
 from command_line_conflict.maps.base import Map
+
 
 class TestMapSecurity(unittest.TestCase):
     def test_map_dimensions_limit(self):
@@ -31,16 +34,16 @@ class TestMapSecurity(unittest.TestCase):
             "width": width,
             "height": height,
             "walls": [
-                [5, 5],         # Valid
-                [-1, 5],        # Invalid: Negative X
-                [5, -1],        # Invalid: Negative Y
-                [10, 5],        # Invalid: Out of bounds X (width=10, max index 9)
-                [5, 10],        # Invalid: Out of bounds Y
-                "invalid",      # Invalid: Not a list
-                [1],            # Invalid: Too short
-                ["a", "b"],     # Invalid: Non-integers
-                [1.5, 1.5]      # Invalid: Floats (cast to int 1, 1)
-            ]
+                [5, 5],  # Valid
+                [-1, 5],  # Invalid: Negative X
+                [5, -1],  # Invalid: Negative Y
+                [10, 5],  # Invalid: Out of bounds X (width=10, max index 9)
+                [5, 10],  # Invalid: Out of bounds Y
+                "invalid",  # Invalid: Not a list
+                [1],  # Invalid: Too short
+                ["a", "b"],  # Invalid: Non-integers
+                [1.5, 1.5],  # Invalid: Floats (cast to int 1, 1)
+            ],
         }
 
         m = Map.from_dict(data)
@@ -54,3 +57,23 @@ class TestMapSecurity(unittest.TestCase):
 
         # Count should be 2: (5,5) and (1,1)
         self.assertEqual(len(m.walls), 2)
+
+    @patch("command_line_conflict.maps.base.log")
+    def test_excessive_walls_truncation(self, mock_log):
+        """Verify that excessive wall definitions are truncated."""
+        width, height = 5, 5
+        max_walls = width * height
+        excessive_count = max_walls + 10
+
+        # Create walls list with duplicates (to be valid but excessive)
+        walls = [[1, 1] for _ in range(excessive_count)]
+
+        data = {"width": width, "height": height, "walls": walls}
+
+        Map.from_dict(data)
+
+        # Verify log warning
+        mock_log.warning.assert_called_once()
+        args, _ = mock_log.warning.call_args
+        self.assertIn("Too many walls defined", args[0])
+        self.assertIn(f"Truncating to {max_walls}", args[0])
