@@ -17,6 +17,8 @@ def test_health_bar_colors(mock_scale, mock_draw_rect):
     """Verify health bar changes color based on health percentage."""
     # Arrange
     mock_screen = Mock()
+    mock_screen.get_width.return_value = 800
+    mock_screen.get_height.return_value = 600
     mock_font = Mock()
     mock_surface = Mock()
     mock_scale.return_value = Mock()
