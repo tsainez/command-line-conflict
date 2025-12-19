@@ -6,6 +6,7 @@ from .components.confetti import Confetti
 from .components.detection import Detection
 from .components.factory import Factory
 from .components.flee import Flee
+from .components.floating_text import FloatingText
 from .components.health import Health
 from .components.movable import Movable
 from .components.player import Player
@@ -99,6 +100,33 @@ def create_confetti(game_state: GameState, x: float, y: float) -> int:
     game_state.add_component(entity_id, Position(x, y))
     game_state.add_component(entity_id, Renderable(icon="*"))
     game_state.add_component(entity_id, Confetti(lifetime=0.5))
+    return entity_id
+
+
+def create_floating_text(
+    game_state: GameState, x: float, y: float, text: str, color: tuple = (255, 255, 255)
+) -> int:
+    """Creates a new floating text entity.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate.
+        y: The y-coordinate.
+        text: The text string to display.
+        color: The RGB color tuple.
+    Returns:
+        The entity ID.
+    """
+    entity_id = game_state.create_entity()
+    game_state.add_component(entity_id, Position(x, y))
+    # We add Renderable just so it might be picked up by generic renderers or debug,
+    # but RenderingSystem will need specific logic for text.
+    # Actually, RenderingSystem iterates over spatial_map.
+    # If I give it a Renderable(icon=" ") it won't crash if I forget to handle it specifically.
+    game_state.add_component(entity_id, Renderable(icon=" ", color=color))
+    game_state.add_component(
+        entity_id, FloatingText(text=text, color=color, lifetime=1.0)
+    )
     return entity_id
 
 

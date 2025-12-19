@@ -6,7 +6,7 @@ from ..components.player import Player  # TODO: Remove unused import.
 from ..components.position import Position
 from ..components.unit_identity import UnitIdentity
 from ..components.vision import Vision  # TODO: Remove unused import.
-from ..factories import create_confetti
+from ..factories import create_confetti, create_floating_text
 from ..game_state import GameState
 from ..logger import log
 
@@ -81,6 +81,15 @@ class CombatSystem:
                                 f"for {attack.attack_damage} damage."
                             )
                         target_health.hp -= attack.attack_damage
+
+                        # Spawn floating combat text
+                        create_floating_text(
+                            game_state,
+                            target_pos.x,
+                            target_pos.y - 0.5,
+                            str(attack.attack_damage),
+                            (255, 50, 50),  # Reddish
+                        )
 
                         # Trigger attack sound
                         game_state.add_event(

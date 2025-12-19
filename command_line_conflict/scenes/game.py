@@ -23,6 +23,8 @@ from command_line_conflict.systems.confetti_system import ConfettiSystem
 from command_line_conflict.systems.corpse_removal_system import \
     CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
+from command_line_conflict.systems.floating_text_system import \
+    FloatingTextSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.production_system import ProductionSystem
@@ -102,6 +104,7 @@ class GameScene:
         self.corpse_removal_system = CorpseRemovalSystem()
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
+        self.floating_text_system = FloatingTextSystem()
         self.production_system = ProductionSystem(self.campaign_manager)
 
         # Current Mission ID - In a full game this would be passed from a mission select screen
@@ -449,6 +452,7 @@ class GameScene:
         self.wander_system.update(self.game_state, dt)
         self.combat_system.update(self.game_state, dt)
         self.confetti_system.update(self.game_state, dt)
+        self.floating_text_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)

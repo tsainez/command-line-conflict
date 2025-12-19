@@ -7,6 +7,7 @@ from .. import config
 from ..camera import Camera
 from ..components.confetti import Confetti
 from ..components.dead import Dead
+from ..components.floating_text import FloatingText
 from ..components.health import Health
 from ..components.movable import Movable
 from ..components.player import Player
@@ -120,6 +121,28 @@ class RenderingSystem:
                         * self.camera.zoom
                     )
                     grid_size = int(config.GRID_SIZE * self.camera.zoom)
+
+                    floating_text = components.get(FloatingText)
+                    if floating_text:
+                        # Floating text rendering
+                        # Render text at exact position for smooth movement
+                        text_surface = self.font.render(
+                            floating_text.text, True, floating_text.color
+                        )
+                        # We don't scale the text itself, but we position it relative to zoom
+                        # Use raw float position for smooth interpolation
+                        exact_cam_x = (
+                            (position.x - self.camera.x)
+                            * config.GRID_SIZE
+                            * self.camera.zoom
+                        )
+                        exact_cam_y = (
+                            (position.y - self.camera.y)
+                            * config.GRID_SIZE
+                            * self.camera.zoom
+                        )
+                        self.screen.blit(text_surface, (exact_cam_x, exact_cam_y))
+                        continue
 
                     confetti = components.get(Confetti)
                     if confetti:

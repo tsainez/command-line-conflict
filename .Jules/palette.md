@@ -10,3 +10,7 @@
 ## 2025-05-20 - Context-Aware Health Bars
 **Learning:** Color-coding health bars (Green/Yellow/Red) combined with neutral backgrounds drastically improves "at-a-glance" status reading compared to simple foreground/background fills, especially for color-blind users who struggle with Red/Green contrast.
 **Action:** Whenever displaying status meters, use multi-stage coloring and high-contrast borders to convey urgency without relying solely on length.
+
+## 2025-05-21 - Floating Combat Text for Feedback
+**Learning:** In combat-heavy interfaces, players often lack immediate feedback on whether attacks are hitting or how effective they are. Floating damage numbers provide instant, granular confirmation of success without cluttering the HUD.
+**Action:** When implementing damage or healing mechanics, always provide world-space feedback (like floating numbers) to reinforce the action-reaction loop.
