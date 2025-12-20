@@ -10,3 +10,7 @@
 ## 2025-05-20 - Context-Aware Health Bars
 **Learning:** Color-coding health bars (Green/Yellow/Red) combined with neutral backgrounds drastically improves "at-a-glance" status reading compared to simple foreground/background fills, especially for color-blind users who struggle with Red/Green contrast.
 **Action:** Whenever displaying status meters, use multi-stage coloring and high-contrast borders to convey urgency without relying solely on length.
+
+## 2025-12-15 - Input Modality Exclusion
+**Learning:** The UI architecture consistently assumes keyboard-only navigation for menus, likely due to CLI/keyboard-centric origins. This excludes mouse/touch users and requires refactoring scene `draw` methods to store layout data (rects) for hit-testing in event handlers.
+**Action:** When creating new UI scenes, always separate layout calculation from rendering to facilitate mouse/touch hit-testing without code duplication or "render-to-find" hacks.
