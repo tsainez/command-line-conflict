@@ -2,7 +2,6 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from command_line_conflict import config
 from command_line_conflict.scenes.editor import EditorScene
 
 

@@ -21,9 +21,7 @@ from .logger import log
 # TODO: Create a map with factories for the player to fight against.
 
 
-def create_chassis(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_chassis(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new chassis unit.
     Args:
         game_state: The current state of the game.
@@ -36,17 +34,13 @@ def create_chassis(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created chassis (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created chassis (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="C", color=color))
     game_state.add_component(entity_id, Movable(speed=2, intelligent=False))
     game_state.add_component(entity_id, Health(hp=80, max_hp=80))
-    game_state.add_component(
-        entity_id, Attack(attack_damage=10, attack_range=1, attack_speed=1.0)
-    )
+    game_state.add_component(entity_id, Attack(attack_damage=10, attack_range=1, attack_speed=1.0))
     game_state.add_component(entity_id, Detection(detection_range=1))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
@@ -72,14 +66,10 @@ def create_wildlife(game_state: GameState, x: float, y: float) -> int:
     game_state.add_component(entity_id, Renderable(icon="w", color=color))
     game_state.add_component(entity_id, Movable(speed=1.0, intelligent=False))
     game_state.add_component(entity_id, Health(hp=40, max_hp=40))
-    game_state.add_component(
-        entity_id, Attack(attack_damage=8, attack_range=1, attack_speed=0.8)
-    )
+    game_state.add_component(entity_id, Attack(attack_damage=8, attack_range=1, attack_speed=0.8))
     game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
-    game_state.add_component(
-        entity_id, Player(player_id=config.NEUTRAL_PLAYER_ID, is_human=False)
-    )
+    game_state.add_component(entity_id, Player(player_id=config.NEUTRAL_PLAYER_ID, is_human=False))
     game_state.add_component(entity_id, Wander(wander_radius=5, move_interval=4.0))
     return entity_id
 
@@ -102,9 +92,7 @@ def create_confetti(game_state: GameState, x: float, y: float) -> int:
     return entity_id
 
 
-def create_rover(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_rover(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new rover unit.
     Args:
         game_state: The current state of the game.
@@ -117,17 +105,13 @@ def create_rover(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created rover (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created rover (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="R", color=color))
     game_state.add_component(entity_id, Movable(speed=2.5, intelligent=True))
     game_state.add_component(entity_id, Health(hp=60, max_hp=60))
-    game_state.add_component(
-        entity_id, Attack(attack_damage=15, attack_range=5, attack_speed=1.0)
-    )
+    game_state.add_component(entity_id, Attack(attack_damage=15, attack_range=5, attack_speed=1.0))
     game_state.add_component(entity_id, Detection(detection_range=5))
     game_state.add_component(entity_id, Vision(vision_range=5))
     game_state.add_component(entity_id, Selectable())
@@ -136,9 +120,7 @@ def create_rover(
     return entity_id
 
 
-def create_arachnotron(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_arachnotron(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new arachnotron unit.
     Args:
         game_state: The current state of the game.
@@ -151,19 +133,13 @@ def create_arachnotron(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created arachnotron (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created arachnotron (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="A", color=color))
-    game_state.add_component(
-        entity_id, Movable(speed=1.8, can_fly=True, intelligent=True)
-    )
+    game_state.add_component(entity_id, Movable(speed=1.8, can_fly=True, intelligent=True))
     game_state.add_component(entity_id, Health(hp=120, max_hp=120))
-    game_state.add_component(
-        entity_id, Attack(attack_damage=20, attack_range=6, attack_speed=1.0)
-    )
+    game_state.add_component(entity_id, Attack(attack_damage=20, attack_range=6, attack_speed=1.0))
     game_state.add_component(entity_id, Detection(detection_range=6))
     game_state.add_component(entity_id, Vision(vision_range=6))
     game_state.add_component(entity_id, Selectable())
@@ -172,9 +148,7 @@ def create_arachnotron(
     return entity_id
 
 
-def create_observer(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_observer(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new observer unit.
     Args:
         game_state: The current state of the game.
@@ -187,15 +161,11 @@ def create_observer(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created observer (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created observer (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="O", color=color))
-    game_state.add_component(
-        entity_id, Movable(speed=4, can_fly=True, intelligent=True)
-    )
+    game_state.add_component(entity_id, Movable(speed=4, can_fly=True, intelligent=True))
     game_state.add_component(entity_id, Health(hp=40, max_hp=40))
     game_state.add_component(entity_id, Detection(detection_range=15))
     game_state.add_component(entity_id, Vision(vision_range=15))
@@ -206,9 +176,7 @@ def create_observer(
     return entity_id
 
 
-def create_immortal(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_immortal(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new immortal unit.
     Args:
         game_state: The current state of the game.
@@ -221,19 +189,13 @@ def create_immortal(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created immortal (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created immortal (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="I", color=color))
     game_state.add_component(entity_id, Movable(speed=2, intelligent=True))
-    game_state.add_component(
-        entity_id, Health(hp=150, max_hp=150, health_regen_rate=2.0)
-    )
-    game_state.add_component(
-        entity_id, Attack(attack_damage=25, attack_range=7, attack_speed=1.0)
-    )
+    game_state.add_component(entity_id, Health(hp=150, max_hp=150, health_regen_rate=2.0))
+    game_state.add_component(entity_id, Attack(attack_damage=25, attack_range=7, attack_speed=1.0))
     game_state.add_component(entity_id, Detection(detection_range=7))
     game_state.add_component(entity_id, Vision(vision_range=7))
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.2))
@@ -243,9 +205,7 @@ def create_immortal(
     return entity_id
 
 
-def create_extractor(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_extractor(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new extractor unit.
     Args:
         game_state: The current state of the game.
@@ -258,9 +218,7 @@ def create_extractor(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created extractor (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created extractor (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="E", color=color))
@@ -274,9 +232,7 @@ def create_extractor(
     return entity_id
 
 
-def create_rover_factory(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_rover_factory(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a factory that converts Chassis to Rovers.
 
     Args:
@@ -290,25 +246,19 @@ def create_rover_factory(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created rover_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created rover_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="F", color=color))
     game_state.add_component(entity_id, Health(hp=200, max_hp=200))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(
-        entity_id, Factory(input_unit="chassis", output_unit="rover")
-    )
+    game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
     game_state.add_component(entity_id, UnitIdentity(name="rover_factory"))
     return entity_id
 
 
-def create_arachnotron_factory(
-    game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False
-) -> int:
+def create_arachnotron_factory(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a factory that converts Rovers to Arachnotrons.
 
     Args:
@@ -322,18 +272,14 @@ def create_arachnotron_factory(
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(
-            f"Created arachnotron_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}"
-        )
+        log.debug(f"Created arachnotron_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="f", color=color))
     game_state.add_component(entity_id, Health(hp=300, max_hp=300))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(
-        entity_id, Factory(input_unit="rover", output_unit="arachnotron")
-    )
+    game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))
     game_state.add_component(entity_id, UnitIdentity(name="arachnotron_factory"))
     return entity_id
 

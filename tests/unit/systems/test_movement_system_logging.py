@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from command_line_conflict.components.movable import Movable
 from command_line_conflict.factories import create_chassis, create_rover
@@ -22,17 +22,10 @@ class TestMovementSystemLogging(unittest.TestCase):
         self.movement_system.set_target(self.game_state, unit_id, 12, 12)
 
         # Check that debug log was called for setting target
-        mock_log.debug.assert_any_call(
-            f"Setting target for entity {unit_id} from (10, 10) to (12, 12)"
-        )
+        mock_log.debug.assert_any_call(f"Setting target for entity {unit_id} from (10, 10) to (12, 12)")
 
         # Check that debug log was called for path found
-        self.assertTrue(
-            any(
-                "Path found for entity" in str(call)
-                for call in mock_log.debug.mock_calls
-            )
-        )
+        self.assertTrue(any("Path found for entity" in str(call) for call in mock_log.debug.mock_calls))
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_set_target_logs_warning_when_no_path(self, mock_log):
@@ -49,9 +42,7 @@ class TestMovementSystemLogging(unittest.TestCase):
         self.movement_system.set_target(self.game_state, unit_id, 20, 20)
 
         # Check warning log
-        mock_log.warning.assert_called_with(
-            f"No path found for entity {unit_id} from (10, 10) to (20, 20)"
-        )
+        mock_log.warning.assert_called_with(f"No path found for entity {unit_id} from (10, 10) to (20, 20)")
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_update_logs_collision_for_non_intelligent(self, mock_log):
@@ -67,12 +58,8 @@ class TestMovementSystemLogging(unittest.TestCase):
         self.movement_system.update(self.game_state, dt=0.1)
 
         # Check if any debug call contains "Collision detected"
-        collision_logged = any(
-            "Collision detected" in str(call) for call in mock_log.debug.mock_calls
-        )
-        self.assertTrue(
-            collision_logged, "Should log collision for non-intelligent unit"
-        )
+        collision_logged = any("Collision detected" in str(call) for call in mock_log.debug.mock_calls)
+        self.assertTrue(collision_logged, "Should log collision for non-intelligent unit")
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_update_logs_intelligent_pathfinding_failure(self, mock_log):
@@ -100,6 +87,4 @@ class TestMovementSystemLogging(unittest.TestCase):
         self.movement_system.update(self.game_state, dt=0.1)
 
         # Should log failure
-        mock_log.warning.assert_any_call(
-            f"Intelligent pathfinding failed for entity {unit_id} to (7.0, 5.0)"
-        )
+        mock_log.warning.assert_any_call(f"Intelligent pathfinding failed for entity {unit_id} to (7.0, 5.0)")

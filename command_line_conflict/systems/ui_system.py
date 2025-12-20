@@ -1,5 +1,3 @@
-import math  # TODO: Remove unused import.
-
 import pygame
 
 from command_line_conflict import config
@@ -44,9 +42,7 @@ class UISystem:
         self.last_active_cheats_count = -1
 
         # Pre-create the pause overlay
-        self.pause_overlay = pygame.Surface(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
-        )
+        self.pause_overlay = pygame.Surface((config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA)
         self.pause_overlay.fill((0, 0, 0, 150))
 
         # List of active click effects (ripples)
@@ -55,9 +51,7 @@ class UISystem:
 
         log.debug("UISystem initialized")
 
-    def draw(
-        self, game_state: GameState, paused: bool, current_player_id: int = 1
-    ) -> None:
+    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
         Args:
@@ -96,9 +90,7 @@ class UISystem:
         if paused:
             self._draw_paused_message()
 
-    def add_click_effect(
-        self, grid_x: int, grid_y: int, color: tuple[int, int, int] = (0, 255, 0)
-    ) -> None:
+    def add_click_effect(self, grid_x: int, grid_y: int, color: tuple[int, int, int] = (0, 255, 0)) -> None:
         """Adds a visual click effect at the specified grid coordinates.
 
         Args:
@@ -120,21 +112,19 @@ class UISystem:
         """Draws and updates active click effects (ripples)."""
         current_time = pygame.time.get_ticks()
         # Filter out expired effects
-        self.click_effects = [
-            e for e in self.click_effects if current_time - e["time"] < e["duration"]
-        ]
+        self.click_effects = [e for e in self.click_effects if current_time - e["time"] < e["duration"]]
 
         for effect in self.click_effects:
             elapsed = current_time - effect["time"]
             progress = elapsed / effect["duration"]
 
             # Calculate screen position
-            cam_x = (
-                (effect["x"] - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-            ) + (config.GRID_SIZE * self.camera.zoom / 2)
-            cam_y = (
-                (effect["y"] - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            ) + (config.GRID_SIZE * self.camera.zoom / 2)
+            cam_x = ((effect["x"] - self.camera.x) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
+            cam_y = ((effect["y"] - self.camera.y) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
 
             # Draw expanding ring
             max_radius = config.GRID_SIZE * self.camera.zoom
@@ -149,9 +139,7 @@ class UISystem:
             # Maybe width decreases?
             width = max(1, int(3 * (1 - progress)))
 
-            pygame.draw.circle(
-                self.screen, effect["color"], (int(cam_x), int(cam_y)), radius, width
-            )
+            pygame.draw.circle(self.screen, effect["color"], (int(cam_x), int(cam_y)), radius, width)
 
     def _draw_player_indicator(self, current_player_id: int) -> None:
         """Draws a visual indicator for the current player.
@@ -219,9 +207,7 @@ class UISystem:
             panel_y += 20
 
         if attack:
-            attack_text = (
-                f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
-            )
+            attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
             text = self.font.render(attack_text, True, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
@@ -229,9 +215,7 @@ class UISystem:
         self._draw_aggregate_attack_range(game_state, [entity_id])
         self._draw_unit_health_text(game_state, entity_id)
 
-    def _draw_aggregate_detection_range(
-        self, game_state: GameState, entity_ids: list[int]
-    ) -> None:
+    def _draw_aggregate_detection_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined detection range for multiple units."""
         detection_tiles = set()
         for entity_id in entity_ids:
@@ -248,9 +232,7 @@ class UISystem:
                     unit_y - detection.detection_range,
                     unit_y + detection.detection_range + 1,
                 ):
-                    if (x - unit_x) ** 2 + (
-                        y - unit_y
-                    ) ** 2 <= detection.detection_range**2:
+                    if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
                         detection_tiles.add((x, y))
 
         for x, y in detection_tiles:
@@ -266,9 +248,7 @@ class UISystem:
             pygame.draw.rect(surface, (0, 0, 255, 30), surface.get_rect())
             self.screen.blit(surface, (cam_x, cam_y))
 
-    def _draw_aggregate_attack_range(
-        self, game_state: GameState, entity_ids: list[int]
-    ) -> None:
+    def _draw_aggregate_attack_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined attack range for multiple units."""
         attack_tiles = set()
         for entity_id in entity_ids:
@@ -277,12 +257,8 @@ class UISystem:
             if not position or not attack or attack.attack_range <= 0:
                 continue
             unit_x, unit_y = int(position.x), int(position.y)
-            for x in range(
-                unit_x - attack.attack_range, unit_x + attack.attack_range + 1
-            ):
-                for y in range(
-                    unit_y - attack.attack_range, unit_y + attack.attack_range + 1
-                ):
+            for x in range(unit_x - attack.attack_range, unit_x + attack.attack_range + 1):
+                for y in range(unit_y - attack.attack_range, unit_y + attack.attack_range + 1):
                     if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= attack.attack_range**2:
                         attack_tiles.add((x, y))
 
@@ -313,18 +289,12 @@ class UISystem:
             health_text = f"{int(health.hp)}"
             text = self.small_font.render(health_text, True, (255, 255, 255))
             grid_size = config.GRID_SIZE * self.camera.zoom
-            center_x = (
-                int(position.x) - self.camera.x
-            ) * config.GRID_SIZE * self.camera.zoom + grid_size / 2
-            center_y = (
-                int(position.y) - self.camera.y
-            ) * config.GRID_SIZE * self.camera.zoom - 5 * self.camera.zoom
+            center_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom + grid_size / 2
+            center_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom - 5 * self.camera.zoom
             text_rect = text.get_rect(center=(center_x, center_y))
             self.screen.blit(text, text_rect)
 
-    def _draw_multi_unit_info(
-        self, game_state: GameState, entity_ids: list[int]
-    ) -> None:
+    def _draw_multi_unit_info(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws the information panel for multiple selected units.
 
         This shows the total number of units and their combined health.
@@ -404,15 +374,11 @@ class UISystem:
         # Draw "Paused" text
         font = pygame.font.Font(None, 74)
         text = font.render("Paused", True, (255, 255, 255))
-        text_rect = text.get_rect(
-            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2)
-        )
+        text_rect = text.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2))
         self.screen.blit(text, text_rect)
 
         # Draw instruction text
         small_font = pygame.font.Font(None, 36)
         instruction = small_font.render("Press P to Resume", True, (200, 200, 200))
-        instruction_rect = instruction.get_rect(
-            center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50)
-        )
+        instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)

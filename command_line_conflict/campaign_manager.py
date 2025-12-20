@@ -61,9 +61,7 @@ class CampaignManager:
                 self.completed_missions = data.get("completed_missions", [])
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
-                log.info(
-                    f"Loaded campaign progress: {len(self.completed_missions)} missions completed."
-                )
+                log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
         except Exception as e:
             log.error(f"Failed to load save file: {e}")
 

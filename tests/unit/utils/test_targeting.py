@@ -38,9 +38,7 @@ class TestTargeting:
         # Add my unit (though find_closest_enemy takes components directly, it might rely on game_state for exclusions)
         self.create_unit(game_state, my_id, 10, 10, 1)
 
-        target = Targeting.find_closest_enemy(
-            my_id, my_pos, my_player, vision, game_state
-        )
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target == enemy_id
 
     def test_find_closest_enemy_ignores_out_of_range(self, game_state):
@@ -53,9 +51,7 @@ class TestTargeting:
         enemy_id = 2
         self.create_unit(game_state, enemy_id, 16, 10, 2)
 
-        target = Targeting.find_closest_enemy(
-            my_id, my_pos, my_player, vision, game_state
-        )
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target is None
 
     def test_find_closest_enemy_ignores_friends(self, game_state):
@@ -68,9 +64,7 @@ class TestTargeting:
         friend_id = 2
         self.create_unit(game_state, friend_id, 12, 10, 1)
 
-        target = Targeting.find_closest_enemy(
-            my_id, my_pos, my_player, vision, game_state
-        )
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target is None
 
     def test_find_closest_enemy_picks_closest(self, game_state):
@@ -91,9 +85,7 @@ class TestTargeting:
         e3 = 4
         self.create_unit(game_state, e3, 15, 10, 2)
 
-        target = Targeting.find_closest_enemy(
-            my_id, my_pos, my_player, vision, game_state
-        )
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target == e2
 
     def test_find_closest_enemy_large_coordinates(self, game_state):
@@ -106,7 +98,5 @@ class TestTargeting:
         enemy_id = 2
         self.create_unit(game_state, enemy_id, 1002, 1002, 2)
 
-        target = Targeting.find_closest_enemy(
-            my_id, my_pos, my_player, vision, game_state
-        )
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target == enemy_id

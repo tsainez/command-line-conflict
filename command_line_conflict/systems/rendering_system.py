@@ -33,9 +33,7 @@ class RenderingSystem:
         log.debug("RenderingSystem initialized")
 
     @functools.lru_cache(maxsize=1024)
-    def _get_rendered_surface(
-        self, char: str, color: tuple, size: int | None = None
-    ) -> pygame.Surface:
+    def _get_rendered_surface(self, char: str, color: tuple, size: int | None = None) -> pygame.Surface:
         """Returns a cached surface for the character, optionally scaled."""
         s = self.font.render(char, True, color)
         if size is not None:
@@ -55,16 +53,8 @@ class RenderingSystem:
 
             if position and renderable:
                 # Camera transform
-                cam_x = (
-                    (int(position.x) - self.camera.x)
-                    * config.GRID_SIZE
-                    * self.camera.zoom
-                )
-                cam_y = (
-                    (int(position.y) - self.camera.y)
-                    * config.GRID_SIZE
-                    * self.camera.zoom
-                )
+                cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
                 grid_size = int(config.GRID_SIZE * self.camera.zoom)
 
                 confetti = components.get(Confetti)
@@ -109,16 +99,8 @@ class RenderingSystem:
                         continue
 
                     # Camera transform
-                    cam_x = (
-                        (int(position.x) - self.camera.x)
-                        * config.GRID_SIZE
-                        * self.camera.zoom
-                    )
-                    cam_y = (
-                        (int(position.y) - self.camera.y)
-                        * config.GRID_SIZE
-                        * self.camera.zoom
-                    )
+                    cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+                    cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
                     grid_size = int(config.GRID_SIZE * self.camera.zoom)
 
                     confetti = components.get(Confetti)
@@ -133,9 +115,7 @@ class RenderingSystem:
                             (0, 255, 255),
                         ]
                         color = random.choice(colors)
-                        ch = self._get_rendered_surface(
-                            renderable.icon, color, grid_size
-                        )
+                        ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                         self.screen.blit(
                             ch,
                             (
@@ -155,9 +135,7 @@ class RenderingSystem:
                         selectable = components.get(Selectable)
                         if selectable and selectable.is_selected:
                             color = (0, 255, 0)
-                            shadow_ch = self._get_rendered_surface(
-                                renderable.icon, (128, 128, 128), grid_size
-                            )
+                            shadow_ch = self._get_rendered_surface(renderable.icon, (128, 128, 128), grid_size)
                             self.screen.blit(
                                 shadow_ch,
                                 (
@@ -302,9 +280,7 @@ class RenderingSystem:
         self.screen.blit(ch, (cam_x, cam_y))
 
     @staticmethod
-    def _direct_line(
-        start: tuple[int, int], end: tuple[int, int]
-    ) -> list[tuple[int, int]]:
+    def _direct_line(start: tuple[int, int], end: tuple[int, int]) -> list[tuple[int, int]]:
         """Return a simple diagonal path from ``start`` to ``end``."""
         x, y = start
         path: list[tuple[int, int]] = []

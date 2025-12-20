@@ -36,9 +36,7 @@ class AISystem:
                 if vision:
                     my_pos = components.get(Position)
                     if my_pos:
-                        closest_enemy = Targeting.find_closest_enemy(
-                            entity_id, my_pos, player, vision, game_state
-                        )
+                        closest_enemy = Targeting.find_closest_enemy(entity_id, my_pos, player, vision, game_state)
                         if closest_enemy:
                             log.debug(
                                 f"Entity {entity_id} (Player {player.player_id}) "

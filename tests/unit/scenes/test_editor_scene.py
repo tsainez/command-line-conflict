@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-import pygame
-
 from command_line_conflict.maps.base import Map
 from command_line_conflict.scenes.editor import EditorScene
 

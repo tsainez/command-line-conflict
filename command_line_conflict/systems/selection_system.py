@@ -1,4 +1,3 @@
-from .. import config  # TODO: Remove unused import.
 from ..components.player import Player
 from ..components.position import Position
 from ..components.selectable import Selectable
@@ -78,12 +77,7 @@ class SelectionSystem:
         for entity_id, components in game_state.entities.items():
             selectable = components.get(Selectable)
             player = components.get(Player)
-            if (
-                selectable
-                and selectable.is_selected
-                and player
-                and player.player_id == current_player_id
-            ):
+            if selectable and selectable.is_selected and player and player.player_id == current_player_id:
                 selected_count += 1
 
         if selected_count > 0:

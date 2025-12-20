@@ -20,8 +20,7 @@ from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.corpse_removal_system import \
-    CorpseRemovalSystem
+from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
@@ -56,9 +55,7 @@ class GameScene:
         self.game = game
         self.font = game.font
         self.game_state = GameState(SimpleMap())
-        self.fog_of_war = FogOfWar(
-            self.game_state.map.width, self.game_state.map.height
-        )
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
         self.current_player_id = 1
@@ -70,9 +67,7 @@ class GameScene:
         }
 
         # Fog of War
-        self.fog_of_war = FogOfWar(
-            self.game_state.map.width, self.game_state.map.height
-        )
+        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
 
         # Camera
         self.camera = Camera()
@@ -88,9 +83,7 @@ class GameScene:
         # Initialize systems
         self.campaign_manager = CampaignManager()
         self.movement_system = MovementSystem()
-        self.rendering_system = RenderingSystem(
-            self.game.screen, self.font, self.camera
-        )
+        self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
         self.combat_system = CombatSystem()
         self.flee_system = FleeSystem()
         self.health_system = HealthSystem()
@@ -113,8 +106,7 @@ class GameScene:
         self._create_initial_units()
 
         self.has_player_2_opponent = any(
-            c.get(Player) and c.get(Player).player_id == 2
-            for _, c in self.game_state.entities.items()
+            c.get(Player) and c.get(Player).player_id == 2 for _, c in self.game_state.entities.items()
         )
 
         # Start game music
@@ -137,9 +129,7 @@ class GameScene:
         """Creates the starting units for each player."""
         # Player 1 units (human)
         for i in range(3):
-            factories.create_chassis(
-                self.game_state, 10 + i * 2, 10, player_id=1, is_human=True
-            )
+            factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1, is_human=True)
         # Player 2 units (AI) - Mission 1: Single Rover in center
         factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
@@ -165,11 +155,7 @@ class GameScene:
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
-        elif (
-            event.type == pygame.MOUSEBUTTONUP
-            and event.button == 1
-            and self.selection_start
-        ):
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1 and self.selection_start:
             x1, y1 = self.selection_start
             x2, y2 = event.pos
             # If the mouse moved less than 5 pixels, it's a click
@@ -178,16 +164,12 @@ class GameScene:
                 shift_pressed = mods & pygame.KMOD_SHIFT
                 grid_pos = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 log.debug(f"Click selection at {grid_pos}. Shift: {shift_pressed}")
-                self.selection_system.handle_click_selection(
-                    self.game_state, grid_pos, shift_pressed, self.current_player_id
-                )
+                self.selection_system.handle_click_selection(self.game_state, grid_pos, shift_pressed, self.current_player_id)
             else:
                 log.debug(f"Drag selection from {self.selection_start} to {event.pos}")
                 mods = pygame.key.get_mods()
                 shift_pressed = mods & pygame.KMOD_SHIFT
-                grid_start = self.camera.screen_to_grid(
-                    self.selection_start[0], self.selection_start[1]
-                )
+                grid_start = self.camera.screen_to_grid(self.selection_start[0], self.selection_start[1])
                 grid_end = self.camera.screen_to_grid(event.pos[0], event.pos[1])
                 self.selection_system.update(
                     self.game_state,
@@ -199,9 +181,7 @@ class GameScene:
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-            log.debug(
-                f"Right-click move command at grid coordinates: {(grid_x, grid_y)}"
-            )
+            log.debug(f"Right-click move command at grid coordinates: {(grid_x, grid_y)}")
             # Add visual feedback (green ripple)
             self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
 
@@ -210,16 +190,13 @@ class GameScene:
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
                     # Moving clears hold position
-                    from command_line_conflict.components.movable import \
-                        Movable
+                    from command_line_conflict.components.movable import Movable
 
                     movable = components.get(Movable)
                     if movable:
                         movable.hold_position = False
 
-                    self.movement_system.set_target(
-                        self.game_state, entity_id, grid_x, grid_y
-                    )
+                    self.movement_system.set_target(self.game_state, entity_id, grid_x, grid_y)
                     attack = components.get(Attack)
                     if attack:
                         attack.attack_target = None
@@ -291,9 +268,7 @@ class GameScene:
                     # Debug cheats
                     if event.key == pygame.K_F1:
                         self.cheats["reveal_map"] = not self.cheats["reveal_map"]
-                        log.info(
-                            f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}"
-                        )
+                        log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
                     elif event.key == pygame.K_F2:
                         self.cheats["god_mode"] = not self.cheats["god_mode"]
                         log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
@@ -308,8 +283,7 @@ class GameScene:
 
                 if event.key == pygame.K_h:
                     # Hold Position
-                    from command_line_conflict.components.movable import \
-                        Movable
+                    from command_line_conflict.components.movable import Movable
 
                     for entity_id, components in self.game_state.entities.items():
                         selectable = components.get(Selectable)
@@ -394,9 +368,7 @@ class GameScene:
             if self.campaign_manager.is_unit_unlocked("rover"):
                 log.info("Building Rover Factory")
                 self.game_state.remove_entity(builder_id)
-                factories.create_rover_factory(
-                    self.game_state, pos.x, pos.y, player.player_id, player.is_human
-                )
+                factories.create_rover_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
                 self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Rover tech not unlocked!")
@@ -405,9 +377,7 @@ class GameScene:
             if self.campaign_manager.is_unit_unlocked("arachnotron"):
                 log.info("Building Arachnotron Factory")
                 self.game_state.remove_entity(builder_id)
-                factories.create_arachnotron_factory(
-                    self.game_state, pos.x, pos.y, player.player_id, player.is_human
-                )
+                factories.create_arachnotron_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
                 self.game.steam.unlock_achievement("BUILDER")
             else:
                 log.info("Arachnotron tech not unlocked!")
@@ -465,9 +435,7 @@ class GameScene:
             vis = components.get(Vision)
             player = components.get(Player)
             if pos and vis and player and player.is_human:
-                vision_units.append(
-                    SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range)
-                )
+                vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
         if self.check_win_condition():
@@ -485,10 +453,7 @@ class GameScene:
         for _, components in self.game_state.entities.items():
             player = components.get(Player)
             if player and not player.is_human:
-                if (
-                    self.has_player_2_opponent
-                    and player.player_id == config.NEUTRAL_PLAYER_ID
-                ):
+                if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
                     continue
                 if Health in components:
                     enemy_count += 1

@@ -19,22 +19,14 @@ class MovementSystem:
         movable = game_state.get_component(entity_id, Movable)
         position = game_state.get_component(entity_id, Position)
         if not movable or not position:
-            log.warning(
-                f"Missing components for entity {entity_id}: Movable={bool(movable)}, Position={bool(position)}"
-            )
+            log.warning(f"Missing components for entity {entity_id}: Movable={bool(movable)}, Position={bool(position)}")
             return
 
-        log.debug(
-            f"Setting target for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})"
-        )
+        log.debug(f"Setting target for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})")
 
         movable.target_x = x
         movable.target_y = y
-        extra_obstacles = (
-            self._get_obstacles(game_state, entity_id, position)
-            if movable.intelligent
-            else set()
-        )
+        extra_obstacles = self._get_obstacles(game_state, entity_id, position) if movable.intelligent else set()
         if (x, y) in extra_obstacles:
             extra_obstacles.remove((x, y))
 
@@ -48,13 +40,9 @@ class MovementSystem:
         if movable.path:
             log.debug(f"Path found for entity {entity_id}: {movable.path}")
         else:
-            log.warning(
-                f"No path found for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})"
-            )
+            log.warning(f"No path found for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})")
 
-    def _get_obstacles(
-        self, game_state: GameState, entity_id: int, position: Position | None = None
-    ) -> set[tuple[int, int]]:
+    def _get_obstacles(self, game_state: GameState, entity_id: int, position: Position | None = None) -> set[tuple[int, int]]:
         """Collects obstacle positions from other entities."""
         # Use spatial map for O(K) lookup instead of O(N)
         # Optimized to use set construction from dict keys (O(K) in C)
@@ -100,18 +88,12 @@ class MovementSystem:
 
             # This logic is adapted from the Unit._move method
             # If intelligent and we have a target but no path, try to find one
-            if (
-                not movable.path
-                and movable.target_x is not None
-                and movable.target_y is not None
-            ):
+            if not movable.path and movable.target_x is not None and movable.target_y is not None:
                 if movable.intelligent:
                     start_node = (int(position.x), int(position.y))
                     end_node = (int(movable.target_x), int(movable.target_y))
                     if start_node != end_node:
-                        extra_obstacles = self._get_obstacles(
-                            game_state, entity_id, position
-                        )
+                        extra_obstacles = self._get_obstacles(game_state, entity_id, position)
                         if end_node in extra_obstacles:
                             extra_obstacles.remove(end_node)
                         movable.path = game_state.map.find_path(
@@ -123,7 +105,8 @@ class MovementSystem:
                         if not movable.path:
                             # No path found to target, stop to avoid clipping
                             log.warning(
-                                f"Intelligent pathfinding failed for entity {entity_id} to ({movable.target_x}, {movable.target_y})"
+                                f"Intelligent pathfinding failed for entity {entity_id} "
+                                f"to ({movable.target_x}, {movable.target_y})"
                             )
                             movable.target_x = None
                             movable.target_y = None
@@ -133,13 +116,9 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_next_pos = game_state.get_entities_at_position(
-                        next_x, next_y
-                    )
+                    entities_at_next_pos = game_state.get_entities_at_position(next_x, next_y)
                     if any(e != entity_id for e in entities_at_next_pos):
-                        log.debug(
-                            f"Collision detected for non-intelligent entity {entity_id} at ({next_x}, {next_y})"
-                        )
+                        log.debug(f"Collision detected for non-intelligent entity {entity_id} at ({next_x}, {next_y})")
                         movable.path = []
                         movable.target_x = None
                         movable.target_y = None
@@ -150,9 +129,7 @@ class MovementSystem:
                 dy = movable.target_y - position.y
                 dist = (dx * dx + dy * dy) ** 0.5
                 if dist < 0.01:
-                    game_state.update_entity_position(
-                        entity_id, movable.target_x, movable.target_y
-                    )
+                    game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
                 else:
                     step = movable.speed * dt
@@ -177,13 +154,9 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_proposed_pos = game_state.get_entities_at_position(
-                        int(proposed_x), int(proposed_y)
-                    )
+                    entities_at_proposed_pos = game_state.get_entities_at_position(int(proposed_x), int(proposed_y))
                     if any(e != entity_id for e in entities_at_proposed_pos):
-                        log.debug(
-                            f"Collision detected for non-intelligent entity {entity_id} at ({proposed_x}, {proposed_y})"
-                        )
+                        log.debug(f"Collision detected for non-intelligent entity {entity_id} at ({proposed_x}, {proposed_y})")
                         movable.target_x = None
                         movable.target_y = None
                         continue

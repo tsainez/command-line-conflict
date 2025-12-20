@@ -1,8 +1,5 @@
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock, patch
 
-import pygame
-
-from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.position import Position
@@ -25,9 +22,7 @@ def test_draw_health_bar(mock_scale, mock_draw_rect):
     mock_font.render.return_value = mock_surface
 
     camera = Camera(x=0, y=0, zoom=1.0)
-    rendering_system = RenderingSystem(
-        screen=mock_screen, font=mock_font, camera=camera
-    )
+    rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
 
     mock_map = Mock()
     game_state = GameState(game_map=mock_map)

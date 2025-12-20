@@ -31,9 +31,7 @@ class Map:
             ValueError: If dimensions exceed MAX_MAP_DIMENSION.
         """
         if width > self.MAX_MAP_DIMENSION or height > self.MAX_MAP_DIMENSION:
-            raise ValueError(
-                f"Map dimensions exceed maximum allowed size ({self.MAX_MAP_DIMENSION})"
-            )
+            raise ValueError(f"Map dimensions exceed maximum allowed size ({self.MAX_MAP_DIMENSION})")
 
         self.width = width
         self.height = height
@@ -119,11 +117,7 @@ class Map:
                 nx, ny = current[0] + dx, current[1] + dy
                 if not (0 <= nx < self.width and 0 <= ny < self.height):
                     continue
-                if (
-                    not can_fly
-                    and self.is_blocked(nx, ny)
-                    or (extra_obstacles and (nx, ny) in extra_obstacles)
-                ):
+                if not can_fly and self.is_blocked(nx, ny) or (extra_obstacles and (nx, ny) in extra_obstacles):
                     continue
                 tentative_g = g_score[current] + 1
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
@@ -188,9 +182,7 @@ class Map:
         # Security: Prevent CPU exhaustion from excessive wall definitions
         max_walls = m.width * m.height
         if len(raw_walls) > max_walls:
-            log.warning(
-                f"Too many walls defined ({len(raw_walls)}). Truncating to {max_walls}."
-            )
+            log.warning(f"Too many walls defined ({len(raw_walls)}). Truncating to {max_walls}.")
             raw_walls = raw_walls[:max_walls]
 
         for w in raw_walls:
