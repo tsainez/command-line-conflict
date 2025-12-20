@@ -43,13 +43,30 @@ def test_setup_logger_debug_level(mock_get_logger):
 
 
 @patch("command_line_conflict.logger.logging.getLogger")
-@patch("command_line_conflict.logger.logging.FileHandler")
-def test_setup_logger_file_handler_append_mode(mock_file_handler, mock_get_logger):
+@patch("command_line_conflict.logger.logging.handlers.RotatingFileHandler")
+@patch("command_line_conflict.logger.get_user_data_dir")
+def test_setup_logger_file_handler_secure(
+    mock_get_user_data, mock_rotating_handler, mock_get_logger
+):
     """
-    Tests that the file handler is created with append mode ('a').
+    Tests that the logger uses RotatingFileHandler in the user data directory.
     """
     mock_logger = MagicMock()
     mock_get_logger.return_value = mock_logger
 
+    mock_path = MagicMock()
+    mock_get_user_data.return_value = mock_path
+    # Mock the / operator for Path
+    mock_log_file_path = MagicMock()
+    mock_log_file_path.__str__.return_value = "/mock/path/game.log"
+    mock_path.__truediv__.return_value = mock_log_file_path
+
     setup_logger()
-    mock_file_handler.assert_called_with("game.log", mode="a")
+
+    # Verify directory creation
+    mock_path.mkdir.assert_called_with(parents=True, exist_ok=True)
+
+    # Verify secure handler usage
+    mock_rotating_handler.assert_called_with(
+        "/mock/path/game.log", maxBytes=5 * 1024 * 1024, backupCount=1
+    )
