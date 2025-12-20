@@ -38,25 +38,25 @@ We enforce a strict code style to keep the codebase clean and maintainable.
 *   **Linting:** We use `flake8` and `pylint`.
 
 ### Running Checks
-Run the following commands before submitting your PR:
+We have provided a convenience script to run all checks. Run the following command before submitting your PR:
 
 ```bash
-# Format code
-black .
-isort .
-
-# Lint code
-flake8 .
-pylint $(git ls-files '*.py')
-
-# Run tests
-pytest --cov=command_line_conflict tests/
+./scripts/pre_commit.sh
 ```
+
+This script will run:
+*   **Formatting:** `black` and `isort`
+*   **Linting:** `flake8` and `pylint`
+*   **Testing:** `pytest` with coverage
+
+Ensure the script exits with "All checks passed!" before pushing your changes.
 
 ### Logging
 *   Avoid wrapping `log.debug()` calls with `if config.DEBUG:`. Rely on the logging library's level filtering instead.
 
 ## Pull Requests
+
+Please use the provided Pull Request Template when opening a PR.
 
 *   **Title:** Use a descriptive title (e.g., "Add delta-time to unit movement", "Fix crash in map loader").
 *   **Scope:** Keep PRs small and focused on a single feature or bug fix.
