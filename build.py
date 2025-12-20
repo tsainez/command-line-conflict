@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import sys
 
@@ -49,9 +48,7 @@ def build():
 
     print("\nBuild complete.")
     dist_folder = "dist"
-    executable_name = "Command Line Conflict" + (
-        ".exe" if sys.platform.startswith("win") else ""
-    )
+    executable_name = "Command Line Conflict" + (".exe" if sys.platform.startswith("win") else "")
     executable_path = os.path.join(dist_folder, executable_name)
 
     if os.path.exists(executable_path):

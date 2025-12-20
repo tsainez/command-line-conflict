@@ -1,6 +1,4 @@
-import os
-
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 
 def create_icon(filepath="icon.ico"):
@@ -15,9 +13,7 @@ def create_icon(filepath="icon.ico"):
 
     # Draw a border
     border_width = 10
-    draw.rectangle(
-        [0, 0, size[0] - 1, size[1] - 1], outline=fg_color, width=border_width
-    )
+    draw.rectangle([0, 0, size[0] - 1, size[1] - 1], outline=fg_color, width=border_width)
 
     # Draw ">"
     # Points for the triangle/arrow

@@ -1,6 +1,4 @@
-from unittest.mock import Mock, call
-
-import pytest
+from unittest.mock import Mock
 
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.player import Player
@@ -13,9 +11,7 @@ from command_line_conflict.systems.ai_system import AISystem
 class TestAISystem:
     def test_ai_acquires_target(self, mocker):
         # Mock Targeting.find_closest_enemy
-        mock_find_closest_enemy = mocker.patch(
-            "command_line_conflict.utils.targeting.Targeting.find_closest_enemy"
-        )
+        mock_find_closest_enemy = mocker.patch("command_line_conflict.utils.targeting.Targeting.find_closest_enemy")
 
         # Game state and entities
         game_state = GameState(Mock())
@@ -45,17 +41,13 @@ class TestAISystem:
         ai_system.update(game_state)
 
         # Check that find_closest_enemy was called
-        mock_find_closest_enemy.assert_called_once_with(
-            entity_id, position, player, vision, game_state
-        )
+        mock_find_closest_enemy.assert_called_once_with(entity_id, position, player, vision, game_state)
 
         # Check that attack target was set
         assert attack.attack_target == target_entity_id
 
     def test_ai_does_not_acquire_target_if_already_has_one(self, mocker):
-        mock_find_closest_enemy = mocker.patch(
-            "command_line_conflict.utils.targeting.Targeting.find_closest_enemy"
-        )
+        mock_find_closest_enemy = mocker.patch("command_line_conflict.utils.targeting.Targeting.find_closest_enemy")
 
         game_state = GameState(Mock())
         ai_system = AISystem()
@@ -78,9 +70,7 @@ class TestAISystem:
         assert attack.attack_target == 999
 
     def test_ai_missing_components(self, mocker):
-        mock_find_closest_enemy = mocker.patch(
-            "command_line_conflict.utils.targeting.Targeting.find_closest_enemy"
-        )
+        mock_find_closest_enemy = mocker.patch("command_line_conflict.utils.targeting.Targeting.find_closest_enemy")
 
         game_state = GameState(Mock())
         ai_system = AISystem()

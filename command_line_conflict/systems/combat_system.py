@@ -2,10 +2,8 @@ from .. import config
 from ..components.attack import Attack
 from ..components.health import Health
 from ..components.movable import Movable
-from ..components.player import Player  # TODO: Remove unused import.
 from ..components.position import Position
 from ..components.unit_identity import UnitIdentity
-from ..components.vision import Vision  # TODO: Remove unused import.
 from ..factories import create_confetti
 from ..game_state import GameState
 from ..logger import log
@@ -48,9 +46,7 @@ class CombatSystem:
                 if not my_pos or not target_pos:
                     continue
 
-                dist_to_target = (
-                    (my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2
-                ) ** 0.5
+                dist_to_target = ((my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2) ** 0.5
 
                 if dist_to_target <= attack.attack_range:
                     # Stop moving and attack
@@ -63,36 +59,19 @@ class CombatSystem:
                         if config.DEBUG:
                             # Get entity names for logging
                             attacker_identity = components.get(UnitIdentity)
-                            attacker_name = (
-                                attacker_identity.name
-                                if attacker_identity
-                                else f"Entity {entity_id}"
-                            )
+                            attacker_name = attacker_identity.name if attacker_identity else f"Entity {entity_id}"
 
                             target_identity = target_components.get(UnitIdentity)
-                            target_name = (
-                                target_identity.name
-                                if target_identity
-                                else f"Entity {attack.attack_target}"
-                            )
+                            target_name = target_identity.name if target_identity else f"Entity {attack.attack_target}"
 
-                            log.info(
-                                f"{attacker_name} attacks {target_name} "
-                                f"for {attack.attack_damage} damage."
-                            )
+                            log.info(f"{attacker_name} attacks {target_name} " f"for {attack.attack_damage} damage.")
                         target_health.hp -= attack.attack_damage
 
                         # Trigger attack sound
                         game_state.add_event(
                             {
                                 "type": "sound",
-                                "data": {
-                                    "name": (
-                                        "attack_melee"
-                                        if attack.attack_range <= 1.5
-                                        else "attack_ranged"
-                                    )
-                                },
+                                "data": {"name": ("attack_melee" if attack.attack_range <= 1.5 else "attack_ranged")},
                             }
                         )
                         # Retaliation Logic:
@@ -104,9 +83,7 @@ class CombatSystem:
                         if attack.attack_range > 1:
                             create_confetti(game_state, target_pos.x, target_pos.y)
                             if config.DEBUG:
-                                log.info(
-                                    f"Confetti effect created at ({target_pos.x}, {target_pos.y})"
-                                )
+                                log.info(f"Confetti effect created at ({target_pos.x}, {target_pos.y})")
                         attack.attack_cooldown = 1 / attack.attack_speed
                 else:
                     # Move towards target

@@ -1,9 +1,6 @@
 import pytest
 
-from command_line_conflict.components.flee import Flee
-from command_line_conflict.components.movable import Movable
 from command_line_conflict.components.position import Position
-from command_line_conflict.components.vision import Vision
 from command_line_conflict.factories import create_observer, create_rover
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map

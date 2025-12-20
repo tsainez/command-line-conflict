@@ -26,9 +26,7 @@ def create_unit(game_state, entity_id, player_id, x, y):
     game_state.entities[entity_id] = {}
     game_state.add_component(entity_id, Player(player_id=player_id))
     game_state.add_component(entity_id, Position(x, y))
-    game_state.add_component(
-        entity_id, Attack(attack_damage=10, attack_range=5, attack_speed=1)
-    )
+    game_state.add_component(entity_id, Attack(attack_damage=10, attack_range=5, attack_speed=1))
     game_state.add_component(entity_id, Vision(vision_range=10))
 
 

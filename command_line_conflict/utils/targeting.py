@@ -22,9 +22,7 @@ class Targeting:
         Optimized to use spatial hashing to avoid O(N) iteration over all entities.
         """
         if DEBUG:
-            log.debug(
-                f"Targeting: Searching for enemy for unit {my_id} at ({my_pos.x}, {my_pos.y})"
-            )
+            log.debug(f"Targeting: Searching for enemy for unit {my_id} at ({my_pos.x}, {my_pos.y})")
 
         closest_enemy = None
         min_dist = float("inf")
@@ -54,27 +52,20 @@ class Targeting:
                         continue
 
                     other_player = other_components.get(Player)
-                    if (
-                        not other_player
-                        or other_player.player_id == my_player.player_id
-                    ):
+                    if not other_player or other_player.player_id == my_player.player_id:
                         continue
 
                     other_pos = other_components.get(Position)
                     if not other_pos:
                         continue
 
-                    dist = (
-                        (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
-                    ) ** 0.5
+                    dist = ((my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2) ** 0.5
 
                     if dist <= vision_range and dist < min_dist:
                         min_dist = dist
                         closest_enemy = other_id
 
         if DEBUG and closest_enemy:
-            log.debug(
-                f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist:.2f}"
-            )
+            log.debug(f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist:.2f}")
 
         return closest_enemy

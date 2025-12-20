@@ -3,10 +3,9 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-from command_line_conflict.campaign_manager import (DEFAULT_SAVE_FILENAME,
-                                                    CampaignManager)
+from command_line_conflict.campaign_manager import DEFAULT_SAVE_FILENAME, CampaignManager
 
 
 class TestCampaignManagerMigration(unittest.TestCase):
@@ -41,9 +40,7 @@ class TestCampaignManagerMigration(unittest.TestCase):
         # Check it moved
         self.assertFalse(os.path.exists(DEFAULT_SAVE_FILENAME))
         self.assertTrue((self.temp_data_dir / DEFAULT_SAVE_FILENAME).exists())
-        self.assertEqual(
-            manager.save_file, str(self.temp_data_dir / DEFAULT_SAVE_FILENAME)
-        )
+        self.assertEqual(manager.save_file, str(self.temp_data_dir / DEFAULT_SAVE_FILENAME))
 
     def test_no_migration_if_dest_exists(self):
         # Create legacy file

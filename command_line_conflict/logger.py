@@ -22,9 +22,7 @@ def setup_logger():
     logger.setLevel(log_level)
 
     # Create a formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Create a file handler
     file_handler = logging.FileHandler("game.log", mode="a")

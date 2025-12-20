@@ -1,5 +1,3 @@
-import pytest
-
 from command_line_conflict.components.position import Position
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.base import Map

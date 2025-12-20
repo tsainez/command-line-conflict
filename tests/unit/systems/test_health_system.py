@@ -17,9 +17,7 @@ def test_health_system_handles_death():
     entity_id = game_state.create_entity()
     game_state.add_component(entity_id, Health(hp=0, max_hp=10, health_regen_rate=1))
     game_state.add_component(entity_id, Movable(speed=1.0))
-    game_state.add_component(
-        entity_id, Attack(attack_range=1, attack_damage=1, attack_speed=1)
-    )
+    game_state.add_component(entity_id, Attack(attack_range=1, attack_damage=1, attack_speed=1))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Flee(flee_health_threshold=0.5))
     system = HealthSystem()

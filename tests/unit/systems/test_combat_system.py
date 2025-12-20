@@ -14,9 +14,7 @@ def test_combat_system_creates_confetti_on_ranged_attack():
 
     attacker_id = game_state.create_entity()
     game_state.add_component(attacker_id, Position(0, 0))
-    game_state.add_component(
-        attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0)
-    )
+    game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
 
     target_id = game_state.create_entity()
     game_state.add_component(target_id, Position(3, 3))

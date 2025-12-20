@@ -1,6 +1,4 @@
-from unittest.mock import Mock, call, patch
-
-import pygame
+from unittest.mock import Mock, patch
 
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
@@ -30,9 +28,7 @@ def test_map_draw_with_camera(mock_scale):
 
     grid_size = int(config.GRID_SIZE * camera.zoom)
     mock_scale.assert_called_once_with(mock_surface, (grid_size, grid_size))
-    mock_surf.blit.assert_called_once_with(
-        mock_scaled_surface, (expected_x, expected_y)
-    )
+    mock_surf.blit.assert_called_once_with(mock_scaled_surface, (expected_x, expected_y))
 
 
 @patch("pygame.transform.scale")
@@ -60,10 +56,6 @@ def test_map_draw_without_camera_bug(mock_scale):
     # and doesn't scale the surface.
 
     # We expect scale to be called with the default grid size
-    mock_scale.assert_called_once_with(
-        mock_surface, (config.GRID_SIZE, config.GRID_SIZE)
-    )
+    mock_scale.assert_called_once_with(mock_surface, (config.GRID_SIZE, config.GRID_SIZE))
     # We expect blit to be called with the scaled coordinates
-    mock_surf.blit.assert_called_once_with(
-        mock_scaled_surface, (expected_x, expected_y)
-    )
+    mock_surf.blit.assert_called_once_with(mock_scaled_surface, (expected_x, expected_y))

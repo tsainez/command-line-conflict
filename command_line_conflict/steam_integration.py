@@ -32,9 +32,7 @@ class SteamIntegration:
             achievement_name: The API name of the achievement to unlock.
         """
         if not self.initialized or not self.steam:
-            log.debug(
-                f"Steam not initialized. Skipping achievement: {achievement_name}"
-            )
+            log.debug(f"Steam not initialized. Skipping achievement: {achievement_name}")
             return
 
         try:

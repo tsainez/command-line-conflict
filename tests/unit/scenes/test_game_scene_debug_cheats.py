@@ -1,8 +1,5 @@
 from unittest.mock import MagicMock
 
-import pytest
-
-import command_line_conflict.config as config
 from command_line_conflict.scenes.game import GameScene
 
 

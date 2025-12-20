@@ -1,4 +1,3 @@
-from command_line_conflict import config
 from command_line_conflict.camera import Camera
 
 
