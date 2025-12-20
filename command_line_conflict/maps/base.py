@@ -78,7 +78,8 @@ class Map:
         start: Tuple[int, int],
         goal: Tuple[int, int],
         can_fly: bool = False,
-        extra_obstacles: set[Tuple[int, int]] | None = None,
+        extra_obstacles: set[Tuple[int, int]] | dict | None = None,
+        exclude_obstacles: set[Tuple[int, int]] | None = None,
     ) -> List[Tuple[int, int]]:
         """Finds a path between two points using A* algorithm.
 
@@ -88,8 +89,9 @@ class Map:
             start: The starting (x, y) coordinates.
             goal: The destination (x, y) coordinates.
             can_fly: If True, the path ignores walls.
-            extra_obstacles: A set of additional (x, y) coordinates to treat
-                             as obstacles for this pathfinding request.
+            extra_obstacles: A set or dict of additional (x, y) coordinates to treat
+                             as obstacles.
+            exclude_obstacles: A set of coordinates to ignore if they appear in extra_obstacles.
 
         Returns:
             A list of (x, y) tuples representing the path from start to goal.
@@ -117,8 +119,14 @@ class Map:
                 nx, ny = current[0] + dx, current[1] + dy
                 if not (0 <= nx < self.width and 0 <= ny < self.height):
                     continue
-                if not can_fly and self.is_blocked(nx, ny) or (extra_obstacles and (nx, ny) in extra_obstacles):
+
+                if not can_fly and self.is_blocked(nx, ny):
                     continue
+
+                if extra_obstacles and (nx, ny) in extra_obstacles:
+                    if not (exclude_obstacles and (nx, ny) in exclude_obstacles):
+                        continue
+
                 tentative_g = g_score[current] + 1
                 if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
                     g_score[(nx, ny)] = tentative_g

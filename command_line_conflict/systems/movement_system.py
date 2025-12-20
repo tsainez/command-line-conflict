@@ -26,42 +26,25 @@ class MovementSystem:
 
         movable.target_x = x
         movable.target_y = y
-        extra_obstacles = self._get_obstacles(game_state, entity_id, position) if movable.intelligent else set()
-        if (x, y) in extra_obstacles:
-            extra_obstacles.remove((x, y))
+
+        extra_obstacles = None
+        exclude_obstacles = None
+        if movable.intelligent:
+            extra_obstacles = game_state.spatial_map
+            exclude_obstacles = {(x, y)}
 
         movable.path = game_state.map.find_path(
             (int(position.x), int(position.y)),
             (x, y),
             can_fly=movable.can_fly,
             extra_obstacles=extra_obstacles,
+            exclude_obstacles=exclude_obstacles,
         )
 
         if movable.path:
             log.debug(f"Path found for entity {entity_id}: {movable.path}")
         else:
             log.warning(f"No path found for entity {entity_id} from ({position.x}, {position.y}) to ({x}, {y})")
-
-    def _get_obstacles(self, game_state: GameState, entity_id: int, position: Position | None = None) -> set[tuple[int, int]]:
-        """Collects obstacle positions from other entities."""
-        # Use spatial map for O(K) lookup instead of O(N)
-        # Optimized to use set construction from dict keys (O(K) in C)
-        obstacles = set(game_state.spatial_map)
-
-        # We need to remove the current entity's position from obstacles
-        # if it's the only entity at that position.
-        if position is None:
-            position = game_state.get_component(entity_id, Position)
-
-        if position:
-            pos = (int(position.x), int(position.y))
-            entities = game_state.spatial_map.get(pos)
-
-            # If we are at this position and we are the only one, it's not an obstacle for us
-            if entities and len(entities) == 1 and entity_id in entities:
-                obstacles.discard(pos)
-
-        return obstacles
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Processes entity movement based on their current path or target.
@@ -93,14 +76,16 @@ class MovementSystem:
                     start_node = (int(position.x), int(position.y))
                     end_node = (int(movable.target_x), int(movable.target_y))
                     if start_node != end_node:
-                        extra_obstacles = self._get_obstacles(game_state, entity_id, position)
-                        if end_node in extra_obstacles:
-                            extra_obstacles.remove(end_node)
+                        # Use spatial map directly and exclude the target
+                        extra_obstacles = game_state.spatial_map
+                        exclude_obstacles = {end_node}
+
                         movable.path = game_state.map.find_path(
                             start_node,
                             end_node,
                             can_fly=movable.can_fly,
                             extra_obstacles=extra_obstacles,
+                            exclude_obstacles=exclude_obstacles,
                         )
                         if not movable.path:
                             # No path found to target, stop to avoid clipping
