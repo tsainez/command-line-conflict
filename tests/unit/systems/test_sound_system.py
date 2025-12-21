@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
-from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.systems.sound_system import SoundSystem  # noqa: E402
 
 
 class TestSoundSystem(unittest.TestCase):

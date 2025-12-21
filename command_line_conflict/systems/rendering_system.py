@@ -9,7 +9,6 @@ from ..components.confetti import Confetti
 from ..components.dead import Dead
 from ..components.health import Health
 from ..components.movable import Movable
-from ..components.player import Player
 from ..components.position import Position
 from ..components.renderable import Renderable
 from ..components.selectable import Selectable
@@ -70,7 +69,6 @@ class RenderingSystem:
 
                     position = components.get(Position)
                     renderable = components.get(Renderable)
-                    player = components.get(Player)
 
                     if not position or not renderable:
                         continue
@@ -132,23 +130,39 @@ class RenderingSystem:
 
                     health = components.get(Health)
                     if not dead and health and health.max_hp > 0:
-                        health_pct = health.hp / health.max_hp
+                        health_pct = max(0.0, min(1.0, health.hp / health.max_hp))
                         bar_width = grid_size
-                        bar_height = max(2, int(grid_size * 0.2))
+                        bar_height = max(4, int(grid_size * 0.2))
                         bar_x = cam_x
                         bar_y = cam_y - bar_height - 2
 
-                        # Draw background (red)
+                        # Determine color based on health percentage
+                        if health_pct > 0.5:
+                            hp_color = (0, 255, 0)  # Green
+                        elif health_pct > 0.25:
+                            hp_color = (255, 255, 0)  # Yellow
+                        else:
+                            hp_color = (255, 0, 0)  # Red
+
+                        # Draw background (dark grey)
                         pygame.draw.rect(
                             self.screen,
-                            (255, 0, 0),
+                            (60, 60, 60),
                             (bar_x, bar_y, bar_width, bar_height),
                         )
-                        # Draw foreground (green)
+                        # Draw foreground
+                        if health_pct > 0:
+                            pygame.draw.rect(
+                                self.screen,
+                                hp_color,
+                                (bar_x, bar_y, int(bar_width * health_pct), bar_height),
+                            )
+                        # Draw border (black)
                         pygame.draw.rect(
                             self.screen,
-                            (0, 255, 0),
-                            (bar_x, bar_y, int(bar_width * health_pct), bar_height),
+                            (0, 0, 0),
+                            (bar_x, bar_y, bar_width, bar_height),
+                            1,
                         )
 
                     selectable = components.get(Selectable)
@@ -157,58 +171,6 @@ class RenderingSystem:
                             self.draw_orders(components)
                         elif config.DEBUG:
                             self.draw_orders(components)
-                ch = self._get_rendered_surface(renderable.icon, color, grid_size)
-                self.screen.blit(
-                    ch,
-                    (
-                        cam_x,
-                        cam_y,
-                    ),
-                )
-
-                health = components.get(Health)
-                if not dead and health and health.max_hp > 0:
-                    health_pct = max(0.0, min(1.0, health.hp / health.max_hp))
-                    bar_width = grid_size
-                    bar_height = max(4, int(grid_size * 0.2))
-                    bar_x = cam_x
-                    bar_y = cam_y - bar_height - 2
-
-                    # Determine color based on health percentage
-                    if health_pct > 0.5:
-                        color = (0, 255, 0)  # Green
-                    elif health_pct > 0.25:
-                        color = (255, 255, 0)  # Yellow
-                    else:
-                        color = (255, 0, 0)  # Red
-
-                    # Draw background (dark grey)
-                    pygame.draw.rect(
-                        self.screen,
-                        (60, 60, 60),
-                        (bar_x, bar_y, bar_width, bar_height),
-                    )
-                    # Draw foreground
-                    if health_pct > 0:
-                        pygame.draw.rect(
-                            self.screen,
-                            color,
-                            (bar_x, bar_y, int(bar_width * health_pct), bar_height),
-                        )
-                    # Draw border (black)
-                    pygame.draw.rect(
-                        self.screen,
-                        (0, 0, 0),
-                        (bar_x, bar_y, bar_width, bar_height),
-                        1,
-                    )
-
-                selectable = components.get(Selectable)
-                if not dead:
-                    if selectable and selectable.is_selected:
-                        self.draw_orders(components)
-                    elif config.DEBUG:
-                        self.draw_orders(components)
 
     def draw_orders(self, components) -> None:
         """Draws the movement path and target for a selected entity.
