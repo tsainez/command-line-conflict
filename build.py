@@ -33,7 +33,7 @@ def build():
         "--name=Command Line Conflict",
         "--onefile",
         "--windowed",
-        f"--icon=icon.ico",
+        "--icon=icon.ico",
         "--clean",
         "--log-level=INFO",
     ]
