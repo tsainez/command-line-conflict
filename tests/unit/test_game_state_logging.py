@@ -62,5 +62,5 @@ class TestGameStateLogging:
         game_state = GameState(mock_map)
         mock_log.debug.assert_not_called()
 
-        game_state.create_entity()
+        entity_id = game_state.create_entity()
         mock_log.debug.assert_not_called()

@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: bug
 assignees: ''
-
 ---
 
 **Describe the bug**
@@ -25,7 +24,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows, macOS, Linux]
- - Version [e.g. 22]
+ - Python Version: [e.g. 3.10]
+ - Game Version [e.g. 0.1.0]
 
 **Additional context**
 Add any other context about the problem here.

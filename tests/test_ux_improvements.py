@@ -44,7 +44,7 @@ def test_game_scene_space_pause():
     event = pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE)
     scene.handle_event(event)
 
-    assert scene.paused is True, "Spacebar did not toggle pause"
+    assert scene.paused == True, "Spacebar did not toggle pause"
 
     scene.handle_event(event)
-    assert scene.paused is False, "Spacebar did not toggle pause back"
+    assert scene.paused == False, "Spacebar did not toggle pause back"

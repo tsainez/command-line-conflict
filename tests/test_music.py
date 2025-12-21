@@ -6,7 +6,7 @@ from unittest.mock import patch
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
-from command_line_conflict.music import MusicManager  # noqa: E402
+from command_line_conflict.music import MusicManager
 
 
 class TestMusicManager(unittest.TestCase):

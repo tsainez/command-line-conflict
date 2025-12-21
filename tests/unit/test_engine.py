@@ -118,8 +118,7 @@ class TestGame:
 
         # Mock clock.tick to avoid waiting
         # We need to mock the clock object itself or its tick method properly.
-        # Since game.clock is an instance of pygame.time.Clock, and we can't patch its methods directly
-        # if it's a C extension class (which it is),
+        # Since game.clock is an instance of pygame.time.Clock, and we can't patch its methods directly if it's a C extension class (which it is),
         # we should have mocked pygame.time.Clock when initializing the game.
 
         # However, we can also overwrite game.clock with a Mock object since python allows that.
