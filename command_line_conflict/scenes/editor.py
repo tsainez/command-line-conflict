@@ -146,7 +146,6 @@ class EditorScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
     def _draw_ui(self, screen):
-        # TODO: Fix f-string missing placeholders or remove f-prefix.
         text = "Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
         surf = self.ui_font.render(text, True, (255, 255, 255))
         screen.blit(surf, (10, 10))
