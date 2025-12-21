@@ -3,18 +3,11 @@ import os
 
 import pygame
 
-try:
-    import tkinter as tk
-    from tkinter import filedialog
-
-    HAS_TKINTER = True
-except ImportError:
-    HAS_TKINTER = False
-
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.logger import log
 from command_line_conflict.maps.base import Map
+from command_line_conflict.ui.file_dialog import FileDialog
 
 
 class EditorScene:
@@ -54,8 +47,14 @@ class EditorScene:
         # UI Font - try to use game font if possible, or default
         self.ui_font = pygame.font.SysFont("arial", 24)
 
+        self.file_dialog = None
+
     def handle_event(self, event):
         """Handles user input."""
+        if self.file_dialog:
+            self.file_dialog.handle_event(event)
+            return
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 self.camera_movement["up"] = True
@@ -123,6 +122,9 @@ class EditorScene:
         # Draw UI
         self._draw_ui(screen)
 
+        if self.file_dialog:
+            self.file_dialog.draw(screen)
+
     def _draw_grid(self, screen):
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
         if grid_size > 0:
@@ -146,120 +148,70 @@ class EditorScene:
         screen.blit(surf2, (10, 30))
 
     def save_map(self):
-        """Opens a file dialog (or console input) to save the map."""
-        # Default directory
+        """Opens the in-game file dialog to save the map."""
         initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-        if not os.path.exists(initial_dir):
-            os.makedirs(initial_dir)
 
-        file_path = None
-        use_console = not HAS_TKINTER
+        width = 600
+        height = 400
+        screen_width = self.game.screen.get_width()
+        screen_height = self.game.screen.get_height()
+        rect = pygame.Rect(
+            (screen_width - width) // 2,
+            (screen_height - height) // 2,
+            width,
+            height
+        )
 
-        if HAS_TKINTER:
-            try:
-                root = tk.Tk()
-                root.withdraw()  # Hide the main window
-                file_path = filedialog.asksaveasfilename(
-                    initialdir=initial_dir,
-                    title="Save Map",
-                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-                    defaultextension=".json",
-                )
-                root.destroy()
-            except tk.TclError as e:
-                log.error(f"Tkinter error: {e}. Falling back to console.")
-                print(f"Tkinter error: {e}")
-                use_console = True
+        self.file_dialog = FileDialog(
+            rect,
+            self.ui_font,
+            initial_dir,
+            mode="save",
+            on_confirm=self._on_save_confirm,
+            on_cancel=self._close_dialog
+        )
 
-        if use_console and not file_path:
-            # TODO: Implement in-game file dialog to remove dependency on console input/Tkinter.
-            print("\n--- Save Map ---")
-            print(f"Default directory: {initial_dir}")
-            try:
-                name = input("Enter filename (e.g. mymap.json) or blank to cancel: ").strip()
-                if name:
-                    # Security: Prevent path traversal
-                    name = os.path.basename(name)
-                    if not name:
-                        print("Invalid filename.")
-                        return
+    def _on_save_confirm(self, file_path):
+        try:
+            self.map.save_to_file(file_path)
+            self.map_path = file_path
+            log.info(f"Map saved to {file_path}")
+        except (IOError, ValueError) as e:
+            log.error(f"Failed to save map: {e}")
+        self._close_dialog()
 
-                    file_path = os.path.join(initial_dir, name)
-                    if not file_path.endswith(".json"):
-                        file_path += ".json"
-            except EOFError:
-                pass
-
-        if file_path:
-            try:
-                self.map.save_to_file(file_path)
-                self.map_path = file_path  # Update current path
-                log.info(f"Map saved to {file_path}.")
-                print(f"Map saved to {file_path}.")
-            except (IOError, ValueError) as e:
-                log.error(f"Failed to save map: {e}")
+    def _close_dialog(self):
+        self.file_dialog = None
 
     def load_map(self):
-        """Opens a file dialog (or console input) to load a map."""
+        """Opens the in-game file dialog to load a map."""
         initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-        if not os.path.exists(initial_dir):
-            os.makedirs(initial_dir)
 
-        file_path = None
-        use_console = not HAS_TKINTER
+        width = 600
+        height = 400
+        screen_width = self.game.screen.get_width()
+        screen_height = self.game.screen.get_height()
+        rect = pygame.Rect(
+            (screen_width - width) // 2,
+            (screen_height - height) // 2,
+            width,
+            height
+        )
 
-        if HAS_TKINTER:
-            try:
-                root = tk.Tk()
-                root.withdraw()
-                file_path = filedialog.askopenfilename(
-                    initialdir=initial_dir,
-                    title="Load Map",
-                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-                )
-                root.destroy()
-            except tk.TclError as e:
-                log.error(f"Tkinter error: {e}. Falling back to console.")
-                print(f"Tkinter error: {e}")
-                use_console = True
+        self.file_dialog = FileDialog(
+            rect,
+            self.ui_font,
+            initial_dir,
+            mode="load",
+            on_confirm=self._on_load_confirm,
+            on_cancel=self._close_dialog
+        )
 
-        if use_console and not file_path:
-            # TODO: Implement in-game file dialog to remove dependency on console input/Tkinter.
-            print("\n--- Load Map ---")
-            print(f"Directory: {initial_dir}")
-            # List files
-            try:
-                files = [f for f in os.listdir(initial_dir) if f.endswith(".json")]
-                if not files:
-                    print("No maps found in custom folder.")
-                else:
-                    print("Available maps:")
-                    for f in files:
-                        print(f" - {f}")
-            except OSError:
-                pass
-
-            try:
-                name = input("Enter filename to load or blank to cancel: ").strip()
-                if name:
-                    # Security: Prevent path traversal
-                    name = os.path.basename(name)
-                    if not name:
-                        print("Invalid filename.")
-                        return
-
-                    file_path = os.path.join(initial_dir, name)
-                    if not file_path.endswith(".json"):
-                        file_path += ".json"
-            except EOFError:
-                pass
-
-        if file_path:
-            try:
-                self.map = Map.load_from_file(file_path)
-                self.map_path = file_path
-                log.info(f"Map loaded from {file_path}.")
-                print(f"Map loaded from {file_path}.")
-            except (IOError, ValueError) as e:
-                log.error(f"Failed to load map: {e}")
-                print(f"Failed to load map: {e}")
+    def _on_load_confirm(self, file_path):
+        try:
+            self.map = Map.load_from_file(file_path)
+            self.map_path = file_path
+            log.info(f"Map loaded from {file_path}")
+        except (IOError, ValueError) as e:
+            log.error(f"Failed to load map: {e}")
+        self._close_dialog()
