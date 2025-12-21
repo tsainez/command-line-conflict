@@ -30,8 +30,8 @@ class TestEditorPathTraversal(unittest.TestCase):
 
             editor.save_map()
 
-            editor.map.save_to_file.assert_called()
-            args, _ = editor.map.save_to_file.call_args
+            editor.map.save_to_file.assert_called()  # pylint: disable=no-member
+            args, _ = editor.map.save_to_file.call_args  # pylint: disable=no-member
             saved_path = args[0]
 
             normalized_path = os.path.normpath(saved_path)
@@ -61,8 +61,8 @@ class TestEditorPathTraversal(unittest.TestCase):
 
             editor.load_map()
 
-            mock_map_cls.load_from_file.assert_called()
-            args, _ = mock_map_cls.load_from_file.call_args
+            mock_map_cls.load_from_file.assert_called()  # pylint: disable=no-member
+            args, _ = mock_map_cls.load_from_file.call_args  # pylint: disable=no-member
             loaded_path = args[0]
 
             normalized_path = os.path.normpath(loaded_path)
@@ -83,8 +83,8 @@ class TestEditorPathTraversal(unittest.TestCase):
 
             editor.save_map()
 
-            editor.map.save_to_file.assert_called()
-            args, _ = editor.map.save_to_file.call_args
+            editor.map.save_to_file.assert_called()  # pylint: disable=no-member
+            args, _ = editor.map.save_to_file.call_args  # pylint: disable=no-member
             saved_path = args[0]
             normalized_path = os.path.normpath(saved_path)
             expected_suffix = os.path.join("maps", "custom", "good_map.json")
