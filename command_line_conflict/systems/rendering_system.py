@@ -17,7 +17,10 @@ from ..logger import log
 
 
 class RenderingSystem:
-    """Handles rendering all entities and UI elements to the screen."""
+    """Handles rendering all entities and UI elements to the screen.
+
+    Optimized to use spatial hashing for performance.
+    """
 
     def __init__(self, screen, font, camera: Camera):
         """Initializes the RenderingSystem.

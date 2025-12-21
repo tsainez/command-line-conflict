@@ -3,18 +3,11 @@ import os
 
 import pygame
 
-try:
-    import tkinter as tk
-    from tkinter import filedialog
-
-    HAS_TKINTER = True
-except ImportError:
-    HAS_TKINTER = False
-
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.logger import log
 from command_line_conflict.maps.base import Map
+from command_line_conflict.ui.file_dialog import FileDialog
 
 
 class EditorScene:
@@ -54,8 +47,22 @@ class EditorScene:
         # UI Font - try to use game font if possible, or default
         self.ui_font = pygame.font.SysFont("arial", 24)
 
+        self.file_dialog = None
+
     def handle_event(self, event):
         """Handles user input."""
+        if self.file_dialog and self.file_dialog.active:
+            result = self.file_dialog.handle_event(event)
+            if result:
+                if self.file_dialog.mode == "save":
+                    self._perform_save(result)
+                elif self.file_dialog.mode == "load":
+                    self._perform_load(result)
+                self.file_dialog = None
+            elif not self.file_dialog.active:
+                self.file_dialog = None
+            return
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 self.camera_movement["up"] = True
@@ -66,9 +73,9 @@ class EditorScene:
             elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = True
             elif event.key == pygame.K_s:
-                self.save_map()
+                self.open_save_dialog()
             elif event.key == pygame.K_l:
-                self.load_map()
+                self.open_load_dialog()
             elif event.key == pygame.K_ESCAPE:
                 self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.KEYUP:
@@ -123,6 +130,9 @@ class EditorScene:
         # Draw UI
         self._draw_ui(screen)
 
+        if self.file_dialog:
+            self.file_dialog.draw()
+
     def _draw_grid(self, screen):
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
         if grid_size > 0:
@@ -136,7 +146,6 @@ class EditorScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
     def _draw_ui(self, screen):
-        # TODO: Fix f-string missing placeholders or remove f-prefix.
         text = "Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
         surf = self.ui_font.render(text, True, (255, 255, 255))
         screen.blit(surf, (10, 10))
@@ -145,121 +154,32 @@ class EditorScene:
         surf2 = self.ui_font.render(status, True, (200, 200, 200))
         screen.blit(surf2, (10, 30))
 
-    def save_map(self):
-        """Opens a file dialog (or console input) to save the map."""
-        # Default directory
+    def open_save_dialog(self):
+        """Opens the save map dialog."""
         initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-        if not os.path.exists(initial_dir):
-            os.makedirs(initial_dir)
+        self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Save Map", initial_dir, mode="save")
+        # Stop camera movement
+        self.camera_movement = {k: False for k in self.camera_movement}
 
-        file_path = None
-        use_console = not HAS_TKINTER
-
-        if HAS_TKINTER:
-            try:
-                root = tk.Tk()
-                root.withdraw()  # Hide the main window
-                file_path = filedialog.asksaveasfilename(
-                    initialdir=initial_dir,
-                    title="Save Map",
-                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-                    defaultextension=".json",
-                )
-                root.destroy()
-            except tk.TclError as e:
-                log.error(f"Tkinter error: {e}. Falling back to console.")
-                print(f"Tkinter error: {e}")
-                use_console = True
-
-        if use_console and not file_path:
-            # TODO: Implement in-game file dialog to remove dependency on console input/Tkinter.
-            print("\n--- Save Map ---")
-            print(f"Default directory: {initial_dir}")
-            try:
-                name = input("Enter filename (e.g. mymap.json) or blank to cancel: ").strip()
-                if name:
-                    # Security: Prevent path traversal
-                    name = os.path.basename(name)
-                    if not name:
-                        print("Invalid filename.")
-                        return
-
-                    file_path = os.path.join(initial_dir, name)
-                    if not file_path.endswith(".json"):
-                        file_path += ".json"
-            except EOFError:
-                pass
-
-        if file_path:
-            try:
-                self.map.save_to_file(file_path)
-                self.map_path = file_path  # Update current path
-                log.info(f"Map saved to {file_path}.")
-                print(f"Map saved to {file_path}.")
-            except (IOError, ValueError) as e:
-                log.error(f"Failed to save map: {e}")
-
-    def load_map(self):
-        """Opens a file dialog (or console input) to load a map."""
+    def open_load_dialog(self):
+        """Opens the load map dialog."""
         initial_dir = os.path.join("command_line_conflict", "maps", "custom")
-        if not os.path.exists(initial_dir):
-            os.makedirs(initial_dir)
+        self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Load Map", initial_dir, mode="load")
+        # Stop camera movement
+        self.camera_movement = {k: False for k in self.camera_movement}
 
-        file_path = None
-        use_console = not HAS_TKINTER
+    def _perform_save(self, file_path):
+        try:
+            self.map.save_to_file(file_path)
+            self.map_path = file_path
+            log.info(f"Map saved to {file_path}.")
+        except (IOError, ValueError) as e:
+            log.error(f"Failed to save map: {e}")
 
-        if HAS_TKINTER:
-            try:
-                root = tk.Tk()
-                root.withdraw()
-                file_path = filedialog.askopenfilename(
-                    initialdir=initial_dir,
-                    title="Load Map",
-                    filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-                )
-                root.destroy()
-            except tk.TclError as e:
-                log.error(f"Tkinter error: {e}. Falling back to console.")
-                print(f"Tkinter error: {e}")
-                use_console = True
-
-        if use_console and not file_path:
-            # TODO: Implement in-game file dialog to remove dependency on console input/Tkinter.
-            print("\n--- Load Map ---")
-            print(f"Directory: {initial_dir}")
-            # List files
-            try:
-                files = [f for f in os.listdir(initial_dir) if f.endswith(".json")]
-                if not files:
-                    print("No maps found in custom folder.")
-                else:
-                    print("Available maps:")
-                    for f in files:
-                        print(f" - {f}")
-            except OSError:
-                pass
-
-            try:
-                name = input("Enter filename to load or blank to cancel: ").strip()
-                if name:
-                    # Security: Prevent path traversal
-                    name = os.path.basename(name)
-                    if not name:
-                        print("Invalid filename.")
-                        return
-
-                    file_path = os.path.join(initial_dir, name)
-                    if not file_path.endswith(".json"):
-                        file_path += ".json"
-            except EOFError:
-                pass
-
-        if file_path:
-            try:
-                self.map = Map.load_from_file(file_path)
-                self.map_path = file_path
-                log.info(f"Map loaded from {file_path}.")
-                print(f"Map loaded from {file_path}.")
-            except (IOError, ValueError) as e:
-                log.error(f"Failed to load map: {e}")
-                print(f"Failed to load map: {e}")
+    def _perform_load(self, file_path):
+        try:
+            self.map = Map.load_from_file(file_path)
+            self.map_path = file_path
+            log.info(f"Map loaded from {file_path}.")
+        except (IOError, ValueError) as e:
+            log.error(f"Failed to load map: {e}")
