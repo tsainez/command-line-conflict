@@ -238,6 +238,7 @@ class RenderingSystem:
     @staticmethod
     def _arrow_char(dx: int, dy: int) -> str:
         """Return a character representing movement direction."""
+        # pylint: disable=too-many-return-statements
         dx = (dx > 0) - (dx < 0)
         dy = (dy > 0) - (dy < 0)
         if dx == 1 and dy == 0:

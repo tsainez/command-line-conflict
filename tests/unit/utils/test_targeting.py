@@ -18,7 +18,7 @@ class TestTargeting:
         game_map.height = 100
         return GameState(game_map)
 
-    def create_unit(self, game_state, entity_id, x, y, player_id):
+    def create_unit(self, game_state, entity_id, x, y, player_id):  # pylint: disable=too-many-arguments
         game_state.entities[entity_id] = {}
         game_state.add_component(entity_id, Position(x, y))
         game_state.add_component(entity_id, Player(player_id))

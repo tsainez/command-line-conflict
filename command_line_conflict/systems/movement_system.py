@@ -132,9 +132,7 @@ class MovementSystem:
                     game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
                 else:
-                    step = movable.speed * dt
-                    if step > dist:
-                        step = dist
+                    step = min(movable.speed * dt, dist)
                     new_x = position.x + step * dx / dist
                     new_y = position.y + step * dy / dist
                     game_state.update_entity_position(entity_id, new_x, new_y)
@@ -145,9 +143,7 @@ class MovementSystem:
                 if dist < 0.01:
                     continue
 
-                step = movable.speed * dt
-                if step > dist:
-                    step = dist
+                step = min(movable.speed * dt, dist)
 
                 proposed_x = position.x + step * dx / dist
                 proposed_y = position.y + step * dy / dist

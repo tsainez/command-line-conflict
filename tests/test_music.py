@@ -5,8 +5,7 @@ from unittest.mock import patch
 # Set dummy video driver for headless testing
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-
-from command_line_conflict.music import MusicManager  # noqa: E402
+from command_line_conflict.music import MusicManager
 
 
 class TestMusicManager(unittest.TestCase):
