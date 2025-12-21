@@ -211,7 +211,7 @@ class Map:
         # Ensure directory exists
         os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
 
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4)
 
     @classmethod
@@ -226,6 +226,6 @@ class Map:
         """
         import json
 
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding="utf-8") as f:
             data = json.load(f)
         return cls.from_dict(data)
