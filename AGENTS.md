@@ -91,7 +91,7 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 80. Add static analysis (pylint, mypy) checks to the pipeline.
 81. Create test fixtures for complex game scenarios (e.g., max supply).
 82. Mock external dependencies (like Pygame) effectively in tests.
-83. Add pre-commit hooks for linting and formatting.
+83. [x] Add pre-commit hooks for linting and formatting.
 84. Verify determinism in game logic (same seed = same outcome).
 85. Test backward compatibility of save files.
 
