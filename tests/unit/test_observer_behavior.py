@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 import pytest
 
 from command_line_conflict.components.position import Position
@@ -17,7 +18,7 @@ def game_state():
 def test_observer_flees_when_detected(game_state):
     # Create an observer and an enemy
     observer_id = create_observer(game_state=game_state, x=10, y=10, player_id=1)
-    enemy_id = create_rover(game_state=game_state, x=10, y=11, player_id=2)
+    create_rover(game_state=game_state, x=10, y=11, player_id=2)
 
     # Get the initial position of the observer
     initial_position = game_state.get_component(observer_id, Position)

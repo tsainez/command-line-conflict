@@ -1,4 +1,3 @@
-import os  # TODO: Remove unused import.
 from pathlib import Path
 
 import pygame
@@ -103,7 +102,7 @@ class Game:
             try:
                 self.font = pygame.font.Font(str(bundled), 16)
                 log.debug(f"Loaded bundled font: {bundled}")
-            except Exception as e:
+            except pygame.error as e:
                 log.warning(f"Failed to load bundled font: {e}")
                 self.font = None
         else:

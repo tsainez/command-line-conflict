@@ -37,7 +37,7 @@ class EditorScene:
         except FileNotFoundError:
             self.map = Map(width=40, height=30)
             log.info("Created new blank map")
-        except Exception as e:
+        except (IOError, ValueError) as e:
             log.error(f"Error loading map: {e}")
             self.map = Map(width=40, height=30)
 
@@ -137,7 +137,7 @@ class EditorScene:
 
     def _draw_ui(self, screen):
         # TODO: Fix f-string missing placeholders or remove f-prefix.
-        text = f"Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
+        text = "Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
         surf = self.ui_font.render(text, True, (255, 255, 255))
         screen.blit(surf, (10, 10))
 
@@ -166,7 +166,7 @@ class EditorScene:
                     defaultextension=".json",
                 )
                 root.destroy()
-            except Exception as e:
+            except tk.TclError as e:
                 log.error(f"Tkinter error: {e}. Falling back to console.")
                 print(f"Tkinter error: {e}")
                 use_console = True
@@ -196,7 +196,7 @@ class EditorScene:
                 self.map_path = file_path  # Update current path
                 log.info(f"Map saved to {file_path}.")
                 print(f"Map saved to {file_path}.")
-            except Exception as e:
+            except (IOError, ValueError) as e:
                 log.error(f"Failed to save map: {e}")
 
     def load_map(self):
@@ -218,7 +218,7 @@ class EditorScene:
                     filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
                 )
                 root.destroy()
-            except Exception as e:
+            except tk.TclError as e:
                 log.error(f"Tkinter error: {e}. Falling back to console.")
                 print(f"Tkinter error: {e}")
                 use_console = True
@@ -260,6 +260,6 @@ class EditorScene:
                 self.map_path = file_path
                 log.info(f"Map loaded from {file_path}.")
                 print(f"Map loaded from {file_path}.")
-            except Exception as e:
+            except (IOError, ValueError) as e:
                 log.error(f"Failed to load map: {e}")
                 print(f"Failed to load map: {e}")

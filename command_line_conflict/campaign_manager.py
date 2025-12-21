@@ -56,13 +56,13 @@ class CampaignManager:
             return
 
         try:
-            with open(self.save_file, "r") as f:
+            with open(self.save_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 self.completed_missions = data.get("completed_missions", [])
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
                 log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
-        except Exception as e:
+        except (IOError, json.JSONDecodeError) as e:
             log.error(f"Failed to load save file: {e}")
 
     def save_progress(self) -> None:
@@ -71,10 +71,10 @@ class CampaignManager:
             "completed_missions": self.completed_missions,
         }
         try:
-            with open(self.save_file, "w") as f:
+            with open(self.save_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
             log.info("Campaign progress saved.")
-        except Exception as e:
+        except IOError as e:
             log.error(f"Failed to save progress: {e}")
 
     def complete_mission(self, mission_id: str) -> None:

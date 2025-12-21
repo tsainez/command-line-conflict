@@ -26,6 +26,4 @@ def test_chat_input_length_limit():
         chat.handle_event(event)
 
     # We expect the input to be truncated to a reasonable limit (e.g. 200)
-    assert (
-        len(chat.input_text) <= 200
-    ), f"Chat input length {len(chat.input_text)} exceeds limit"
+    assert len(chat.input_text) <= 200, f"Chat input length {len(chat.input_text)} exceeds limit"
