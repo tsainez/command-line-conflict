@@ -55,7 +55,7 @@ class CombatSystem:
                         movable.path = []
                         movable.target_x, movable.target_y = my_pos.x, my_pos.y
 
-                    if attack.attack_cooldown <= 0 and attack.attack_damage > 0:
+                    if attack.attack_cooldown <= 0 and attack.attack_damage > 0:  # pylint: disable=chained-comparison
                         if config.DEBUG:
                             # Get entity names for logging
                             attacker_identity = components.get(UnitIdentity)

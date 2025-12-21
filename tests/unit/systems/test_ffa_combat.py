@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+# pylint: disable=redefined-outer-name
 import pytest
 
 from command_line_conflict.components.attack import Attack

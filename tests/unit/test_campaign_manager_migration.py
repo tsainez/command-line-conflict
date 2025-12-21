@@ -32,7 +32,7 @@ class TestCampaignManagerMigration(unittest.TestCase):
 
     def test_migration_legacy_file(self):
         # Create a dummy legacy save file in current directory (which is self.test_dir)
-        with open(DEFAULT_SAVE_FILENAME, "w") as f:
+        with open(DEFAULT_SAVE_FILENAME, "w", encoding="utf-8") as f:
             f.write("{}")
 
         manager = CampaignManager()
@@ -44,12 +44,12 @@ class TestCampaignManagerMigration(unittest.TestCase):
 
     def test_no_migration_if_dest_exists(self):
         # Create legacy file
-        with open(DEFAULT_SAVE_FILENAME, "w") as f:
+        with open(DEFAULT_SAVE_FILENAME, "w", encoding="utf-8") as f:
             f.write('{"legacy": true}')
 
         # Create destination directory and file
         self.temp_data_dir.mkdir(parents=True)
-        with open(self.temp_data_dir / DEFAULT_SAVE_FILENAME, "w") as f:
+        with open(self.temp_data_dir / DEFAULT_SAVE_FILENAME, "w", encoding="utf-8") as f:
             f.write('{"new": true}')
 
         CampaignManager()
@@ -57,13 +57,13 @@ class TestCampaignManagerMigration(unittest.TestCase):
         # Legacy file should still exist (no overwrite)
         self.assertTrue(os.path.exists(DEFAULT_SAVE_FILENAME))
         # Dest file should remain unchanged
-        with open(self.temp_data_dir / DEFAULT_SAVE_FILENAME, "r") as f:
+        with open(self.temp_data_dir / DEFAULT_SAVE_FILENAME, "r", encoding="utf-8") as f:
             content = f.read()
             self.assertIn('"new": true', content)
 
     def test_explicit_path_no_migration(self):
         # Even if legacy file exists, providing explicit path should use that path
-        with open(DEFAULT_SAVE_FILENAME, "w") as f:
+        with open(DEFAULT_SAVE_FILENAME, "w", encoding="utf-8") as f:
             f.write("{}")
 
         custom_path = "custom_save.json"

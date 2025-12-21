@@ -5,8 +5,7 @@ from unittest.mock import MagicMock, patch
 # Set dummy video driver for headless testing
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-
-from command_line_conflict.systems.sound_system import SoundSystem  # noqa: E402
+from command_line_conflict.systems.sound_system import SoundSystem
 
 
 class TestSoundSystem(unittest.TestCase):
