@@ -46,29 +46,6 @@ class RenderingSystem:
         This method iterates through visible entities using the spatial map,
         drawing them based on their position and state.
         """
-        for entity_id, components in game_state.entities.items():
-            position = components.get(Position)
-            renderable = components.get(Renderable)
-            player = components.get(Player)  # TODO: Remove unused variable.
-
-            if position and renderable:
-                # Camera transform
-                cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-                cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-                grid_size = int(config.GRID_SIZE * self.camera.zoom)
-
-                confetti = components.get(Confetti)
-                if confetti:
-                    # Confetti is just a particle, so it should be simple
-                    colors = [
-                        (255, 0, 0),
-                        (0, 255, 0),
-                        (0, 0, 255),
-                        (255, 255, 0),
-                        (255, 0, 255),
-                        (0, 255, 255),
-                    ]
-                    color = random.choice(colors)
         screen_width = self.screen.get_width()
         screen_height = self.screen.get_height()
         tile_size = config.GRID_SIZE * self.camera.zoom
