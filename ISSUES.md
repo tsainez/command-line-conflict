@@ -41,10 +41,10 @@ The project structure documentation is currently empty.
 
 ## 3. Remove Unused Imports
 **Locations:**
-*   `command_line_conflict/engine.py`
-*   `command_line_conflict/systems/combat_system.py`
-*   `command_line_conflict/systems/selection_system.py`
-*   `command_line_conflict/systems/ui_system.py`
+*   ~~`command_line_conflict/engine.py`~~
+*   ~~`command_line_conflict/systems/combat_system.py`~~
+*   ~~`command_line_conflict/systems/selection_system.py`~~
+*   ~~`command_line_conflict/systems/ui_system.py`~~
 
 **Original TODOs:**
 *   `# TODO: Remove unused import.`
@@ -53,11 +53,11 @@ The project structure documentation is currently empty.
 Several files contain unused imports which clutter the code and can be confusing.
 
 **Instructions:**
-1.  Remove `import os` from `command_line_conflict/engine.py`.
-2.  Remove `Player` and `Vision` imports from `command_line_conflict/systems/combat_system.py` if they are indeed unused.
-3.  Remove `config` import from `command_line_conflict/systems/selection_system.py`.
-4.  Remove `import math` from `command_line_conflict/systems/ui_system.py`.
-5.  Remove the corresponding TODO comments.
+1.  ~~Remove `import os` from `command_line_conflict/engine.py`.~~
+2.  ~~Remove `Player` and `Vision` imports from `command_line_conflict/systems/combat_system.py` if they are indeed unused.~~
+3.  ~~Remove `config` import from `command_line_conflict/systems/selection_system.py`.~~
+4.  ~~Remove `import math` from `command_line_conflict/systems/ui_system.py`.~~
+5.  ~~Remove the corresponding TODO comments.~~
 
 ## 4. Fix Logic Bug and Unused Variables in Game Scene
 **Location:** `command_line_conflict/scenes/game.py`
