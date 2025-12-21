@@ -40,17 +40,31 @@ We enforce a strict code style to keep the codebase clean and maintainable.
 ### Running Checks
 Run the following commands before submitting your PR:
 
+You can use the provided `Makefile` to run all checks:
 ```bash
-# Format code
-black .
-isort .
+make check
+```
 
-# Lint code
-flake8 .
-pylint $(git ls-files '*.py')
+Or run individual steps:
+```bash
+make format  # Runs black and isort
+make lint    # Runs flake8 and pylint
+make test    # Runs pytest
+```
 
-# Run tests
-pytest --cov=command_line_conflict tests/
+Alternatively, you can run the pre-commit script:
+```bash
+./scripts/pre_commit.sh
+```
+
+### Pre-commit Hooks
+
+We support `pre-commit` to automatically check your code before you commit.
+To set it up:
+
+```bash
+pip install pre-commit
+pre-commit install
 ```
 
 ### Logging

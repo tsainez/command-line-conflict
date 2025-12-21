@@ -13,3 +13,4 @@ pytest
 flake8
 pytest-cov
 pylint
+pre-commit
