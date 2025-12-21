@@ -461,6 +461,17 @@ class GameScene:
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
             self.game.steam.unlock_achievement("VICTORY")
+            # Trigger victory sound (note: scene switch might cut it off if SoundSystem isn't persistent or updated)
+            # Since SoundSystem is part of GameScene, and we switch scene, we should ideally play it in the new scene
+            # or ensure the sound continues. For now, we emit the event.
+            # But wait, if we switch immediately, update won't process events.
+            # However, GameScene.update processes systems then checks win.
+            # So the event might be lost if we don't process it.
+            # Actually, SoundSystem.update is called BEFORE check_win_condition in update().
+            # So if we add event here, it won't be processed until NEXT frame's SoundSystem.update.
+            # But next frame we are in VictoryScene.
+            # So we should play it directly via self.sound_system.play_sound("victory") to ensure it starts.
+            self.sound_system.play_sound("victory")
             self.campaign_manager.complete_mission(self.current_mission_id)
             return True
         return False
@@ -482,6 +493,7 @@ class GameScene:
         if player_entity_count == 0:
             log.info("Defeat! Mission Failed.")
             self.game.steam.unlock_achievement("DEFEAT")
+            self.sound_system.play_sound("defeat")
             return True
         return False
 
