@@ -26,3 +26,7 @@
 2. Optimized `update`: Cached vision circle offsets to avoid repeated distance calculations (O(1) lookup vs O(R^2) math).
 3. Optimized `draw`: Intersect camera viewport with map bounds to render only visible tiles (O(View) vs O(MapSize)).
 **Result:** Reduced FogOfWar processing time from ~27ms to ~10.8ms (60% reduction) on a 256x256 map with 50 units.
+
+## 2025-05-25 - Zero-Copy Pathfinding Obstacles
+**Learning:** Avoiding the creation of temporary obstacle sets (O(N)) for A* pathfinding by passing the persistent `spatial_map` directly resulted in a ~20% speedup for short paths.
+**Action:** When filtering a large collection for a hot loop, prefer passing the collection reference and a small "exclusion" list rather than copying/modifying the collection.

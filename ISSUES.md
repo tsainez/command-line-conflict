@@ -73,17 +73,6 @@ In `GameScene`, the variable `unit_identity` is assigned the result of `componen
 4.  If not needed, remove the assignment entirely.
 5.  Remove the TODO comment.
 
-## 5. Remove Unused Variable in Rendering System
-**Location:** `command_line_conflict/systems/rendering_system.py`
-**Original TODO:** `# TODO: Remove unused variable.`
-
-**Description:**
-The `player` variable is assigned but never used in the rendering loop.
-
-**Instructions:**
-1.  Remove the line `player = components.get(Player)`.
-2.  Remove the TODO comment.
-
 ## 6. Fix F-string in Editor Scene
 **Location:** `command_line_conflict/scenes/editor.py`
 **Original TODO:** `# TODO: Fix f-string missing placeholders or remove f-prefix.`

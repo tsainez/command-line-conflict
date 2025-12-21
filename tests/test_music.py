@@ -29,6 +29,22 @@ class TestMusicManager(unittest.TestCase):
     @patch("pygame.mixer.music")
     @patch("pygame.mixer.init")
     @patch("pygame.mixer.get_init", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    def test_play_music_already_playing_same_track(
+        self, mock_exists, mock_get_init, mock_init, mock_music
+    ):
+        manager = MusicManager()
+        manager.current_track = "test.ogg"
+        mock_music.get_busy.return_value = True
+
+        manager.play("test.ogg")
+
+        mock_music.load.assert_not_called()
+        mock_music.play.assert_not_called()
+
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
     def test_stop_music(self, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.current_track = "something.ogg"
