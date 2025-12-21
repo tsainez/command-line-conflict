@@ -128,9 +128,7 @@ class UISystem:
 
             # Draw expanding ring
             max_radius = config.GRID_SIZE * self.camera.zoom
-            radius = int(max_radius * progress)
-            if radius < 1:
-                radius = 1
+            radius = max(1, int(max_radius * progress))
 
             # Fade out alpha (simulated by not drawing if too faint,
             # or we could use a surface, but circles are cheap.

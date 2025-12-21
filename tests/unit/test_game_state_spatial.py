@@ -45,7 +45,7 @@ def test_spatial_map_operations():
 
     # 4. Remove e2
     game_state.remove_entity(e2)
-    assert game_state.get_entities_at_position(5, 5) == []
+    assert not game_state.get_entities_at_position(5, 5)
     assert (5, 5) not in game_state.spatial_map  # cleanup empty key
 
     # 5. Move e1 to new location and remove via remove_component
@@ -53,4 +53,4 @@ def test_spatial_map_operations():
     assert game_state.get_entities_at_position(7, 7) == [e1]
 
     game_state.remove_component(e1, Position)
-    assert game_state.get_entities_at_position(7, 7) == []
+    assert not game_state.get_entities_at_position(7, 7)
