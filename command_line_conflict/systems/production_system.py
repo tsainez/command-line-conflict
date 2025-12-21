@@ -66,11 +66,11 @@ class ProductionSystem:
                         if self.campaign_manager.is_unit_unlocked(factory.output_unit):
                             self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
                             break  # Consumed unit, stop checking factories for this unit
-                        else:
-                            # Optional: Feedback that tech is not unlocked
-                            pass
+                        # Optional: Feedback that tech is not unlocked
 
-    def _transform_unit(self, game_state, input_unit_id, input_player, factory, position):
+    def _transform_unit(
+        self, game_state, input_unit_id, input_player, factory, position
+    ):  # pylint: disable=too-many-arguments
         """Performs the transformation from input unit to output unit."""
         log.info(f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}")
 
@@ -79,17 +79,18 @@ class ProductionSystem:
 
         # Create output unit
         factory_func = factories.UNIT_NAME_TO_FACTORY.get(factory.output_unit)
-        if factory_func:
-            # Preserve player ownership and human status
-            player_id = input_player.player_id if input_player else 1
-            is_human = input_player.is_human if input_player else True
-
-            factory_func(
-                game_state,
-                position.x,
-                position.y,
-                player_id=player_id,
-                is_human=is_human,
-            )
-        else:
+        if not factory_func:
             log.error(f"No factory function found for unit type: {factory.output_unit}")
+            return
+
+        # Preserve player ownership and human status
+        player_id = input_player.player_id if input_player else 1
+        is_human = input_player.is_human if input_player else True
+
+        factory_func(
+            game_state,
+            position.x,
+            position.y,
+            player_id=player_id,
+            is_human=is_human,
+        )

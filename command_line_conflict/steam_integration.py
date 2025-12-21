@@ -22,8 +22,8 @@ class SteamIntegration:
             log.info("Steamworks initialized successfully.")
         except ImportError:
             log.warning("steamworks module not found. Steam integration disabled.")
-        except Exception as e:
-            log.warning(f"Failed to initialize Steamworks: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            log.warning(f"Failed to initialize Steamworks: {e} ({type(e).__name__})")
 
     def unlock_achievement(self, achievement_name: str) -> None:
         """Unlocks a Steam achievement.
@@ -39,13 +39,13 @@ class SteamIntegration:
             self.steam.SetAchievement(achievement_name)
             self.steam.StoreStats()
             log.info(f"Unlocked achievement: {achievement_name}")
-        except Exception as e:
-            log.error(f"Failed to unlock achievement {achievement_name}: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            log.error(f"Failed to unlock achievement {achievement_name}: {e} ({type(e).__name__})")
 
     def update(self) -> None:
         """Runs Steam callbacks. Should be called every frame."""
         if self.initialized and self.steam:
             try:
                 self.steam.RunCallbacks()
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 pass
