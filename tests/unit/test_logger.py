@@ -14,8 +14,7 @@ def test_setup_logger_default_level(mock_get_logger):
     mock_get_logger.return_value = mock_logger
 
     with patch.dict(os.environ):
-        if "LOG_LEVEL" in os.environ:
-            del os.environ["LOG_LEVEL"]
+        os.environ.pop("LOG_LEVEL", None)
 
         # Case 1: DEBUG is False -> INFO
         with patch("command_line_conflict.config.DEBUG", False):
