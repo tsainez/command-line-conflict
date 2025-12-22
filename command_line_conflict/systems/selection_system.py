@@ -128,6 +128,8 @@ class SelectionSystem:
                     selectable.is_selected = not selectable.is_selected
                     status = "selected" if selectable.is_selected else "deselected"
                     log.debug(f"Shift-clicked unit {clicked_entity_id}: {status}")
+                    if selectable.is_selected:
+                        game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
             else:
                 for entity_id, components in game_state.entities.items():
                     selectable = components.get(Selectable)
@@ -135,6 +137,7 @@ class SelectionSystem:
                     if selectable:
                         selectable.is_selected = entity_id == clicked_entity_id
                 log.debug(f"Selected unit {clicked_entity_id}")
+                game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
         elif not shift_pressed:
             log.debug("Clicked on empty space, clearing selection")
             self.clear_selection(game_state)

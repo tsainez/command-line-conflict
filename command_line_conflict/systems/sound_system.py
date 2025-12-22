@@ -61,8 +61,9 @@ class SoundSystem:
         Args:
             name: The name of the sound file.
         """
-        # Placeholder path, assuming sounds are in a 'sounds' directory
-        filepath = f"sounds/{name}.ogg"
+        # Calculate path relative to this file
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        filepath = os.path.join(base_path, "sounds", f"{name}.ogg")
 
         if not os.path.exists(filepath):
             # Log warning only once per sound to avoid spam
