@@ -30,3 +30,7 @@
 ## 2025-05-25 - Zero-Copy Pathfinding Obstacles
 **Learning:** Avoiding the creation of temporary obstacle sets (O(N)) for A* pathfinding by passing the persistent `spatial_map` directly resulted in a ~20% speedup for short paths.
 **Action:** When filtering a large collection for a hot loop, prefer passing the collection reference and a small "exclusion" list rather than copying/modifying the collection.
+
+## 2025-12-22 - Replacing Python Draw Loops with Texture Blitting
+**Learning:** Even when culling visible tiles, iterating over 1000+ grid cells in Python to call `pygame.draw` or `surface.fill` is slow (~3ms). Replacing this with a persistent `pygame.Surface` (texture) updated via `PixelArray` (differential updates only) and drawn via `transform.scale` + `blit` (C-level) reduced draw time by ~50% in benchmarks.
+**Action:** For grid-based rendering layers (like fog, terrain), maintain a persistent off-screen surface and use blitting instead of per-tile drawing loops.
