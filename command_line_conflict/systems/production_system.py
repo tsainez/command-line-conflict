@@ -94,3 +94,6 @@ class ProductionSystem:
             player_id=player_id,
             is_human=is_human,
         )
+
+        # Trigger spawn sound
+        game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})

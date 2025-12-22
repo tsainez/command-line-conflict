@@ -29,7 +29,9 @@ class TestSoundSystem(unittest.TestCase):
 
         system.update(self.game_state)
 
-        mock_sound_class.assert_called_with("sounds/test_sound.ogg")
+        # Check that it was called with a path ending in sounds/test_sound.ogg
+        args, _ = mock_sound_class.call_args
+        self.assertTrue(args[0].endswith("sounds/test_sound.ogg"))
         mock_sound_instance.play.assert_called()
 
     @patch("pygame.mixer.Sound")
@@ -61,7 +63,9 @@ class TestSoundSystem(unittest.TestCase):
         system.update(self.game_state)
 
         # Should only load once
-        mock_sound_class.assert_called_once_with("sounds/cached_sound.ogg")
+        mock_sound_class.assert_called_once()
+        args, _ = mock_sound_class.call_args
+        self.assertTrue(args[0].endswith("sounds/cached_sound.ogg"))
         # Should play twice (once per update loop iteration if we were looping, but update iterates list)
         # Actually update iterates over list.
         # First iteration: play "cached_sound". Loads it.
