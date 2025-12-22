@@ -5,11 +5,19 @@ from .logger import log
 
 
 class FogOfWar:
-    """Manages the fog of war overlay, revealing the map based on unit vision."""
+    """Manages the fog of war overlay, revealing the map based on unit vision.
+
+    Optimized to use a persistent texture and differential updates.
+    """
 
     HIDDEN = 0
     EXPLORED = 1
     VISIBLE = 2
+
+    # Colors for the fog texture
+    COLOR_HIDDEN = (0, 0, 0, 255)
+    COLOR_EXPLORED = (0, 0, 0, 180)
+    COLOR_VISIBLE = (0, 0, 0, 0)
 
     def __init__(self, width: int, height: int):
         """Initializes the FogOfWar system.
@@ -20,8 +28,13 @@ class FogOfWar:
         """
         self.width = width
         self.height = height
+        # Logic grid
         self.grid = [[self.HIDDEN for _ in range(width)] for _ in range(height)]
-        self.surface = None
+
+        # Visual texture (1 pixel per tile)
+        self.fog_texture = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.fog_texture.fill(self.COLOR_HIDDEN)
+
         self.visible_cells = set()
         self._vision_cache = {}
         log.info(f"Initialized FogOfWar with grid size {width}x{height}")
@@ -40,19 +53,13 @@ class FogOfWar:
     def update(self, units: list) -> None:
         """Updates the fog of war based on unit positions and vision.
 
-        First, it downgrades all currently visible tiles to explored. Then, it
-        marks the tiles within each unit's vision range as visible.
-
         Args:
             units: A list of unit objects that have vision. Each unit must have
                    x, y, and vision_range attributes.
         """
-        # Step 1: Downgrade all previously VISIBLE tiles to EXPLORED
-        for x, y in self.visible_cells:
-            self.grid[y][x] = self.EXPLORED
-        self.visible_cells.clear()
+        # Calculate currently visible cells
+        current_visible = set()
 
-        # Step 2: Mark tiles within unit vision as VISIBLE
         for unit in units:
             ux, uy = int(unit.x), int(unit.y)
             vision_range = int(unit.vision_range)
@@ -62,74 +69,105 @@ class FogOfWar:
             for dx, dy in offsets:
                 x, y = ux + dx, uy + dy
                 if 0 <= x < self.width and 0 <= y < self.height:
-                    self.grid[y][x] = self.VISIBLE
-                    self.visible_cells.add((x, y))
+                    current_visible.add((x, y))
+
+        # Determine what changed
+        to_explore = self.visible_cells - current_visible
+        to_reveal = current_visible - self.visible_cells
+
+        # If nothing changed, we are done
+        if not to_explore and not to_reveal:
+            return
+
+        # Update grid and texture
+        # Using PixelArray for faster pixel access
+        try:
+            px = pygame.PixelArray(self.fog_texture)
+
+            for x, y in to_explore:
+                self.grid[y][x] = self.EXPLORED
+                px[x, y] = self.COLOR_EXPLORED
+
+            for x, y in to_reveal:
+                self.grid[y][x] = self.VISIBLE
+                px[x, y] = self.COLOR_VISIBLE
+
+            # No need to explicitly delete px, context manager or del works
+            del px
+        except Exception as e:  # pylint: disable=broad-except
+            log.error(f"Error updating fog texture: {e}")
+
+        # Update state
+        self.visible_cells = current_visible
 
     def draw(self, screen: pygame.Surface, camera=None) -> None:
-        """Draws the fog of war overlay onto the screen, using camera if provided.
+        """Draws the fog of war overlay onto the screen.
 
-        Hidden tiles are drawn as black, and explored tiles are drawn as a
-        semi-transparent black. Visible tiles are not drawn, allowing the
-        underlying map to be seen.
+        Scales the fog texture to match the screen view.
 
         Args:
             screen: The pygame screen surface to draw on.
             camera: The camera object for view/zoom (optional).
         """
-        if self.surface is None or self.surface.get_size() != screen.get_size():
-            log.debug(f"Creating FogOfWar surface with size {screen.get_size()}")
-            self.surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-
-        # Fill with opaque black (HIDDEN)
-        self.surface.fill((0, 0, 0, 255))
-
         grid_size = config.GRID_SIZE
         screen_w, screen_h = screen.get_size()
 
-        # Calculate visible grid bounds to avoid iterating over the entire map
-        start_x, start_y = 0, 0
-        end_x, end_y = self.width, self.height
-
         if camera:
-            scaled_grid_size = int(grid_size * camera.zoom)
-            if scaled_grid_size > 0:
-                start_x = int(camera.x)
-                end_x = int(camera.x + screen_w / scaled_grid_size) + 2
-                start_y = int(camera.y)
-                end_y = int(camera.y + screen_h / scaled_grid_size) + 2
+            # Determine visible portion of the map in grid coordinates
+            # Camera view in pixels:
+            # The map is drawn at: (x - cam.x) * tile_size * zoom
+            # We want to find the source rect in the texture corresponding to the screen.
+
+            zoom = camera.zoom
+            scaled_tile_size = grid_size * zoom
+
+            # Map top-left on screen
+            # map_screen_x = -camera.x * scaled_tile_size
+            # map_screen_y = -camera.y * scaled_tile_size
+
+            # Better: Subsurface the visible part of the texture, then scale it.
+
+            start_x = int(camera.x)
+            start_y = int(camera.y)
+            # Add buffer
+            width_tiles = int(screen_w / scaled_tile_size) + 2
+            height_tiles = int(screen_h / scaled_tile_size) + 2
+
+            # Clamp
+            start_x = max(0, min(start_x, self.width))
+            start_y = max(0, min(start_y, self.height))
+
+            end_x = min(self.width, start_x + width_tiles)
+            end_y = min(self.height, start_y + height_tiles)
+
+            w = end_x - start_x
+            h = end_y - start_y
+
+            if w <= 0 or h <= 0:
+                return
+
+            # Extract source patch
+            sub = self.fog_texture.subsurface((start_x, start_y, w, h))
+
+            # Target size
+            target_w = int(w * scaled_tile_size)
+            target_h = int(h * scaled_tile_size)
+
+            # Scale
+            scaled = pygame.transform.scale(sub, (target_w, target_h))
+
+            # Blit position
+            # (start_x - camera.x) * scaled_tile_size
+            pos_x = (start_x - camera.x) * scaled_tile_size
+            pos_y = (start_y - camera.y) * scaled_tile_size
+
+            screen.blit(scaled, (pos_x, pos_y))
+
         else:
-            if grid_size > 0:
-                end_x = int(screen_w / grid_size) + 2
-                end_y = int(screen_h / grid_size) + 2
+            # Full map fit to screen? Or just scale by grid size?
+            # Original code: if no camera, just scale by grid_size starting at 0,0
+            target_w = self.width * grid_size
+            target_h = self.height * grid_size
 
-        # Clamp to map bounds
-        start_x = max(0, start_x)
-        end_x = min(self.width, end_x)
-        start_y = max(0, start_y)
-        end_y = min(self.height, end_y)
-
-        for y in range(start_y, end_y):
-            for x in range(start_x, end_x):
-                state = self.grid[y][x]
-                if state == self.HIDDEN:
-                    continue
-
-                draw_x, draw_y = x, y
-                size = grid_size
-                if camera:
-                    draw_x = (x - camera.x) * grid_size * camera.zoom
-                    draw_y = (y - camera.y) * grid_size * camera.zoom
-                    size = int(grid_size * camera.zoom)
-                else:
-                    draw_x *= grid_size
-                    draw_y *= grid_size
-
-                # Ensure we draw integers for rect
-                rect = (int(draw_x), int(draw_y), size + 1, size + 1)
-
-                if state == self.VISIBLE:
-                    self.surface.fill((0, 0, 0, 0), rect)
-                elif state == self.EXPLORED:
-                    self.surface.fill((0, 0, 0, 180), rect)
-
-        screen.blit(self.surface, (0, 0))
+            scaled = pygame.transform.scale(self.fog_texture, (target_w, target_h))
+            screen.blit(scaled, (0, 0))
