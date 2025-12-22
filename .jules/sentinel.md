@@ -19,3 +19,8 @@
 **Vulnerability:** The `Map.from_dict` method iterated over an arbitrarily long list of walls before validating them, allowing CPU exhaustion via malicious JSON files with millions of items.
 **Learning:** Validating individual items in a loop is expensive if the input size is unchecked. Resource consumption (CPU) can be attacked even if the final state (memory) is bounded.
 **Prevention:** Verify list lengths against expected bounds (e.g., `width * height`) *before* processing elements. Truncate or reject excessive input early.
+
+## 2025-12-21 - Unbounded File Read DoS in Map Loading
+**Vulnerability:** `Map.load_from_file` blindly read the entire file content into memory via `json.load` before performing validation, allowing Memory Exhaustion (DoS) via large files.
+**Learning:** Checking content validity (dimensions, wall count) after reading is insufficient if the act of reading itself exhausts resources. JSON parsing loads the entire object graph into RAM.
+**Prevention:** Check file size using `os.path.getsize` against a strict limit before opening the file.

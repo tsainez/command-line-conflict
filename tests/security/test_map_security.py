@@ -77,3 +77,18 @@ class TestMapSecurity(unittest.TestCase):
         args, _ = mock_log.warning.call_args
         self.assertIn("Too many walls defined", args[0])
         self.assertIn(f"Truncating to {max_walls}", args[0])
+
+    @patch("command_line_conflict.maps.base.open")
+    @patch("command_line_conflict.maps.base.os.path.getsize")
+    def test_load_from_file_size_limit(self, mock_getsize, mock_open):
+        """Verify that loading large map files raises ValueError."""
+        # Set size larger than limit (assuming 2MB limit)
+        mock_getsize.return_value = 5 * 1024 * 1024  # 5MB
+
+        with self.assertRaises(ValueError) as cm:
+            Map.load_from_file("large_map.json")
+
+        self.assertIn("exceeds maximum allowed size", str(cm.exception))
+
+        # Ensure open was NOT called
+        mock_open.assert_not_called()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
 
@@ -19,6 +20,7 @@ class Map:
     """
 
     MAX_MAP_DIMENSION = 256  # Security limit to prevent DoS via memory exhaustion
+    MAX_FILE_SIZE = 2 * 1024 * 1024  # Security limit: 2MB max file size
 
     def __init__(self, width: int = 40, height: int = 30) -> None:
         """Initializes the map.
@@ -214,7 +216,6 @@ class Map:
             filename: The path to the file to save to.
         """
         import json
-        import os
 
         # Ensure directory exists
         os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
@@ -231,8 +232,15 @@ class Map:
 
         Returns:
             The loaded Map instance.
+
+        Raises:
+            ValueError: If the file size exceeds MAX_FILE_SIZE.
         """
         import json
+
+        # Security: Check file size to prevent DoS via memory exhaustion
+        if os.path.getsize(filename) > cls.MAX_FILE_SIZE:
+            raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
 
         with open(filename, "r", encoding="utf-8") as f:
             data = json.load(f)
