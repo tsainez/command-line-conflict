@@ -43,4 +43,6 @@ class SpawnSystem:
                 # Check if occupied by another entity
                 if not game_state.get_entities_at_position(x, y):
                     factories.create_wildlife(game_state, float(x), float(y))
+                    # Trigger spawn sound
+                    game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})
                     return
