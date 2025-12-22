@@ -24,3 +24,8 @@
 **Vulnerability:** `Map.load_from_file` blindly read the entire file content into memory via `json.load` before performing validation, allowing Memory Exhaustion (DoS) via large files.
 **Learning:** Checking content validity (dimensions, wall count) after reading is insufficient if the act of reading itself exhausts resources. JSON parsing loads the entire object graph into RAM.
 **Prevention:** Check file size using `os.path.getsize` against a strict limit before opening the file.
+
+## 2025-12-22 - Unbounded Save File Loading DoS
+**Vulnerability:** `CampaignManager` loaded arbitrary save files into memory and processed unbounded mission lists without validation, risking Memory Exhaustion.
+**Learning:** Local save files are untrusted input. `json.load` is vulnerable to large file DoS.
+**Prevention:** Enforce strict file size limits (`os.path.getsize`) before opening and validate/truncate list lengths immediately after parsing.
