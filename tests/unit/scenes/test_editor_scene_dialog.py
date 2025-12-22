@@ -1,10 +1,10 @@
-
-import os
-import pytest
 from unittest.mock import MagicMock, patch
+
 import pygame
+import pytest
+
 from command_line_conflict.scenes.editor import EditorScene
-from command_line_conflict.maps.base import Map
+
 
 class TestEditorSceneDialog:
 
@@ -78,12 +78,12 @@ class TestEditorSceneDialog:
         event.type = pygame.KEYDOWN
         event.key = pygame.K_s
 
-        with patch.object(editor_scene, 'open_save_dialog') as mock_open:
+        with patch.object(editor_scene, "open_save_dialog") as mock_open:
             editor_scene.handle_event(event)
             mock_open.assert_called_once()
 
         # 'l' key
         event.key = pygame.K_l
-        with patch.object(editor_scene, 'open_load_dialog') as mock_open:
+        with patch.object(editor_scene, "open_load_dialog") as mock_open:
             editor_scene.handle_event(event)
             mock_open.assert_called_once()

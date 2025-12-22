@@ -1,9 +1,5 @@
-import os
 import unittest
 from unittest.mock import MagicMock, patch
-
-# Set dummy video driver for headless testing
-os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 from command_line_conflict.systems.sound_system import SoundSystem
 

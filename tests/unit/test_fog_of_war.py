@@ -1,7 +1,6 @@
 from types import SimpleNamespace
 from unittest.mock import Mock
 
-from command_line_conflict import config
 from command_line_conflict.fog_of_war import FogOfWar
 
 

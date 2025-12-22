@@ -1,91 +1,49 @@
 import os
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from command_line_conflict.scenes.editor import EditorScene
+from command_line_conflict.ui.file_dialog import FileDialog
 
 
 class TestEditorPathTraversal(unittest.TestCase):
-    def setUp(self):
-        self.mock_game = MagicMock()
-        self.mock_game.font = MagicMock()
-        self.mock_game.screen.get_size.return_value = (800, 600)
-
-    @patch("command_line_conflict.scenes.editor.input")
-    @patch("command_line_conflict.scenes.editor.os.path.exists")
-    @patch("command_line_conflict.scenes.editor.Map")
-    def test_save_map_path_traversal_fix(self, mock_map_cls, mock_exists, mock_input):
+    def test_path_traversal_sanitization(self):
         """
-        Test that path traversal is blocked in save_map.
+        Test that path traversal characters are stripped from the filename.
         """
-        # We need to construct EditorScene.
-        # Since we mock Map class, EditorScene will use the mock.
-        editor = EditorScene(self.mock_game)
+        # Mock screen and font
+        screen = MagicMock()
+        font = MagicMock()
+        font.render.return_value = MagicMock()
 
-        # Force console mode
-        with patch("command_line_conflict.scenes.editor.HAS_TKINTER", False):
-            # Simulate user entering a path traversal filename
-            mock_input.return_value = "../evil_map"
-            mock_exists.return_value = True
+        initial_dir = os.path.join("tmp", "maps")
+        dialog = FileDialog(screen, font, "Test", initial_dir, mode="save")
 
-            editor.save_map()
+        # Simulate user inputting a path traversal string
+        dialog.input_text = "../../../etc/passwd"
 
-            editor.map.save_to_file.assert_called()  # pylint: disable=no-member
-            args, _ = editor.map.save_to_file.call_args  # pylint: disable=no-member
-            saved_path = args[0]
+        # Confirm selection
+        result = dialog._confirm_selection()
 
-            normalized_path = os.path.normpath(saved_path)
+        # Expected behavior: os.path.basename should strip directory components
+        # resulting in "passwd" (and extension added if needed, default .json)
+        # So "passwd.json" inside initial_dir
 
-            # We expect the path to be sanitized to "evil_map.json" inside custom dir
-            # Vulnerable code produces: .../maps/custom/../evil_map.json -> .../maps/evil_map.json
-            # Fixed code produces: .../maps/custom/evil_map.json
+        expected_filename = "passwd.json"
+        expected_path = os.path.join(initial_dir, expected_filename)
 
-            expected_suffix = os.path.join("maps", "custom", "evil_map.json")
-            self.assertTrue(
-                normalized_path.endswith(expected_suffix),
-                f"Path traversal detected! Path: {normalized_path}",
-            )
+        self.assertEqual(result, expected_path)
 
-    @patch("command_line_conflict.scenes.editor.input")
-    @patch("command_line_conflict.scenes.editor.os.path.exists")
-    @patch("command_line_conflict.scenes.editor.Map")
-    def test_load_map_path_traversal_fix(self, mock_map_cls, mock_exists, mock_input):
-        """
-        Test that path traversal is blocked in load_map.
-        """
-        editor = EditorScene(self.mock_game)
+    def test_path_traversal_with_extension(self):
+        screen = MagicMock()
+        font = MagicMock()
+        font.render.return_value = MagicMock()
 
-        with patch("command_line_conflict.scenes.editor.HAS_TKINTER", False):
-            mock_input.return_value = "../secret_file"
-            mock_exists.return_value = True
+        initial_dir = os.path.join("tmp", "maps")
+        dialog = FileDialog(screen, font, "Test", initial_dir, mode="save")
 
-            editor.load_map()
+        dialog.input_text = "../evil.json"
 
-            mock_map_cls.load_from_file.assert_called()  # pylint: disable=no-member
-            args, _ = mock_map_cls.load_from_file.call_args  # pylint: disable=no-member
-            loaded_path = args[0]
+        result = dialog._confirm_selection()
 
-            normalized_path = os.path.normpath(loaded_path)
-            expected_suffix = os.path.join("maps", "custom", "secret_file.json")
-            self.assertTrue(
-                normalized_path.endswith(expected_suffix),
-                f"Path traversal detected in load! Path: {normalized_path}",
-            )
-
-    @patch("command_line_conflict.scenes.editor.input")
-    @patch("command_line_conflict.scenes.editor.os.path.exists")
-    @patch("command_line_conflict.scenes.editor.Map")
-    def test_save_map_valid_filename(self, mock_map_cls, mock_exists, mock_input):
-        editor = EditorScene(self.mock_game)
-        with patch("command_line_conflict.scenes.editor.HAS_TKINTER", False):
-            mock_input.return_value = "good_map"
-            mock_exists.return_value = True
-
-            editor.save_map()
-
-            editor.map.save_to_file.assert_called()  # pylint: disable=no-member
-            args, _ = editor.map.save_to_file.call_args  # pylint: disable=no-member
-            saved_path = args[0]
-            normalized_path = os.path.normpath(saved_path)
-            expected_suffix = os.path.join("maps", "custom", "good_map.json")
-            self.assertTrue(normalized_path.endswith(expected_suffix))
+        expected_path = os.path.join(initial_dir, "evil.json")
+        self.assertEqual(result, expected_path)

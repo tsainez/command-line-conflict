@@ -1,9 +1,5 @@
-import os
 import unittest
 from unittest.mock import patch
-
-# Set dummy video driver for headless testing
-os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 from command_line_conflict.music import MusicManager
 
@@ -30,9 +26,7 @@ class TestMusicManager(unittest.TestCase):
     @patch("pygame.mixer.init")
     @patch("pygame.mixer.get_init", return_value=True)
     @patch("os.path.exists", return_value=True)
-    def test_play_music_already_playing_same_track(
-        self, mock_exists, mock_get_init, mock_init, mock_music
-    ):
+    def test_play_music_already_playing_same_track(self, mock_exists, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.current_track = "test.ogg"
         mock_music.get_busy.return_value = True
