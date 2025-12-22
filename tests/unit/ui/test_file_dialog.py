@@ -1,9 +1,11 @@
-
 import os
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
 import pygame
+import pytest
+
 from command_line_conflict.ui.file_dialog import FileDialog
+
 
 class TestFileDialog:
 
@@ -61,7 +63,7 @@ class TestFileDialog:
         event = MagicMock()
         event.type = pygame.MOUSEBUTTONDOWN
         event.button = 1
-        event.pos = (150, 105) # Just inside first item
+        event.pos = (150, 105)  # Just inside first item
 
         # We need to rely on the actual implementation of idx calculation
         # idx = (event.pos[1] - self.file_list_rect.y) // self.item_height + self.scroll_offset

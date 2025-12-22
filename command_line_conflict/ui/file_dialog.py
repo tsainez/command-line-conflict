@@ -1,8 +1,10 @@
-
 import os
+
 import pygame
+
 from command_line_conflict import config
 from command_line_conflict.logger import log
+
 
 class FileDialog:
     """A simple in-game file dialog for saving and loading files."""
@@ -78,8 +80,8 @@ class FileDialog:
                     if 0 <= idx < len(self.files):
                         self.input_text = self.files[idx]
                         if self.mode == "load":
-                             # Double click logic could go here, but for now single click selects
-                             pass
+                            # Double click logic could go here, but for now single click selects
+                            pass
 
                 if self.action_button_rect.collidepoint(event.pos):
                     return self._confirm_selection()
@@ -127,7 +129,7 @@ class FileDialog:
 
         # Draw background
         pygame.draw.rect(self.screen, (50, 50, 50), self.rect)
-        pygame.draw.rect(self.screen, (200, 200, 200), self.rect, 2) # Border
+        pygame.draw.rect(self.screen, (200, 200, 200), self.rect, 2)  # Border
 
         # Draw Title
         title_surf = self.font.render(self.title, True, (255, 255, 255))
@@ -152,7 +154,9 @@ class FileDialog:
 
             # Highlight selected
             if f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text):
-                 pygame.draw.rect(self.screen, (70, 70, 100), (self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height))
+                pygame.draw.rect(
+                    self.screen, (70, 70, 100), (self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
+                )
 
             text_surf = self.font.render(f, True, (200, 200, 200))
             self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))

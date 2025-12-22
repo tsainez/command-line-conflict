@@ -34,9 +34,7 @@ def setup_logger():
 
         # Security: Rotate logs to prevent disk exhaustion (DoS)
         # Limit to 5MB, keep 1 backup
-        file_handler = logging.handlers.RotatingFileHandler(
-            str(log_file), maxBytes=5 * 1024 * 1024, backupCount=1
-        )
+        file_handler = logging.handlers.RotatingFileHandler(str(log_file), maxBytes=5 * 1024 * 1024, backupCount=1)
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)

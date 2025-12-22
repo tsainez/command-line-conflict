@@ -44,9 +44,7 @@ def test_setup_logger_debug_level(mock_get_logger):
 @patch("command_line_conflict.logger.logging.getLogger")
 @patch("command_line_conflict.logger.logging.handlers.RotatingFileHandler")
 @patch("command_line_conflict.logger.get_user_data_dir")
-def test_setup_logger_file_handler_secure(
-    mock_get_user_data, mock_rotating_handler, mock_get_logger
-):
+def test_setup_logger_file_handler_secure(mock_get_user_data, mock_rotating_handler, mock_get_logger):
     """
     Tests that the logger uses RotatingFileHandler in the user data directory.
     """
@@ -66,6 +64,4 @@ def test_setup_logger_file_handler_secure(
     mock_path.mkdir.assert_called_with(parents=True, exist_ok=True)
 
     # Verify secure handler usage
-    mock_rotating_handler.assert_called_with(
-        "/mock/path/game.log", maxBytes=5 * 1024 * 1024, backupCount=1
-    )
+    mock_rotating_handler.assert_called_with("/mock/path/game.log", maxBytes=5 * 1024 * 1024, backupCount=1)
