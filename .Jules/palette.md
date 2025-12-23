@@ -14,3 +14,7 @@
 ## 2025-05-25 - Menu Interaction Consistency
 **Learning:** Purely keyboard-driven menus in a desktop environment break the user's mental model of "point and click" interaction, especially when switching between game (mouse-heavy) and menu contexts. This creates a jarring disconnect for users expecting standard UI behavior.
 **Action:** Ensure all menu scenes support mouse hover for selection and click for activation, mirroring the keyboard navigation logic to provide a consistent and expected experience.
+
+## 2025-12-22 - Hidden Command Feedback
+**Learning:** Hidden commands (like hotkeys or debug toggles) without immediate visual feedback create uncertainty and "mode errors" where users forget the current state.
+**Action:** Always pair state-changing hotkeys with a toast, chat message, or visual indicator to confirm the action and current state.
