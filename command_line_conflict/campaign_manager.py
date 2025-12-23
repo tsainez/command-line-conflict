@@ -26,6 +26,7 @@ class CampaignManager:
 
     MAX_SAVE_FILE_SIZE = 512 * 1024  # 512KB limit to prevent DoS
     MAX_MISSIONS_COUNT = 1000  # Limit number of missions to track
+    MAX_MISSION_ID_LENGTH = 64  # Security limit for mission ID length
 
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
@@ -81,8 +82,14 @@ class CampaignManager:
                     log.warning(f"Too many completed missions ({len(missions)}). Truncating to {self.MAX_MISSIONS_COUNT}.")
                     missions = missions[:self.MAX_MISSIONS_COUNT]
 
-                # Ensure all entries are strings
-                self.completed_missions = [str(m) for m in missions]
+                # Ensure all entries are strings and within length limits
+                self.completed_missions = []
+                for m in missions:
+                    m_str = str(m)
+                    if len(m_str) <= self.MAX_MISSION_ID_LENGTH:
+                        self.completed_missions.append(m_str)
+                    else:
+                        log.warning(f"Skipping mission ID exceeding length limit: {m_str[:20]}...")
 
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
@@ -108,7 +115,17 @@ class CampaignManager:
         Args:
             mission_id: The unique identifier of the completed mission.
         """
+        # Security check: Validate mission ID length
+        if len(mission_id) > self.MAX_MISSION_ID_LENGTH:
+            log.warning(f"Failed to complete mission: ID '{mission_id[:20]}...' exceeds maximum length of {self.MAX_MISSION_ID_LENGTH}")
+            return
+
         if mission_id not in self.completed_missions:
+            # Security check: Validate max missions count
+            if len(self.completed_missions) >= self.MAX_MISSIONS_COUNT:
+                log.warning(f"Failed to complete mission {mission_id}: Maximum mission count ({self.MAX_MISSIONS_COUNT}) reached.")
+                return
+
             log.info(f"Mission {mission_id} completed!")
             self.completed_missions.append(mission_id)
             self._update_unlocks()

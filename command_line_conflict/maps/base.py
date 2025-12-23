@@ -21,6 +21,7 @@ class Map:
 
     MAX_MAP_DIMENSION = 256  # Security limit to prevent DoS via memory exhaustion
     MAX_FILE_SIZE = 2 * 1024 * 1024  # Security limit: 2MB max file size
+    MAX_PATHFINDING_ITERATIONS = 50000 # Security limit to prevent pathfinding freeze
 
     def __init__(self, width: int = 40, height: int = 30) -> None:
         """Initializes the map.
@@ -107,7 +108,15 @@ class Map:
         came_from: Dict[Tuple[int, int], Tuple[int, int]] = {}
         g_score = {start: 0}
 
+        iterations = 0
+
         while open_set:
+            # Security: Prevent infinite loops or excessive CPU usage
+            iterations += 1
+            if iterations > self.MAX_PATHFINDING_ITERATIONS:
+                log.warning(f"Pathfinding iteration limit reached ({self.MAX_PATHFINDING_ITERATIONS}). Aborting.")
+                return []
+
             _, current = heappop(open_set)
             if current == goal:
                 path = []
