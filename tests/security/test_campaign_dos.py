@@ -1,8 +1,10 @@
-import unittest
-import os
 import json
+import os
 import tempfile
+import unittest
+
 from command_line_conflict.campaign_manager import CampaignManager
+
 
 class TestCampaignManagerDoS(unittest.TestCase):
     def setUp(self):
@@ -21,7 +23,7 @@ class TestCampaignManagerDoS(unittest.TestCase):
             f.write(" " * (1024 * 1024))
 
         # We expect an error log when loading fails due to size
-        with self.assertLogs('Command Line Conflict', level='ERROR') as cm:
+        with self.assertLogs("Command Line Conflict", level="ERROR") as cm:
             manager = CampaignManager(save_file=self.save_file)
 
         # Verify that it didn't load (empty missions)
@@ -31,16 +33,14 @@ class TestCampaignManagerDoS(unittest.TestCase):
 
     def test_load_excessive_missions_truncation(self):
         # Create a valid JSON but with excessive items
-        limit = 1000 # The limit we plan to set
+        limit = 1000  # The limit we plan to set
         excess = 5000
-        data = {
-            "completed_missions": [f"mission_{i}" for i in range(excess)]
-        }
+        data = {"completed_missions": [f"mission_{i}" for i in range(excess)]}
         with open(self.save_file, "w") as f:
             json.dump(data, f)
 
-        with self.assertLogs('Command Line Conflict', level='WARNING') as cm:
-             manager = CampaignManager(save_file=self.save_file)
+        with self.assertLogs("Command Line Conflict", level="WARNING") as cm:
+            manager = CampaignManager(save_file=self.save_file)
 
         # Should be truncated to the limit
         self.assertLessEqual(len(manager.completed_missions), limit)

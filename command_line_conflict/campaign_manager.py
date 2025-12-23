@@ -79,7 +79,7 @@ class CampaignManager:
 
                 if len(missions) > self.MAX_MISSIONS_COUNT:
                     log.warning(f"Too many completed missions ({len(missions)}). Truncating to {self.MAX_MISSIONS_COUNT}.")
-                    missions = missions[:self.MAX_MISSIONS_COUNT]
+                    missions = missions[: self.MAX_MISSIONS_COUNT]
 
                 # Ensure all entries are strings
                 self.completed_missions = [str(m) for m in missions]
