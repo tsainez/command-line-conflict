@@ -24,6 +24,9 @@ MISSION_REWARDS: Dict[str, List[str]] = {
 class CampaignManager:
     """Manages campaign progress, including completed missions and unlocked units."""
 
+    MAX_SAVE_FILE_SIZE = 512 * 1024  # 512KB limit to prevent DoS
+    MAX_MISSIONS_COUNT = 1000  # Limit number of missions to track
+
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
             self.save_file = save_file
@@ -55,10 +58,32 @@ class CampaignManager:
             log.info("No save file found. Starting new campaign.")
             return
 
+        # Security check: File size
+        try:
+            if os.path.getsize(self.save_file) > self.MAX_SAVE_FILE_SIZE:
+                log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
+                return
+        except OSError as e:
+            log.error(f"Failed to check save file size: {e}")
+            return
+
         try:
             with open(self.save_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                self.completed_missions = data.get("completed_missions", [])
+
+                # Security check: Validate structure and limits
+                missions = data.get("completed_missions", [])
+                if not isinstance(missions, list):
+                    missions = []
+                    log.warning("Invalid 'completed_missions' format, expected list. Resetting.")
+
+                if len(missions) > self.MAX_MISSIONS_COUNT:
+                    log.warning(f"Too many completed missions ({len(missions)}). Truncating to {self.MAX_MISSIONS_COUNT}.")
+                    missions = missions[:self.MAX_MISSIONS_COUNT]
+
+                # Ensure all entries are strings
+                self.completed_missions = [str(m) for m in missions]
+
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
                 log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
