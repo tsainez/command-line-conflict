@@ -37,6 +37,7 @@ class FogOfWar:
 
         self.visible_cells = set()
         self._vision_cache = {}
+        self._last_vision_sources = set()
         log.info(f"Initialized FogOfWar with grid size {width}x{height}")
 
     def _get_vision_offsets(self, radius: int) -> list[tuple[int, int]]:
@@ -57,6 +58,18 @@ class FogOfWar:
             units: A list of unit objects that have vision. Each unit must have
                    x, y, and vision_range attributes.
         """
+        # Optimization: Check if vision sources have changed
+        # We care about integer grid coordinates and vision range.
+        # This reduces update cost from O(N*R^2) to O(N) when units are stationary.
+        current_sources = set()
+        for unit in units:
+            current_sources.add((int(unit.x), int(unit.y), int(unit.vision_range)))
+
+        if current_sources == self._last_vision_sources:
+            return
+
+        self._last_vision_sources = current_sources
+
         # Calculate currently visible cells
         current_visible = set()
 

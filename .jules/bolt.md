@@ -34,3 +34,7 @@
 ## 2025-12-22 - Replacing Python Draw Loops with Texture Blitting
 **Learning:** Even when culling visible tiles, iterating over 1000+ grid cells in Python to call `pygame.draw` or `surface.fill` is slow (~3ms). Replacing this with a persistent `pygame.Surface` (texture) updated via `PixelArray` (differential updates only) and drawn via `transform.scale` + `blit` (C-level) reduced draw time by ~50% in benchmarks.
 **Action:** For grid-based rendering layers (like fog, terrain), maintain a persistent off-screen surface and use blitting instead of per-tile drawing loops.
+
+## 2025-12-23 - Skipping Fog Calculations for Stationary Units
+**Learning:** Even with optimized rendering (PixelArray), recalculating the visible set for Fog of War every frame (O(N*R^2)) is wasteful if units haven't moved. Implementing a simple check for changes in unit state (position/range) reduced update time by ~98% (4.5ms -> 0.07ms) for stationary frames.
+**Action:** For systems that process the same input repeatedly (like Fog of War or static UI), check if the input state signature has changed before recalculating.
