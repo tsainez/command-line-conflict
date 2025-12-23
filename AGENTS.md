@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## Agent Instructions
+Before creating a Pull Request, you **must** run the pre-commit script to verify your changes:
+```bash
+./scripts/pre_commit.sh
+```
+All checks (formatting, linting, testing) must pass.
+
 This file contains a backlog of 100 potential tasks that can be performed by autonomous coding agents to improve the `command_line_conflict` project.
 
 ## Features / Gameplay
