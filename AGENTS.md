@@ -86,9 +86,9 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 75. Implement fuzz testing for input handling.
 76. Add visual regression tests (comparing screen output snapshots).
 77. Create a stress test spawning 1000 units to check stability.
-78. Add test coverage reporting (target > 80%).
+78. [x] Add test coverage reporting (target > 80%).
 79. Implement automated map validation (check for unreachable areas).
-80. Add static analysis (pylint, mypy) checks to the pipeline.
+80. [x] Add static analysis (pylint, mypy) checks to the pipeline.
 81. Create test fixtures for complex game scenarios (e.g., max supply).
 82. Mock external dependencies (like Pygame) effectively in tests.
 83. [x] Add pre-commit hooks for linting and formatting.
@@ -96,20 +96,20 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 85. Test backward compatibility of save files.
 
 ## Documentation
-86. Create a `CONTRIBUTING.md` file with guidelines.
+86. [x] Create a `CONTRIBUTING.md` file with guidelines.
 87. Document the ECS architecture with a diagram.
-88. Create API documentation using Sphinx or MkDocs.
+88. [x] Create API documentation using Sphinx or MkDocs.
 89. Write a guide on "How to Create a New Map".
 90. Document available cheat codes and debug commands.
 91. Create a changelog generation script.
 92. Write a "Getting Started" guide for new developers.
-93. Document known issues and workarounds.
+93. [x] Document known issues and workarounds.
 94. Create an ASCII art style guide for the game.
 95. Document AI behavior trees and logic flow.
 
 ## DevOps / Tooling
 96. Create a Dockerfile for running the game in a container.
-97. Set up GitHub Actions for Continuous Integration.
+97. [x] Set up GitHub Actions for Continuous Integration.
 98. Create a release script to package the game.
 99. Add a "watch mode" script for auto-restarting on code changes.
 100. Create a map editor tool (CLI or simple GUI).
