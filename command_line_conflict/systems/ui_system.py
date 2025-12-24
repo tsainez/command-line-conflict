@@ -28,6 +28,8 @@ class UISystem:
         self.camera = camera
         self.cheats = {}
         self.small_font = pygame.font.Font(None, 18)
+        self.paused_font = pygame.font.Font(None, 74)
+        self.instruction_font = pygame.font.Font(None, 36)
         self.key_options = [
             "L-Click: Select",
             "R-Click: Move",
@@ -370,13 +372,11 @@ class UISystem:
         self.screen.blit(self.pause_overlay, (0, 0))
 
         # Draw "Paused" text
-        font = pygame.font.Font(None, 74)
-        text = font.render("Paused", True, (255, 255, 255))
+        text = self.paused_font.render("Paused", True, (255, 255, 255))
         text_rect = text.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2))
         self.screen.blit(text, text_rect)
 
         # Draw instruction text
-        small_font = pygame.font.Font(None, 36)
-        instruction = small_font.render("Press P to Resume", True, (200, 200, 200))
+        instruction = self.instruction_font.render("Press P to Resume", True, (200, 200, 200))
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)
