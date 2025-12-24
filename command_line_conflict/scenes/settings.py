@@ -27,6 +27,7 @@ class SettingsScene:
             "Back",
         ]
         self.selected_option = 0
+        self.option_rects = []
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
         self.current_screen_size_index = 0
         try:
@@ -40,7 +41,24 @@ class SettingsScene:
         Args:
             event: The pygame event to handle.
         """
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.MOUSEMOTION:
+            for rect, i in self.option_rects:
+                if rect.collidepoint(event.pos):
+                    self.selected_option = i
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            for rect, i in self.option_rects:
+                if rect.collidepoint(event.pos):
+                    self.selected_option = i
+                    option_name = self.settings_options[i]
+                    if "Volume" in option_name:
+                        # Left side decreases, right side increases
+                        direction = -1 if event.pos[0] < rect.centerx else 1
+                        self._change_volume(option_name, direction)
+                    else:
+                        self._trigger_option(option_name)
+
+        elif event.type == pygame.KEYDOWN:
             option_name = self.settings_options[self.selected_option]
 
             if event.key == pygame.K_UP:
@@ -49,29 +67,34 @@ class SettingsScene:
                 self.selected_option = (self.selected_option + 1) % len(self.settings_options)
             elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                 direction = -1 if event.key == pygame.K_LEFT else 1
-                change = direction * 0.1
-
-                if option_name == "Master Volume":
-                    config.MASTER_VOLUME = max(0.0, min(1.0, config.MASTER_VOLUME + change))
-                    self.game.music_manager.refresh_volume()
-                elif option_name == "Music Volume":
-                    config.MUSIC_VOLUME = max(0.0, min(1.0, config.MUSIC_VOLUME + change))
-                    self.game.music_manager.set_volume(config.MUSIC_VOLUME)
-                elif option_name == "SFX Volume":
-                    config.SOUND_VOLUME = max(0.0, min(1.0, config.SOUND_VOLUME + change))
+                self._change_volume(option_name, direction)
 
             elif event.key == pygame.K_RETURN:
-                if option_name == "Screen Size":
-                    self.current_screen_size_index = (self.current_screen_size_index + 1) % len(self.screen_sizes)
-                    width, height = self.screen_sizes[self.current_screen_size_index]
-                    config.SCREEN["width"] = width
-                    config.SCREEN["height"] = height
-                    self.game.screen = pygame.display.set_mode((width, height))
-                elif option_name == "Debug Mode":
-                    config.DEBUG = not config.DEBUG
-                    log.info(f"Debug mode set to {config.DEBUG}")
-                elif option_name == "Back":
-                    self.game.scene_manager.switch_to("menu")
+                self._trigger_option(option_name)
+
+    def _change_volume(self, option_name, direction):
+        change = direction * 0.1
+        if option_name == "Master Volume":
+            config.MASTER_VOLUME = max(0.0, min(1.0, config.MASTER_VOLUME + change))
+            self.game.music_manager.refresh_volume()
+        elif option_name == "Music Volume":
+            config.MUSIC_VOLUME = max(0.0, min(1.0, config.MUSIC_VOLUME + change))
+            self.game.music_manager.set_volume(config.MUSIC_VOLUME)
+        elif option_name == "SFX Volume":
+            config.SOUND_VOLUME = max(0.0, min(1.0, config.SOUND_VOLUME + change))
+
+    def _trigger_option(self, option_name):
+        if option_name == "Screen Size":
+            self.current_screen_size_index = (self.current_screen_size_index + 1) % len(self.screen_sizes)
+            width, height = self.screen_sizes[self.current_screen_size_index]
+            config.SCREEN["width"] = width
+            config.SCREEN["height"] = height
+            self.game.screen = pygame.display.set_mode((width, height))
+        elif option_name == "Debug Mode":
+            config.DEBUG = not config.DEBUG
+            log.info(f"Debug mode set to {config.DEBUG}")
+        elif option_name == "Back":
+            self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
         """Updates the settings scene. This scene has no dynamic elements.
@@ -106,6 +129,7 @@ class SettingsScene:
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
+        self.option_rects.clear()
         for i, option in enumerate(self.settings_options):
             if i == self.selected_option:
                 color = (255, 255, 0)
@@ -128,3 +152,4 @@ class SettingsScene:
             text = self.option_font.render(text_to_render, True, color)
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 250 + i * 60))
             screen.blit(text, text_rect)
+            self.option_rects.append((text_rect, i))
