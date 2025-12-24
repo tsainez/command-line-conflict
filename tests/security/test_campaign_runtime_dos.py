@@ -1,8 +1,10 @@
-import unittest
 import os
 import shutil
 import tempfile
+import unittest
+
 from command_line_conflict.campaign_manager import CampaignManager
+
 
 class TestCampaignRuntimeDoS(unittest.TestCase):
     def setUp(self):
@@ -25,7 +27,9 @@ class TestCampaignRuntimeDoS(unittest.TestCase):
             manager.complete_mission(f"mission_{i}")
 
         # With the fix, the count should be capped at the limit
-        self.assertLessEqual(len(manager.completed_missions), limit, "Fix verified: Mission count capped at limit during runtime")
+        self.assertLessEqual(
+            len(manager.completed_missions), limit, "Fix verified: Mission count capped at limit during runtime"
+        )
         self.assertEqual(len(manager.completed_missions), limit)
 
     def test_huge_mission_id(self):
@@ -41,4 +45,4 @@ class TestCampaignRuntimeDoS(unittest.TestCase):
 
         # The save file might not exist if save was never triggered
         if os.path.exists(self.save_file):
-             self.assertLess(os.path.getsize(self.save_file), 1000)
+            self.assertLess(os.path.getsize(self.save_file), 1000)

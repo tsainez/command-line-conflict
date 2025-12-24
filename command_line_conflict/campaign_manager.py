@@ -117,13 +117,17 @@ class CampaignManager:
         """
         # Security check: Validate mission ID length
         if len(mission_id) > self.MAX_MISSION_ID_LENGTH:
-            log.warning(f"Failed to complete mission: ID '{mission_id[:20]}...' exceeds maximum length of {self.MAX_MISSION_ID_LENGTH}")
+            log.warning(
+                f"Failed to complete mission: ID '{mission_id[:20]}...' exceeds maximum length of {self.MAX_MISSION_ID_LENGTH}"
+            )
             return
 
         if mission_id not in self.completed_missions:
             # Security check: Validate max missions count
             if len(self.completed_missions) >= self.MAX_MISSIONS_COUNT:
-                log.warning(f"Failed to complete mission {mission_id}: Maximum mission count ({self.MAX_MISSIONS_COUNT}) reached.")
+                log.warning(
+                    f"Failed to complete mission {mission_id}: Maximum mission count ({self.MAX_MISSIONS_COUNT}) reached."
+                )
                 return
 
             log.info(f"Mission {mission_id} completed!")
