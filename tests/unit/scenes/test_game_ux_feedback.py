@@ -1,7 +1,10 @@
-import pygame
 from unittest.mock import MagicMock
-from command_line_conflict.scenes.game import GameScene
+
+import pygame
+
 from command_line_conflict import config
+from command_line_conflict.scenes.game import GameScene
+
 
 class MockGame:
     def __init__(self):
@@ -12,6 +15,7 @@ class MockGame:
         self.screen.get_size.return_value = (800, 600)
         self.running = True
 
+
 def test_hold_position_feedback(mocker):
     """Verifies that the Hold Position command gives visual feedback via chat."""
     # Arrange
@@ -21,7 +25,7 @@ def test_hold_position_feedback(mocker):
     game = MockGame()
     scene = GameScene(game)
     scene.chat_system = MagicMock()
-    scene.chat_system.handle_event.return_value = False # Important: Chat shouldn't consume event
+    scene.chat_system.handle_event.return_value = False  # Important: Chat shouldn't consume event
 
     # Simulate 'H' key press
     event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_h, "mod": 0})
@@ -31,6 +35,7 @@ def test_hold_position_feedback(mocker):
 
     # Assert
     scene.chat_system.add_message.assert_called_with("Hold Position command issued", (255, 255, 0))
+
 
 def test_cheat_reveal_map_feedback(mocker):
     """Verifies that the Reveal Map cheat gives visual feedback."""
@@ -52,6 +57,7 @@ def test_cheat_reveal_map_feedback(mocker):
     scene.chat_system.add_message.assert_called()
     assert "Map Reveal" in scene.chat_system.add_message.call_args[0][0]
 
+
 def test_cheat_god_mode_feedback(mocker):
     """Verifies that the God Mode cheat gives visual feedback."""
     # Arrange
@@ -71,6 +77,7 @@ def test_cheat_god_mode_feedback(mocker):
     # Assert
     scene.chat_system.add_message.assert_called()
     assert "God Mode" in scene.chat_system.add_message.call_args[0][0]
+
 
 def test_cheat_switch_player_feedback(mocker):
     """Verifies that Switching Player gives visual feedback."""

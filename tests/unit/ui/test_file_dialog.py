@@ -121,3 +121,42 @@ class TestFileDialog:
 
         file_dialog.handle_event(event)
         assert file_dialog.active is False
+
+    def test_hover_states(self, file_dialog):
+        # Move over close button
+        event = MagicMock()
+        event.type = pygame.MOUSEMOTION
+        event.pos = (0, 0)
+        file_dialog.close_button_rect.collidepoint.return_value = True
+        file_dialog.action_button_rect.collidepoint.return_value = False
+        file_dialog.file_list_rect.collidepoint.return_value = False
+
+        file_dialog.handle_event(event)
+        assert file_dialog.hovered_element == "close"
+        assert file_dialog.hovered_file_index is None
+
+        # Move over action button
+        event.pos = (100, 100)
+        file_dialog.close_button_rect.collidepoint.return_value = False
+        file_dialog.action_button_rect.collidepoint.return_value = True
+
+        file_dialog.handle_event(event)
+        assert file_dialog.hovered_element == "action"
+        assert file_dialog.hovered_file_index is None
+
+        # Move over file list
+        event.pos = (150, 105)  # Index 0
+        file_dialog.action_button_rect.collidepoint.return_value = False
+        file_dialog.file_list_rect.collidepoint.return_value = True
+
+        file_dialog.handle_event(event)
+        assert file_dialog.hovered_element is None
+        assert file_dialog.hovered_file_index == 0
+
+        # Move outside
+        event.pos = (500, 500)
+        file_dialog.file_list_rect.collidepoint.return_value = False
+
+        file_dialog.handle_event(event)
+        assert file_dialog.hovered_element is None
+        assert file_dialog.hovered_file_index is None

@@ -47,6 +47,9 @@ class FileDialog:
         self.action_button_rect = pygame.Rect(self.x + self.width - 110, self.y + self.height - 50, 90, 30)
         self.close_button_rect = pygame.Rect(self.x + self.width - 30, self.y + 10, 20, 20)
 
+        self.hovered_file_index = None
+        self.hovered_element = None  # "close", "action", or None
+
         self.refresh_files()
 
     def refresh_files(self):
@@ -68,7 +71,20 @@ class FileDialog:
         if not self.active:
             return None
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEMOTION:
+            self.hovered_element = None
+            self.hovered_file_index = None
+
+            if self.close_button_rect.collidepoint(event.pos):
+                self.hovered_element = "close"
+            elif self.action_button_rect.collidepoint(event.pos):
+                self.hovered_element = "action"
+            elif self.file_list_rect.collidepoint(event.pos):
+                idx = (event.pos[1] - self.file_list_rect.y) // self.item_height + self.scroll_offset
+                if 0 <= idx < len(self.files):
+                    self.hovered_file_index = idx
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
                 if self.close_button_rect.collidepoint(event.pos):
                     self.active = False
@@ -136,7 +152,8 @@ class FileDialog:
         self.screen.blit(title_surf, (self.x + 20, self.y + 20))
 
         # Draw Close Button
-        pygame.draw.rect(self.screen, (200, 50, 50), self.close_button_rect)
+        close_color = (230, 80, 80) if self.hovered_element == "close" else (200, 50, 50)
+        pygame.draw.rect(self.screen, close_color, self.close_button_rect)
         close_txt = self.font.render("X", True, (255, 255, 255))
         self.screen.blit(close_txt, (self.close_button_rect.x + 5, self.close_button_rect.y))
 
@@ -151,14 +168,19 @@ class FileDialog:
 
             f = self.files[idx]
             y_pos = self.file_list_rect.y + i * self.item_height
+            item_rect = pygame.Rect(self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
 
-            # Highlight selected
-            if f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text):
-                pygame.draw.rect(
-                    self.screen, (70, 70, 100), (self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
-                )
+            # Highlight logic
+            is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
+            is_hovered = idx == self.hovered_file_index
 
-            text_surf = self.font.render(f, True, (200, 200, 200))
+            if is_selected:
+                pygame.draw.rect(self.screen, (70, 70, 100), item_rect)
+            elif is_hovered:
+                pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
+
+            text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
+            text_surf = self.font.render(f, True, text_color)
             self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
 
         # Draw Input Field
@@ -168,7 +190,8 @@ class FileDialog:
         self.screen.blit(input_surf, (self.input_rect.x + 5, self.input_rect.y + 5))
 
         # Draw Action Button
-        pygame.draw.rect(self.screen, (50, 150, 50), self.action_button_rect)
+        action_color = (70, 170, 70) if self.hovered_element == "action" else (50, 150, 50)
+        pygame.draw.rect(self.screen, action_color, self.action_button_rect)
         btn_text = "Save" if self.mode == "save" else "Load"
         btn_surf = self.font.render(btn_text, True, (255, 255, 255))
         self.screen.blit(btn_surf, (self.action_button_rect.x + 10, self.action_button_rect.y + 5))
