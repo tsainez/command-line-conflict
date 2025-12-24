@@ -21,7 +21,7 @@ class Map:
 
     MAX_MAP_DIMENSION = 256  # Security limit to prevent DoS via memory exhaustion
     MAX_FILE_SIZE = 2 * 1024 * 1024  # Security limit: 2MB max file size
-    MAX_PATHFINDING_ITERATIONS = 50000 # Security limit to prevent pathfinding freeze
+    MAX_PATHFINDING_ITERATIONS = 50000  # Security limit to prevent pathfinding freeze
 
     def __init__(self, width: int = 40, height: int = 30) -> None:
         """Initializes the map.

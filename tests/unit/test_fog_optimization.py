@@ -1,7 +1,5 @@
 from types import SimpleNamespace
 
-import pytest
-
 from command_line_conflict.fog_of_war import FogOfWar
 
 

@@ -2,7 +2,6 @@ from unittest.mock import MagicMock
 
 import pygame
 
-from command_line_conflict import config
 from command_line_conflict.scenes.game import GameScene
 
 
@@ -20,7 +19,7 @@ def test_hold_position_feedback(mocker):
     """Verifies that the Hold Position command gives visual feedback via chat."""
     # Arrange
     mocker.patch("command_line_conflict.config.DEBUG", True)
-    mock_logger = mocker.patch("command_line_conflict.scenes.game.log")
+    mocker.patch("command_line_conflict.scenes.game.log")
 
     game = MockGame()
     scene = GameScene(game)
