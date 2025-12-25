@@ -118,7 +118,10 @@ class FileDialog:
             else:
                 # Add character to input
                 if event.unicode.isprintable():
-                    self.input_text += event.unicode
+                    # Security: Limit input length to prevent DoS
+                    max_len = getattr(config, "MAX_FILENAME_LENGTH", 64)
+                    if len(self.input_text) < max_len:
+                        self.input_text += event.unicode
 
         return None
 
