@@ -31,7 +31,19 @@ class ChatSystem:
             text: The message text.
             color: The color of the text (RGB tuple).
         """
-        self.messages.append({"text": text, "color": color, "time": pygame.time.get_ticks()})
+        # Pre-render text surfaces to avoid doing it every frame
+        text_surf = self.font.render(text, True, color)
+        shadow_surf = self.font.render(text, True, (0, 0, 0))
+
+        self.messages.append(
+            {
+                "text": text,
+                "color": color,
+                "time": pygame.time.get_ticks(),
+                "surface": text_surf,
+                "shadow_surface": shadow_surf,
+            }
+        )
         if len(self.messages) > self.max_messages:
             self.messages.pop(0)
         self.last_message_time = pygame.time.get_ticks()
@@ -108,9 +120,14 @@ class ChatSystem:
         # Draw messages
         if show_history:
             for i, msg in enumerate(reversed(self.messages)):
-                text_surface = self.font.render(msg["text"], True, msg["color"])
-                # Add a slight shadow/outline for better visibility
-                shadow_surface = self.font.render(msg["text"], True, (0, 0, 0))
+                text_surface = msg.get("surface")
+                shadow_surface = msg.get("shadow_surface")
+
+                # Fallback if surfaces missing (e.g. from saved state or legacy)
+                if not text_surface:
+                    text_surface = self.font.render(msg["text"], True, msg["color"])
+                if not shadow_surface:
+                    shadow_surface = self.font.render(msg["text"], True, (0, 0, 0))
 
                 y_pos = chat_bottom - (i + 1) * line_height
                 if self.input_active:
