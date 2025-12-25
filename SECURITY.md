@@ -2,20 +2,14 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+We support the latest version of `command-line-conflict` on the `main` branch.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| main    | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability within `command-line-conflict`, please report it by creating a new issue on our GitHub repository with the label `security` or sending an email to the maintainers if one is provided in the repository profile.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+We are committed to addressing security issues promptly. Please provide as much detail as possible, including steps to reproduce the issue.

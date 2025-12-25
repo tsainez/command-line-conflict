@@ -103,7 +103,7 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 85. Test backward compatibility of save files.
 
 ## Documentation
-86. Create a `CONTRIBUTING.md` file with guidelines.
+86. [x] Create a `CONTRIBUTING.md` file with guidelines.
 87. Document the ECS architecture with a diagram.
 88. Create API documentation using Sphinx or MkDocs.
 89. Write a guide on "How to Create a New Map".
@@ -116,7 +116,7 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 
 ## DevOps / Tooling
 96. Create a Dockerfile for running the game in a container.
-97. Set up GitHub Actions for Continuous Integration.
+97. [x] Set up GitHub Actions for Continuous Integration.
 98. Create a release script to package the game.
 99. Add a "watch mode" script for auto-restarting on code changes.
 100. Create a map editor tool (CLI or simple GUI).
