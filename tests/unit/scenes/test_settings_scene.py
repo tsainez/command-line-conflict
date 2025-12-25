@@ -1,8 +1,11 @@
-import pytest
 from unittest.mock import MagicMock
+
 import pygame
-from command_line_conflict.scenes.settings import SettingsScene
+import pytest
+
 from command_line_conflict import config
+from command_line_conflict.scenes.settings import SettingsScene
+
 
 @pytest.fixture
 def mock_game():
@@ -14,13 +17,16 @@ def mock_game():
     game.music_manager = MagicMock()
     return game
 
+
 @pytest.fixture
 def settings_scene(mock_game):
     return SettingsScene(mock_game)
 
+
 def test_initialization(settings_scene):
     assert settings_scene.selected_option == 0
     assert "Screen Size" in settings_scene.settings_options
+
 
 def test_handle_key_down(settings_scene):
     event = MagicMock()
@@ -29,6 +35,7 @@ def test_handle_key_down(settings_scene):
 
     settings_scene.handle_event(event)
     assert settings_scene.selected_option == 1
+
 
 def test_handle_key_up(settings_scene):
     settings_scene.selected_option = 1
@@ -39,9 +46,10 @@ def test_handle_key_up(settings_scene):
     settings_scene.handle_event(event)
     assert settings_scene.selected_option == 0
 
+
 def test_change_volume(settings_scene):
     config.MASTER_VOLUME = 0.5  # Set to a known value
-    settings_scene.selected_option = 2 # Master Volume
+    settings_scene.selected_option = 2  # Master Volume
     original_volume = config.MASTER_VOLUME
 
     event = MagicMock()
@@ -51,8 +59,9 @@ def test_change_volume(settings_scene):
     settings_scene.handle_event(event)
     assert config.MASTER_VOLUME > original_volume
 
+
 def test_toggle_debug(settings_scene):
-    settings_scene.selected_option = 1 # Debug Mode
+    settings_scene.selected_option = 1  # Debug Mode
     original_debug = config.DEBUG
 
     event = MagicMock()
@@ -64,12 +73,13 @@ def test_toggle_debug(settings_scene):
     # Revert
     config.DEBUG = original_debug
 
+
 def test_mouse_hover(settings_scene):
     # Setup option rects
     rect0 = MagicMock()
     rect0.collidepoint.return_value = False
     rect1 = MagicMock()
-    rect1.collidepoint.return_value = True # Hovering over 2nd option
+    rect1.collidepoint.return_value = True  # Hovering over 2nd option
     settings_scene.option_rects = [(rect0, 0), (rect1, 1)]
 
     event = MagicMock()
@@ -78,6 +88,7 @@ def test_mouse_hover(settings_scene):
 
     settings_scene.handle_event(event)
     assert settings_scene.selected_option == 1
+
 
 def test_mouse_click_volume_right(settings_scene):
     config.MASTER_VOLUME = 0.5
@@ -91,10 +102,11 @@ def test_mouse_click_volume_right(settings_scene):
 
     event = MagicMock()
     event.type = pygame.MOUSEBUTTONUP
-    event.pos = (150, 100) # Right side
+    event.pos = (150, 100)  # Right side
 
     settings_scene.handle_event(event)
     assert config.MASTER_VOLUME > original_volume
+
 
 def test_mouse_click_volume_left(settings_scene):
     config.MASTER_VOLUME = 0.5
@@ -108,10 +120,11 @@ def test_mouse_click_volume_left(settings_scene):
 
     event = MagicMock()
     event.type = pygame.MOUSEBUTTONUP
-    event.pos = (50, 100) # Left side
+    event.pos = (50, 100)  # Left side
 
     settings_scene.handle_event(event)
     assert config.MASTER_VOLUME < original_volume
+
 
 def test_mouse_click_trigger(settings_scene):
     # Back is index 5
