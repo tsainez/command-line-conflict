@@ -56,7 +56,7 @@ Ensure the script exits with "All checks passed!" before pushing your changes.
 
 ## Pull Requests
 
-Please use the provided Pull Request Template when opening a PR.
+Please use the provided Pull Request Template (`.github/pull_request_template.md`) when opening a PR.
 
 *   **Title:** Use a descriptive title (e.g., "Add delta-time to unit movement", "Fix crash in map loader").
 *   **Scope:** Keep PRs small and focused on a single feature or bug fix.
