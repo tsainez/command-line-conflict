@@ -243,12 +243,23 @@ class Map:
             The loaded Map instance.
 
         Raises:
-            ValueError: If the file size exceeds MAX_FILE_SIZE.
+            ValueError: If the file size exceeds MAX_FILE_SIZE or is a special file.
         """
         import json
+        import stat
+
+        try:
+            st = os.stat(filename)
+        except OSError as e:
+            raise ValueError(f"Could not stat file: {e}")
+
+        # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
+        # which can cause DoS.
+        if not stat.S_ISREG(st.st_mode):
+            raise ValueError("Map file must be a regular file.")
 
         # Security: Check file size to prevent DoS via memory exhaustion
-        if os.path.getsize(filename) > cls.MAX_FILE_SIZE:
+        if st.st_size > cls.MAX_FILE_SIZE:
             raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
 
         with open(filename, "r", encoding="utf-8") as f:

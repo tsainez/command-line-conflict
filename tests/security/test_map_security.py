@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from command_line_conflict.maps.base import Map
-
+import stat
 
 class TestMapSecurity(unittest.TestCase):
     def test_map_dimensions_limit(self):
@@ -79,16 +79,36 @@ class TestMapSecurity(unittest.TestCase):
         self.assertIn(f"Truncating to {max_walls}", args[0])
 
     @patch("command_line_conflict.maps.base.open")
-    @patch("command_line_conflict.maps.base.os.path.getsize")
-    def test_load_from_file_size_limit(self, mock_getsize, mock_open):
+    @patch("command_line_conflict.maps.base.os.stat")
+    def test_load_from_file_size_limit(self, mock_stat, mock_open):
         """Verify that loading large map files raises ValueError."""
         # Set size larger than limit (assuming 2MB limit)
-        mock_getsize.return_value = 5 * 1024 * 1024  # 5MB
+        mock_st = MagicMock()
+        mock_st.st_size = 5 * 1024 * 1024  # 5MB
+        mock_st.st_mode = stat.S_IFREG  # Regular file
+        mock_stat.return_value = mock_st
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("large_map.json")
 
         self.assertIn("exceeds maximum allowed size", str(cm.exception))
+
+        # Ensure open was NOT called
+        mock_open.assert_not_called()
+
+    @patch("command_line_conflict.maps.base.open")
+    @patch("command_line_conflict.maps.base.os.stat")
+    def test_load_from_special_file(self, mock_stat, mock_open):
+        """Verify that loading from special files raises ValueError."""
+        mock_st = MagicMock()
+        mock_st.st_size = 0
+        mock_st.st_mode = stat.S_IFCHR  # Character device
+        mock_stat.return_value = mock_st
+
+        with self.assertRaises(ValueError) as cm:
+            Map.load_from_file("/dev/zero")
+
+        self.assertIn("must be a regular file", str(cm.exception))
 
         # Ensure open was NOT called
         mock_open.assert_not_called()
