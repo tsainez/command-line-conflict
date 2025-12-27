@@ -3,12 +3,12 @@ from unittest.mock import MagicMock, patch
 
 import pygame
 
+from command_line_conflict.scenes.menu import MenuScene
+
 # Patch SoundSystem before importing MenuScene if it was imported at module level,
 # but since it's imported inside the module, we need to patch it where it is used.
 # However, we must ensure we don't trigger real pygame mixer init.
 # The best way is to patch 'command_line_conflict.scenes.menu.SoundSystem'.
-
-from command_line_conflict.scenes.menu import MenuScene
 
 
 class TestMenuScene(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestMenuScene(unittest.TestCase):
         self.mock_game.music_manager = MagicMock()
 
         # Patch SoundSystem to prevent real initialization
-        self.patcher = patch('command_line_conflict.scenes.menu.SoundSystem')
+        self.patcher = patch("command_line_conflict.scenes.menu.SoundSystem")
         self.MockSoundSystem = self.patcher.start()
 
         self.scene = MenuScene(self.mock_game)

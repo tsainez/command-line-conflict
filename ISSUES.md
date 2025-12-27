@@ -17,28 +17,6 @@ The game currently lacks a map specifically designed for player vs factory comba
 5.  (Optional) Refactor `GameScene` to use `FactoryMap` or allow map selection.
 6.  Once implemented, remove the TODO comment from `command_line_conflict/factories.py`.
 
-## 2. Complete Project Structure Documentation
-**Location:** `docs/ProjectStructure.md`
-**Original TODO:** `TODO:: ADD SOMETHING HERE!`
-
-**Description:**
-The project structure documentation is currently empty.
-
-**Instructions:**
-1.  Edit `docs/ProjectStructure.md`.
-2.  Add a description of the repository layout:
-    *   `command_line_conflict/`: Source code package.
-    *   `tests/`: Unit and integration tests.
-    *   `docs/`: Documentation.
-    *   `scripts/`: Utility scripts.
-3.  Describe key modules:
-    *   `main.py`: Application entry point.
-    *   `engine.py`: Game loop and scene management.
-    *   `game_state.py`: ECS data holder.
-    *   `systems/`: Game logic systems.
-    *   `components/`: Entity data components.
-4.  Remove the TODO placeholder.
-
 ## 3. Remove Unused Imports
 **Locations:**
 *   ~~`command_line_conflict/engine.py`~~
