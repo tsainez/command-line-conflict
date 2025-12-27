@@ -149,7 +149,24 @@ class SettingsScene:
             else:
                 text_to_render = option
 
+            if i == self.selected_option:
+                if "Volume" in option:
+                    text_to_render = f"< {text_to_render} >"
+                else:
+                    text_to_render = f"> {text_to_render} <"
+
             text = self.option_font.render(text_to_render, True, color)
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 250 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
+
+        # Helper text for volume controls
+        current_option = self.settings_options[self.selected_option]
+        if "Volume" in current_option:
+            help_text = self.game.font.render(
+                "Use Arrow Keys or Click Left/Right to Adjust", True, (150, 150, 150)
+            )
+            help_rect = help_text.get_rect(
+                center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50)
+            )
+            screen.blit(help_text, help_rect)
