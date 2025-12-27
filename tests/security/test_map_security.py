@@ -1,8 +1,9 @@
+import stat
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from command_line_conflict.maps.base import Map
-import stat
+
 
 class TestMapSecurity(unittest.TestCase):
     def test_map_dimensions_limit(self):
