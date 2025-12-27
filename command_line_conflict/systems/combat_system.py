@@ -46,9 +46,11 @@ class CombatSystem:
                 if not my_pos or not target_pos:
                     continue
 
-                dist_to_target = ((my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2) ** 0.5
+                # Optimization: Compare squared distances to avoid expensive sqrt()
+                dist_sq = (my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2
+                attack_range_sq = attack.attack_range**2
 
-                if dist_to_target <= attack.attack_range:
+                if dist_sq <= attack_range_sq:
                     # Stop moving and attack
                     movable = components.get(Movable)
                     if movable:
