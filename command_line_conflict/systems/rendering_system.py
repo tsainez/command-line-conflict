@@ -1,5 +1,4 @@
 import functools
-import random
 
 import pygame
 
@@ -21,6 +20,16 @@ class RenderingSystem:
 
     Optimized to use spatial hashing for performance.
     """
+
+    # Pre-defined colors for confetti to avoid allocation per frame
+    CONFETTI_COLORS = [
+        (255, 0, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (255, 255, 0),
+        (255, 0, 255),
+        (0, 255, 255),
+    ]
 
     def __init__(self, screen, font, camera: Camera):
         """Initializes the RenderingSystem.
@@ -84,15 +93,10 @@ class RenderingSystem:
                     confetti = components.get(Confetti)
                     if confetti:
                         # Confetti is just a particle, so it should be simple
-                        colors = [
-                            (255, 0, 0),
-                            (0, 255, 0),
-                            (0, 0, 255),
-                            (255, 255, 0),
-                            (255, 0, 255),
-                            (0, 255, 255),
-                        ]
-                        color = random.choice(colors)
+                        # Optimization: Use deterministic color based on ID to avoid
+                        # list allocation and random.choice() per frame.
+                        # Also prevents visual flickering.
+                        color = self.CONFETTI_COLORS[entity_id % len(self.CONFETTI_COLORS)]
                         ch = self._get_rendered_surface(renderable.icon, color, grid_size)
                         self.screen.blit(
                             ch,
