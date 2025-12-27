@@ -1,5 +1,7 @@
 import pygame
 
+from command_line_conflict.campaign_manager import CampaignManager
+
 
 class MenuScene:
     """Manages the main menu scene, allowing navigation to other scenes."""
@@ -13,7 +15,12 @@ class MenuScene:
         """
         self.game = game
         self.font = game.font
+        self.campaign_manager = CampaignManager()
         self.menu_options = ["New Game", "Map Editor", "Options", "Quit"]
+
+        if self.campaign_manager.completed_missions:
+            self.menu_options.insert(0, "Continue Campaign")
+
         self.selected_option = 0
         self.option_rects = []
         self.title_font = pygame.font.Font(None, 74)
@@ -49,13 +56,20 @@ class MenuScene:
                 self._trigger_option(self.selected_option)
 
     def _trigger_option(self, option_index):
-        if option_index == 0:
+        option_text = self.menu_options[option_index]
+
+        if option_text == "Continue Campaign":
+            # In the future, this would load the latest save
+            # For now, it just starts the game scene, same as New Game
             self.game.scene_manager.switch_to("game")
-        elif option_index == 1:
+        elif option_text == "New Game":
+            # Ideally reset progress here or start fresh mission
+            self.game.scene_manager.switch_to("game")
+        elif option_text == "Map Editor":
             self.game.scene_manager.switch_to("editor")
-        elif option_index == 2:
+        elif option_text == "Options":
             self.game.scene_manager.switch_to("settings")
-        elif option_index == 3:
+        elif option_text == "Quit":
             self.game.running = False
 
     def update(self, dt):
@@ -81,9 +95,12 @@ class MenuScene:
         for i, option in enumerate(self.menu_options):
             if i == self.selected_option:
                 color = (255, 255, 0)
+                display_text = f"> {option} <"
             else:
                 color = (255, 255, 255)
-            text = self.option_font.render(option, True, color)
+                display_text = option
+
+            text = self.option_font.render(display_text, True, color)
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
