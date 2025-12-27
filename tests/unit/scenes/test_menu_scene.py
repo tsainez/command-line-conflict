@@ -1,7 +1,12 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pygame
+
+# Patch SoundSystem before importing MenuScene if it was imported at module level,
+# but since it's imported inside the module, we need to patch it where it is used.
+# However, we must ensure we don't trigger real pygame mixer init.
+# The best way is to patch 'command_line_conflict.scenes.menu.SoundSystem'.
 
 from command_line_conflict.scenes.menu import MenuScene
 
@@ -12,7 +17,15 @@ class TestMenuScene(unittest.TestCase):
         self.mock_game.font = MagicMock()
         # Mock music manager
         self.mock_game.music_manager = MagicMock()
+
+        # Patch SoundSystem to prevent real initialization
+        self.patcher = patch('command_line_conflict.scenes.menu.SoundSystem')
+        self.MockSoundSystem = self.patcher.start()
+
         self.scene = MenuScene(self.mock_game)
+
+    def tearDown(self):
+        self.patcher.stop()
 
     def test_menu_options(self):
         self.assertIn("Map Editor", self.scene.menu_options)
@@ -45,6 +58,21 @@ class TestMenuScene(unittest.TestCase):
         self.scene.handle_event(event)
 
         self.assertEqual(self.scene.selected_option, 1)
+        # Verify sound played
+        self.scene.sound_system.play_sound.assert_called_with("click_select")
+
+    def test_keyboard_navigation_plays_sound(self):
+        # Start at 0
+        self.scene.selected_option = 0
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_DOWN
+
+        self.scene.handle_event(event)
+
+        self.assertEqual(self.scene.selected_option, 1)
+        self.scene.sound_system.play_sound.assert_called_with("click_select")
 
     def test_mouse_click_triggers_option(self):
         # Setup mock rects
