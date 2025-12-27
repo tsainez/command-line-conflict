@@ -2,6 +2,10 @@
 
 "Command Line Conflict" is a codename for a fast-paced, open-source real-time strategy game inspired by Starcraft, rendered entirely in charming ASCII art.
 
+[![CI](https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml)
+[![Tests](https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml)
+[![Docs](https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml)
+
 ## Getting Started
 
 This guide will walk you through setting up and running the game on your local machine, as well as development best practices. 
@@ -62,7 +66,7 @@ Most Linux distributions come with Python installed. If you installed a custom v
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/command-line-conflict.git
+    git clone https://github.com/tsainez/command-line-conflict.git
     cd command-line-conflict
     ```
 
