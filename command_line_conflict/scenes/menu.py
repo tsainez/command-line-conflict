@@ -1,6 +1,7 @@
 import pygame
 
 from command_line_conflict.campaign_manager import CampaignManager
+from command_line_conflict.systems.sound_system import SoundSystem
 
 
 class MenuScene:
@@ -16,6 +17,7 @@ class MenuScene:
         self.game = game
         self.font = game.font
         self.campaign_manager = CampaignManager()
+        self.sound_system = SoundSystem()
         self.menu_options = ["New Game", "Map Editor", "Options", "Quit"]
 
         if self.campaign_manager.completed_missions:
@@ -40,6 +42,8 @@ class MenuScene:
         if event.type == pygame.MOUSEMOTION:
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
+                    if self.selected_option != i:
+                        self.sound_system.play_sound("click_select")
                     self.selected_option = i
 
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -48,12 +52,16 @@ class MenuScene:
                     self._trigger_option(i)
 
         elif event.type == pygame.KEYDOWN:
+            old_selection = self.selected_option
             if event.key == pygame.K_UP:
                 self.selected_option = (self.selected_option - 1) % len(self.menu_options)
             elif event.key == pygame.K_DOWN:
                 self.selected_option = (self.selected_option + 1) % len(self.menu_options)
             elif event.key == pygame.K_RETURN:
                 self._trigger_option(self.selected_option)
+
+            if self.selected_option != old_selection:
+                self.sound_system.play_sound("click_select")
 
     def _trigger_option(self, option_index):
         option_text = self.menu_options[option_index]
