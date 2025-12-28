@@ -56,7 +56,12 @@ class MovementSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in game_state.entities.items():
+        # Optimized to iterate only over entities with Movable component
+        for entity_id in game_state.get_entities_with_component(Movable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             position = components.get(Position)
             movable = components.get(Movable)
 

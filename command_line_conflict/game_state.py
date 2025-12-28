@@ -22,6 +22,8 @@ class GameState:
         self.event_queue = []
         # Spatial hashing for O(1) lookups
         self.spatial_map: dict[tuple[int, int], set[int]] = {}
+        # Component index for O(1) entity lookup by component type
+        self.component_index: dict[type, set[int]] = {}
 
     def _add_to_spatial_map(self, entity_id: int, x: int, y: int) -> None:
         pos = (x, y)
@@ -64,6 +66,12 @@ class GameState:
         """
         component_type = type(component)
         self.entities[entity_id][component_type] = component
+
+        # Update component index
+        if component_type not in self.component_index:
+            self.component_index[component_type] = set()
+        self.component_index[component_type].add(entity_id)
+
         if isinstance(component, Position):
             self._add_to_spatial_map(entity_id, int(component.x), int(component.y))
         if config.DEBUG:
@@ -82,6 +90,17 @@ class GameState:
         """
         return self.entities[entity_id].get(component_type)
 
+    def get_entities_with_component(self, component_type) -> set[int]:
+        """Returns a set of entity IDs that have the specified component type.
+
+        Args:
+            component_type: The type of component to look for.
+
+        Returns:
+            A set of entity IDs.
+        """
+        return self.component_index.get(component_type, set())
+
     def remove_component(self, entity_id: int, component_type) -> None:
         """Removes a component from an entity.
 
@@ -91,6 +110,11 @@ class GameState:
         """
         if component_type in self.entities[entity_id]:
             component = self.entities[entity_id][component_type]
+
+            # Update component index
+            if component_type in self.component_index:
+                self.component_index[component_type].discard(entity_id)
+
             if isinstance(component, Position):
                 self._remove_from_spatial_map(entity_id, int(component.x), int(component.y))
             del self.entities[entity_id][component_type]
@@ -104,6 +128,11 @@ class GameState:
             entity_id: The ID of the entity to remove.
         """
         if entity_id in self.entities:
+            # Update component index
+            for component_type in self.entities[entity_id]:
+                if component_type in self.component_index:
+                    self.component_index[component_type].discard(entity_id)
+
             position = self.entities[entity_id].get(Position)
             if position:
                 self._remove_from_spatial_map(entity_id, int(position.x), int(position.y))
