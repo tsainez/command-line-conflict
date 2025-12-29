@@ -25,28 +25,3 @@ The codebase currently relies on `GameScene._create_initial_units` to spawn enti
         *   Ensure enemy factories have defensive units nearby.
 4.  **Cleanup:**
     *   Remove the TODO comment from `command_line_conflict/factories.py`.
-
-## Issue 2: Complete Project Structure Documentation
-
-**Source:** `docs/ProjectStructure.md:6`
-**Context:** `TODO:: ADD SOMETHING HERE!`
-
-**Description:**
-The documentation for the project structure is currently a placeholder.
-
-**Instructions:**
-1.  **Analyze the Directory Structure:**
-    *   Review the purpose of top-level directories (`command_line_conflict`, `tests`, `docs`, `scripts`).
-    *   Identify key modules within `command_line_conflict` (e.g., `scenes`, `systems`, `components`, `maps`).
-2.  **Update `docs/ProjectStructure.md`:**
-    *   Replace the TODO with a textual representation of the project tree.
-    *   Add brief descriptions for each major component.
-    *   Example structure:
-        ```markdown
-        - command_line_conflict/
-          - components/  # ECS Components (Data)
-          - systems/     # ECS Systems (Logic)
-          - scenes/      # Game States (Menu, Game, etc.)
-          - maps/        # Map definitions
-        - tests/         # Unit and Integration tests
-        ```
