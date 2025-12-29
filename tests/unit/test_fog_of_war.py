@@ -73,8 +73,10 @@ class TestFogOfWar:
     def test_draw_uses_scale_and_blit(self, mocker):
         # Patch transform.scale
         mock_scale = mocker.patch("pygame.transform.scale")
+        mock_smoothscale = mocker.patch("pygame.transform.smoothscale")
         mock_scaled_surf = Mock()
         mock_scale.return_value = mock_scaled_surf
+        mock_smoothscale.return_value = mock_scaled_surf
 
         width, height = 10, 10
         fog = FogOfWar(width, height)
@@ -84,16 +86,40 @@ class TestFogOfWar:
 
         fog.draw(screen)
 
-        # Should scale fog_texture to screen-ish size (since no camera, simple scaling)
-        # Target size: 10 * 20 = 200, 10 * 20 = 200
-        mock_scale.assert_called_with(fog.fog_texture, (200, 200))
+        # Should use smoothscale
+        mock_smoothscale.assert_called_with(fog.fog_texture, (200, 200))
+
+        screen.blit.assert_called_with(mock_scaled_surf, (0, 0))
+
+    def test_draw_fallback_on_error(self, mocker):
+        import pygame
+        mock_scale = mocker.patch("pygame.transform.scale")
+        mock_smoothscale = mocker.patch("pygame.transform.smoothscale")
+
+        # Smoothscale fails
+        mock_smoothscale.side_effect = pygame.error("Smoothscale failed")
+
+        mock_scaled_surf = Mock()
+        mock_scale.return_value = mock_scaled_surf
+
+        width, height = 10, 10
+        fog = FogOfWar(width, height)
+        screen = Mock()
+        screen.get_size.return_value = (800, 600)
+
+        fog.draw(screen)
+
+        # Verify smoothscale was tried
+        mock_smoothscale.assert_called()
+        # Verify fallback to scale
+        mock_scale.assert_called()
 
         screen.blit.assert_called_with(mock_scaled_surf, (0, 0))
 
     def test_draw_with_camera(self, mocker):
-        mock_scale = mocker.patch("pygame.transform.scale")
+        mock_smoothscale = mocker.patch("pygame.transform.smoothscale")
         mock_scaled_surf = Mock()
-        mock_scale.return_value = mock_scaled_surf
+        mock_smoothscale.return_value = mock_scaled_surf
 
         width, height = 100, 100
         fog = FogOfWar(width, height)
@@ -115,8 +141,8 @@ class TestFogOfWar:
         # Should call subsurface
         fog.fog_texture.subsurface.assert_called()
 
-        # Should call scale on subsurface
-        args, _ = mock_scale.call_args
+        # Should call smoothscale on subsurface
+        args, _ = mock_smoothscale.call_args
         assert args[0] == mock_subsurface
 
         # Should blit

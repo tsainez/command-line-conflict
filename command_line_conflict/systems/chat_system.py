@@ -18,11 +18,12 @@ class ChatSystem:
         self.messages = []  # List of (text, color) tuples
         self.input_active = False
         self.input_text = ""
-        self.max_messages = 10
+        self.max_messages = 20
         self.chat_history_duration = 5000  # Milliseconds to show chat history
         self.last_message_time = 0
         self.cursor_blink_timer = 0
         self.cursor_visible = True
+        self.show_log = False  # Toggle for persistent log view
 
     def add_message(self, text: str, color: tuple[int, int, int] = (255, 255, 255)):
         """Adds a message to the chat history.
@@ -87,15 +88,27 @@ class ChatSystem:
                     ):
                         self.input_text += event.unicode
                 return True
+            elif event.key == pygame.K_l:
+                # Toggle persistent log view
+                self.show_log = not self.show_log
+                return True
 
         return False
 
-    def update(self, dt: float):
+    def update(self, game_state, dt: float):
         """Updates the chat system state.
 
         Args:
+            game_state: The current game state.
             dt: Time elapsed since last frame.
         """
+        # Process log events
+        for event in game_state.event_queue:
+            if event.get("type") == "log":
+                text = event.get("text", "")
+                color = event.get("color", (255, 255, 255))
+                self.add_message(text, color)
+
         if self.input_active:
             self.cursor_blink_timer += dt
             if self.cursor_blink_timer >= 0.5:
@@ -109,7 +122,9 @@ class ChatSystem:
         current_time = pygame.time.get_ticks()
 
         # Determine if we should show history
-        show_history = self.input_active or (current_time - self.last_message_time < self.chat_history_duration)
+        show_history = (
+            self.input_active or self.show_log or (current_time - self.last_message_time < self.chat_history_duration)
+        )
 
         if not show_history and not self.input_active:
             return
@@ -119,6 +134,15 @@ class ChatSystem:
 
         # Draw messages
         if show_history:
+            # If explicit log view is active, draw a background
+            if self.show_log:
+                # Calculate height based on max messages or current messages
+                height = min(len(self.messages), self.max_messages) * line_height + 10
+                bg_rect = pygame.Rect(5, chat_bottom - height, 600, height)
+                s = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
+                s.fill((0, 0, 0, 160))  # Semi-transparent black
+                self.screen.blit(s, bg_rect.topleft)
+
             for i, msg in enumerate(reversed(self.messages)):
                 text_surface = msg.get("surface")
                 shadow_surface = msg.get("shadow_surface")
