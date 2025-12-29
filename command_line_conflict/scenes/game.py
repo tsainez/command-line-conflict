@@ -410,7 +410,7 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
-        self.chat_system.update(dt)
+        self.chat_system.update(self.game_state, dt)
 
         if self.paused:
             return
