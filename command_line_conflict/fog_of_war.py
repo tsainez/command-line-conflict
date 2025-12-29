@@ -35,9 +35,9 @@ class FogOfWar:
         self.fog_texture = pygame.Surface((width, height), pygame.SRCALPHA)
         self.fog_texture.fill(self.COLOR_HIDDEN)
 
-        self.visible_cells = set()
-        self._vision_cache = {}
-        self._last_vision_sources = set()
+        self.visible_cells: set[tuple[int, int]] = set()
+        self._vision_cache: dict[tuple[int, int, int], set[tuple[int, int]]] = {}
+        self._last_vision_sources: set[tuple[int, int, int]] = set()
         log.info(f"Initialized FogOfWar with grid size {width}x{height}")
 
     def _get_vision_offsets(self, radius: int) -> list[tuple[int, int]]:
