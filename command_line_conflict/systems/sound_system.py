@@ -63,12 +63,21 @@ class SoundSystem:
         """
         # Calculate path relative to this file
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        filepath = os.path.join(base_path, "sounds", f"{name}.ogg")
 
-        if not os.path.exists(filepath):
+        # Try .wav first (user preference), then .ogg
+        extensions = [".wav", ".ogg"]
+        filepath = None
+
+        for ext in extensions:
+            path = os.path.join(base_path, "sounds", f"{name}{ext}")
+            if os.path.exists(path):
+                filepath = path
+                break
+
+        if not filepath:
             # Log warning only once per sound to avoid spam
             if name not in self.sounds:
-                log.warning(f"Sound file not found: {filepath}")
+                log.warning(f"Sound file not found: {name} (checked .wav, .ogg)")
                 self.sounds[name] = None  # Cache failure to avoid repeated checks
             return
 
