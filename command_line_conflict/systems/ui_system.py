@@ -8,6 +8,7 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 
@@ -72,6 +73,7 @@ class UISystem:
                 self.last_active_cheats_count = active_cheats_count
 
         selected_entities = self._get_selected_entities(game_state)
+        self._draw_construction_hints(game_state, selected_entities)
 
         # Log changes in selection
         if len(selected_entities) != self.last_selected_count:
@@ -380,3 +382,34 @@ class UISystem:
         instruction = small_font.render("Press P to Resume", True, (200, 200, 200))
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)
+
+    def _draw_construction_hints(self, game_state: GameState, selected_entities: list[int]) -> None:
+        """Draws construction hints if a builder unit is selected.
+
+        Args:
+            game_state: The current state of the game.
+            selected_entities: A list of IDs for the selected entities.
+        """
+        is_builder_selected = False
+        for entity_id in selected_entities:
+            identity = game_state.get_component(entity_id, UnitIdentity)
+            if identity and identity.name == "chassis":
+                is_builder_selected = True
+                break
+
+        if is_builder_selected:
+            hints = [
+                "R: Build Rover Factory",
+                "A: Build Arachnotron Factory",
+            ]
+            panel_y = config.SCREEN_HEIGHT - 160
+            panel_x_offset = 10
+
+            title = self.font.render("Construction:", True, (255, 255, 0))
+            self.screen.blit(title, (panel_x_offset, panel_y))
+            panel_y += 20
+
+            for hint in hints:
+                text = self.small_font.render(hint, True, (200, 200, 200))
+                self.screen.blit(text, (panel_x_offset, panel_y))
+                panel_y += 18
