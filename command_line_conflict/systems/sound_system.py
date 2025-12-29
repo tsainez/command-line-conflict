@@ -63,15 +63,35 @@ class SoundSystem:
         """
         # Calculate path relative to this file
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sounds_dir = os.path.join(base_path, "sounds")
 
         # Try .wav first (user preference), then .ogg
         extensions = [".wav", ".ogg"]
         filepath = None
 
         for ext in extensions:
-            path = os.path.join(base_path, "sounds", f"{name}{ext}")
-            if os.path.exists(path):
-                filepath = path
+            path = os.path.join(sounds_dir, f"{name}{ext}")
+
+            # Security: Prevent path traversal
+            # Resolve the absolute path
+            abs_path = os.path.abspath(path)
+
+            # Ensure the resolved path starts with the sounds directory
+            # We use commonpath to correctly handle directory boundaries and avoid prefix matching issues
+            # e.g. /app/sounds_confidential would match startswith('/app/sounds') but not commonpath
+            try:
+                if os.path.commonpath([abs_path, os.path.abspath(sounds_dir)]) != os.path.abspath(sounds_dir):
+                    log.warning(f"Security Alert: Attempted path traversal in sound loading: {name}")
+                    self.sounds[name] = None
+                    return
+            except ValueError:
+                # commonpath raises ValueError if paths are on different drives (Windows)
+                log.warning(f"Security Alert: Attempted cross-drive access in sound loading: {name}")
+                self.sounds[name] = None
+                return
+
+            if os.path.exists(abs_path):
+                filepath = abs_path
                 break
 
         if not filepath:
