@@ -34,6 +34,14 @@ jobs:
     - name: Lint with Pylint
       run: |
         pylint $(git ls-files '*.py') --fail-under=9.0
+    - name: Type Check with Mypy
+      run: |
+        mypy command_line_conflict
     - name: Test with pytest
       run: |
-        pytest --cov=command_line_conflict tests/
+        pytest --cov=command_line_conflict --cov-report=html --cov-report=term tests/
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: htmlcov

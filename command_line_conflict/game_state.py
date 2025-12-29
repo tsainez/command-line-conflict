@@ -1,3 +1,5 @@
+from typing import Any
+
 from . import config
 from .components.position import Position
 from .logger import log
@@ -19,7 +21,7 @@ class GameState:
         self.map = game_map
         self.entities: dict[int, dict] = {}
         self.next_entity_id = 0
-        self.event_queue = []
+        self.event_queue: list[dict[str, Any]] = []
         # Spatial hashing for O(1) lookups
         self.spatial_map: dict[tuple[int, int], set[int]] = {}
         # Component index for O(1) entity lookup by component type

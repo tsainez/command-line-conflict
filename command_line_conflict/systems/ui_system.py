@@ -27,7 +27,7 @@ class UISystem:
         self.screen = screen
         self.font = font
         self.camera = camera
-        self.cheats = {}
+        self.cheats: dict = {}
         self.small_font = pygame.font.Font(None, 18)
         self.key_options = [
             "L-Click: Select",
@@ -48,7 +48,7 @@ class UISystem:
 
         # List of active click effects (ripples)
         # Each effect is a dict: {x, y, time, color, duration}
-        self.click_effects = []
+        self.click_effects: list[dict] = []
 
         log.debug("UISystem initialized")
 
