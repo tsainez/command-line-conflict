@@ -33,6 +33,10 @@ class HealthSystem:
                 if not components.get(Dead):
                     if config.DEBUG:
                         log.info(f"Entity {entity_id} has died.")
+
+                    # Play death sound
+                    game_state.add_event({"type": "sound", "data": {"name": "explosion"}})
+
                     game_state.add_component(entity_id, Dead())
                     game_state.remove_component(entity_id, Movable)
                     game_state.remove_component(entity_id, Attack)

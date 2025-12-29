@@ -42,17 +42,26 @@ class MusicManager:
             if pygame.mixer.music.get_busy():
                 return
 
-        if not os.path.exists(filepath):
+        # Check if file exists, or try extensions if none provided
+        target_path = filepath
+        if not os.path.exists(target_path):
+            # If path doesn't exist, try appending extensions
+            for ext in [".ogg", ".wav", ".mp3"]:
+                if os.path.exists(target_path + ext):
+                    target_path = target_path + ext
+                    break
+
+        if not os.path.exists(target_path):
             log.warning(f"Music file not found: {filepath}")
             return
 
         try:
-            pygame.mixer.music.load(filepath)
+            pygame.mixer.music.load(target_path)
             pygame.mixer.music.play(loop)
-            self.current_track = filepath
-            log.info(f"Playing music: {filepath}")
+            self.current_track = target_path
+            log.info(f"Playing music: {target_path}")
         except pygame.error as e:
-            log.error(f"Failed to play music {filepath}: {e}")
+            log.error(f"Failed to play music {target_path}: {e}")
 
     def stop(self):
         """Stops the currently playing music."""
