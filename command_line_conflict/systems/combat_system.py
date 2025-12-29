@@ -20,7 +20,15 @@ class CombatSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in list(game_state.entities.items()):
+        # Optimization: Iterate only over entities with Attack component
+        # This avoids iterating over non-combat entities (walls, minerals, etc.)
+        attackers = game_state.get_entities_with_component(Attack)
+
+        for entity_id in list(attackers):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             attack = components.get(Attack)
             if not attack:
                 continue
