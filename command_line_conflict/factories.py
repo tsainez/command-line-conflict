@@ -18,8 +18,6 @@ from .components.wander import Wander
 from .game_state import GameState
 from .logger import log
 
-# TODO: Create a map with factories for the player to fight against.
-
 
 def create_chassis(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new chassis unit.

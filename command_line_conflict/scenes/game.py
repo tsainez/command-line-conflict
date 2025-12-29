@@ -16,6 +16,7 @@ from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap
+from command_line_conflict.maps.factory_battle_map import FactoryBattleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
@@ -54,7 +55,7 @@ class GameScene:
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(SimpleMap())
+        self.game_state = GameState(FactoryBattleMap())
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
@@ -127,11 +128,15 @@ class GameScene:
 
     def _create_initial_units(self):
         """Creates the starting units for each player."""
-        # Player 1 units (human)
-        for i in range(3):
-            factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1, is_human=True)
-        # Player 2 units (AI) - Mission 1: Single Rover in center
-        factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
+        if hasattr(self.game_state.map, "create_initial_units"):
+            self.game_state.map.create_initial_units(self.game_state)
+        else:
+            # Fallback for maps without custom spawn logic
+            # Player 1 units (human)
+            for i in range(3):
+                factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1, is_human=True)
+            # Player 2 units (AI) - Mission 1: Single Rover in center
+            factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.
@@ -405,7 +410,7 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
-        self.chat_system.update(dt)
+        self.chat_system.update(self.game_state, dt)
 
         if self.paused:
             return
