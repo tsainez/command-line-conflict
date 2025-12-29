@@ -55,6 +55,12 @@ class GameScene:
         self.game = game
         self.font = game.font
         self.game_state = GameState(SimpleMap())
+
+        # Load campaign tech modifiers
+        self.campaign_manager = CampaignManager()
+        self.game_state.tech_modifiers = self.campaign_manager.get_tech_modifiers()
+        log.info(f"Loaded {len(self.game_state.tech_modifiers)} tech modifiers.")
+
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
@@ -81,7 +87,7 @@ class GameScene:
         self.camera_start_pos = None
 
         # Initialize systems
-        self.campaign_manager = CampaignManager()
+        # self.campaign_manager is already initialized above
         self.movement_system = MovementSystem()
         self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
         self.combat_system = CombatSystem()

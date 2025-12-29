@@ -21,6 +21,56 @@ from .logger import log
 # TODO: Create a map with factories for the player to fight against.
 
 
+def _apply_modifiers(game_state: GameState, entity_id: int, unit_name: str):
+    """Applies active tech modifiers to the entity."""
+    modifiers = game_state.tech_modifiers
+    if not modifiers:
+        return
+
+    for mod in modifiers:
+        if mod.get("unit_id") != unit_name:
+            continue
+
+        stat = mod.get("stat")
+        value = mod.get("value")
+        operation = mod.get("operation", "add")
+
+        # Apply logic based on stat
+        if stat == "hp":
+            health = game_state.get_component(entity_id, Health)
+            if health:
+                if operation == "add":
+                    health.max_hp += value
+                    health.hp += value # Heal to match max hp increase? Usually yes for permanent upgrades.
+                elif operation == "set":
+                    health.max_hp = value
+                    health.hp = value
+
+        elif stat == "speed":
+            movable = game_state.get_component(entity_id, Movable)
+            if movable:
+                if operation == "add":
+                    movable.speed += value
+                elif operation == "set":
+                    movable.speed = value
+
+        elif stat == "attack_damage":
+            attack = game_state.get_component(entity_id, Attack)
+            if attack:
+                 if operation == "add":
+                    attack.attack_damage += value
+                 elif operation == "set":
+                    attack.attack_damage = value
+
+        elif stat == "attack_range":
+            attack = game_state.get_component(entity_id, Attack)
+            if attack:
+                 if operation == "add":
+                    attack.attack_range += value
+                 elif operation == "set":
+                    attack.attack_range = value
+
+
 def create_chassis(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
     """Creates a new chassis unit.
     Args:
@@ -46,6 +96,10 @@ def create_chassis(game_state: GameState, x: float, y: float, player_id: int, is
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="chassis"))
+
+    if is_human: # Only apply tech to human units usually? Or all? Let's assume player only for now based on CampaignManager context.
+        _apply_modifiers(game_state, entity_id, "chassis")
+
     return entity_id
 
 
@@ -117,6 +171,10 @@ def create_rover(game_state: GameState, x: float, y: float, player_id: int, is_h
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="rover"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "rover")
+
     return entity_id
 
 
@@ -145,6 +203,10 @@ def create_arachnotron(game_state: GameState, x: float, y: float, player_id: int
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="arachnotron"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "arachnotron")
+
     return entity_id
 
 
@@ -173,6 +235,10 @@ def create_observer(game_state: GameState, x: float, y: float, player_id: int, i
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="observer"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "observer")
+
     return entity_id
 
 
@@ -202,6 +268,10 @@ def create_immortal(game_state: GameState, x: float, y: float, player_id: int, i
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="immortal"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "immortal")
+
     return entity_id
 
 
@@ -229,6 +299,10 @@ def create_extractor(game_state: GameState, x: float, y: float, player_id: int, 
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, UnitIdentity(name="extractor"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "extractor")
+
     return entity_id
 
 
@@ -255,6 +329,10 @@ def create_rover_factory(game_state: GameState, x: float, y: float, player_id: i
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
     game_state.add_component(entity_id, UnitIdentity(name="rover_factory"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "rover_factory")
+
     return entity_id
 
 
@@ -281,6 +359,10 @@ def create_arachnotron_factory(game_state: GameState, x: float, y: float, player
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))
     game_state.add_component(entity_id, UnitIdentity(name="arachnotron_factory"))
+
+    if is_human:
+        _apply_modifiers(game_state, entity_id, "arachnotron_factory")
+
     return entity_id
 
 

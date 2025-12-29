@@ -2,31 +2,21 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Any
 
 from .logger import log
 from .utils.paths import get_user_data_dir
+from .tech_tree import TECH_TREE, MISSION_CHOICES, TechNode
 
 DEFAULT_SAVE_FILENAME = "save_game.json"
 
-# Define the Tech Tree: Mission ID -> List of Unlocked Units
-# Mission 1 unlocks Rover
-# Mission 2 unlocks Arachnotron
-# ...
-MISSION_REWARDS: Dict[str, List[str]] = {
-    "mission_1": ["rover"],
-    "mission_2": ["arachnotron"],
-    "mission_3": ["observer"],
-    "mission_4": ["immortal"],
-}
-
-
 class CampaignManager:
-    """Manages campaign progress, including completed missions and unlocked units."""
+    """Manages campaign progress, including completed missions and unlocked tech."""
 
     MAX_SAVE_FILE_SIZE = 512 * 1024  # 512KB limit to prevent DoS
     MAX_MISSIONS_COUNT = 1000  # Limit number of missions to track
     MAX_MISSION_ID_LENGTH = 64  # Security limit for mission ID length
+    MAX_TECH_ID_LENGTH = 64 # Security limit for tech ID
 
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
@@ -50,13 +40,20 @@ class CampaignManager:
                     log.error(f"Failed to migrate save file: {e}")
 
         self.completed_missions: List[str] = []
-        self.unlocked_units: Set[str] = {"chassis", "extractor"}  # Default unlocks
+        self.unlocked_techs: Set[str] = set()
+
+        # Determine unlocked units from techs
+        self.unlocked_units: Set[str] = {"chassis", "extractor"}
+
         self.load_progress()
 
     def load_progress(self) -> None:
         """Loads progress from the save file."""
         if not os.path.exists(self.save_file):
             log.info("No save file found. Starting new campaign.")
+            # Default unlocks
+            self.unlocked_techs = set()
+            # Note: We might want to give default techs here if any
             return
 
         # Security check: File size
@@ -91,16 +88,64 @@ class CampaignManager:
                     else:
                         log.warning(f"Skipping mission ID exceeding length limit: {m_str[:20]}...")
 
-                # Re-evaluate unlocks based on completed missions
-                self._update_unlocks()
-                log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
+                # Load Techs
+                techs = data.get("unlocked_techs", [])
+                if not isinstance(techs, list):
+                     # Migration from legacy save (which didn't have unlocked_techs)
+                    log.info("Migrating legacy save to tech tree system.")
+                    self._migrate_legacy_unlocks(missions)
+                else:
+                    self.unlocked_techs = set()
+                    for t in techs:
+                        t_str = str(t)
+                        if len(t_str) <= self.MAX_TECH_ID_LENGTH:
+                            if t_str in TECH_TREE:
+                                self.unlocked_techs.add(t_str)
+                            else:
+                                log.warning(f"Skipping unknown tech ID: {t_str}")
+                        else:
+                             log.warning(f"Skipping tech ID exceeding length limit: {t_str[:20]}...")
+
+                self._refresh_derived_state()
+                log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed, {len(self.unlocked_techs)} techs unlocked.")
+
         except (IOError, json.JSONDecodeError) as e:
             log.error(f"Failed to load save file: {e}")
+
+    def _migrate_legacy_unlocks(self, completed_missions: List[str]):
+        """Migrates legacy mission-based unlocks to tech tree nodes."""
+        self.unlocked_techs = set()
+
+        # Hardcoded legacy mapping
+        legacy_mapping = {
+            "mission_1": ["unlock_rover"],
+            "mission_2": ["unlock_arachnotron"],
+            "mission_3": ["unlock_observer"],
+            "mission_4": ["unlock_immortal"],
+        }
+
+        for mission_id in completed_missions:
+            techs = legacy_mapping.get(mission_id, [])
+            for t in techs:
+                if t in TECH_TREE:
+                    self.unlocked_techs.add(t)
+
+    def _refresh_derived_state(self):
+        """Updates derived state like unlocked_units from unlocked_techs."""
+        self.unlocked_units = {"chassis", "extractor"}
+        for tech_id in self.unlocked_techs:
+            tech = TECH_TREE.get(tech_id)
+            if tech and tech.type == "unit":
+                # Find unit_id in modifiers
+                for mod in tech.modifiers:
+                    if mod.get("stat") == "unlock" and mod.get("value") is True:
+                        self.unlocked_units.add(mod.get("unit_id"))
 
     def save_progress(self) -> None:
         """Saves current progress to the save file."""
         data = {
             "completed_missions": self.completed_missions,
+            "unlocked_techs": list(self.unlocked_techs)
         }
         try:
             with open(self.save_file, "w", encoding="utf-8") as f:
@@ -132,17 +177,61 @@ class CampaignManager:
 
             log.info(f"Mission {mission_id} completed!")
             self.completed_missions.append(mission_id)
-            self._update_unlocks()
+            # Note: We do NOT automatically unlock things anymore.
+            # The player must choose rewards.
+            # But we should save the fact that the mission is done.
             self.save_progress()
 
-    def _update_unlocks(self) -> None:
-        """Updates the set of unlocked units based on completed missions."""
-        self.unlocked_units = {"chassis", "extractor"}  # Reset to default
-        for mission_id in self.completed_missions:
-            rewards = MISSION_REWARDS.get(mission_id, [])
-            for unit in rewards:
-                self.unlocked_units.add(unit)
-                log.info(f"Unlocked unit: {unit}")
+    def unlock_tech(self, tech_id: str) -> bool:
+        """Unlocks a specific tech node.
+
+        Args:
+            tech_id: The ID of the tech to unlock.
+
+        Returns:
+            True if successful, False if invalid or requirements not met.
+        """
+        if tech_id not in TECH_TREE:
+            log.warning(f"Attempted to unlock unknown tech: {tech_id}")
+            return False
+
+        tech = TECH_TREE[tech_id]
+
+        # Check prerequisites
+        for req in tech.prerequisites:
+            if req not in self.unlocked_techs:
+                log.warning(f"Cannot unlock {tech_id}: Prerequisite {req} missing.")
+                return False
+
+        # Check mutual exclusion
+        for conflict in tech.mutually_exclusive_with:
+            if conflict in self.unlocked_techs:
+                log.warning(f"Cannot unlock {tech_id}: Conflict with {conflict}.")
+                return False
+
+        self.unlocked_techs.add(tech_id)
+        self._refresh_derived_state()
+        self.save_progress()
+        log.info(f"Unlocked tech: {tech_id}")
+        return True
+
+    def get_available_choices(self, mission_id: str) -> List[TechNode]:
+        """Returns a list of TechNodes available as rewards for the given mission."""
+        choice_ids = MISSION_CHOICES.get(mission_id, [])
+        choices = []
+        for tid in choice_ids:
+            if tid in TECH_TREE:
+                # Only offer choice if not already unlocked and not blocked
+                # Actually, for mutual exclusion, we want to show it but maybe mark as unavailable?
+                # Or just show valid options.
+                # If I picked A, B is excluded. Should B still be offered? No, usually not.
+
+                node = TECH_TREE[tid]
+                is_blocked = any(conflict in self.unlocked_techs for conflict in node.mutually_exclusive_with)
+                if tid not in self.unlocked_techs and not is_blocked:
+                     choices.append(node)
+
+        return choices
 
     def is_unit_unlocked(self, unit_name: str) -> bool:
         """Checks if a specific unit is unlocked.
@@ -154,3 +243,12 @@ class CampaignManager:
             True if the unit is unlocked, False otherwise.
         """
         return unit_name in self.unlocked_units
+
+    def get_tech_modifiers(self) -> List[Dict]:
+        """Returns a list of all active modifiers from unlocked techs."""
+        modifiers = []
+        for tech_id in self.unlocked_techs:
+            node = TECH_TREE.get(tech_id)
+            if node:
+                modifiers.extend(node.modifiers)
+        return modifiers

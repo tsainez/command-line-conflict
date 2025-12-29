@@ -1,3 +1,4 @@
+from typing import List, Dict
 from . import config
 from .components.position import Position
 from .logger import log
@@ -24,6 +25,10 @@ class GameState:
         self.spatial_map: dict[tuple[int, int], set[int]] = {}
         # Component index for O(1) entity lookup by component type
         self.component_index: dict[type, set[int]] = {}
+
+        # Tech Modifiers
+        # Format: [{"unit_id": "rover", "stat": "speed", "value": 1.0, "operation": "add"}, ...]
+        self.tech_modifiers: List[Dict] = []
 
     def _add_to_spatial_map(self, entity_id: int, x: int, y: int) -> None:
         pos = (x, y)
