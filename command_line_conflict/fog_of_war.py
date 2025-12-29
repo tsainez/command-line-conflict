@@ -167,7 +167,11 @@ class FogOfWar:
             target_h = int(h * scaled_tile_size)
 
             # Scale
-            scaled = pygame.transform.scale(sub, (target_w, target_h))
+            try:
+                scaled = pygame.transform.smoothscale(sub, (target_w, target_h))
+            except (pygame.error, ValueError):
+                # Fallback if smoothscale fails (e.g. wrong bit depth)
+                scaled = pygame.transform.scale(sub, (target_w, target_h))
 
             # Blit position
             # (start_x - camera.x) * scaled_tile_size
@@ -182,5 +186,8 @@ class FogOfWar:
             target_w = self.width * grid_size
             target_h = self.height * grid_size
 
-            scaled = pygame.transform.scale(self.fog_texture, (target_w, target_h))
+            try:
+                scaled = pygame.transform.smoothscale(self.fog_texture, (target_w, target_h))
+            except (pygame.error, ValueError):
+                scaled = pygame.transform.scale(self.fog_texture, (target_w, target_h))
             screen.blit(scaled, (0, 0))
