@@ -4,6 +4,8 @@ from unittest.mock import MagicMock
 
 from command_line_conflict.ui.file_dialog import FileDialog
 
+# pylint: disable=protected-access
+
 
 class TestEditorPathTraversal(unittest.TestCase):
     def test_path_traversal_sanitization(self):

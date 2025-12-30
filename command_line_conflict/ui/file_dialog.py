@@ -9,7 +9,9 @@ from command_line_conflict.logger import log
 class FileDialog:
     """A simple in-game file dialog for saving and loading files."""
 
-    def __init__(self, screen, font, title, initial_dir, mode="load", extension=".json"):
+    def __init__(
+        self, screen, font, title, initial_dir, mode="load", extension=".json"
+    ):  # pylint: disable=too-many-positional-arguments
         """Initializes the FileDialog.
 
         Args:
@@ -111,9 +113,9 @@ class FileDialog:
             if event.key == pygame.K_ESCAPE:
                 self.active = False
                 return None
-            elif event.key == pygame.K_RETURN:
+            if event.key == pygame.K_RETURN:
                 return self._confirm_selection()
-            elif event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
                 # Add character to input
@@ -188,13 +190,29 @@ class FileDialog:
 
         # Draw Input Field
         pygame.draw.rect(self.screen, (255, 255, 255), self.input_rect)
-        input_surf = self.font.render(self.input_text, True, (0, 0, 0))
+        if self.input_text:
+            input_surf = self.font.render(self.input_text, True, (0, 0, 0))
+            input_surf_y = self.input_rect.y + 5
+        else:
+            input_surf = self.font.render("Enter a file name", True, (130, 130, 130))
+            input_surf_y = self.input_rect.y + 5
+
         # Clip input text if too long? For now just render.
-        self.screen.blit(input_surf, (self.input_rect.x + 5, self.input_rect.y + 5))
+        self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
+
+        # Helper hint beneath the input for quick keyboard guidance.
+        hint_text = "Enter to confirm, Esc to cancel, scroll to browse"
+        hint_surf = self.font.render(hint_text, True, (170, 170, 170))
+        self.screen.blit(hint_surf, (self.input_rect.x, self.input_rect.y + 32))
 
         # Draw Action Button
-        action_color = (70, 170, 70) if self.hovered_element == "action" else (50, 150, 50)
+        action_enabled = bool(self.input_text)
+        action_color = (70, 170, 70) if self.hovered_element == "action" and action_enabled else (50, 150, 50)
+        if not action_enabled:
+            action_color = (90, 90, 90)
+
         pygame.draw.rect(self.screen, action_color, self.action_button_rect)
         btn_text = "Save" if self.mode == "save" else "Load"
-        btn_surf = self.font.render(btn_text, True, (255, 255, 255))
+        btn_text_color = (255, 255, 255) if action_enabled else (200, 200, 200)
+        btn_surf = self.font.render(btn_text, True, btn_text_color)
         self.screen.blit(btn_surf, (self.action_button_rect.x + 10, self.action_button_rect.y + 5))

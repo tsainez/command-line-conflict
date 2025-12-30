@@ -88,7 +88,7 @@ class ChatSystem:
                     ):
                         self.input_text += event.unicode
                 return True
-            elif event.key == pygame.K_l:
+            if event.key == pygame.K_l:
                 # Toggle persistent log view
                 self.show_log = not self.show_log
                 return True
