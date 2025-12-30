@@ -55,6 +55,19 @@ class MusicManager:
             log.warning(f"Music file not found: {filepath}")
             return
 
+        # Security: Reject non-regular files and oversized inputs to avoid DoS or special file abuse
+        if not os.path.isfile(target_path):
+            log.warning(f"Music file must be a regular file: {target_path}")
+            return
+        try:
+            size = os.path.getsize(target_path)
+        except OSError as e:
+            log.warning(f"Unable to read music file size ({target_path}): {e}")
+            return
+        if size > config.MAX_AUDIO_FILE_SIZE:
+            log.warning("Music file %s exceeds maximum allowed size (%s bytes)", target_path, config.MAX_AUDIO_FILE_SIZE)
+            return
+
         try:
             pygame.mixer.music.load(target_path)
             pygame.mixer.music.play(loop)

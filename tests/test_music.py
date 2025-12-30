@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 
+from command_line_conflict import config
 from command_line_conflict.music import MusicManager
 
 
@@ -13,8 +14,10 @@ class TestMusicManager(unittest.TestCase):
     @patch("pygame.mixer.music")
     @patch("pygame.mixer.init")
     @patch("pygame.mixer.get_init", return_value=False)
+    @patch("os.path.getsize", return_value=1024)
+    @patch("os.path.isfile", return_value=True)
     @patch("os.path.exists", return_value=True)
-    def test_play_music(self, mock_exists, mock_get_init, mock_init, mock_music):
+    def test_play_music(self, mock_exists, mock_isfile, mock_getsize, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.play("test.ogg")
 
@@ -25,8 +28,12 @@ class TestMusicManager(unittest.TestCase):
     @patch("pygame.mixer.music")
     @patch("pygame.mixer.init")
     @patch("pygame.mixer.get_init", return_value=True)
+    @patch("os.path.getsize", return_value=1024)
+    @patch("os.path.isfile", return_value=True)
     @patch("os.path.exists", return_value=True)
-    def test_play_music_already_playing_same_track(self, mock_exists, mock_get_init, mock_init, mock_music):
+    def test_play_music_already_playing_same_track(
+        self, mock_exists, mock_isfile, mock_getsize, mock_get_init, mock_init, mock_music
+    ):
         manager = MusicManager()
         manager.current_track = "test.ogg"
         mock_music.get_busy.return_value = True
@@ -64,6 +71,20 @@ class TestMusicManager(unittest.TestCase):
     def test_missing_file(self, mock_exists, mock_get_init, mock_init, mock_music):
         manager = MusicManager()
         manager.play("missing.ogg")
+
+        mock_music.load.assert_not_called()
+        self.assertIsNone(manager.current_track)
+
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
+    @patch("os.path.getsize")
+    @patch("os.path.isfile", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    def test_rejects_oversized_file(self, mock_exists, mock_isfile, mock_getsize, mock_get_init, mock_init, mock_music):
+        mock_getsize.return_value = config.MAX_AUDIO_FILE_SIZE + 1
+        manager = MusicManager()
+        manager.play("huge.ogg")
 
         mock_music.load.assert_not_called()
         self.assertIsNone(manager.current_track)

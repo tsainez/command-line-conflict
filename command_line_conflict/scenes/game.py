@@ -15,7 +15,7 @@ from command_line_conflict.components.vision import Vision
 from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
-from command_line_conflict.maps import SimpleMap
+from command_line_conflict.maps import SimpleMap as _SimpleMap
 from command_line_conflict.maps.factory_battle_map import FactoryBattleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
@@ -32,6 +32,8 @@ from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
+
+SimpleMap = _SimpleMap  # Expose for test patching/backwards compatibility
 
 
 class UnitView:

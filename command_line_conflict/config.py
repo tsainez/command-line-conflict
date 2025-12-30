@@ -40,3 +40,4 @@ MASTER_VOLUME = 1.0
 # Security configuration
 MAX_CHAT_INPUT_LENGTH = 200
 MAX_FILENAME_LENGTH = 64  # Limit filename length to prevent DoS/FS issues
+MAX_AUDIO_FILE_SIZE = 10 * 1024 * 1024  # 10MB cap to prevent resource exhaustion when loading audio
