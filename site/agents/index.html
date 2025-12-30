@@ -1,0 +1,772 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+
+        <link rel="prev" href="../CHANGELOG/">
+
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+
+
+
+        <title>Agent Tasks - Command Line Conflict</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#agentsmd" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Command Line Conflict" class="md-header__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Command Line Conflict
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              Agent Tasks
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Command Line Conflict" class="md-nav__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Command Line Conflict
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Home
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../Contributing/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Contributing
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../Security/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Security
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../Maps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Maps
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../ProjectStructure/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Project Structure
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Changelog
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Agent Tasks
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Agent Tasks
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#agent-instructions" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Agent Instructions
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#features-gameplay" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Features / Gameplay
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ai-bot" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        AI / Bot
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#architecture-refactoring" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Architecture / Refactoring
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#testing-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Testing / QA
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Documentation
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#devops-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        DevOps / Tooling
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#agent-instructions" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Agent Instructions
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#features-gameplay" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Features / Gameplay
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ai-bot" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        AI / Bot
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#architecture-refactoring" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Architecture / Refactoring
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#testing-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Testing / QA
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Documentation
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#devops-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        DevOps / Tooling
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="agentsmd">AGENTS.md</h1>
+<h2 id="agent-instructions">Agent Instructions</h2>
+<p>Before creating a Pull Request, you <strong>must</strong> run the pre-commit script to verify your changes:</p>
+<pre><code class="language-bash">./scripts/pre_commit.sh
+</code></pre>
+<p>All checks (formatting, linting, testing) must pass.</p>
+<p>This file contains a backlog of 100 potential tasks that can be performed by autonomous coding agents to improve the <code>command_line_conflict</code> project.</p>
+<h2 id="features-gameplay">Features / Gameplay</h2>
+<ol>
+<li>Implement fog of war smoothing for better visual transitions.</li>
+<li>Add a minimap to the HUD.</li>
+<li>Implement A* pathfinding for unit movement.</li>
+<li>Add different unit types (Melee, Ranged, Flying).</li>
+<li>Implement resource gathering animations (ASCII characters changing).</li>
+<li>Add building construction timers and animations.</li>
+<li>Implement a tech tree system for unlocking units.</li>
+<li>Add weapon and armor upgrade systems.</li>
+<li>Implement Hero units with special abilities.</li>
+<li>Add neutral creeps/wildlife to maps.</li>
+<li>Implement day/night cycle with visual effects (dimming).</li>
+<li>Add weather effects like rain or snow (overlay characters).</li>
+<li>Implement different terrain types (slow movement, high ground bonus).</li>
+<li>Add destructible rocks/obstacles.</li>
+<li>Implement unit control groups (0-9 keys).</li>
+<li>Add hotkeys for building construction and unit training.</li>
+<li>Implement game pause functionality.</li>
+<li>Add save/load game functionality during a mission.</li>
+<li>Implement a replay system to watch past games.</li>
+<li>Add an observer mode for spectating.</li>
+<li>Implement an in-game chat/log system.</li>
+<li>Add cheat codes for testing (e.g., reveal map, infinite resources).</li>
+<li>Implement selectable difficulty levels.</li>
+<li>Add a scripted tutorial mission.</li>
+<li>Implement a campaign progression map screen.</li>
+<li>Add ASCII art cutscenes between missions.</li>
+<li>Implement sound effect hooks (even if silent initially).</li>
+<li>Add background music support.</li>
+<li>Implement a main menu with configurable options.</li>
+<li>Add keybinding configuration menu.</li>
+<li>Implement screen resolution or text size scaling.</li>
+<li>Add unit health bars/indicators.</li>
+<li>Implement unit energy/mana for abilities.</li>
+<li>Add cooldown management for abilities.</li>
+<li>Implement "Hold Position" command.</li>
+<li>Implement "Patrol" command.</li>
+<li>Implement "Attack Move" command.</li>
+<li>Add unit formations.</li>
+<li>Implement collision avoidance between friendly units.</li>
+<li>Add floating combat text (damage numbers).</li>
+</ol>
+<h2 id="ai-bot">AI / Bot</h2>
+<ol>
+<li>Create a basic "Random Move" AI.</li>
+<li>Create a dedicated Resource Gathering AI.</li>
+<li>Create a "Rush" strategy AI (early aggression).</li>
+<li>Create a "Turtle" strategy AI (defensive).</li>
+<li>Implement AI personality or chat taunts.</li>
+<li>Add AI difficulty scaling (limit APM or resource rates).</li>
+<li>Implement AI scouting behavior.</li>
+<li>Create AI logic to retreat when units are low health.</li>
+<li>Implement AI base expansion logic.</li>
+<li>Create a Reinforcement Learning gym wrapper for the game.</li>
+</ol>
+<h2 id="architecture-refactoring">Architecture / Refactoring</h2>
+<ol>
+<li>Refactor ECS storage to be more cache-friendly.</li>
+<li>Split the large <code>engine.py</code> into smaller, focused modules.</li>
+<li>Introduce an Event Bus for decoupled system communication.</li>
+<li>Optimize the rendering loop to reduce flicker.</li>
+<li>Add comprehensive type hinting to the entire codebase.</li>
+<li>Add docstrings to all public functions and classes.</li>
+<li>Refactor map loading to use a standard format like JSON or YAML.</li>
+<li>Implement a Dependency Injection container.</li>
+<li>Extract all hardcoded configuration values to a separate config file.</li>
+<li>Create a unified logging system with different levels.</li>
+<li>Refactor unit logic into a State Machine pattern.</li>
+<li>Optimize collision detection using a Quadtree or spatial hash.</li>
+<li>Refactor input handling to support custom keymaps easily.</li>
+<li>Abstract the rendering interface to allow potential GUI backends.</li>
+<li>Implement object pooling for frequently created entities (units/projectiles).</li>
+<li>Refactor the Factory pattern for entity creation.</li>
+<li>Standardize error handling and exceptions.</li>
+<li>Remove magic numbers and replace with named constants.</li>
+<li>Enforce PEP8 compliance across the codebase.</li>
+<li>Sort imports automatically using <code>isort</code> configuration.</li>
+</ol>
+<h2 id="testing-qa">Testing / QA</h2>
+<ol>
+<li>Add unit tests for the core <code>Game</code> class.</li>
+<li>Add integration tests for full campaign mission flow.</li>
+<li>Implement property-based testing using <code>Hypothesis</code>.</li>
+<li>Add performance benchmarks for the game loop.</li>
+<li>Implement fuzz testing for input handling.</li>
+<li>Add visual regression tests (comparing screen output snapshots).</li>
+<li>Create a stress test spawning 1000 units to check stability.</li>
+<li>Add test coverage reporting (target &gt; 80%).</li>
+<li>Implement automated map validation (check for unreachable areas).</li>
+<li>Add static analysis (pylint, mypy) checks to the pipeline.</li>
+<li>Create test fixtures for complex game scenarios (e.g., max supply).</li>
+<li>Mock external dependencies (like Pygame) effectively in tests.</li>
+<li>[x] Add pre-commit hooks for linting and formatting.</li>
+<li>Verify determinism in game logic (same seed = same outcome).</li>
+<li>Test backward compatibility of save files.</li>
+</ol>
+<h2 id="documentation">Documentation</h2>
+<ol>
+<li>[x] Create a <code>CONTRIBUTING.md</code> file with guidelines.</li>
+<li>Document the ECS architecture with a diagram.</li>
+<li>Create API documentation using Sphinx or MkDocs.</li>
+<li>Write a guide on "How to Create a New Map".</li>
+<li>Document available cheat codes and debug commands.</li>
+<li>Create a changelog generation script.</li>
+<li>Write a "Getting Started" guide for new developers.</li>
+<li>Document known issues and workarounds.</li>
+<li>Create an ASCII art style guide for the game.</li>
+<li>Document AI behavior trees and logic flow.</li>
+</ol>
+<h2 id="devops-tooling">DevOps / Tooling</h2>
+<ol>
+<li>Create a Dockerfile for running the game in a container.</li>
+<li>[x] Set up GitHub Actions for Continuous Integration.</li>
+<li>Create a release script to package the game.</li>
+<li>Add a "watch mode" script for auto-restarting on code changes.</li>
+<li>Create a map editor tool (CLI or simple GUI).</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+
+  </body>
+</html>
