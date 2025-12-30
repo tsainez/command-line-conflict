@@ -1,3 +1,4 @@
+import math
 import pygame
 
 from command_line_conflict.campaign_manager import CampaignManager
@@ -27,6 +28,7 @@ class MenuScene:
         self.option_rects = []
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
+        self.time = 0.0
 
         # Start menu music
         # Assuming the music file is in the root or a music folder
@@ -81,11 +83,12 @@ class MenuScene:
             self.game.running = False
 
     def update(self, dt):
-        """Updates the menu scene. This scene has no dynamic elements.
+        """Updates the menu scene.
 
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.time += dt
 
     def draw(self, screen):
         """Draws the menu options and title to the screen.
@@ -99,10 +102,16 @@ class MenuScene:
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
+        # Pulse calculation: varies between 0 and 1
+        pulse = (math.sin(self.time * 5) + 1) / 2
+        # Interpolate between dim yellow (150, 150, 0) and bright yellow (255, 255, 0)
+        yellow_val = 150 + int(105 * pulse)
+        pulse_color = (yellow_val, yellow_val, 0)
+
         self.option_rects.clear()
         for i, option in enumerate(self.menu_options):
             if i == self.selected_option:
-                color = (255, 255, 0)
+                color = pulse_color
                 display_text = f"> {option} <"
             else:
                 color = (255, 255, 255)

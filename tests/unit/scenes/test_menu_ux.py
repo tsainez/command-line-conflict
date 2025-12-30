@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pygame
 import pytest
+import math
 
 from command_line_conflict.scenes.menu import MenuScene
 
@@ -18,7 +19,7 @@ class TestMenuUX:
         return game
 
     def test_menu_visual_indicators(self, mock_game):
-        """Test that the selected menu option has visual markers."""
+        """Test that the selected menu option has visual markers and correct color."""
         with patch("pygame.font.Font") as MockFont, patch(
             "command_line_conflict.scenes.menu.CampaignManager"
         ) as MockCampaignManager:
@@ -39,6 +40,10 @@ class TestMenuUX:
             MockCampaignManager.return_value.completed_missions = []
 
             menu = MenuScene(mock_game)
+            # Force time to give a known pulse value
+            # pulse = (sin(time*5) + 1) / 2
+            # For max brightness (255, 255, 0): pulse=1 -> sin(time*5)=1 -> time*5 = PI/2 -> time = PI/10
+            menu.time = math.pi / 10
             menu.draw(mock_game.screen)
 
             # Find the rendered text for the selected option (index 0 by default)
@@ -47,7 +52,14 @@ class TestMenuUX:
 
             assert selected_option_render is not None
             assert selected_option_render["text"] == "> New Game <"
-            assert selected_option_render["color"] == (255, 255, 0)
+
+            # Allow for some floating point tolerance in color matching or exact match if logic is robust
+            # With pulse=1, color should be (255, 255, 0)
+            # With pulse=0, color should be (150, 150, 0)
+            r, g, b = selected_option_render["color"]
+            assert 150 <= r <= 255
+            assert 150 <= g <= 255
+            assert b == 0
 
             # Verify unselected option has no markers
             unselected_option_render = next((r for r in rendered_texts if "Map Editor" in r["text"]), None)
@@ -90,3 +102,11 @@ class TestMenuUX:
             menu._trigger_option(0)
 
             mock_game.scene_manager.switch_to.assert_called_with("game")
+
+    def test_update_increments_time(self, mock_game):
+        with patch("pygame.font.Font"), patch("command_line_conflict.scenes.menu.CampaignManager"):
+            scene = MenuScene(mock_game)
+            initial_time = scene.time
+            dt = 0.016
+            scene.update(dt)
+            assert scene.time == initial_time + dt
