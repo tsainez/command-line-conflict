@@ -15,3 +15,7 @@
 ## 2024-05-24 - Zero-Copy Pathfinding
 **Learning:** Passing `GameState.spatial_map` directly to `Map.find_path` as `extra_obstacles` avoids the overhead of constructing a new set of obstacles every frame, which was an O(N) operation.
 **Action:** Pass existing data structures to expensive algorithms instead of rebuilding them, whenever possible.
+
+## 2025-02-14 - List Allocations in Hot Paths
+**Learning:** Avoid `list()` conversion when iterating over sets in performance-critical loops (like `CombatSystem.update`) unless snapshot behavior is strictly required for safety (e.g., removing elements from the set during iteration).
+**Action:** Iterate over sets directly when safe to avoid O(N) allocation overhead.
