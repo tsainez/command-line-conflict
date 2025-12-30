@@ -50,7 +50,7 @@ def main():
     changes = parse_log(log_lines)
     markdown = generate_markdown(changes)
 
-    with open("CHANGELOG.md", "w") as f:
+    with open("CHANGELOG.md", "w", encoding="utf-8") as f:
         f.write(markdown)
 
     print(f"CHANGELOG.md generated with {len(changes)} entries.")

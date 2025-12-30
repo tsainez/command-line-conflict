@@ -4,6 +4,8 @@ from ..components.selectable import Selectable
 from ..game_state import GameState
 from ..logger import log
 
+# pylint: disable=too-many-positional-arguments
+
 
 class SelectionSystem:
     """Handles entity selection via mouse clicks and drag-to-select."""
@@ -31,7 +33,7 @@ class SelectionSystem:
         grid_end: tuple[int, int],
         shift_pressed: bool = False,
         current_player_id: int = 1,
-    ) -> None:
+    ) -> None:  # pylint: disable=too-many-positional-arguments
         """Processes a drag-to-select action.
 
         This method is called when a drag selection event is completed.
