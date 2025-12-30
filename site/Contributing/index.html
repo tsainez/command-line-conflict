@@ -1,0 +1,746 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+
+        <link rel="prev" href="..">
+
+
+        <link rel="next" href="../Security/">
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+
+
+
+        <title>Contributing - Command Line Conflict</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#contributing-to-command-line-conflict" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Command Line Conflict" class="md-header__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Command Line Conflict
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              Contributing
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Command Line Conflict" class="md-nav__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Command Line Conflict
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Home
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Contributing
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Contributing
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Getting Started
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Development Workflow
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#code-style-linting" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Code Style &amp; Linting
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Code Style &amp; Linting">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#running-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Running Checks
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Logging
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pull Requests
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#reporting-bugs" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reporting Bugs
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#feature-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Feature Requests
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../Security/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Security
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../Maps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Maps
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../ProjectStructure/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Project Structure
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Changelog
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    Agent Tasks
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Getting Started
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Development Workflow
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#code-style-linting" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Code Style &amp; Linting
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Code Style &amp; Linting">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#running-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Running Checks
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Logging
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pull Requests
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#reporting-bugs" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reporting Bugs
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#feature-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Feature Requests
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="contributing-to-command-line-conflict">Contributing to Command Line Conflict</h1>
+<p>Thank you for your interest in contributing to Command Line Conflict! We welcome contributions from everyone.</p>
+<h2 id="getting-started">Getting Started</h2>
+<ol>
+<li><strong>Fork the repository</strong> on GitHub.</li>
+<li><strong>Clone your fork</strong> locally:
+    <code>bash
+    git clone https://github.com/your-username/command-line-conflict.git
+    cd command-line-conflict</code></li>
+<li><strong>Set up your environment</strong>:
+    <code>bash
+    python -m venv .venv
+    source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+    pip install -r requirements.txt</code></li>
+</ol>
+<h2 id="development-workflow">Development Workflow</h2>
+<ol>
+<li><strong>Create a branch</strong> for your feature or bugfix:
+    <code>bash
+    git checkout -b feature/my-new-feature</code></li>
+<li><strong>Make your changes</strong>.</li>
+<li><strong>Run tests and linters</strong> locally to ensure everything is correct (see below).</li>
+<li><strong>Commit your changes</strong> with a descriptive commit message.</li>
+<li><strong>Push to your fork</strong> and submit a Pull Request.</li>
+</ol>
+<h2 id="code-style-linting">Code Style &amp; Linting</h2>
+<p>We enforce a strict code style to keep the codebase clean and maintainable.</p>
+<ul>
+<li><strong>Line Length:</strong> Maximum 127 characters.</li>
+<li><strong>Formatter:</strong> We use <code>black</code>.</li>
+<li><strong>Import Sorting:</strong> We use <code>isort</code>.</li>
+<li><strong>Linting:</strong> We use <code>flake8</code> and <code>pylint</code>.</li>
+</ul>
+<h3 id="running-checks">Running Checks</h3>
+<p>We have provided a convenience script to run all checks. Run the following command before submitting your PR:</p>
+<pre><code class="language-bash">./scripts/pre_commit.sh
+</code></pre>
+<p>This script will run:
+*   <strong>Formatting:</strong> <code>black</code> and <code>isort</code>
+*   <strong>Linting:</strong> <code>flake8</code> and <code>pylint</code>
+*   <strong>Testing:</strong> <code>pytest</code> with coverage</p>
+<p>Ensure the script exits with "All checks passed!" before pushing your changes.</p>
+<h3 id="logging">Logging</h3>
+<ul>
+<li>Avoid wrapping <code>log.debug()</code> calls with <code>if config.DEBUG:</code>. Rely on the logging library's level filtering instead.</li>
+</ul>
+<h2 id="pull-requests">Pull Requests</h2>
+<p>Please use the provided Pull Request Template (<code>.github/pull_request_template.md</code>) when opening a PR.</p>
+<ul>
+<li><strong>Title:</strong> Use a descriptive title (e.g., "Add delta-time to unit movement", "Fix crash in map loader").</li>
+<li><strong>Scope:</strong> Keep PRs small and focused on a single feature or bug fix.</li>
+<li><strong>Description:</strong> Include details about what was changed and why.</li>
+<li><strong>Smoke Tests:</strong> Include basic smoke tests or verification steps in your PR description, especially when changing core logic.</li>
+<li><strong>CI:</strong> All CI checks must pass before merging.</li>
+</ul>
+<h2 id="reporting-bugs">Reporting Bugs</h2>
+<p>Please open an issue on GitHub with:
+1.  A clear title.
+2.  Steps to reproduce the bug.
+3.  Expected vs. actual behavior.
+4.  Logs or screenshots if applicable.</p>
+<h2 id="feature-requests">Feature Requests</h2>
+<p>We welcome feature ideas! Open an issue to discuss your proposal before starting work to ensure it aligns with the project goals.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+
+  </body>
+</html>

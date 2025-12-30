@@ -1,0 +1,5 @@
+# This file is used to define the owners of the various parts of the codebase.
+# The owners are responsible for reviewing pull requests and ensuring the code is maintainable.
+
+# Default owner for everything
+* @tsainez
