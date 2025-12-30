@@ -8,7 +8,8 @@ from ..logger import log
 class SelectionSystem:
     """Handles entity selection via mouse clicks and drag-to-select."""
 
-    def clear_selection(self, game_state: GameState) -> None:
+    @staticmethod
+    def clear_selection(game_state: GameState) -> None:
         """Deselects all entities.
 
         Args:
@@ -24,8 +25,8 @@ class SelectionSystem:
         if count > 0:
             log.debug(f"Cleared selection of {count} entities.")
 
+    @staticmethod
     def update(
-        self,
         game_state: GameState,
         grid_start: tuple[int, int] | None,
         grid_end: tuple[int, int],
@@ -85,8 +86,8 @@ class SelectionSystem:
         elif not shift_pressed:
             log.debug("Drag selection cleared all units.")
 
+    @staticmethod
     def handle_click_selection(
-        self,
         game_state: GameState,
         grid_pos: tuple[int, int],
         shift_pressed: bool,
@@ -140,4 +141,4 @@ class SelectionSystem:
                 game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
         elif not shift_pressed:
             log.debug("Clicked on empty space, clearing selection")
-            self.clear_selection(game_state)
+            SelectionSystem.clear_selection(game_state)

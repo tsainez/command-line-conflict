@@ -15,7 +15,7 @@ from command_line_conflict.components.vision import Vision
 from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
-from command_line_conflict.maps import SimpleMap
+from command_line_conflict.maps import SimpleMap  # noqa: F401  # pylint: disable=unused-import
 from command_line_conflict.maps.factory_battle_map import FactoryBattleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem

@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 import unittest
 from unittest.mock import MagicMock, patch
 

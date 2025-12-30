@@ -68,9 +68,8 @@ class ProductionSystem:
                             break  # Consumed unit, stop checking factories for this unit
                         # Optional: Feedback that tech is not unlocked
 
-    def _transform_unit(
-        self, game_state, input_unit_id, input_player, factory, position
-    ):  # pylint: disable=too-many-arguments
+    @staticmethod
+    def _transform_unit(game_state, input_unit_id, input_player, factory, position):
         """Performs the transformation from input unit to output unit."""
         log.info(f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}")
 

@@ -3,12 +3,11 @@ from .logger import log
 
 
 class Camera:
-    def __init__(self, x=0, y=0, zoom=1.0, min_zoom=0.5, max_zoom=2.0):
+    def __init__(self, x=0, y=0, zoom=1.0, zoom_limits=(0.5, 2.0)):
         self.x = x
         self.y = y
         self.zoom = zoom
-        self.min_zoom = min_zoom
-        self.max_zoom = max_zoom
+        self.min_zoom, self.max_zoom = zoom_limits
         log.debug(f"Camera initialized at ({self.x}, {self.y}) with zoom {self.zoom}")
 
     def move(self, dx, dy):
