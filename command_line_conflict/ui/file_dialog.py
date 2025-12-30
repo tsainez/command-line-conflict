@@ -166,27 +166,56 @@ class FileDialog:
         pygame.draw.rect(self.screen, (30, 30, 30), self.file_list_rect)
 
         # Draw Files
-        for i in range(self.max_visible_files):
-            idx = i + self.scroll_offset
-            if idx >= len(self.files):
-                break
+        if not self.files:
+            msg_surf = self.font.render("No files found", True, (150, 150, 150))
+            msg_rect = msg_surf.get_rect(center=self.file_list_rect.center)
+            self.screen.blit(msg_surf, msg_rect)
+        else:
+            for i in range(self.max_visible_files):
+                idx = i + self.scroll_offset
+                if idx >= len(self.files):
+                    break
 
-            f = self.files[idx]
-            y_pos = self.file_list_rect.y + i * self.item_height
-            item_rect = pygame.Rect(self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
+                f = self.files[idx]
+                y_pos = self.file_list_rect.y + i * self.item_height
+                item_rect = pygame.Rect(self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
 
-            # Highlight logic
-            is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
-            is_hovered = idx == self.hovered_file_index
+                # Highlight logic
+                is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
+                is_hovered = idx == self.hovered_file_index
 
-            if is_selected:
-                pygame.draw.rect(self.screen, (70, 70, 100), item_rect)
-            elif is_hovered:
-                pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
+                if is_selected:
+                    pygame.draw.rect(self.screen, (70, 70, 100), item_rect)
+                elif is_hovered:
+                    pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
 
-            text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
-            text_surf = self.font.render(f, True, text_color)
-            self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
+                text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
+                text_surf = self.font.render(f, True, text_color)
+                self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
+
+            # Draw Scrollbar
+            if len(self.files) > self.max_visible_files:
+                scrollbar_width = 8
+                scrollbar_x = self.file_list_rect.right - scrollbar_width - 2
+                scrollbar_y = self.file_list_rect.y
+                scrollbar_height = self.file_list_rect.height
+
+                # Track
+                track_rect = pygame.Rect(scrollbar_x, scrollbar_y, scrollbar_width, scrollbar_height)
+                pygame.draw.rect(self.screen, (40, 40, 40), track_rect)
+
+                # Thumb
+                total_files = len(self.files)
+                visible_ratio = self.max_visible_files / total_files
+                thumb_height = max(20, int(scrollbar_height * visible_ratio))
+
+                scrollable_range = total_files - self.max_visible_files
+                scroll_progress = self.scroll_offset / scrollable_range
+                track_usable_height = scrollbar_height - thumb_height
+                thumb_y = scrollbar_y + int(track_usable_height * scroll_progress)
+
+                thumb_rect = pygame.Rect(scrollbar_x, thumb_y, scrollbar_width, thumb_height)
+                pygame.draw.rect(self.screen, (100, 100, 100), thumb_rect)
 
         # Draw Input Field
         pygame.draw.rect(self.screen, (255, 255, 255), self.input_rect)
