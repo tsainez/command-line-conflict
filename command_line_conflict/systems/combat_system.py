@@ -22,9 +22,12 @@ class CombatSystem:
         """
         # Optimization: Iterate only over entities with Attack component
         # This avoids iterating over non-combat entities (walls, minerals, etc.)
+        # Note: We iterate over the set directly (no list copy) to avoid O(N) allocation.
+        # This is safe because CombatSystem does not add/remove the Attack component
+        # or entities during iteration (death is handled by CorpseRemovalSystem).
         attackers = game_state.get_entities_with_component(Attack)
 
-        for entity_id in list(attackers):
+        for entity_id in attackers:
             components = game_state.entities.get(entity_id)
             if not components:
                 continue
