@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -93,6 +94,7 @@ class TestFogOfWar:
 
     def test_draw_fallback_on_error(self, mocker):
         import pygame
+
         mock_scale = mocker.patch("pygame.transform.scale")
         mock_smoothscale = mocker.patch("pygame.transform.smoothscale")
 

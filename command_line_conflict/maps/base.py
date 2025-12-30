@@ -39,6 +39,9 @@ class Map:
         self.width = width
         self.height = height
         self.walls: set[Tuple[int, int]] = set()
+        # Cache rendered wall tiles by font and size so we render/scale once per frame size
+        # instead of per wall every draw call (~N renders per frame previously).
+        self._wall_surface_cache: dict[tuple[int, int], pygame.Surface] = {}
 
     def add_wall(self, x: int, y: int) -> None:
         """Adds a wall at the specified coordinates.
@@ -80,6 +83,7 @@ class Map:
         self,
         start: Tuple[int, int],
         goal: Tuple[int, int],
+        *,
         can_fly: bool = False,
         extra_obstacles: set[Tuple[int, int]] | dict | None = None,
         exclude_obstacles: set[Tuple[int, int]] | None = None,
@@ -155,18 +159,27 @@ class Map:
             font: The pygame font to use for rendering the walls.
             camera: The camera object for view/zoom (optional).
         """
+        grid_size = config.GRID_SIZE
+        draw_scale = float(config.GRID_SIZE)
+        if camera:
+            draw_scale = config.GRID_SIZE * camera.zoom
+            grid_size = int(draw_scale)
+
+        cache_key = (id(font), grid_size)
+        if cache_key not in self._wall_surface_cache:
+            # Avoid thousands of font.render/scale calls per frame by reusing pre-scaled tiles.
+            rendered = font.render("#", True, (100, 100, 100))
+            self._wall_surface_cache[cache_key] = pygame.transform.scale(rendered, (grid_size, grid_size))
+
+        wall_tile = self._wall_surface_cache[cache_key]
         for x, y in self.walls:
-            grid_size = config.GRID_SIZE
             if camera:
-                draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
-                draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
-                grid_size = int(config.GRID_SIZE * camera.zoom)
+                draw_x = (x - camera.x) * draw_scale
+                draw_y = (y - camera.y) * draw_scale
             else:
                 draw_x = x * grid_size
                 draw_y = y * grid_size
-            ch = font.render("#", True, (100, 100, 100))
-            ch = pygame.transform.scale(ch, (grid_size, grid_size))
-            surf.blit(ch, (draw_x, draw_y))
+            surf.blit(wall_tile, (draw_x, draw_y))
 
     def to_dict(self) -> dict:
         """Converts the map data to a dictionary for serialization.
@@ -251,7 +264,7 @@ class Map:
         try:
             st = os.stat(filename)
         except OSError as e:
-            raise ValueError(f"Could not stat file: {e}")
+            raise ValueError(f"Could not stat file: {e}") from e
 
         # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
         # which can cause DoS.

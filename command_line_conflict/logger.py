@@ -38,7 +38,7 @@ def setup_logger():
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-    except Exception as e:
+    except OSError as e:
         sys.stderr.write(f"Failed to setup log file: {e}\n")
 
     # Create a console handler

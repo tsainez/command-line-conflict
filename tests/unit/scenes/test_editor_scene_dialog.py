@@ -62,7 +62,6 @@ class TestEditorSceneDialog:
 
         def side_effect(event):
             mock_dialog.active = False
-            return None
 
         mock_dialog.handle_event.side_effect = side_effect
         editor_scene.file_dialog = mock_dialog

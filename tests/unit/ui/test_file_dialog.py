@@ -23,11 +23,11 @@ class TestFileDialog:
     def file_dialog(self, mock_screen, mock_font, tmp_path):
         initial_dir = str(tmp_path)
         # Create some dummy files
-        with open(os.path.join(initial_dir, "map1.json"), "w") as f:
+        with open(os.path.join(initial_dir, "map1.json"), "w", encoding="utf-8") as f:
             f.write("{}")
-        with open(os.path.join(initial_dir, "map2.json"), "w") as f:
+        with open(os.path.join(initial_dir, "map2.json"), "w", encoding="utf-8") as f:
             f.write("{}")
-        with open(os.path.join(initial_dir, "other.txt"), "w") as f:
+        with open(os.path.join(initial_dir, "other.txt"), "w", encoding="utf-8") as f:
             f.write("")
 
         dialog = FileDialog(mock_screen, mock_font, "Test Dialog", initial_dir, mode="load")

@@ -8,9 +8,8 @@ from command_line_conflict.campaign_manager import CampaignManager
 
 class TestCampaignManagerDoS(unittest.TestCase):
     def setUp(self):
-        self.temp_file = tempfile.NamedTemporaryFile(delete=False)
-        self.save_file = self.temp_file.name
-        self.temp_file.close()
+        fd, self.save_file = tempfile.mkstemp()
+        os.close(fd)
 
     def tearDown(self):
         if os.path.exists(self.save_file):
@@ -19,7 +18,7 @@ class TestCampaignManagerDoS(unittest.TestCase):
     def test_load_large_file_prevention(self):
         # Create a file larger than the limit we intend to set (512KB)
         # We'll use 1MB to be sure.
-        with open(self.save_file, "w") as f:
+        with open(self.save_file, "w", encoding="utf-8") as f:
             f.write(" " * (1024 * 1024))
 
         # We expect an error log when loading fails due to size
@@ -36,7 +35,7 @@ class TestCampaignManagerDoS(unittest.TestCase):
         limit = 1000  # The limit we plan to set
         excess = 5000
         data = {"completed_missions": [f"mission_{i}" for i in range(excess)]}
-        with open(self.save_file, "w") as f:
+        with open(self.save_file, "w", encoding="utf-8") as f:
             json.dump(data, f)
 
         with self.assertLogs("Command Line Conflict", level="WARNING") as cm:

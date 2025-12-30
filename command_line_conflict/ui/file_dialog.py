@@ -9,7 +9,9 @@ from command_line_conflict.logger import log
 class FileDialog:
     """A simple in-game file dialog for saving and loading files."""
 
-    def __init__(self, screen, font, title, initial_dir, mode="load", extension=".json"):
+    def __init__(
+        self, screen, font, title, initial_dir, mode="load", extension=".json"
+    ):  # pylint: disable=too-many-positional-arguments
         """Initializes the FileDialog.
 
         Args:
@@ -111,9 +113,9 @@ class FileDialog:
             if event.key == pygame.K_ESCAPE:
                 self.active = False
                 return None
-            elif event.key == pygame.K_RETURN:
+            if event.key == pygame.K_RETURN:
                 return self._confirm_selection()
-            elif event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
                 # Add character to input
