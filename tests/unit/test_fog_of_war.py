@@ -93,6 +93,7 @@ class TestFogOfWar:
 
     def test_draw_fallback_on_error(self, mocker):
         import pygame
+
         mock_scale = mocker.patch("pygame.transform.scale")
         mock_smoothscale = mocker.patch("pygame.transform.smoothscale")
 
