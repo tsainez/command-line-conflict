@@ -3,7 +3,7 @@ from .logger import log
 
 
 class Camera:
-    def __init__(self, x=0, y=0, zoom=1.0, min_zoom=0.5, max_zoom=2.0):
+    def __init__(self, x=0, y=0, zoom=1.0, min_zoom=0.5, max_zoom=2.0):  # pylint: disable=too-many-positional-arguments
         self.x = x
         self.y = y
         self.zoom = zoom

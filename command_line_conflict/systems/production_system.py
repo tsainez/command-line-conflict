@@ -70,7 +70,7 @@ class ProductionSystem:
 
     def _transform_unit(
         self, game_state, input_unit_id, input_player, factory, position
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         """Performs the transformation from input unit to output unit."""
         log.info(f"Transforming unit {input_unit_id} ({factory.input_unit}) into {factory.output_unit}")
 

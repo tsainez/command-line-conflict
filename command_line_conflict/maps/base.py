@@ -76,7 +76,7 @@ class Map:
             return False
         return not self.is_blocked(x, y)
 
-    def find_path(
+    def find_path(  # pylint: disable=too-many-positional-arguments
         self,
         start: Tuple[int, int],
         goal: Tuple[int, int],
@@ -251,7 +251,7 @@ class Map:
         try:
             st = os.stat(filename)
         except OSError as e:
-            raise ValueError(f"Could not stat file: {e}")
+            raise ValueError(f"Could not stat file: {e}") from e
 
         # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
         # which can cause DoS.
