@@ -1,4 +1,5 @@
 import math
+
 import pygame
 
 from command_line_conflict.campaign_manager import CampaignManager
@@ -42,11 +43,18 @@ class MenuScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.MOUSEMOTION:
+            is_hovering = False
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
+                    is_hovering = True
                     if self.selected_option != i:
                         self.sound_system.play_sound("click_select")
                     self.selected_option = i
+
+            if is_hovering:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:

@@ -1,8 +1,8 @@
+import math
 from unittest.mock import MagicMock, patch
 
 import pygame
 import pytest
-import math
 
 from command_line_conflict.scenes.menu import MenuScene
 

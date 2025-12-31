@@ -76,15 +76,24 @@ class FileDialog:
         if event.type == pygame.MOUSEMOTION:
             self.hovered_element = None
             self.hovered_file_index = None
+            is_hovering = False
 
             if self.close_button_rect.collidepoint(event.pos):
                 self.hovered_element = "close"
+                is_hovering = True
             elif self.action_button_rect.collidepoint(event.pos):
                 self.hovered_element = "action"
+                is_hovering = True
             elif self.file_list_rect.collidepoint(event.pos):
                 idx = (event.pos[1] - self.file_list_rect.y) // self.item_height + self.scroll_offset
                 if 0 <= idx < len(self.files):
                     self.hovered_file_index = idx
+                    is_hovering = True
+
+            if is_hovering:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click

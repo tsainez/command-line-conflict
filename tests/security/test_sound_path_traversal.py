@@ -1,7 +1,9 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import os
+import unittest
+from unittest.mock import patch
+
 from command_line_conflict.systems.sound_system import SoundSystem
+
 
 class TestSoundPathTraversal(unittest.TestCase):
     @patch("pygame.mixer.Sound")
@@ -16,7 +18,7 @@ class TestSoundPathTraversal(unittest.TestCase):
 
         # Patch exists to True so the system *tries* to load it if checks are insufficient
         with patch("os.path.exists", return_value=True):
-             system.play_sound(payload)
+            system.play_sound(payload)
 
         if mock_sound_class.called:
             # Get the path passed to Sound constructor
@@ -28,8 +30,12 @@ class TestSoundPathTraversal(unittest.TestCase):
 
             # If traversal worked, parent_dir would be 'command_line_conflict' (or whatever is above sounds)
             # instead of 'sounds'
-            self.assertEqual(parent_dir, "sounds",
-                             f"Security Violation: Attempted to load file outside 'sounds' directory: {normalized_arg}")
+            self.assertEqual(
+                parent_dir,
+                "sounds",
+                f"Security Violation: Attempted to load file outside 'sounds' directory: {normalized_arg}",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
