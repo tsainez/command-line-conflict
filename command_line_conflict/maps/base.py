@@ -225,11 +225,46 @@ class Map:
             filename: The path to the file to save to.
         """
         import json
+        from ..utils.paths import get_user_data_dir
+
+        # Security: Prevent path traversal / Arbitrary File Write
+        # Allowed paths:
+        # 1. The maps directory within the package
+        # 2. The user data directory
+
+        abs_path = os.path.abspath(filename)
+
+        # Determine maps directory (relative to this file)
+        maps_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # User data dir
+        user_data_dir = str(get_user_data_dir())
+
+        allowed = False
+
+        # Check against maps dir
+        try:
+            if os.path.commonpath([abs_path, maps_dir]) == maps_dir:
+                allowed = True
+        except ValueError:
+            pass  # Different drives
+
+        if not allowed:
+            # Check against user data dir
+            try:
+                abs_user_data = os.path.abspath(user_data_dir)
+                if os.path.commonpath([abs_path, abs_user_data]) == abs_user_data:
+                    allowed = True
+            except ValueError:
+                pass  # Different drives
+
+        if not allowed:
+            raise ValueError(f"Security: Cannot save map to unauthorized location: {filename}")
 
         # Ensure directory exists
-        os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
 
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(abs_path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4)
 
     @classmethod
