@@ -76,19 +76,29 @@ class FileDialog:
         if event.type == pygame.MOUSEMOTION:
             self.hovered_element = None
             self.hovered_file_index = None
+            cursor_changed = False
 
             if self.close_button_rect.collidepoint(event.pos):
                 self.hovered_element = "close"
+                cursor_changed = True
             elif self.action_button_rect.collidepoint(event.pos):
                 self.hovered_element = "action"
+                cursor_changed = True
             elif self.file_list_rect.collidepoint(event.pos):
                 idx = (event.pos[1] - self.file_list_rect.y) // self.item_height + self.scroll_offset
                 if 0 <= idx < len(self.files):
                     self.hovered_file_index = idx
+                    cursor_changed = True
+
+            if cursor_changed:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
                 if self.close_button_rect.collidepoint(event.pos):
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                     self.active = False
                     return None
 
@@ -111,6 +121,7 @@ class FileDialog:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.active = False
                 return None
             if event.key == pygame.K_RETURN:
@@ -140,6 +151,7 @@ class FileDialog:
         filename = os.path.basename(filename)
 
         full_path = os.path.join(self.initial_dir, filename)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self.active = False
         return full_path
 
