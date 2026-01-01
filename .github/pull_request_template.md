@@ -11,6 +11,21 @@ Fixes # (issue)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
+## Manual Testing Steps
+
+Please describe the steps you took to manually verify this change (smoke tests).
+1.
+2.
+3.
+
+## Performance Impact
+
+Does this change affect performance? If so, how? (e.g., changes to pathfinding, rendering, etc.)
+
+## Security Considerations
+
+Does this change introduce new user inputs, file operations, or network calls? Have these been secured?
+
 ## Checklist:
 
 - [ ] My code follows the style guidelines of this project

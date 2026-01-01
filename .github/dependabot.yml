@@ -12,6 +12,14 @@ updates:
   - package-ecosystem: "pip"
     # Look for `package.json` and `lock` files in the `root` directory
     directory: "/"
-    # Check the npm registry for updates every day (weekdays)
+    # Check for updates weekly to reduce noise
     schedule:
-      interval: "daily"
+      interval: "weekly"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for workflow files in the `.github/workflows` directory
+    directory: "/"
+    # Check for updates weekly
+    schedule:
+      interval: "weekly"

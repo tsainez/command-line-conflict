@@ -30,3 +30,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**Checklist**
+- [ ] I have checked existing issues and confirmed this is not a duplicate.

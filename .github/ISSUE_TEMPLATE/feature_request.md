@@ -18,3 +18,6 @@ A clear and concise description of any alternative solutions or features you've 
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
+
+**Checklist**
+- [ ] I have checked existing issues and confirmed this is not a duplicate.

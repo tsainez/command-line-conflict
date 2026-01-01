@@ -12,6 +12,7 @@ plugins:
 nav:
   - Home: index.md
   - Contributing: Contributing.md
+  - Development: Development.md
   - Security: Security.md
   - Maps: Maps.md
   - Project Structure: ProjectStructure.md
