@@ -160,3 +160,23 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_empty_state_rendering(self, file_dialog):
+        """Test rendering when no files are available."""
+        file_dialog.files = []
+        # Calling draw should not crash
+        try:
+            file_dialog.draw()
+        except Exception as e:
+            pytest.fail(f"draw() raised exception with empty files: {e}")
+
+    def test_scrollbar_rendering(self, file_dialog):
+        """Test rendering when files exceed visible area."""
+        # Create enough files to trigger scrollbar (max_visible_files is 10)
+        file_dialog.files = [f"file{i}.json" for i in range(20)]
+        file_dialog.scroll_offset = 5
+
+        try:
+            file_dialog.draw()
+        except Exception as e:
+            pytest.fail(f"draw() raised exception with scrollbar: {e}")
