@@ -228,6 +228,7 @@ class Map:
             ValueError: If the filename is outside authorized directories.
         """
         import json
+
         from ..utils.paths import get_user_data_dir
 
         # Security fix: Path traversal prevention

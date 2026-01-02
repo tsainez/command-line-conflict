@@ -1,9 +1,10 @@
 import os
-import unittest
 import shutil
+import unittest
 from pathlib import Path
 
 from command_line_conflict.maps.base import Map
+
 
 class TestMapSecurity(unittest.TestCase):
     def setUp(self):
@@ -44,5 +45,6 @@ class TestMapSecurity(unittest.TestCase):
 
         self.assertFalse(target_path.exists(), "File should not be created for unauthorized path")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
