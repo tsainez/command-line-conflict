@@ -1,4 +1,5 @@
 import math
+
 import pygame
 
 from command_line_conflict.campaign_manager import CampaignManager

@@ -59,10 +59,12 @@ class Targeting:
                     if not other_pos:
                         continue
 
-                    dist = ((my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2) ** 0.5
+                    # Optimization: Use squared distance to avoid expensive sqrt() in the loop
+                    dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+                    vision_range_sq = vision_range**2
 
-                    if dist <= vision_range and dist < min_dist:
-                        min_dist = dist
+                    if dist_sq <= vision_range_sq and dist_sq < min_dist**2:
+                        min_dist = dist_sq**0.5  # Only calculate sqrt if we found a new closest
                         closest_enemy = other_id
 
         if DEBUG and closest_enemy:
