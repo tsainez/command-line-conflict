@@ -19,6 +19,9 @@ class TestAISystem:
 
         # Entity with all necessary components
         entity_id = 1
+        # Create entity entry first
+        game_state.entities[entity_id] = {}
+
         player = Player(1)  # AI player
         # Attack(attack_damage, attack_range, attack_speed)
         attack = Attack(attack_damage=10, attack_range=1, attack_speed=1)
@@ -26,12 +29,11 @@ class TestAISystem:
         vision = Vision(vision_range=5)
         position = Position(10, 10)
 
-        game_state.entities[entity_id] = {
-            Player: player,
-            Attack: attack,
-            Vision: vision,
-            Position: position,
-        }
+        # Use add_component to ensure component indices are updated
+        game_state.add_component(entity_id, player)
+        game_state.add_component(entity_id, attack)
+        game_state.add_component(entity_id, vision)
+        game_state.add_component(entity_id, position)
 
         # Setup mock return for find_closest_enemy
         target_entity_id = 2
@@ -53,15 +55,17 @@ class TestAISystem:
         ai_system = AISystem()
 
         entity_id = 1
+        # Create entity entry first
+        game_state.entities[entity_id] = {}
+
         attack = Attack(attack_damage=10, attack_range=1, attack_speed=1)
         attack.attack_target = 999  # Already has a target
 
-        game_state.entities[entity_id] = {
-            Player: Player(1),
-            Attack: attack,
-            Vision: Vision(vision_range=5),
-            Position: Position(10, 10),
-        }
+        # Use add_component to ensure component indices are updated
+        game_state.add_component(entity_id, Player(1))
+        game_state.add_component(entity_id, attack)
+        game_state.add_component(entity_id, Vision(vision_range=5))
+        game_state.add_component(entity_id, Position(10, 10))
 
         ai_system.update(game_state)
 
@@ -76,25 +80,22 @@ class TestAISystem:
         ai_system = AISystem()
 
         # Entity missing Attack
-        game_state.entities[1] = {
-            Player: Player(1),
-            Vision: Vision(vision_range=5),
-            Position: Position(10, 10),
-        }
+        game_state.entities[1] = {}
+        game_state.add_component(1, Player(1))
+        game_state.add_component(1, Vision(vision_range=5))
+        game_state.add_component(1, Position(10, 10))
 
         # Entity missing Player
-        game_state.entities[2] = {
-            Attack: Attack(attack_damage=10, attack_range=1, attack_speed=1),
-            Vision: Vision(vision_range=5),
-            Position: Position(10, 10),
-        }
+        game_state.entities[2] = {}
+        game_state.add_component(2, Attack(attack_damage=10, attack_range=1, attack_speed=1))
+        game_state.add_component(2, Vision(vision_range=5))
+        game_state.add_component(2, Position(10, 10))
 
         # Entity missing Vision
-        game_state.entities[3] = {
-            Player: Player(1),
-            Attack: Attack(attack_damage=10, attack_range=1, attack_speed=1),
-            Position: Position(10, 10),
-        }
+        game_state.entities[3] = {}
+        game_state.add_component(3, Player(1))
+        game_state.add_component(3, Attack(attack_damage=10, attack_range=1, attack_speed=1))
+        game_state.add_component(3, Position(10, 10))
 
         ai_system.update(game_state)
 
