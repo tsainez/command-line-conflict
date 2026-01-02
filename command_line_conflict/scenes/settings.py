@@ -42,9 +42,16 @@ class SettingsScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.MOUSEMOTION:
+            hovered = False
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
+                    hovered = True
                     self.selected_option = i
+
+            if hovered:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
@@ -94,6 +101,7 @@ class SettingsScene:
             config.DEBUG = not config.DEBUG
             log.info(f"Debug mode set to {config.DEBUG}")
         elif option_name == "Back":
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
