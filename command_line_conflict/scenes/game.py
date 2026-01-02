@@ -11,6 +11,7 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict.components.vision import Vision
 from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
@@ -355,8 +356,7 @@ class GameScene:
         selected_chassis_ids = []
         for entity_id, components in self.game_state.entities.items():
             selectable = components.get(Selectable)
-            # I need to get UnitIdentity from components
-            identity = components.get(factories.UnitIdentity)
+            identity = components.get(UnitIdentity)
 
             if selectable and selectable.is_selected:
                 if identity and identity.name == "chassis":
@@ -367,8 +367,8 @@ class GameScene:
 
         # Simple logic: First selected chassis builds the factory
         builder_id = selected_chassis_ids[0]
-        pos = self.game_state.get_component(builder_id, factories.Position)
-        player = self.game_state.get_component(builder_id, factories.Player)
+        pos = self.game_state.get_component(builder_id, Position)
+        player = self.game_state.get_component(builder_id, Player)
 
         if not pos or not player:
             return
