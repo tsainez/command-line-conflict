@@ -231,14 +231,17 @@ class Map:
         from ..utils.paths import get_user_data_dir
 
         # Security fix: Path traversal prevention
-        abs_path = os.path.abspath(filename)
+        # Resolve symlinks to ensure we check the actual destination
+        abs_path = os.path.realpath(filename)
 
         # Define allowed directories
         # 1. The maps directory (where this file resides)
-        maps_dir = os.path.dirname(os.path.abspath(__file__))
+        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
 
         # 2. The user data directory
         user_data_dir = str(get_user_data_dir())
+        # Ensure user_data_dir is also resolved if it's a symlink
+        user_data_dir = os.path.realpath(user_data_dir)
 
         allowed_dirs = [maps_dir, user_data_dir]
 
