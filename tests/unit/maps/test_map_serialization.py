@@ -1,7 +1,5 @@
 import os
-import shutil
 import unittest
-from pathlib import Path
 
 from command_line_conflict.maps.base import Map
 from command_line_conflict.utils.paths import get_user_data_dir
