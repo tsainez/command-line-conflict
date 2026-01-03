@@ -1,11 +1,11 @@
-
 import os
-import shutil
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
 from unittest.mock import patch
+
 from command_line_conflict.maps.base import Map
+
 
 class TestMapSymlinkTraversal(unittest.TestCase):
     def setUp(self):
@@ -47,5 +47,6 @@ class TestMapSymlinkTraversal(unittest.TestCase):
 
             self.assertFalse(vulnerable, "Map.save_to_file allowed writing to a symlink pointing outside allowed dirs!")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

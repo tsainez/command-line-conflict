@@ -1,5 +1,3 @@
-import os
-import shutil
 import unittest
 from pathlib import Path
 
@@ -15,6 +13,8 @@ class TestMapSecurity(unittest.TestCase):
 
     def tearDown(self):
         if self.base_dir.exists():
+            import shutil
+
             shutil.rmtree(self.base_dir)
 
     def test_save_path_traversal_blocked(self):
