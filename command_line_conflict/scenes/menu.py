@@ -1,3 +1,4 @@
+import functools
 import math
 
 import pygame
@@ -35,6 +36,19 @@ class MenuScene:
         # Assuming the music file is in the root or a music folder
         # For now using a placeholder path
         self.game.music_manager.play("music/menu_theme.ogg")
+
+    @functools.lru_cache(maxsize=32)
+    def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
+        """Returns a cached surface for the text.
+
+        Args:
+            text: The string to render.
+            color: The color tuple (R, G, B).
+            font_type: 'title' or 'option'.
+        """
+        if font_type == "title":
+            return self.title_font.render(text, True, color)
+        return self.option_font.render(text, True, color)
 
     def handle_event(self, event):
         """Handles user input for menu navigation.
@@ -109,7 +123,7 @@ class MenuScene:
         """
         screen.fill((0, 0, 0))
 
-        title_text = self.title_font.render("Command Line Conflict", True, (255, 255, 255))
+        title_text = self._get_text_surface("Command Line Conflict", (255, 255, 255), "title")
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
@@ -128,7 +142,7 @@ class MenuScene:
                 color = (255, 255, 255)
                 display_text = option
 
-            text = self.option_font.render(display_text, True, color)
+            text = self._get_text_surface(display_text, color, "option")
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
