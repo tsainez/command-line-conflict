@@ -1,10 +1,11 @@
 import os
-import unittest
 import shutil
+import unittest
 from pathlib import Path
 
 from command_line_conflict.maps.base import Map
 from command_line_conflict.utils.paths import get_user_data_dir
+
 
 class TestMapSerialization(unittest.TestCase):
     def test_to_dict(self):
@@ -34,9 +35,9 @@ class TestMapSerialization(unittest.TestCase):
         user_data = get_user_data_dir()
         # Create user data dir if it doesn't exist (mocking environment might not have it)
         try:
-             os.makedirs(user_data, exist_ok=True)
+            os.makedirs(user_data, exist_ok=True)
         except OSError:
-             pass
+            pass
 
         filename = os.path.join(user_data, "test_map.json")
         m = Map(width=5, height=5)
