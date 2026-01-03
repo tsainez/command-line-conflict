@@ -263,7 +263,9 @@ class Map:
         # Ensure directory exists
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
 
-        with open(filename, "w", encoding="utf-8") as f:
+        # Security: Use the resolved absolute path to prevent TOCTOU attacks
+        # where the file path (symlink) could change between validation and open.
+        with open(abs_path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4)
 
     @classmethod
