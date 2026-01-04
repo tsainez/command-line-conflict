@@ -3,6 +3,7 @@ import functools
 import pygame
 
 from command_line_conflict import config
+from command_line_conflict.utils.input import set_cursor
 
 from ..logger import log
 
@@ -48,7 +49,7 @@ class SettingsScene:
         """
         if font_type == "title":
             return self.title_font.render(text, True, color)
-        elif font_type == "help":
+        if font_type == "help":
             return self.game.font.render(text, True, color)
         return self.option_font.render(text, True, color)
 
@@ -66,9 +67,9 @@ class SettingsScene:
                     self.selected_option = i
 
             if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
@@ -118,7 +119,7 @@ class SettingsScene:
             config.DEBUG = not config.DEBUG
             log.info(f"Debug mode set to {config.DEBUG}")
         elif option_name == "Back":
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
