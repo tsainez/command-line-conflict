@@ -4,6 +4,7 @@ import pygame
 
 from command_line_conflict import config
 from command_line_conflict.logger import log
+from command_line_conflict.utils.audio import init_mixer
 
 
 class SoundSystem:
@@ -15,12 +16,8 @@ class SoundSystem:
         self.volume = config.SOUND_VOLUME
         self.sounds = {}
 
-        if not pygame.mixer.get_init():
-            try:
-                pygame.mixer.init()
-            except pygame.error as e:
-                log.error(f"Failed to initialize pygame mixer: {e}")
-                self.enabled = False
+        if not init_mixer():
+            self.enabled = False
 
     def update(self, game_state):
         """Processes sound events from the game state.

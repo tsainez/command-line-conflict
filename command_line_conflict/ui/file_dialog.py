@@ -4,6 +4,7 @@ import pygame
 
 from command_line_conflict import config
 from command_line_conflict.logger import log
+from command_line_conflict.utils.input import set_cursor
 
 
 class FileDialog:
@@ -91,14 +92,14 @@ class FileDialog:
                     cursor_changed = True
 
             if cursor_changed:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
                 if self.close_button_rect.collidepoint(event.pos):
-                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                    set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                     self.active = False
                     return None
 
@@ -121,7 +122,7 @@ class FileDialog:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.active = False
                 return None
             if event.key == pygame.K_RETURN:
@@ -151,7 +152,7 @@ class FileDialog:
         filename = os.path.basename(filename)
 
         full_path = os.path.join(self.initial_dir, filename)
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self.active = False
         return full_path
 

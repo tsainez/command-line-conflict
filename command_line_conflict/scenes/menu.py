@@ -5,6 +5,7 @@ import pygame
 
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.utils.input import set_cursor
 
 
 class MenuScene:
@@ -66,9 +67,9 @@ class MenuScene:
                     self.selected_option = i
 
             if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
@@ -91,7 +92,7 @@ class MenuScene:
         option_text = self.menu_options[option_index]
 
         # Reset cursor before switching scenes
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if option_text == "Continue Campaign":
             # In the future, this would load the latest save

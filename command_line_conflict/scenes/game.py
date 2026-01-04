@@ -7,6 +7,7 @@ from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.dead import Dead
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
@@ -33,6 +34,7 @@ from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.spawn_system import SpawnSystem
 from command_line_conflict.systems.ui_system import UISystem
 from command_line_conflict.systems.wander_system import WanderSystem
+from command_line_conflict.utils.input import set_cursor
 
 
 class UnitView:
@@ -356,7 +358,7 @@ class GameScene:
         # Check if over UI panel (bottom 100px)
         panel_height = 100
         if screen_pos[1] > config.SCREEN_HEIGHT - panel_height:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             return
 
         grid_x, grid_y = self.camera.screen_to_grid(screen_pos[0], screen_pos[1])
@@ -365,25 +367,25 @@ class GameScene:
         cursor_set = False
         for entity_id in entity_ids:
             # We must filter out dead entities, or cursors will react to corpses
-            if self.game_state.get_component(entity_id, factories.Dead):
+            if self.game_state.get_component(entity_id, Dead):
                 continue
 
             player = self.game_state.get_component(entity_id, Player)
             if player:
                 if player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
                     # Enemy
-                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                    set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
                     cursor_set = True
                     break
-                elif player.player_id == self.current_player_id:
+                if player.player_id == self.current_player_id:
                     # Friendly
                     if self.game_state.get_component(entity_id, Selectable):
-                        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                        set_cursor(pygame.SYSTEM_CURSOR_HAND)
                         cursor_set = True
                         break
 
         if not cursor_set:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
     def _handle_construction(self, key):
         """Handles building construction requests."""

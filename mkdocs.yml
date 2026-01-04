@@ -13,6 +13,7 @@ nav:
   - Home: index.md
   - Contributing: Contributing.md
   - Security: Security.md
+  - Architecture: ECS.md
   - Maps: Maps.md
   - Project Structure: ProjectStructure.md
   - Changelog: CHANGELOG.md

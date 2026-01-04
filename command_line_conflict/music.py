@@ -4,6 +4,7 @@ import pygame
 
 from . import config
 from .logger import log
+from .utils.audio import init_mixer
 
 
 class MusicManager:
@@ -15,12 +16,8 @@ class MusicManager:
         self.volume = config.MUSIC_VOLUME
         self.current_track = None
 
-        if not pygame.mixer.get_init():
-            try:
-                pygame.mixer.init()
-            except pygame.error as e:
-                log.error(f"Failed to initialize pygame mixer: {e}")
-                self.enabled = False
+        if not init_mixer():
+            self.enabled = False
 
         if self.enabled:
             try:
