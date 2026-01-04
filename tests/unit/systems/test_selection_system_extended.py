@@ -1,10 +1,11 @@
 # pylint: disable=redefined-outer-name, protected-access
-import pytest
 from unittest.mock import MagicMock, patch
 
-from command_line_conflict.components.selectable import Selectable
+import pytest
+
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
+from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.factories import create_chassis
 from command_line_conflict.game_state import GameState
 from command_line_conflict.maps.simple_map import SimpleMap
@@ -103,7 +104,7 @@ def test_click_selection_enemy_unit(game_state, selection_system):
 def test_drag_selection_basic(game_state, selection_system):
     """Test basic drag selection."""
     unit1 = create_chassis(game_state, 10, 10, 1, is_human=True)
-    unit2 = create_chassis(game_state, 20, 20, 1, is_human=True) # Outside
+    unit2 = create_chassis(game_state, 20, 20, 1, is_human=True)  # Outside
 
     selection_system.update(game_state, (9, 9), (11, 11), shift_pressed=False)
 
