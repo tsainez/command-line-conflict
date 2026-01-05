@@ -126,7 +126,11 @@ class FileDialog:
                 return None
             if event.key == pygame.K_RETURN:
                 return self._confirm_selection()
-            if event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_UP:
+                self._navigate(-1)
+            elif event.key == pygame.K_DOWN:
+                self._navigate(1)
+            elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
                 # Add character to input
@@ -137,6 +141,33 @@ class FileDialog:
                         self.input_text += event.unicode
 
         return None
+
+    def _navigate(self, delta):
+        """Navigates the file list by a delta (e.g., -1 for up, 1 for down)."""
+        if not self.files:
+            return
+
+        # Find current index based on input_text
+        try:
+            current_idx = self.files.index(self.input_text)
+        except ValueError:
+            current_idx = -1
+
+        new_idx = current_idx + delta
+
+        # Boundary checks
+        if new_idx < 0:
+            new_idx = 0
+        elif new_idx >= len(self.files):
+            new_idx = len(self.files) - 1
+
+        self.input_text = self.files[new_idx]
+
+        # Scroll to ensure visibility
+        if new_idx < self.scroll_offset:
+            self.scroll_offset = new_idx
+        elif new_idx >= self.scroll_offset + self.max_visible_files:
+            self.scroll_offset = new_idx - self.max_visible_files + 1
 
     def _confirm_selection(self):
         """Confirms the current selection or input."""
