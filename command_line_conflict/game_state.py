@@ -168,3 +168,26 @@ class GameState:
         Optimized with spatial hashing O(1).
         """
         return list(self.spatial_map.get((x, y), []))
+
+    def is_position_occupied(self, x: int, y: int, exclude_entity_id: int | None = None) -> bool:
+        """Checks if a grid position is occupied by any entity.
+
+        Args:
+            x: The x-coordinate to check.
+            y: The y-coordinate to check.
+            exclude_entity_id: An optional entity ID to ignore (e.g., the moving entity).
+
+        Returns:
+            True if the position is occupied, False otherwise.
+        """
+        entities = self.spatial_map.get((x, y))
+        if not entities:
+            return False
+
+        if exclude_entity_id is None:
+            return True
+
+        if len(entities) == 1 and exclude_entity_id in entities:
+            return False
+
+        return True

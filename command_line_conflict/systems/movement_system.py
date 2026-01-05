@@ -106,8 +106,7 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_next_pos = game_state.get_entities_at_position(next_x, next_y)
-                    if any(e != entity_id for e in entities_at_next_pos):
+                    if game_state.is_position_occupied(next_x, next_y, exclude_entity_id=entity_id):
                         log.debug(f"Collision detected for non-intelligent entity {entity_id} at ({next_x}, {next_y})")
                         movable.path = []
                         movable.target_x = None
@@ -140,8 +139,7 @@ class MovementSystem:
 
                 # Collision check for non-intelligent units
                 if not movable.intelligent:
-                    entities_at_proposed_pos = game_state.get_entities_at_position(int(proposed_x), int(proposed_y))
-                    if any(e != entity_id for e in entities_at_proposed_pos):
+                    if game_state.is_position_occupied(int(proposed_x), int(proposed_y), exclude_entity_id=entity_id):
                         log.debug(f"Collision detected for non-intelligent entity {entity_id} at ({proposed_x}, {proposed_y})")
                         movable.target_x = None
                         movable.target_y = None
