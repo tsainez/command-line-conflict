@@ -78,6 +78,19 @@ class UISystem:
             font = self.font
         return font.render(text, True, color)
 
+    @staticmethod
+    @functools.lru_cache(maxsize=64)
+    def _get_range_surface(size: int, color: tuple) -> pygame.Surface:
+        """Returns a cached surface for range indicators.
+
+        Args:
+            size: The width/height of the surface in pixels.
+            color: The RGBA color tuple.
+        """
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.rect(surface, color, surface.get_rect())
+        return surface
+
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
@@ -261,18 +274,14 @@ class UISystem:
                     if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
                         detection_tiles.add((x, y))
 
+        # Pre-calculate common values
+        size = int(config.GRID_SIZE * self.camera.zoom)
+        range_surface = self._get_range_surface(size, (0, 0, 255, 30))
+
         for x, y in detection_tiles:
             cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            surface = pygame.Surface(
-                (
-                    config.GRID_SIZE * self.camera.zoom,
-                    config.GRID_SIZE * self.camera.zoom,
-                ),
-                pygame.SRCALPHA,
-            )
-            pygame.draw.rect(surface, (0, 0, 255, 30), surface.get_rect())
-            self.screen.blit(surface, (cam_x, cam_y))
+            self.screen.blit(range_surface, (cam_x, cam_y))
 
     def _draw_aggregate_attack_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined attack range for multiple units."""
@@ -288,18 +297,14 @@ class UISystem:
                     if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= attack.attack_range**2:
                         attack_tiles.add((x, y))
 
+        # Pre-calculate common values
+        size = int(config.GRID_SIZE * self.camera.zoom)
+        range_surface = self._get_range_surface(size, (255, 0, 0, 30))
+
         for x, y in attack_tiles:
             cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            surface = pygame.Surface(
-                (
-                    config.GRID_SIZE * self.camera.zoom,
-                    config.GRID_SIZE * self.camera.zoom,
-                ),
-                pygame.SRCALPHA,
-            )
-            pygame.draw.rect(surface, (255, 0, 0, 30), surface.get_rect())
-            self.screen.blit(surface, (cam_x, cam_y))
+            self.screen.blit(range_surface, (cam_x, cam_y))
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
         """Draws the current health of a unit above its icon.
