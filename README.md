@@ -5,10 +5,11 @@
 [![CI](https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml)
 [![Tests](https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml)
 [![Docs](https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml)
+[![CodeQL](https://github.com/tsainez/command-line-conflict/actions/workflows/codeql.yml/badge.svg)](https://github.com/tsainez/command-line-conflict/actions/workflows/codeql.yml)
 
 ## Getting Started
 
-This guide will walk you through setting up and running the game on your local machine, as well as development best practices. 
+This guide will walk you through setting up and running the game on your local machine, as well as development best practices.
 
 ### Prerequisites
 
@@ -89,18 +90,30 @@ Most Linux distributions come with Python installed. If you installed a custom v
     python main.py
     ```
 
+### Development and Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on code style, testing, and pull requests.
+
+Check out [ISSUES.md](ISSUES.md) for known issues and tasks, or [AGENTS.md](AGENTS.md) for a list of potential features and improvements.
+
 ### (Optional) Running Tests and Linters
-Before a change can be safely integrated, it must first pass through linting, automated testing, and finally a human player's assessment. 
+Before a change can be safely integrated, it must first pass through linting, automated testing, and finally a human player's assessment.
 
-Run the checks:
+Run the checks using our convenience script:
 
-    ```bash
-    # Check code formatting with Black
-    black --check .
+```bash
+./scripts/pre_commit.sh
+```
 
-    # Check import sorting with isort
-    isort --check-only .
+Or run them individually:
 
-    # Run the test suite with pytest
-    pytest -q
-    ```
+```bash
+# Check code formatting with Black
+black --check .
+
+# Check import sorting with isort
+isort --check-only .
+
+# Run the test suite with pytest
+pytest -q
+```
