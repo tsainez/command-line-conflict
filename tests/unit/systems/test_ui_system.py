@@ -59,7 +59,7 @@ def test_draw_aggregate_attack_range(mock_draw_rect, ui_system, game_state):
     # +1 for the key options panel, +2 for player indicator (box + border)
     # Range indicators are now blitted, so draw.rect is only called during cache miss.
 
-    assert mock_draw_rect.call_count <= 5 + 10 # Allow some margin for cache misses but ensure it's not O(N)
+    assert mock_draw_rect.call_count <= 5 + 10  # Allow some margin for cache misses but ensure it's not O(N)
 
 
 @patch("pygame.draw.rect")

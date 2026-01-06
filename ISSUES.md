@@ -52,15 +52,15 @@ In `GameScene`, the variable `unit_identity` is assigned the result of `componen
 5.  Remove the TODO comment.
 
 ## 6. Fix F-string in Editor Scene
-**Location:** `command_line_conflict/scenes/editor.py`
-**Original TODO:** `# TODO: Fix f-string missing placeholders or remove f-prefix.`
+**Location:** ~~`command_line_conflict/scenes/editor.py`~~
+**Original TODO:** ~~`# TODO: Fix f-string missing placeholders or remove f-prefix.`~~
 
 **Description:**
-An f-string is used without any placeholders, which is unnecessary.
+~~An f-string is used without any placeholders, which is unnecessary.~~
 
 **Instructions:**
-1.  Remove the `f` prefix from the string `text = f"Editor Mode..."`.
-2.  Remove the TODO comment.
+1.  ~~Remove the `f` prefix from the string `text = f"Editor Mode..."`.~~
+2.  ~~Remove the TODO comment.~~
 
 ## 7. Implement In-Game File Dialog for Map Editor
 **Location:** `command_line_conflict/scenes/editor.py`
