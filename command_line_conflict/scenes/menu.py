@@ -37,6 +37,8 @@ class MenuScene:
         # For now using a placeholder path
         self.game.music_manager.play("music/menu_theme.ogg")
 
+        self.confirm_quit = False
+
     @functools.lru_cache(maxsize=32)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
         """Returns a cached surface for the text.
@@ -86,12 +88,26 @@ class MenuScene:
 
             if self.selected_option != old_selection:
                 self.sound_system.play_sound("click_select")
+                # Reset confirmation if moved away from Quit
+                if self.menu_options[self.selected_option] != "Quit":
+                    self.confirm_quit = False
 
     def _trigger_option(self, option_index):
         option_text = self.menu_options[option_index]
 
         # Reset cursor before switching scenes
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+        # Handle Quit specifically for double confirmation
+        if option_text == "Quit":
+            if self.confirm_quit:
+                self.game.running = False
+            else:
+                self.confirm_quit = True
+                self.sound_system.play_sound("click_select")
+            return
+        else:
+            self.confirm_quit = False
 
         if option_text == "Continue Campaign":
             # In the future, this would load the latest save
@@ -104,8 +120,6 @@ class MenuScene:
             self.game.scene_manager.switch_to("editor")
         elif option_text == "Options":
             self.game.scene_manager.switch_to("settings")
-        elif option_text == "Quit":
-            self.game.running = False
 
     def update(self, dt):
         """Updates the menu scene.
@@ -137,7 +151,11 @@ class MenuScene:
         for i, option in enumerate(self.menu_options):
             if i == self.selected_option:
                 color = pulse_color
-                display_text = f"> {option} <"
+                if option == "Quit" and self.confirm_quit:
+                    display_text = f"> Confirm Quit? <"
+                    color = (255, 50, 50)  # Red warning color
+                else:
+                    display_text = f"> {option} <"
             else:
                 color = (255, 255, 255)
                 display_text = option
