@@ -54,3 +54,35 @@ def test_spatial_map_operations():
 
     game_state.remove_component(e1, Position)
     assert not game_state.get_entities_at_position(7, 7)
+
+
+def test_is_position_occupied():
+    game_map = Map(10, 10)
+    game_state = GameState(game_map)
+
+    # Empty initially
+    assert not game_state.is_position_occupied(5, 5)
+
+    # Add entity
+    e1 = game_state.create_entity()
+    game_state.add_component(e1, Position(5, 5))
+
+    # Occupied now
+    assert game_state.is_position_occupied(5, 5)
+
+    # Occupied if we exclude a different ID
+    assert game_state.is_position_occupied(5, 5, exclude_entity_id=e1 + 999)
+
+    # Not occupied if we exclude the only entity there
+    assert not game_state.is_position_occupied(5, 5, exclude_entity_id=e1)
+
+    # Add second entity
+    e2 = game_state.create_entity()
+    game_state.add_component(e2, Position(5, 5))
+
+    # Still occupied
+    assert game_state.is_position_occupied(5, 5)
+
+    # Occupied even if we exclude one of them
+    assert game_state.is_position_occupied(5, 5, exclude_entity_id=e1)
+    assert game_state.is_position_occupied(5, 5, exclude_entity_id=e2)

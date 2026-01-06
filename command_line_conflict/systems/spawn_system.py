@@ -41,7 +41,7 @@ class SpawnSystem:
 
             if game_state.map.is_walkable(x, y):
                 # Check if occupied by another entity
-                if not game_state.get_entities_at_position(x, y):
+                if not game_state.is_position_occupied(x, y):
                     factories.create_wildlife(game_state, float(x), float(y))
                     # Trigger spawn sound
                     game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})

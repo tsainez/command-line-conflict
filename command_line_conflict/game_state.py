@@ -162,6 +162,24 @@ class GameState:
             position.x = x
             position.y = y
 
+    def is_position_occupied(self, x: int, y: int, exclude_entity_id: int | None = None) -> bool:
+        """Checks if a position is occupied by any entity.
+
+        Optimized to avoid list allocation.
+        """
+        entity_ids = self.spatial_map.get((x, y))
+        if not entity_ids:
+            return False
+
+        if exclude_entity_id is None:
+            return True
+
+        # If there's any entity other than the excluded one
+        for eid in entity_ids:
+            if eid != exclude_entity_id:
+                return True
+        return False
+
     def get_entities_at_position(self, x: int, y: int) -> list[int]:
         """Returns a list of entity IDs at a given position.
 
