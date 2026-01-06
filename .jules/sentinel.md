@@ -1,4 +1,4 @@
-## 2025-12-25 - Unbounded Filename Input DoS
-**Vulnerability:** `FileDialog` allowed unlimited string input for filenames, potentially causing memory exhaustion (DoS) or filesystem errors with extremely long paths.
-**Learning:** Input fields in UI components, even for internal tools like map editors, must always enforce length limits. Standard libraries (like Pygame) do not enforce these by default.
-**Prevention:** Added `MAX_FILENAME_LENGTH` (64 chars) to `config.py` and enforced it in `FileDialog.handle_event`.
+## 2026-01-06 - [TOCTOU Vulnerability in File Loading]
+**Vulnerability:** A Time-of-Check to Time-of-Use (TOCTOU) race condition existed in `CampaignManager.load_progress`. The code checked the file size with `os.path.getsize` before opening it. An attacker could swap the file for a massive one between the check and the read, causing memory exhaustion (DoS).
+**Learning:** Checking a file's properties (like size) and then opening it in a separate step is inherently insecure against race conditions. The state of the file system can change at any moment.
+**Prevention:** Always enforce constraints *during* the read operation. Use `f.read(limit)` instead of trusting a pre-check. This "atomic" approach ensures the constraint is respected regardless of external changes.

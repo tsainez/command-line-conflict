@@ -60,17 +60,22 @@ class CampaignManager:
             return
 
         # Security check: File size
-        try:
-            if os.path.getsize(self.save_file) > self.MAX_SAVE_FILE_SIZE:
-                log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
-                return
-        except OSError as e:
-            log.error(f"Failed to check save file size: {e}")
-            return
-
+        # We perform this check when reading to prevent TOCTOU race conditions
+        # where the file grows between check and read.
         try:
             with open(self.save_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
+                # Read up to the limit + 1 char to detect overflow
+                content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
+
+                if len(content) > self.MAX_SAVE_FILE_SIZE:
+                    log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
+                    return
+
+                if not content:
+                    log.info("Save file is empty. Starting new campaign.")
+                    return
+
+                data = json.loads(content)
 
                 # Security check: Validate structure and limits
                 missions = data.get("completed_missions", [])
