@@ -47,16 +47,27 @@ class UnitView:
 class GameScene:
     """Manages the main gameplay scene, including entities, systems, and events."""
 
-    def __init__(self, game):
+    def __init__(self, game, mission_id="mission_1"):
         """Initializes the GameScene.
 
         Args:
             game: The main game object, providing access to the screen, font,
                   and scene manager.
+            mission_id: The ID of the mission to load.
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(FactoryBattleMap())
+        self.current_mission_id = mission_id
+
+        # Select map based on mission ID
+        # For now, we only have one specialized map, but this structure supports expansion
+        if self.current_mission_id == "mission_1":
+            game_map = FactoryBattleMap()
+        else:
+            # Fallback for future missions or custom scenarios
+            game_map = FactoryBattleMap()
+
+        self.game_state = GameState(game_map)
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
@@ -99,9 +110,6 @@ class GameScene:
         self.confetti_system = ConfettiSystem()
         self.production_system = ProductionSystem(self.campaign_manager)
 
-        # Current Mission ID - In a full game this would be passed from a mission select screen
-        self.current_mission_id = "mission_1"
-
         self.sound_system = SoundSystem()
         self.wander_system = WanderSystem()
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
@@ -128,16 +136,14 @@ class GameScene:
                 log.info(cheat)
 
     def _create_initial_units(self):
-        """Creates the starting units for each player."""
+        """Creates the starting units for each player.
+
+        Delegates unit spawning to the map instance.
+        """
         if hasattr(self.game_state.map, "create_initial_units"):
             self.game_state.map.create_initial_units(self.game_state)
         else:
-            # Fallback for maps without custom spawn logic
-            # Player 1 units (human)
-            for i in range(3):
-                factories.create_chassis(self.game_state, 10 + i * 2, 10, player_id=1, is_human=True)
-            # Player 2 units (AI) - Mission 1: Single Rover in center
-            factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
+            log.warning("Map does not have create_initial_units method. No units spawned.")
 
     def handle_event(self, event):
         """Handles user input and other events for the game scene.

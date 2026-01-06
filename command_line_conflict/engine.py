@@ -36,15 +36,17 @@ class SceneManager:
         self.current_scene = self.scenes["menu"]
         log.debug("SceneManager initialized with scenes: %s", list(self.scenes.keys()))
 
-    def switch_to(self, scene_name):
+    def switch_to(self, scene_name, **kwargs):
         """Switches the active scene.
 
         Args:
             scene_name: The name of the scene to switch to.
+            **kwargs: Additional arguments to pass to the scene constructor.
         """
-        log.debug(f"Switching scene to: {scene_name}")
+        log.debug(f"Switching scene to: {scene_name} with args: {kwargs}")
         if scene_name == "game":
-            self.scenes["game"] = GameScene(self.game)
+            mission_id = kwargs.get("mission_id", "mission_1")
+            self.scenes["game"] = GameScene(self.game, mission_id=mission_id)
         elif scene_name == "editor":
             self.scenes["editor"] = EditorScene(self.game)
         self.current_scene = self.scenes[scene_name]

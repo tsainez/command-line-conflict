@@ -96,10 +96,10 @@ class MenuScene:
         if option_text == "Continue Campaign":
             # In the future, this would load the latest save
             # For now, it just starts the game scene, same as New Game
-            self.game.scene_manager.switch_to("game")
+            self.game.scene_manager.switch_to("game", mission_id="mission_1")
         elif option_text == "New Game":
             # Ideally reset progress here or start fresh mission
-            self.game.scene_manager.switch_to("game")
+            self.game.scene_manager.switch_to("game", mission_id="mission_1")
         elif option_text == "Map Editor":
             self.game.scene_manager.switch_to("editor")
         elif option_text == "Options":
