@@ -17,10 +17,12 @@ class TestFileDialogUX:
     def mock_font(self):
         font = MagicMock()
         font.render.return_value = MagicMock()
+
         # Mock size to estimate width for clipping tests
         # Let's say each char is 10px wide
         def size(text):
             return (len(text) * 10, 20)
+
         font.size.side_effect = size
         return font
 
@@ -50,7 +52,7 @@ class TestFileDialogUX:
         # Width is 600. Input rect width is width - 140 = 460.
         # If each char is 10px, 50 chars = 500px, which is > 460.
 
-        long_text = "A" * 60 # 600px
+        long_text = "A" * 60  # 600px
         empty_file_dialog.input_text = long_text
 
         empty_file_dialog.draw()
