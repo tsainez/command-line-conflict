@@ -31,6 +31,7 @@ class MenuScene:
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
         self.time = 0.0
+        self.confirm_quit = False
 
         # Start menu music
         # Assuming the music file is in the root or a music folder
@@ -63,6 +64,9 @@ class MenuScene:
                     hovered = True
                     if self.selected_option != i:
                         self.sound_system.play_sound("click_select")
+                        # Reset confirm quit if hovering a different option
+                        if self.confirm_quit:
+                            self.confirm_quit = False
                     self.selected_option = i
 
             if hovered:
@@ -86,9 +90,26 @@ class MenuScene:
 
             if self.selected_option != old_selection:
                 self.sound_system.play_sound("click_select")
+                # Reset confirmation if navigating away
+                if self.confirm_quit:
+                    self.confirm_quit = False
 
     def _trigger_option(self, option_index):
         option_text = self.menu_options[option_index]
+
+        if option_text == "Quit":
+            if not self.confirm_quit:
+                self.confirm_quit = True
+                self.sound_system.play_sound("click_select") # Feedback for the first click
+                return
+
+            # If confirmed
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            self.game.running = False
+            return
+
+        # Reset quit confirmation if another option is selected
+        self.confirm_quit = False
 
         # Reset cursor before switching scenes
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -104,8 +125,6 @@ class MenuScene:
             self.game.scene_manager.switch_to("editor")
         elif option_text == "Options":
             self.game.scene_manager.switch_to("settings")
-        elif option_text == "Quit":
-            self.game.running = False
 
     def update(self, dt):
         """Updates the menu scene.
@@ -135,12 +154,16 @@ class MenuScene:
 
         self.option_rects.clear()
         for i, option in enumerate(self.menu_options):
+            display_text = option
+            color = (255, 255, 255)
+
             if i == self.selected_option:
-                color = pulse_color
-                display_text = f"> {option} <"
-            else:
-                color = (255, 255, 255)
-                display_text = option
+                if option == "Quit" and self.confirm_quit:
+                    color = (255, 50, 50) # Red
+                    display_text = "> Confirm Quit? <"
+                else:
+                    color = pulse_color
+                    display_text = f"> {option} <"
 
             text = self._get_text_surface(display_text, color, "option")
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
