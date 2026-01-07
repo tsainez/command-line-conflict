@@ -7,6 +7,7 @@ from command_line_conflict import config, factories
 from command_line_conflict.camera import Camera
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.dead import Dead
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
@@ -365,7 +366,7 @@ class GameScene:
         cursor_set = False
         for entity_id in entity_ids:
             # We must filter out dead entities, or cursors will react to corpses
-            if self.game_state.get_component(entity_id, factories.Dead):
+            if self.game_state.get_component(entity_id, Dead):
                 continue
 
             player = self.game_state.get_component(entity_id, Player)
