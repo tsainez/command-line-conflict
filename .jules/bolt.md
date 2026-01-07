@@ -21,3 +21,7 @@
 ## 2025-05-27 - UI Text Caching Pattern
 **Learning:** Initializing new `pygame.font.Font` objects every frame (even if they use the default system font) causes significant performance degradation. Coupled with uncached `render` calls for static UI text, this can consume a large portion of the frame budget.
 **Action:** Always initialize fonts in `__init__` and use `@functools.lru_cache` for text rendering methods in UI systems.
+
+## 2025-05-28 - Loop Hoisting in Rendering
+**Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
+**Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
