@@ -79,37 +79,64 @@ class TestMapSecurity(unittest.TestCase):
         self.assertIn("Too many walls defined", args[0])
         self.assertIn(f"Truncating to {max_walls}", args[0])
 
+    @patch("command_line_conflict.utils.paths.get_user_data_dir")
+    @patch("command_line_conflict.maps.base.os.fstat")
     @patch("command_line_conflict.maps.base.open")
-    @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_file_size_limit(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.realpath")
+    def test_load_from_file_size_limit(self, mock_realpath, mock_open, mock_fstat, mock_get_user_data_dir):
         """Verify that loading large map files raises ValueError."""
-        # Set size larger than limit (assuming 2MB limit)
+        # Setup authorized paths
+        mock_get_user_data_dir.return_value = "/app/user_data"
+
+        # Ensure path validation passes by returning an authorized path
+        # The logic in Map.load_from_file checks:
+        # maps_dir = ...abspath(__file__) -> e.g., /app/command_line_conflict/maps
+        # user_data_dir = /app/user_data
+
+        # We need mock_realpath to return something inside one of these.
+        # Let's mock it to return /app/user_data/large_map.json
+        mock_realpath.return_value = "/app/user_data/large_map.json"
+
+        # Mock file descriptor stats
         mock_st = MagicMock()
         mock_st.st_size = 5 * 1024 * 1024  # 5MB
         mock_st.st_mode = stat.S_IFREG  # Regular file
-        mock_stat.return_value = mock_st
+        mock_fstat.return_value = mock_st
+
+        # Mock open to return a file object with a fileno
+        mock_file = MagicMock()
+        mock_file.fileno.return_value = 1
+        mock_open.return_value.__enter__.return_value = mock_file
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("large_map.json")
 
         self.assertIn("exceeds maximum allowed size", str(cm.exception))
 
-        # Ensure open was NOT called
-        mock_open.assert_not_called()
-
+    @patch("command_line_conflict.utils.paths.get_user_data_dir")
+    @patch("command_line_conflict.maps.base.os.fstat")
     @patch("command_line_conflict.maps.base.open")
-    @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_special_file(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.realpath")
+    def test_load_from_special_file(self, mock_realpath, mock_open, mock_fstat, mock_get_user_data_dir):
         """Verify that loading from special files raises ValueError."""
+        # Setup authorized paths
+        mock_get_user_data_dir.return_value = "/app/user_data"
+
+        # Ensure path validation passes
+        mock_realpath.return_value = "/app/user_data/special_file"
+
+        # Mock file descriptor stats
         mock_st = MagicMock()
         mock_st.st_size = 0
         mock_st.st_mode = stat.S_IFCHR  # Character device
-        mock_stat.return_value = mock_st
+        mock_fstat.return_value = mock_st
+
+        # Mock open
+        mock_file = MagicMock()
+        mock_file.fileno.return_value = 1
+        mock_open.return_value.__enter__.return_value = mock_file
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("/dev/zero")
 
         self.assertIn("must be a regular file", str(cm.exception))
-
-        # Ensure open was NOT called
-        mock_open.assert_not_called()

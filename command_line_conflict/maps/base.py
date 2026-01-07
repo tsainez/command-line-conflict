@@ -284,20 +284,43 @@ class Map:
         import json
         import stat
 
+        from ..utils.paths import get_user_data_dir
+
+        # Security fix: Path traversal prevention
+        abs_path = os.path.realpath(filename)
+        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+        user_data_dir = os.path.realpath(str(get_user_data_dir()))
+        allowed_dirs = [maps_dir, user_data_dir]
+
+        is_allowed = False
+        for d in allowed_dirs:
+            try:
+                if os.path.commonpath([d, abs_path]) == d:
+                    is_allowed = True
+                    break
+            except ValueError:
+                # Handle cases where paths are on different drives (Windows)
+                continue
+
+        if not is_allowed:
+            log.error(f"Security violation: Attempted to load map from unauthorized location: {abs_path}")
+            raise ValueError(f"Cannot load from unauthorized location: {filename}")
+
         try:
-            st = os.stat(filename)
+            with open(abs_path, "r", encoding="utf-8") as f:
+                # Security: Check file stats on the open file descriptor to prevent TOCTOU
+                st = os.fstat(f.fileno())
+
+                # Security: Check file type to prevent reading from special files
+                if not stat.S_ISREG(st.st_mode):
+                    raise ValueError("Map file must be a regular file.")
+
+                # Security: Check file size to prevent DoS via memory exhaustion
+                if st.st_size > cls.MAX_FILE_SIZE:
+                    raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
+
+                data = json.load(f)
         except OSError as e:
-            raise ValueError(f"Could not stat file: {e}") from e
+            raise ValueError(f"Failed to load map file: {e}") from e
 
-        # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
-        # which can cause DoS.
-        if not stat.S_ISREG(st.st_mode):
-            raise ValueError("Map file must be a regular file.")
-
-        # Security: Check file size to prevent DoS via memory exhaustion
-        if st.st_size > cls.MAX_FILE_SIZE:
-            raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
-
-        with open(filename, "r", encoding="utf-8") as f:
-            data = json.load(f)
         return cls.from_dict(data)
