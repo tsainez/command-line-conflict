@@ -1,4 +1,4 @@
-name: Tests
+name: Compatibility Matrix
 
 on:
   push:
@@ -8,8 +8,10 @@ on:
 
 jobs:
   test:
+    name: Test on ${{ matrix.os }} / Py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.10", "3.11", "3.12"]
@@ -20,13 +22,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Test with pytest
+
+    # On Windows/Mac, we might need specific setup for audio/video drivers if tests were real integration tests
+    # But since we use SDL_VIDEODRIVER=dummy, it should be fine.
+
+    - name: Run Tests
       run: |
         pytest tests/

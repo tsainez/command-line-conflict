@@ -1,4 +1,4 @@
-name: CI
+name: Quality Gate
 
 on:
   push:
@@ -7,7 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  quality:
+    name: Lint & Fast Test
     runs-on: ubuntu-latest
     env:
       SDL_VIDEODRIVER: dummy
@@ -15,31 +16,37 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.12
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.12"
+        cache: 'pip'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
     - name: Format Check (Black)
-      run: |
-        black --check .
+      run: black --check .
+
     - name: Import Sort Check (isort)
+      run: isort --check .
+
+    - name: Lint (Flake8)
+      run: flake8 .
+
+    - name: Lint (Pylint)
       run: |
-        isort --check .
-    - name: Lint with Flake8
-      run: |
-        flake8 .
-    - name: Lint with Pylint
-      run: |
+        # Get list of python files, excluding tests/ if desired, but here we scan all like pre_commit.sh
+        # Using git ls-files to respect .gitignore
         pylint $(git ls-files '*.py') --fail-under=9.0
-    - name: Type Check with Mypy
-      run: |
-        mypy command_line_conflict
-    - name: Test with pytest
+
+    - name: Type Check (Mypy)
+      run: mypy command_line_conflict
+
+    - name: Test (Pytest + Coverage)
       run: |
         pytest --cov=command_line_conflict --cov-report=html --cov-report=term tests/
+
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
       with:

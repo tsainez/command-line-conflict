@@ -54,6 +54,15 @@ Ensure the script exits with "All checks passed!" before pushing your changes.
 ### Logging
 *   Avoid wrapping `log.debug()` calls with `if config.DEBUG:`. Rely on the logging library's level filtering instead.
 
+## GitHub Workflows
+
+We use GitHub Actions to ensure code quality.
+
+*   **Quality Gate (`ci.yml`):** Runs on every push and PR. It checks formatting, linting, type safety, and runs fast tests on Linux.
+*   **Compatibility Matrix (`tests.yml`):** Runs tests across multiple operating systems (Ubuntu, Windows, macOS) and Python versions (3.10, 3.11, 3.12).
+*   **Stale (`stale.yml`):** Manages stale issues and PRs.
+*   **Deploy Docs (`deploy_docs.yml`):** Deploys MkDocs documentation to GitHub Pages on merge to main.
+
 ## Pull Requests
 
 Please use the provided Pull Request Template (`.github/pull_request_template.md`) when opening a PR.

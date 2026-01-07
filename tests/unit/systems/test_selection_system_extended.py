@@ -1,10 +1,6 @@
 # pylint: disable=redefined-outer-name, protected-access
-from unittest.mock import MagicMock, patch
-
 import pytest
 
-from command_line_conflict.components.player import Player
-from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.factories import create_chassis
 from command_line_conflict.game_state import GameState
