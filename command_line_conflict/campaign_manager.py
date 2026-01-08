@@ -59,18 +59,26 @@ class CampaignManager:
             log.info("No save file found. Starting new campaign.")
             return
 
-        # Security check: File size
         try:
-            if os.path.getsize(self.save_file) > self.MAX_SAVE_FILE_SIZE:
-                log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
-                return
-        except OSError as e:
-            log.error(f"Failed to check save file size: {e}")
-            return
-
-        try:
+            # Security Fix: Prevent TOCTOU and DoS by reading from the file descriptor
+            # with a strict size limit. We read one byte more than the max to detect
+            # if the file is too large.
             with open(self.save_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
+                content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
+
+                if len(content) > self.MAX_SAVE_FILE_SIZE:
+                    log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
+                    return
+
+                # If empty file
+                if not content:
+                    return
+
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError as e:
+                    log.error(f"Failed to parse save file: {e}")
+                    return
 
                 # Security check: Validate structure and limits
                 missions = data.get("completed_missions", [])
@@ -94,8 +102,9 @@ class CampaignManager:
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
                 log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
-        except (IOError, json.JSONDecodeError) as e:
-            log.error(f"Failed to load save file: {e}")
+
+        except IOError as e:
+            log.error(f"Failed to access save file: {e}")
 
     def save_progress(self) -> None:
         """Saves current progress to the save file."""
