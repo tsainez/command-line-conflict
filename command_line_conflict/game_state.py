@@ -168,3 +168,21 @@ class GameState:
         Optimized with spatial hashing O(1).
         """
         return list(self.spatial_map.get((x, y), []))
+
+    def is_position_occupied(self, x: int, y: int, exclude_entity_id: int | None = None) -> bool:
+        """Checks if a position is occupied by any entity.
+
+        Optimized to avoid list allocation.
+        """
+        entities = self.spatial_map.get((x, y))
+        if not entities:
+            return False
+
+        if exclude_entity_id is None:
+            return True
+
+        # If the set contains only the excluded entity, it's not occupied by others
+        if len(entities) == 1 and exclude_entity_id in entities:
+            return False
+
+        return True
