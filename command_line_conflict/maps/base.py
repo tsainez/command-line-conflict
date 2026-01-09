@@ -284,8 +284,39 @@ class Map:
         import json
         import stat
 
+        from ..utils.paths import get_user_data_dir
+
+        # Security fix: Path traversal prevention
+        # Resolve symlinks to ensure we check the actual destination
+        abs_path = os.path.realpath(filename)
+
+        # Define allowed directories
+        # 1. The maps directory (where this file resides)
+        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+
+        # 2. The user data directory
+        user_data_dir = str(get_user_data_dir())
+        # Ensure user_data_dir is also resolved if it's a symlink
+        user_data_dir = os.path.realpath(user_data_dir)
+
+        allowed_dirs = [maps_dir, user_data_dir]
+
+        is_allowed = False
+        for allowed_dir in allowed_dirs:
+            try:
+                # os.path.commonpath returns the longest common sub-path
+                if os.path.commonpath([allowed_dir, abs_path]) == allowed_dir:
+                    is_allowed = True
+                    break
+            except ValueError:
+                continue
+
+        if not is_allowed:
+            log.error(f"Security violation: Attempted to load map from unauthorized location: {abs_path}")
+            raise ValueError(f"Cannot load from unauthorized location: {filename}")
+
         try:
-            st = os.stat(filename)
+            st = os.stat(abs_path)
         except OSError as e:
             raise ValueError(f"Could not stat file: {e}") from e
 
@@ -298,6 +329,6 @@ class Map:
         if st.st_size > cls.MAX_FILE_SIZE:
             raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
 
-        with open(filename, "r", encoding="utf-8") as f:
+        with open(abs_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return cls.from_dict(data)

@@ -1,7 +1,5 @@
-import os
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
-import pygame
 import pytest
 
 from command_line_conflict.ui.file_dialog import FileDialog
