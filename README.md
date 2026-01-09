@@ -89,6 +89,23 @@ Most Linux distributions come with Python installed. If you installed a custom v
     python main.py
     ```
 
+### Windows 11 Build (PyInstaller)
+
+The build script creates a standalone executable using PyInstaller.
+
+```powershell
+.\scripts\build_windows.ps1
+```
+
+Optional flags:
+
+```powershell
+.\scripts\build_windows.ps1 -Clean
+.\scripts\build_windows.ps1 -NoVenv -Python "py"
+```
+
+The output executable will be in the `dist` folder.
+
 ### (Optional) Running Tests and Linters
 Before a change can be safely integrated, it must first pass through linting, automated testing, and finally a human player's assessment. 
 
