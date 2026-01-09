@@ -48,15 +48,3 @@ Several files contain unused imports which clutter the code and can be confusing
 1.  ~~Remove the `f` prefix from the string `text = f"Editor Mode..."`.~~
 2.  ~~Remove the TODO comment.~~
 
-## 7. Implement In-Game File Dialog for Map Editor
-**Location:** `command_line_conflict/scenes/editor.py`
-**Original TODO:** `# TODO: Implement in-game file dialog to remove dependency on console input/Tkinter.`
-
-**Description:**
-The Map Editor falls back to console `input()` for saving and loading maps if Tkinter is not available. This disrupts the graphical user experience.
-
-**Instructions:**
-1.  Create a simple UI overlay or state in `EditorScene` to accept text input for filenames.
-2.  Replace the `print()` and `input()` calls in `save_map` and `load_map` with this UI system.
-3.  Remove the dependency on console interaction.
-4.  Remove the TODO comment.
