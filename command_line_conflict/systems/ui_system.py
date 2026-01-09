@@ -1,3 +1,5 @@
+import functools
+
 import pygame
 
 from command_line_conflict import config
@@ -28,7 +30,12 @@ class UISystem:
         self.font = font
         self.camera = camera
         self.cheats: dict = {}
+
+        # Initialize fonts once
         self.small_font = pygame.font.Font(None, 18)
+        self.medium_font = pygame.font.Font(None, 36)
+        self.large_font = pygame.font.Font(None, 74)
+
         self.key_options = [
             "L-Click: Select",
             "R-Click: Move",
@@ -51,6 +58,38 @@ class UISystem:
         self.click_effects: list[dict] = []
 
         log.debug("UISystem initialized")
+
+    @functools.lru_cache(maxsize=256)
+    def _get_text_surface(self, text: str, color: tuple, font_size: str = "normal") -> pygame.Surface:
+        """Returns a cached surface for the text.
+
+        Args:
+            text: The string to render.
+            color: The color tuple (R, G, B).
+            font_size: 'small', 'medium', 'large', or 'normal' (default).
+        """
+        if font_size == "small":
+            font = self.small_font
+        elif font_size == "medium":
+            font = self.medium_font
+        elif font_size == "large":
+            font = self.large_font
+        else:
+            font = self.font
+        return font.render(text, True, color)
+
+    @staticmethod
+    @functools.lru_cache(maxsize=64)
+    def _get_range_surface(size: int, color: tuple) -> pygame.Surface:
+        """Returns a cached surface for range indicators.
+
+        Args:
+            size: The width/height of the surface in pixels.
+            color: The RGBA color tuple.
+        """
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.rect(surface, color, surface.get_rect())
+        return surface
 
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
@@ -160,7 +199,7 @@ class UISystem:
         pygame.draw.rect(self.screen, (255, 255, 255), rect, 2)  # Border
 
         # Label
-        text = self.small_font.render(f"P{current_player_id}", True, (255, 255, 255))
+        text = self._get_text_surface(f"P{current_player_id}", (255, 255, 255), "small")
         text_rect = text.get_rect(center=rect.center)
         self.screen.blit(text, text_rect)
 
@@ -196,19 +235,19 @@ class UISystem:
         panel_y = config.SCREEN_HEIGHT - 90
 
         if renderable:
-            text = self.font.render(f"Unit: {renderable.icon}", True, (255, 255, 255))
+            text = self._get_text_surface(f"Unit: {renderable.icon}", (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
             panel_y += 20
 
         if health:
             health_text = f"Health: {int(health.hp)} / {health.max_hp}"
-            text = self.font.render(health_text, True, (255, 255, 255))
+            text = self._get_text_surface(health_text, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
             panel_y += 20
 
         if attack:
             attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
-            text = self.font.render(attack_text, True, (255, 255, 255))
+            text = self._get_text_surface(attack_text, (255, 255, 255))
             self.screen.blit(text, (panel_x_offset, panel_y))
 
         self._draw_aggregate_detection_range(game_state, [entity_id])
@@ -235,18 +274,14 @@ class UISystem:
                     if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
                         detection_tiles.add((x, y))
 
+        # Pre-calculate common values
+        size = int(config.GRID_SIZE * self.camera.zoom)
+        range_surface = self._get_range_surface(size, (0, 0, 255, 30))
+
         for x, y in detection_tiles:
             cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            surface = pygame.Surface(
-                (
-                    config.GRID_SIZE * self.camera.zoom,
-                    config.GRID_SIZE * self.camera.zoom,
-                ),
-                pygame.SRCALPHA,
-            )
-            pygame.draw.rect(surface, (0, 0, 255, 30), surface.get_rect())
-            self.screen.blit(surface, (cam_x, cam_y))
+            self.screen.blit(range_surface, (cam_x, cam_y))
 
     def _draw_aggregate_attack_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined attack range for multiple units."""
@@ -262,18 +297,14 @@ class UISystem:
                     if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= attack.attack_range**2:
                         attack_tiles.add((x, y))
 
+        # Pre-calculate common values
+        size = int(config.GRID_SIZE * self.camera.zoom)
+        range_surface = self._get_range_surface(size, (255, 0, 0, 30))
+
         for x, y in attack_tiles:
             cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            surface = pygame.Surface(
-                (
-                    config.GRID_SIZE * self.camera.zoom,
-                    config.GRID_SIZE * self.camera.zoom,
-                ),
-                pygame.SRCALPHA,
-            )
-            pygame.draw.rect(surface, (255, 0, 0, 30), surface.get_rect())
-            self.screen.blit(surface, (cam_x, cam_y))
+            self.screen.blit(range_surface, (cam_x, cam_y))
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
         """Draws the current health of a unit above its icon.
@@ -287,7 +318,7 @@ class UISystem:
         health = components.get(Health)
         if position and health:
             health_text = f"{int(health.hp)}"
-            text = self.small_font.render(health_text, True, (255, 255, 255))
+            text = self._get_text_surface(health_text, (255, 255, 255), "small")
             grid_size = config.GRID_SIZE * self.camera.zoom
             center_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom + grid_size / 2
             center_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom - 5 * self.camera.zoom
@@ -315,12 +346,12 @@ class UISystem:
         panel_y = config.SCREEN_HEIGHT - 90
 
         count_text = f"Selected Units: {len(entity_ids)}"
-        text = self.font.render(count_text, True, (255, 255, 255))
+        text = self._get_text_surface(count_text, (255, 255, 255))
         self.screen.blit(text, (panel_x_offset, panel_y))
         panel_y += 20
 
         health_text = f"Total Health: {int(total_health)} / {max_health}"
-        text = self.font.render(health_text, True, (255, 255, 255))
+        text = self._get_text_surface(health_text, (255, 255, 255))
         self.screen.blit(text, (panel_x_offset, panel_y))
 
     def _draw_key_options(self) -> None:
@@ -346,7 +377,7 @@ class UISystem:
             x_pos = x_offset + col * column_width
             y_pos = y_offset + row * row_height
 
-            text = self.font.render(option, True, (255, 255, 255))
+            text = self._get_text_surface(option, (255, 255, 255))
             self.screen.blit(text, (x_pos, y_pos))
 
     def _draw_active_cheats(self, cheats: dict) -> None:
@@ -358,12 +389,12 @@ class UISystem:
         y_offset = 10
         x_offset = config.SCREEN_WIDTH - 200
 
-        title = self.font.render("Active Cheats:", True, (255, 255, 0))
+        title = self._get_text_surface("Active Cheats:", (255, 255, 0))
         self.screen.blit(title, (x_offset, y_offset))
         y_offset += 25
 
         for cheat in active_cheats:
-            text = self.small_font.render(cheat, True, (255, 255, 0))
+            text = self._get_text_surface(cheat, (255, 255, 0), "small")
             self.screen.blit(text, (x_offset + 10, y_offset))
             y_offset += 20
 
@@ -371,15 +402,13 @@ class UISystem:
         # Dim the background
         self.screen.blit(self.pause_overlay, (0, 0))
 
-        # Draw "Paused" text
-        font = pygame.font.Font(None, 74)
-        text = font.render("Paused", True, (255, 255, 255))
+        # Draw "Paused" text - use cached method with large font
+        text = self._get_text_surface("Paused", (255, 255, 255), "large")
         text_rect = text.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2))
         self.screen.blit(text, text_rect)
 
-        # Draw instruction text
-        small_font = pygame.font.Font(None, 36)
-        instruction = small_font.render("Press P to Resume", True, (200, 200, 200))
+        # Draw instruction text - use cached method with medium font
+        instruction = self._get_text_surface("Press P to Resume", (200, 200, 200), "medium")
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)
 
@@ -405,11 +434,11 @@ class UISystem:
             panel_y = config.SCREEN_HEIGHT - 160
             panel_x_offset = 10
 
-            title = self.font.render("Construction:", True, (255, 255, 0))
+            title = self._get_text_surface("Construction:", (255, 255, 0))
             self.screen.blit(title, (panel_x_offset, panel_y))
             panel_y += 20
 
             for hint in hints:
-                text = self.small_font.render(hint, True, (200, 200, 200))
+                text = self._get_text_surface(hint, (200, 200, 200), "small")
                 self.screen.blit(text, (panel_x_offset, panel_y))
                 panel_y += 18

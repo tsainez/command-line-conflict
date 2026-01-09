@@ -1,5 +1,3 @@
-# Bolt's Journal
-
 ## 2024-05-22 - Spatial Hash Map Efficiency
 **Learning:** Using a spatial hash map for collision detection and entity lookup significantly improves performance over O(N) iteration, especially as the entity count grows.
 **Action:** Always look for opportunities to replace linear searches with spatial indexing in systems that query entity positions frequently (e.g., collision, vision, targeting).
@@ -19,3 +17,7 @@
 ## 2025-02-14 - List Allocations in Hot Paths
 **Learning:** Avoid `list()` conversion when iterating over sets in performance-critical loops (like `CombatSystem.update`) unless snapshot behavior is strictly required for safety (e.g., removing elements from the set during iteration).
 **Action:** Iterate over sets directly when safe to avoid O(N) allocation overhead.
+
+## 2025-05-27 - UI Text Caching Pattern
+**Learning:** Initializing new `pygame.font.Font` objects every frame (even if they use the default system font) causes significant performance degradation. Coupled with uncached `render` calls for static UI text, this can consume a large portion of the frame budget.
+**Action:** Always initialize fonts in `__init__` and use `@functools.lru_cache` for text rendering methods in UI systems.

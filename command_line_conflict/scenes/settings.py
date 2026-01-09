@@ -1,3 +1,5 @@
+import functools
+
 import pygame
 
 from command_line_conflict import config
@@ -35,6 +37,21 @@ class SettingsScene:
         except ValueError:
             self.current_screen_size_index = 0
 
+    @functools.lru_cache(maxsize=64)
+    def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
+        """Returns a cached surface for the text.
+
+        Args:
+            text: The string to render.
+            color: The color tuple (R, G, B).
+            font_type: 'title', 'help', or 'option'.
+        """
+        if font_type == "title":
+            return self.title_font.render(text, True, color)
+        elif font_type == "help":
+            return self.game.font.render(text, True, color)
+        return self.option_font.render(text, True, color)
+
     def handle_event(self, event):
         """Handles user input for changing settings.
 
@@ -42,9 +59,16 @@ class SettingsScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.MOUSEMOTION:
+            hovered = False
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
+                    hovered = True
                     self.selected_option = i
+
+            if hovered:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
@@ -94,6 +118,7 @@ class SettingsScene:
             config.DEBUG = not config.DEBUG
             log.info(f"Debug mode set to {config.DEBUG}")
         elif option_name == "Back":
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
@@ -125,7 +150,7 @@ class SettingsScene:
         """
         screen.fill((0, 0, 0))
 
-        title_text = self.title_font.render("Settings", True, (255, 255, 255))
+        title_text = self._get_text_surface("Settings", (255, 255, 255), "title")
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
@@ -155,7 +180,7 @@ class SettingsScene:
                 else:
                     text_to_render = f"> {text_to_render} <"
 
-            text = self.option_font.render(text_to_render, True, color)
+            text = self._get_text_surface(text_to_render, color, "option")
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 250 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
@@ -163,6 +188,6 @@ class SettingsScene:
         # Helper text for volume controls
         current_option = self.settings_options[self.selected_option]
         if "Volume" in current_option:
-            help_text = self.game.font.render("Use Arrow Keys or Click Left/Right to Adjust", True, (150, 150, 150))
+            help_text = self._get_text_surface("Use Arrow Keys or Click Left/Right to Adjust", (150, 150, 150), "help")
             help_rect = help_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
             screen.blit(help_text, help_rect)

@@ -76,19 +76,29 @@ class FileDialog:
         if event.type == pygame.MOUSEMOTION:
             self.hovered_element = None
             self.hovered_file_index = None
+            cursor_changed = False
 
             if self.close_button_rect.collidepoint(event.pos):
                 self.hovered_element = "close"
+                cursor_changed = True
             elif self.action_button_rect.collidepoint(event.pos):
                 self.hovered_element = "action"
+                cursor_changed = True
             elif self.file_list_rect.collidepoint(event.pos):
                 idx = (event.pos[1] - self.file_list_rect.y) // self.item_height + self.scroll_offset
                 if 0 <= idx < len(self.files):
                     self.hovered_file_index = idx
+                    cursor_changed = True
+
+            if cursor_changed:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
                 if self.close_button_rect.collidepoint(event.pos):
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                     self.active = False
                     return None
 
@@ -111,11 +121,16 @@ class FileDialog:
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.active = False
                 return None
             if event.key == pygame.K_RETURN:
                 return self._confirm_selection()
-            if event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_UP:
+                self._navigate(-1)
+            elif event.key == pygame.K_DOWN:
+                self._navigate(1)
+            elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
                 # Add character to input
@@ -126,6 +141,33 @@ class FileDialog:
                         self.input_text += event.unicode
 
         return None
+
+    def _navigate(self, delta):
+        """Navigates the file list by a delta (e.g., -1 for up, 1 for down)."""
+        if not self.files:
+            return
+
+        # Find current index based on input_text
+        try:
+            current_idx = self.files.index(self.input_text)
+        except ValueError:
+            current_idx = -1
+
+        new_idx = current_idx + delta
+
+        # Boundary checks
+        if new_idx < 0:
+            new_idx = 0
+        elif new_idx >= len(self.files):
+            new_idx = len(self.files) - 1
+
+        self.input_text = self.files[new_idx]
+
+        # Scroll to ensure visibility
+        if new_idx < self.scroll_offset:
+            self.scroll_offset = new_idx
+        elif new_idx >= self.scroll_offset + self.max_visible_files:
+            self.scroll_offset = new_idx - self.max_visible_files + 1
 
     def _confirm_selection(self):
         """Confirms the current selection or input."""
@@ -140,6 +182,7 @@ class FileDialog:
         filename = os.path.basename(filename)
 
         full_path = os.path.join(self.initial_dir, filename)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self.active = False
         return full_path
 
@@ -166,27 +209,39 @@ class FileDialog:
         pygame.draw.rect(self.screen, (30, 30, 30), self.file_list_rect)
 
         # Draw Files
-        for i in range(self.max_visible_files):
-            idx = i + self.scroll_offset
-            if idx >= len(self.files):
-                break
+        if not self.files:
+            no_files_text = self.font.render("No files found", True, (150, 150, 150))
+            self.screen.blit(
+                no_files_text,
+                (self.file_list_rect.x + 20, self.file_list_rect.y + 20),
+            )
+        else:
+            for i in range(self.max_visible_files):
+                idx = i + self.scroll_offset
+                if idx >= len(self.files):
+                    break
 
-            f = self.files[idx]
-            y_pos = self.file_list_rect.y + i * self.item_height
-            item_rect = pygame.Rect(self.file_list_rect.x, y_pos, self.file_list_rect.width, self.item_height)
+                f = self.files[idx]
+                y_pos = self.file_list_rect.y + i * self.item_height
+                item_rect = pygame.Rect(
+                    self.file_list_rect.x,
+                    y_pos,
+                    self.file_list_rect.width,
+                    self.item_height,
+                )
 
-            # Highlight logic
-            is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
-            is_hovered = idx == self.hovered_file_index
+                # Highlight logic
+                is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
+                is_hovered = idx == self.hovered_file_index
 
-            if is_selected:
-                pygame.draw.rect(self.screen, (70, 70, 100), item_rect)
-            elif is_hovered:
-                pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
+                if is_selected:
+                    pygame.draw.rect(self.screen, (70, 70, 100), item_rect)
+                elif is_hovered:
+                    pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
 
-            text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
-            text_surf = self.font.render(f, True, text_color)
-            self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
+                text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
+                text_surf = self.font.render(f, True, text_color)
+                self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
 
         # Draw Input Field
         pygame.draw.rect(self.screen, (255, 255, 255), self.input_rect)
@@ -197,8 +252,10 @@ class FileDialog:
             input_surf = self.font.render("Enter a file name", True, (130, 130, 130))
             input_surf_y = self.input_rect.y + 5
 
-        # Clip input text if too long? For now just render.
+        # Clip input text to input_rect
+        self.screen.set_clip(self.input_rect)
         self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
+        self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.
         hint_text = "Enter to confirm, Esc to cancel, scroll to browse"

@@ -1,7 +1,10 @@
 import os
+import shutil
 import unittest
+from pathlib import Path
 
 from command_line_conflict.maps.base import Map
+from command_line_conflict.utils.paths import get_user_data_dir
 
 
 class TestMapSerialization(unittest.TestCase):
@@ -28,7 +31,15 @@ class TestMapSerialization(unittest.TestCase):
         self.assertFalse(m.is_blocked(0, 0))
 
     def test_save_load(self):
-        filename = "test_map.json"
+        # Use user data dir for authorized save location
+        user_data = get_user_data_dir()
+        # Create user data dir if it doesn't exist (mocking environment might not have it)
+        try:
+            os.makedirs(user_data, exist_ok=True)
+        except OSError:
+            pass
+
+        filename = os.path.join(user_data, "test_map.json")
         m = Map(width=5, height=5)
         m.add_wall(3, 3)
         m.save_to_file(filename)

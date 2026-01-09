@@ -223,13 +223,49 @@ class Map:
 
         Args:
             filename: The path to the file to save to.
+
+        Raises:
+            ValueError: If the filename is outside authorized directories.
         """
         import json
 
-        # Ensure directory exists
-        os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
+        from ..utils.paths import get_user_data_dir
 
-        with open(filename, "w", encoding="utf-8") as f:
+        # Security fix: Path traversal prevention
+        # Resolve symlinks to ensure we check the actual destination
+        abs_path = os.path.realpath(filename)
+
+        # Define allowed directories
+        # 1. The maps directory (where this file resides)
+        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+
+        # 2. The user data directory
+        user_data_dir = str(get_user_data_dir())
+        # Ensure user_data_dir is also resolved if it's a symlink
+        user_data_dir = os.path.realpath(user_data_dir)
+
+        allowed_dirs = [maps_dir, user_data_dir]
+
+        is_allowed = False
+        for allowed_dir in allowed_dirs:
+            try:
+                # os.path.commonpath returns the longest common sub-path
+                if os.path.commonpath([allowed_dir, abs_path]) == allowed_dir:
+                    is_allowed = True
+                    break
+            except ValueError:
+                continue
+
+        if not is_allowed:
+            log.error(f"Security violation: Attempted to save map to unauthorized location: {abs_path}")
+            raise ValueError(f"Cannot save to unauthorized location: {filename}")
+
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+
+        # Security: Use the resolved absolute path to prevent TOCTOU attacks
+        # where the file path (symlink) could change between validation and open.
+        with open(abs_path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=4)
 
     @classmethod
