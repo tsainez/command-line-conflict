@@ -48,7 +48,7 @@ class SettingsScene:
         """
         if font_type == "title":
             return self.title_font.render(text, True, color)
-        elif font_type == "help":
+        if font_type == "help":
             return self.game.font.render(text, True, color)
         return self.option_font.render(text, True, color)
 

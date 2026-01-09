@@ -20,3 +20,6 @@ class Movable(Component):
         self.can_fly = can_fly
         self.intelligent = intelligent
         self.hold_position: bool = False
+
+        # Optimization: Throttling for pathfinding failures
+        self.path_retry_timer: float = 0.0
