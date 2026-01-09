@@ -37,20 +37,6 @@ Several files contain unused imports which clutter the code and can be confusing
 4.  ~~Remove `import math` from `command_line_conflict/systems/ui_system.py`.~~
 5.  ~~Remove the corresponding TODO comments.~~
 
-## 4. Fix Logic Bug and Unused Variables in Game Scene
-**Location:** `command_line_conflict/scenes/game.py`
-**Original TODO:** `# TODO: Fix bug - should likely get UnitIdentity, or remove if unused.`
-
-**Description:**
-In `GameScene`, the variable `unit_identity` is assigned the result of `components.get(Selectable)`, which appears to be a copy-paste error (should likely be `UnitIdentity`). Furthermore, the variable is unused.
-
-**Instructions:**
-1.  Analyze `command_line_conflict/scenes/game.py`.
-2.  Determine if `unit_identity` is needed.
-3.  If needed, change `components.get(Selectable)` to `components.get(UnitIdentity)` (importing `UnitIdentity` if necessary).
-4.  If not needed, remove the assignment entirely.
-5.  Remove the TODO comment.
-
 ## 6. Fix F-string in Editor Scene
 **Location:** ~~`command_line_conflict/scenes/editor.py`~~
 **Original TODO:** ~~`# TODO: Fix f-string missing placeholders or remove f-prefix.`~~
