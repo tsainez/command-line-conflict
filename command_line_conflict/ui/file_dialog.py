@@ -231,9 +231,7 @@ class FileDialog:
                 )
 
                 # Highlight logic
-                is_selected = f == self.input_text or (
-                    self.input_text.endswith(self.extension) and f == self.input_text
-                )
+                is_selected = f == self.input_text or (self.input_text.endswith(self.extension) and f == self.input_text)
                 is_hovered = idx == self.hovered_file_index
 
                 if is_selected:
@@ -241,9 +239,7 @@ class FileDialog:
                 elif is_hovered:
                     pygame.draw.rect(self.screen, (50, 50, 60), item_rect)
 
-                text_color = (
-                    (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
-                )
+                text_color = (255, 255, 255) if is_selected or is_hovered else (200, 200, 200)
                 text_surf = self.font.render(f, True, text_color)
                 self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
 
