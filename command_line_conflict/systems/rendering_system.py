@@ -67,28 +67,31 @@ class RenderingSystem:
         start_y = int(self.camera.y) - 1
         end_y = int(self.camera.y + screen_height / tile_size) + 2
 
+        # Pre-calculate common values
+        grid_size = int(tile_size)
+        bar_height = max(4, int(grid_size * 0.2))
+
         # Iterate through visible tiles
         for y in range(start_y, end_y):
+            cam_y = (y - self.camera.y) * tile_size
             for x in range(start_x, end_x):
                 entity_ids = game_state.spatial_map.get((x, y))
                 if not entity_ids:
                     continue
+
+                cam_x = (x - self.camera.x) * tile_size
 
                 for entity_id in entity_ids:
                     components = game_state.entities.get(entity_id)
                     if not components:
                         continue
 
-                    position = components.get(Position)
+                    # Optimization: We trust the spatial map, so we know the position is roughly (x, y).
+                    # We skip redundant Position lookup for coordinate calculation.
                     renderable = components.get(Renderable)
 
-                    if not position or not renderable:
+                    if not renderable:
                         continue
-
-                    # Camera transform
-                    cam_x = (int(position.x) - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-                    cam_y = (int(position.y) - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-                    grid_size = int(config.GRID_SIZE * self.camera.zoom)
 
                     confetti = components.get(Confetti)
                     if confetti:
@@ -139,7 +142,6 @@ class RenderingSystem:
                     if not dead and health and health.max_hp > 0:
                         health_pct = max(0.0, min(1.0, health.hp / health.max_hp))
                         bar_width = grid_size
-                        bar_height = max(4, int(grid_size * 0.2))
                         bar_x = cam_x
                         bar_y = cam_y - bar_height - 2
 
