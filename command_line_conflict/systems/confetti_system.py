@@ -18,4 +18,4 @@ class ConfettiSystem:
 
             confetti.lifetime -= dt
             if confetti.lifetime <= 0:
-                del game_state.entities[entity_id]
+                game_state.remove_entity(entity_id)
