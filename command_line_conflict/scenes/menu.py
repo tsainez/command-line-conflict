@@ -22,6 +22,7 @@ class MenuScene:
         self.campaign_manager = CampaignManager()
         self.sound_system = SoundSystem()
         self.menu_options = ["New Game", "Map Editor", "Options", "Quit"]
+        self.quit_confirm = False
 
         if self.campaign_manager.completed_missions:
             self.menu_options.insert(0, "Continue Campaign")
@@ -63,6 +64,7 @@ class MenuScene:
                     hovered = True
                     if self.selected_option != i:
                         self.sound_system.play_sound("click_select")
+                        self.quit_confirm = False  # Reset confirm if selection changes
                     self.selected_option = i
 
             if hovered:
@@ -86,6 +88,7 @@ class MenuScene:
 
             if self.selected_option != old_selection:
                 self.sound_system.play_sound("click_select")
+                self.quit_confirm = False  # Reset confirm if selection changes
 
     def _trigger_option(self, option_index):
         option_text = self.menu_options[option_index]
@@ -94,18 +97,21 @@ class MenuScene:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if option_text == "Continue Campaign":
-            # In the future, this would load the latest save
-            # For now, it just starts the game scene, same as New Game
             self.game.scene_manager.switch_to("game")
         elif option_text == "New Game":
-            # Ideally reset progress here or start fresh mission
             self.game.scene_manager.switch_to("game")
         elif option_text == "Map Editor":
             self.game.scene_manager.switch_to("editor")
         elif option_text == "Options":
             self.game.scene_manager.switch_to("settings")
         elif option_text == "Quit":
-            self.game.running = False
+            if not self.quit_confirm:
+                self.quit_confirm = True
+                self.sound_system.play_sound("click_select")
+            else:
+                self.game.running = False
+        else:
+            self.quit_confirm = False
 
     def update(self, dt):
         """Updates the menu scene.
@@ -135,12 +141,16 @@ class MenuScene:
 
         self.option_rects.clear()
         for i, option in enumerate(self.menu_options):
+            display_text = option
+            color = (255, 255, 255)
+
             if i == self.selected_option:
                 color = pulse_color
-                display_text = f"> {option} <"
-            else:
-                color = (255, 255, 255)
-                display_text = option
+                if option == "Quit" and self.quit_confirm:
+                    display_text = "> Confirm Quit? <"
+                    color = (255, 100, 100)  # Reddish warning color
+                else:
+                    display_text = f"> {option} <"
 
             text = self._get_text_surface(display_text, color, "option")
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
