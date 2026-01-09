@@ -376,7 +376,7 @@ class GameScene:
                     pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
                     cursor_set = True
                     break
-                elif player.player_id == self.current_player_id:
+                if player.player_id == self.current_player_id:
                     # Friendly
                     if self.game_state.get_component(entity_id, Selectable):
                         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)

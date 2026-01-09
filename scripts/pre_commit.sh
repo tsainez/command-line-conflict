@@ -21,7 +21,7 @@ flake8 .
 echo "🧐 Running Pylint..."
 # Use git ls-files to get tracked files, or fallback to find
 if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    FILES=$(git ls-files '*.py' | grep -v '^tests/')
+    FILES=$(git ls-files '*.py')
 else
     FILES=$(find . -name "*.py" -not -path "*/.*" -not -path "*/venv/*")
 fi

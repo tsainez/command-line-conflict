@@ -25,8 +25,9 @@ class Targeting:
             log.debug(f"Targeting: Searching for enemy for unit {my_id} at ({my_pos.x}, {my_pos.y})")
 
         closest_enemy = None
-        min_dist = float("inf")
+        min_dist_sq = float("inf")
         vision_range = vision.vision_range
+        vision_range_sq = vision_range**2
 
         # Calculate search bounds based on vision range
         min_x = int(my_pos.x - vision_range)
@@ -61,13 +62,12 @@ class Targeting:
 
                     # Optimization: Use squared distance to avoid expensive sqrt() in the loop
                     dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
-                    vision_range_sq = vision_range**2
 
-                    if dist_sq <= vision_range_sq and dist_sq < min_dist**2:
-                        min_dist = dist_sq**0.5  # Only calculate sqrt if we found a new closest
+                    if dist_sq <= vision_range_sq and dist_sq < min_dist_sq:
+                        min_dist_sq = dist_sq
                         closest_enemy = other_id
 
         if DEBUG and closest_enemy:
-            log.debug(f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist:.2f}")
+            log.debug(f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist_sq**0.5:.2f}")
 
         return closest_enemy
