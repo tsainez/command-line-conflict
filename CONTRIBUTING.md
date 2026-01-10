@@ -17,6 +17,20 @@ Thank you for your interest in contributing to Command Line Conflict! We welcome
     pip install -r requirements.txt
     ```
 
+## Project Structure
+
+Before diving in, it's helpful to understand the codebase organization. Please read:
+*   [Project Structure](docs/ProjectStructure.md) - Overview of files and modules.
+*   [ECS Architecture](docs/ECS.md) - Guide to the Entity-Component-System design pattern used in the game.
+
+## Finding Tasks
+
+We have a backlog of potential tasks suitable for both human contributors and autonomous agents:
+
+*   **[AGENTS.md](AGENTS.md)**: A list of 100 features, improvements, and refactoring tasks. This is the best place to find something to work on.
+*   **[ISSUES.md](ISSUES.md)**: A collection of known technical debt and code cleanup items.
+*   **GitHub Issues**: Check the open issues on the repository.
+
 ## Development Workflow
 
 1.  **Create a branch** for your feature or bugfix:
@@ -38,7 +52,7 @@ We enforce a strict code style to keep the codebase clean and maintainable.
 *   **Linting:** We use `flake8` and `pylint`.
 
 ### Running Checks
-We have provided a convenience script to run all checks. Run the following command before submitting your PR:
+We have provided a convenience script to run all checks. **You must run this command before submitting your PR:**
 
 ```bash
 ./scripts/pre_commit.sh
@@ -64,13 +78,10 @@ Please use the provided Pull Request Template (`.github/pull_request_template.md
 *   **Smoke Tests:** Include basic smoke tests or verification steps in your PR description, especially when changing core logic.
 *   **CI:** All CI checks must pass before merging.
 
-## Reporting Bugs
+## Reporting Bugs / Security
 
-Please open an issue on GitHub with:
-1.  A clear title.
-2.  Steps to reproduce the bug.
-3.  Expected vs. actual behavior.
-4.  Logs or screenshots if applicable.
+*   **Bugs:** Open an issue on GitHub with steps to reproduce.
+*   **Security:** Please refer to the [Security Policy](SECURITY.md) for reporting vulnerabilities.
 
 ## Feature Requests
 

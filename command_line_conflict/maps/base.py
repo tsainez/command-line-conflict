@@ -288,7 +288,12 @@ class Map:
 
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
-        abs_path = os.path.realpath(filename)
+        try:
+            abs_path = os.path.realpath(filename)
+        except Exception as e:
+            # If realpath fails (e.g. filename is None or weird), treat as violation
+            log.error(f"Security violation: Invalid path: {filename}")
+            raise ValueError(f"Cannot load from unauthorized location: {filename}") from e
 
         # Define allowed directories
         # 1. The maps directory (where this file resides)
