@@ -1,7 +1,5 @@
-import os
 import unittest
 from unittest.mock import MagicMock, patch
-import json
 
 from command_line_conflict.maps.base import Map
 

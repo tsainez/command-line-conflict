@@ -81,7 +81,8 @@ class TestMapSecurity(unittest.TestCase):
 
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_file_size_limit(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.realpath")
+    def test_load_from_file_size_limit(self, mock_realpath, mock_stat, mock_open):
         """Verify that loading large map files raises ValueError."""
         # Set size larger than limit (assuming 2MB limit)
         mock_st = MagicMock()
@@ -89,27 +90,51 @@ class TestMapSecurity(unittest.TestCase):
         mock_st.st_mode = stat.S_IFREG  # Regular file
         mock_stat.return_value = mock_st
 
-        with self.assertRaises(ValueError) as cm:
-            Map.load_from_file("large_map.json")
+        # We need to make sure the path passes the authorized directory check first
+        # otherwise it fails with "unauthorized location" before checking size
+        import os
 
-        self.assertIn("exceeds maximum allowed size", str(cm.exception))
+        mock_realpath.return_value = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "../../../command_line_conflict/maps/large_map.json"
+        )
+
+        # We also need to mock commonpath logic indirectly by ensuring the paths align
+        # But actually, mocking realpath to point to a valid maps dir is easier if we
+        # ensure commonpath works.
+        # However, Map.load_from_file calls realpath on the input filename.
+        # Then it calls realpath on maps_dir.
+
+        # Let's bypass the path check by patching `os.path.commonpath` or ensuring realpath returns a safe path
+        with patch("command_line_conflict.maps.base.os.path.commonpath") as mock_commonpath:
+            # commonpath returns the first argument to simulate "is inside"
+            mock_commonpath.side_effect = lambda paths: paths[0]
+
+            with self.assertRaises(ValueError) as cm:
+                Map.load_from_file("large_map.json")
+
+            self.assertIn("exceeds maximum allowed size", str(cm.exception))
 
         # Ensure open was NOT called
         mock_open.assert_not_called()
 
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_special_file(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.realpath")
+    def test_load_from_special_file(self, mock_realpath, mock_stat, mock_open):
         """Verify that loading from special files raises ValueError."""
         mock_st = MagicMock()
         mock_st.st_size = 0
         mock_st.st_mode = stat.S_IFCHR  # Character device
         mock_stat.return_value = mock_st
 
-        with self.assertRaises(ValueError) as cm:
-            Map.load_from_file("/dev/zero")
+        # Bypass security check
+        with patch("command_line_conflict.maps.base.os.path.commonpath") as mock_commonpath:
+            mock_commonpath.side_effect = lambda paths: paths[0]
 
-        self.assertIn("must be a regular file", str(cm.exception))
+            with self.assertRaises(ValueError) as cm:
+                Map.load_from_file("/dev/zero")
+
+            self.assertIn("must be a regular file", str(cm.exception))
 
         # Ensure open was NOT called
         mock_open.assert_not_called()

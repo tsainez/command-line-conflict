@@ -54,7 +54,6 @@ def test_handle_construction_uses_unit_identity():
             # Act
             # Simulate 'R' key press (Build Rover Factory)
             # handle_event calls _handle_construction when 'R' is pressed
-            event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_r})
             # We call _handle_construction directly to avoid event processing overhead if desired,
             # but testing handle_event is more integration-like.
             # However, handle_event also does other things. Let's call _handle_construction directly for unit testing logic.
