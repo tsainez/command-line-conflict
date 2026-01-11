@@ -46,11 +46,28 @@ class EditorScene:
 
         # UI Font - try to use game font if possible, or default
         self.ui_font = pygame.font.SysFont("arial", 24)
+        self.tooltip_font = pygame.font.SysFont("arial", 16)
 
         self.file_dialog = None
+        self.mouse_pos = (0, 0)
+        self.hover_grid_pos = None
 
     def handle_event(self, event):
         """Handles user input."""
+        if event.type == pygame.MOUSEMOTION:
+            self.mouse_pos = event.pos
+            # Simple UI area check (top 60 pixels)
+            if event.pos[1] < 60:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.hover_grid_pos = None
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                gx, gy = self.camera.screen_to_grid(event.pos[0], event.pos[1])
+                if 0 <= gx < self.map.width and 0 <= gy < self.map.height:
+                    self.hover_grid_pos = (gx, gy)
+                else:
+                    self.hover_grid_pos = None
+
         if self.file_dialog and self.file_dialog.active:
             result = self.file_dialog.handle_event(event)
             if result:
@@ -130,8 +147,26 @@ class EditorScene:
         # Draw UI
         self._draw_ui(screen)
 
+        # Draw Tooltip
+        if self.hover_grid_pos:
+            self._draw_tooltip(screen)
+
         if self.file_dialog:
             self.file_dialog.draw()
+
+    def _draw_tooltip(self, screen):
+        gx, gy = self.hover_grid_pos
+        tooltip_text = f"({gx}, {gy})"
+        surf = self.tooltip_font.render(tooltip_text, True, (255, 255, 255))
+        bg_rect = surf.get_rect(topleft=(self.mouse_pos[0] + 15, self.mouse_pos[1] + 15))
+
+        # Add a small background for readability
+        padding = 4
+        bg_rect.inflate_ip(padding * 2, padding * 2)
+        pygame.draw.rect(screen, (0, 0, 0, 200), bg_rect)
+        pygame.draw.rect(screen, (100, 100, 100), bg_rect, 1)
+
+        screen.blit(surf, (bg_rect.x + padding, bg_rect.y + padding))
 
     def _draw_grid(self, screen):
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
