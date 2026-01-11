@@ -91,6 +91,45 @@ class UISystem:
         pygame.draw.rect(surface, color, surface.get_rect())
         return surface
 
+    def _draw_health_bar(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        current_hp: int,
+        max_hp: int,
+    ) -> None:
+        """Draws a visual health bar.
+
+        Args:
+            x: Top-left X coordinate.
+            y: Top-left Y coordinate.
+            width: Width of the bar.
+            height: Height of the bar.
+            current_hp: Current health.
+            max_hp: Maximum health.
+        """
+        pct = max(0.0, min(1.0, current_hp / max_hp)) if max_hp > 0 else 0
+
+        # Background (Dark Grey)
+        pygame.draw.rect(self.screen, (60, 60, 60), (x, y, width, height))
+
+        # Foreground Color
+        if pct > 0.5:
+            color = (0, 255, 0)  # Green
+        elif pct > 0.25:
+            color = (255, 255, 0)  # Yellow
+        else:
+            color = (255, 0, 0)  # Red
+
+        # Foreground
+        if pct > 0:
+            pygame.draw.rect(self.screen, color, (x, y, int(width * pct), height))
+
+        # Border (Black)
+        pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
+
     def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
         """Draws the main UI, including selected unit info and key options.
 
@@ -245,6 +284,9 @@ class UISystem:
             self.screen.blit(text, (panel_x_offset, panel_y))
             panel_y += 20
 
+            self._draw_health_bar(panel_x_offset, panel_y, 150, 10, health.hp, health.max_hp)
+            panel_y += 15
+
         if attack:
             attack_text = f"Attack: {attack.attack_damage} (Range: {attack.attack_range})"
             text = self._get_text_surface(attack_text, (255, 255, 255))
@@ -353,6 +395,9 @@ class UISystem:
         health_text = f"Total Health: {int(total_health)} / {max_health}"
         text = self._get_text_surface(health_text, (255, 255, 255))
         self.screen.blit(text, (panel_x_offset, panel_y))
+        panel_y += 20
+
+        self._draw_health_bar(panel_x_offset, panel_y, 150, 10, total_health, max_health)
 
     def _draw_key_options(self) -> None:
         """Draws the panel at the bottom of the screen showing key bindings."""
