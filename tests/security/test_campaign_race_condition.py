@@ -1,8 +1,9 @@
-import os
 import json
+import os
 import unittest
-from unittest.mock import patch
 from pathlib import Path
+from unittest.mock import patch
+
 from command_line_conflict.campaign_manager import CampaignManager
 
 
