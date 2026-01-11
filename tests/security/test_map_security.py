@@ -79,10 +79,21 @@ class TestMapSecurity(unittest.TestCase):
         self.assertIn("Too many walls defined", args[0])
         self.assertIn(f"Truncating to {max_walls}", args[0])
 
+    @patch("command_line_conflict.utils.paths.get_user_data_dir")
+    @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_file_size_limit(self, mock_stat, mock_open):
+    def test_load_from_file_size_limit(self, mock_stat, mock_open, mock_realpath, mock_get_user_data_dir):
         """Verify that loading large map files raises ValueError."""
+        # Bypass security check for path traversal
+        def realpath_side_effect(path):
+            if str(path).endswith("large_map.json"):
+                return "/app/large_map.json"
+            return "/app"
+
+        mock_realpath.side_effect = realpath_side_effect
+        mock_get_user_data_dir.return_value = "/app"
+
         # Set size larger than limit (assuming 2MB limit)
         mock_st = MagicMock()
         mock_st.st_size = 5 * 1024 * 1024  # 5MB
@@ -97,10 +108,25 @@ class TestMapSecurity(unittest.TestCase):
         # Ensure open was NOT called
         mock_open.assert_not_called()
 
+    @patch("command_line_conflict.maps.base.os.path.realpath")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_special_file(self, mock_stat, mock_open):
+    def test_load_from_special_file(self, mock_stat, mock_open, mock_commonpath, mock_realpath):
         """Verify that loading from special files raises ValueError."""
+        # Bypass security check for path traversal
+        mock_realpath.return_value = "/dev/zero"
+        # We need to trick commonpath to allow it, or just assert it fails BEFORE commonpath?
+        # Actually, if it's outside allowed dirs, it raises ValueError "unauthorized location"
+        # To test the file type check, we must pass the path check.
+        mock_commonpath.return_value = "/dev"
+        # But wait, allowed_dirs are map dir and user data dir.
+        # We should mock get_user_data_dir too if we want to rely on commonpath logic,
+        # OR we just mock commonpath to return one of the inputs (indicating match).
+
+        # Let's say /dev is allowed for this test only
+        mock_commonpath.side_effect = lambda paths: paths[0]
+
         mock_st = MagicMock()
         mock_st.st_size = 0
         mock_st.st_mode = stat.S_IFCHR  # Character device

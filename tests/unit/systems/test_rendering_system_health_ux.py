@@ -25,6 +25,8 @@ def test_health_bar_colors(mock_scale, mock_draw_rect):
     rendering_system = RenderingSystem(screen=mock_screen, font=mock_font, camera=camera)
 
     mock_map = Mock()
+    mock_map.width = 100
+    mock_map.height = 100
     game_state = GameState(game_map=mock_map)
     entity_id = game_state.create_entity()
 

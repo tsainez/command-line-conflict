@@ -62,24 +62,33 @@ class RenderingSystem:
         tile_size = config.GRID_SIZE * self.camera.zoom
 
         # Calculate visible grid bounds with buffer
-        start_x = int(self.camera.x) - 1
-        end_x = int(self.camera.x + screen_width / tile_size) + 2
-        start_y = int(self.camera.y) - 1
-        end_y = int(self.camera.y + screen_height / tile_size) + 2
+        # Optimization: Clamp to map bounds to avoid useless dictionary lookups
+        map_width = game_state.map.width
+        map_height = game_state.map.height
+
+        start_x = max(0, int(self.camera.x) - 1)
+        end_x = min(map_width, int(self.camera.x + screen_width / tile_size) + 2)
+        start_y = max(0, int(self.camera.y) - 1)
+        end_y = min(map_height, int(self.camera.y + screen_height / tile_size) + 2)
 
         # Pre-calculate common values
         grid_size = int(tile_size)
         bar_height = max(4, int(grid_size * 0.2))
 
+        # Optimization: Pre-calculate X screen coordinates for the row
+        # This avoids doing (x - camera.x) * tile_size inside the nested loop
+        x_coords = []
+        for x in range(start_x, end_x):
+            cam_x = (x - self.camera.x) * tile_size
+            x_coords.append((x, cam_x))
+
         # Iterate through visible tiles
         for y in range(start_y, end_y):
             cam_y = (y - self.camera.y) * tile_size
-            for x in range(start_x, end_x):
+            for x, cam_x in x_coords:
                 entity_ids = game_state.spatial_map.get((x, y))
                 if not entity_ids:
                     continue
-
-                cam_x = (x - self.camera.x) * tile_size
 
                 for entity_id in entity_ids:
                     components = game_state.entities.get(entity_id)
