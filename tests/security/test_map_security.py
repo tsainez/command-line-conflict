@@ -79,37 +79,61 @@ class TestMapSecurity(unittest.TestCase):
         self.assertIn("Too many walls defined", args[0])
         self.assertIn(f"Truncating to {max_walls}", args[0])
 
+    @patch("command_line_conflict.maps.base.os.fstat")
     @patch("command_line_conflict.maps.base.open")
-    @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_file_size_limit(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
+    def test_load_from_file_size_limit(self, mock_commonpath, mock_open, mock_fstat):
         """Verify that loading large map files raises ValueError."""
+        # Bypass path security check
+        def side_effect(args):
+            return args[0]
+        mock_commonpath.side_effect = side_effect
+
+        # Create a mock file object
+        mock_file = MagicMock()
+        mock_file.fileno.return_value = 123
+        mock_open.return_value.__enter__.return_value = mock_file
+
         # Set size larger than limit (assuming 2MB limit)
         mock_st = MagicMock()
         mock_st.st_size = 5 * 1024 * 1024  # 5MB
         mock_st.st_mode = stat.S_IFREG  # Regular file
-        mock_stat.return_value = mock_st
+        mock_fstat.return_value = mock_st
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("large_map.json")
 
         self.assertIn("exceeds maximum allowed size", str(cm.exception))
 
-        # Ensure open was NOT called
-        mock_open.assert_not_called()
+        # Verify open WAS called (because we check AFTER open now)
+        mock_open.assert_called()
+        mock_fstat.assert_called_with(123)
 
+    @patch("command_line_conflict.maps.base.os.fstat")
     @patch("command_line_conflict.maps.base.open")
-    @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_special_file(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
+    def test_load_from_special_file(self, mock_commonpath, mock_open, mock_fstat):
         """Verify that loading from special files raises ValueError."""
+        # Bypass path security check
+        def side_effect(args):
+            return args[0]
+        mock_commonpath.side_effect = side_effect
+
+        # Create a mock file object
+        mock_file = MagicMock()
+        mock_file.fileno.return_value = 456
+        mock_open.return_value.__enter__.return_value = mock_file
+
         mock_st = MagicMock()
         mock_st.st_size = 0
         mock_st.st_mode = stat.S_IFCHR  # Character device
-        mock_stat.return_value = mock_st
+        mock_fstat.return_value = mock_st
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("/dev/zero")
 
         self.assertIn("must be a regular file", str(cm.exception))
 
-        # Ensure open was NOT called
-        mock_open.assert_not_called()
+        # Verify open WAS called
+        mock_open.assert_called()
+        mock_fstat.assert_called_with(456)

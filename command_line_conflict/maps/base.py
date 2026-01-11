@@ -316,19 +316,21 @@ class Map:
             raise ValueError(f"Cannot load from unauthorized location: {filename}")
 
         try:
-            st = os.stat(abs_path)
+            # Security fix: Use file descriptor to prevent TOCTOU attacks
+            # Open the file first, then check stats on the open file descriptor
+            with open(abs_path, "r", encoding="utf-8") as f:
+                st = os.fstat(f.fileno())
+
+                # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
+                # which can cause DoS.
+                if not stat.S_ISREG(st.st_mode):
+                    raise ValueError("Map file must be a regular file.")
+
+                # Security: Check file size to prevent DoS via memory exhaustion
+                if st.st_size > cls.MAX_FILE_SIZE:
+                    raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
+
+                data = json.load(f)
+            return cls.from_dict(data)
         except OSError as e:
-            raise ValueError(f"Could not stat file: {e}") from e
-
-        # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
-        # which can cause DoS.
-        if not stat.S_ISREG(st.st_mode):
-            raise ValueError("Map file must be a regular file.")
-
-        # Security: Check file size to prevent DoS via memory exhaustion
-        if st.st_size > cls.MAX_FILE_SIZE:
-            raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
-
-        with open(abs_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return cls.from_dict(data)
+            raise ValueError(f"Could not open/read file: {e}") from e
