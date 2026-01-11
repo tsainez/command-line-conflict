@@ -243,6 +243,42 @@ class FileDialog:
                 text_surf = self.font.render(f, True, text_color)
                 self.screen.blit(text_surf, (self.file_list_rect.x + 5, y_pos + 5))
 
+            # Draw Scrollbar
+            total_files = len(self.files)
+            if total_files > self.max_visible_files:
+                scrollbar_width = 8
+                # Position at right edge of file list
+                scrollbar_x = self.file_list_rect.right - scrollbar_width - 2
+                scrollbar_y = self.file_list_rect.y + 2
+                scrollbar_height = self.file_list_rect.height - 4
+
+                # Track
+                track_rect = pygame.Rect(scrollbar_x, scrollbar_y, scrollbar_width, scrollbar_height)
+                pygame.draw.rect(self.screen, (40, 40, 40), track_rect)
+
+                # Thumb
+                viewable_ratio = self.max_visible_files / total_files
+                thumb_height = max(20, int(scrollbar_height * viewable_ratio))
+
+                # Max scrollable area for thumb
+                max_scroll = total_files - self.max_visible_files
+                if max_scroll > 0:
+                    scroll_ratio = self.scroll_offset / max_scroll
+                    thumb_y_offset = int((scrollbar_height - thumb_height) * scroll_ratio)
+                else:
+                    thumb_y_offset = 0
+
+                thumb_rect = pygame.Rect(
+                    scrollbar_x,
+                    scrollbar_y + thumb_y_offset,
+                    scrollbar_width,
+                    thumb_height,
+                )
+
+                thumb_color = (120, 120, 120)
+                # Simple hover effect for scrollbar could be added here if mouse tracking was added
+                pygame.draw.rect(self.screen, thumb_color, thumb_rect)
+
         # Draw Input Field
         pygame.draw.rect(self.screen, (255, 255, 255), self.input_rect)
         if self.input_text:
