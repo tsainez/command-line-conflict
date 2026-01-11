@@ -51,6 +51,36 @@ class MusicManager:
                     target_path = target_path + ext
                     break
 
+        # Security: Prevent path traversal and loading of unauthorized file types
+        abs_path = os.path.abspath(target_path)
+
+        # 1. Check extensions (whitelist)
+        valid_extensions = {".ogg", ".wav", ".mp3"}
+        _, ext = os.path.splitext(abs_path)
+        if ext.lower() not in valid_extensions:
+            log.warning(f"Security Alert: Attempted to load invalid music file type: {filepath}")
+            return
+
+        # 2. Check path traversal (must be within project or package root)
+        project_root = os.path.abspath(os.getcwd())
+        package_root = os.path.dirname(os.path.abspath(__file__))
+
+        allowed_roots = [project_root, package_root]
+        is_allowed = False
+
+        for root in allowed_roots:
+            try:
+                # Use commonpath to ensure the file is contained within the root
+                if os.path.commonpath([root, abs_path]) == root:
+                    is_allowed = True
+                    break
+            except ValueError:
+                continue
+
+        if not is_allowed:
+            log.warning(f"Security Alert: Attempted path traversal in music loading: {filepath}")
+            return
+
         if not os.path.exists(target_path):
             log.warning(f"Music file not found: {filepath}")
             return

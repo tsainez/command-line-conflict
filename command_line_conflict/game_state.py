@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from . import config
 from .components.position import Position
@@ -168,3 +168,33 @@ class GameState:
         Optimized with spatial hashing O(1).
         """
         return list(self.spatial_map.get((x, y), []))
+
+    def is_position_occupied(self, x: int, y: int, exclude_entity_id: Optional[int] = None) -> bool:
+        """Checks if a position is occupied by any entity.
+
+        This method is optimized to avoid creating a list of entities.
+        It checks the spatial map directly.
+
+        Args:
+            x: The x-coordinate.
+            y: The y-coordinate.
+            exclude_entity_id: An optional entity ID to exclude from the check
+                (e.g., the entity moving).
+
+        Returns:
+            True if the position is occupied, False otherwise.
+        """
+        entities = self.spatial_map.get((x, y))
+        if not entities:
+            return False
+
+        if exclude_entity_id is None:
+            return True
+
+        # If there are entities and we need to exclude one, we check if
+        # there are any *other* entities.
+        if len(entities) > 1:
+            return True
+
+        # If there is exactly one entity, check if it is the excluded one
+        return exclude_entity_id not in entities
