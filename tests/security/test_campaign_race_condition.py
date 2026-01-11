@@ -5,6 +5,7 @@ from unittest.mock import patch
 from pathlib import Path
 from command_line_conflict.campaign_manager import CampaignManager
 
+
 class TestCampaignRaceCondition(unittest.TestCase):
     def setUp(self):
         self.test_dir = Path("tmp_test/security_race")
@@ -49,8 +50,12 @@ class TestCampaignRaceCondition(unittest.TestCase):
             # If the fix is working, the read will stop or error out, and missions won't be loaded.
 
             # EXPECTATION: This assertion fails BEFORE the fix.
-            self.assertNotIn("mission_pwned", cm.completed_missions,
-                             "VULNERABILITY DETECTED: Large file was loaded! TOCTOU race condition allows bypassing size limits.")
+            self.assertNotIn(
+                "mission_pwned",
+                cm.completed_missions,
+                "VULNERABILITY DETECTED: Large file was loaded! TOCTOU race condition allows bypassing size limits.",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
