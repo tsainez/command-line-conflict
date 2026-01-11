@@ -8,9 +8,12 @@ theme:
 
 plugins:
   - include-markdown
+  - mkdocstrings
 
 nav:
   - Home: index.md
+  - API Reference: API.md
+  - ECS Architecture: ECS.md
   - Contributing: Contributing.md
   - Security: Security.md
   - Maps: Maps.md

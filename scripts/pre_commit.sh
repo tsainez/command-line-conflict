@@ -30,6 +30,9 @@ fi
 # We enforce a score of 9.0 to maintain code quality while allowing some non-critical warnings
 pylint $FILES --fail-under=9.0
 
+echo "🔒 Running Mypy..."
+mypy command_line_conflict
+
 echo "🧪 Running Tests..."
 export SDL_VIDEODRIVER=dummy
 pytest --cov=command_line_conflict tests/

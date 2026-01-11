@@ -104,8 +104,8 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 
 ## Documentation
 86. [x] Create a `CONTRIBUTING.md` file with guidelines.
-87. Document the ECS architecture with a diagram.
-88. Create API documentation using Sphinx or MkDocs.
+87. [x] Document the ECS architecture with a diagram.
+88. [x] Create API documentation using Sphinx or MkDocs.
 89. Write a guide on "How to Create a New Map".
 90. [x] Document available cheat codes and debug commands.
 91. Create a changelog generation script.

@@ -81,8 +81,14 @@ class TestMapSecurity(unittest.TestCase):
 
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_file_size_limit(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
+    def test_load_from_file_size_limit(self, mock_commonpath, mock_stat, mock_open):
         """Verify that loading large map files raises ValueError."""
+        # Bypass security check for path
+        # The code checks: if os.path.commonpath([allowed_dir, abs_path]) == allowed_dir:
+        # We mock it to always return the first argument (allowed_dir) so the check passes
+        mock_commonpath.side_effect = lambda args: args[0]
+
         # Set size larger than limit (assuming 2MB limit)
         mock_st = MagicMock()
         mock_st.st_size = 5 * 1024 * 1024  # 5MB
@@ -99,8 +105,12 @@ class TestMapSecurity(unittest.TestCase):
 
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
-    def test_load_from_special_file(self, mock_stat, mock_open):
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
+    def test_load_from_special_file(self, mock_commonpath, mock_stat, mock_open):
         """Verify that loading from special files raises ValueError."""
+        # Bypass security check for path
+        mock_commonpath.side_effect = lambda args: args[0]
+
         mock_st = MagicMock()
         mock_st.st_size = 0
         mock_st.st_mode = stat.S_IFCHR  # Character device

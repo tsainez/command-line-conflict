@@ -49,7 +49,7 @@ class RenderingSystem:
         s = self.font.render(char, True, color)
         if size is not None:
             s = pygame.transform.scale(s, (size, size))
-        return s
+        return s  # type: ignore[no-any-return]
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.

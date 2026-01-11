@@ -36,7 +36,7 @@ class FogOfWar:
         self.fog_texture.fill(self.COLOR_HIDDEN)
 
         self.visible_cells: set[tuple[int, int]] = set()
-        self._vision_cache: dict[tuple[int, int, int], set[tuple[int, int]]] = {}
+        self._vision_cache: dict[int, list[tuple[int, int]]] = {}
         self._last_vision_sources: set[tuple[int, int, int]] = set()
         log.info(f"Initialized FogOfWar with grid size {width}x{height}")
 
@@ -99,11 +99,11 @@ class FogOfWar:
 
             for x, y in to_explore:
                 self.grid[y][x] = self.EXPLORED
-                px[x, y] = self.COLOR_EXPLORED
+                px[x, y] = self.COLOR_EXPLORED  # type: ignore
 
             for x, y in to_reveal:
                 self.grid[y][x] = self.VISIBLE
-                px[x, y] = self.COLOR_VISIBLE
+                px[x, y] = self.COLOR_VISIBLE  # type: ignore
 
             # No need to explicitly delete px, context manager or del works
             del px

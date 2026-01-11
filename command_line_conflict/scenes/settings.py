@@ -47,10 +47,10 @@ class SettingsScene:
             font_type: 'title', 'help', or 'option'.
         """
         if font_type == "title":
-            return self.title_font.render(text, True, color)
+            return self.title_font.render(text, True, color)  # type: ignore[no-any-return]
         if font_type == "help":
-            return self.game.font.render(text, True, color)
-        return self.option_font.render(text, True, color)
+            return self.game.font.render(text, True, color)  # type: ignore[no-any-return]
+        return self.option_font.render(text, True, color)  # type: ignore[no-any-return]
 
     def handle_event(self, event):
         """Handles user input for changing settings.

@@ -48,8 +48,8 @@ class MenuScene:
             font_type: 'title' or 'option'.
         """
         if font_type == "title":
-            return self.title_font.render(text, True, color)
-        return self.option_font.render(text, True, color)
+            return self.title_font.render(text, True, color)  # type: ignore[no-any-return]
+        return self.option_font.render(text, True, color)  # type: ignore[no-any-return]
 
     def handle_event(self, event):
         """Handles user input for menu navigation.
