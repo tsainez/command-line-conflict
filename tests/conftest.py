@@ -14,6 +14,9 @@ def mock_pygame(mocker):
     mocker.patch("pygame.draw.line", return_value=mocker.MagicMock())
     mocker.patch("pygame.draw.rect", return_value=mocker.MagicMock())
     mocker.patch("pygame.event.get", return_value=[])
+    mocker.patch("pygame.key.get_mods", return_value=0)
+    mocker.patch("pygame.init", return_value=None)
+    mocker.patch("pygame.quit", return_value=None)
     pygame.init()
     yield
     pygame.quit()

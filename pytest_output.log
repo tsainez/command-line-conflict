@@ -1,0 +1,77 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0 -- /home/jules/.pyenv/versions/3.12.12/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pytest.ini
+plugins: xdist-3.8.0
+created: 4/4 workers
+4 workers [4 items]
+
+scheduling tests via LoadScheduling
+
+tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_menu_options
+tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_switch_to_editor
+[gw3] [ 25%] ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_switch_to_editor
+tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_click_triggers_option
+tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_hover_selects_option
+[gw0] [ 50%] ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_menu_options
+[gw1] [ 75%] ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_click_triggers_option
+[gw2] [100%] ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_hover_selects_option pygame 2.6.1 (SDL 2.28.4, Python 3.12.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+
+
+==================================== ERRORS ====================================
+____________ ERROR at setup of TestMenuScene.test_switch_to_editor _____________
+[gw3] linux -- Python 3.12.12 /home/jules/.pyenv/versions/3.12.12/bin/python
+file /app/tests/unit/scenes/test_menu_scene.py, line 20
+      def test_switch_to_editor(self):
+file /app/tests/conftest.py, line 5
+  @pytest.fixture(autouse=True)
+  def mock_pygame(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: _unittest_setUpClass_fixture_TestMenuScene, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, game_state, mock_pygame, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/app/tests/conftest.py:5
+______________ ERROR at setup of TestMenuScene.test_menu_options _______________
+[gw0] linux -- Python 3.12.12 /home/jules/.pyenv/versions/3.12.12/bin/python
+file /app/tests/unit/scenes/test_menu_scene.py, line 17
+      def test_menu_options(self):
+file /app/tests/conftest.py, line 5
+  @pytest.fixture(autouse=True)
+  def mock_pygame(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: _unittest_setUpClass_fixture_TestMenuScene, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, game_state, mock_pygame, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/app/tests/conftest.py:5
+_______ ERROR at setup of TestMenuScene.test_mouse_click_triggers_option _______
+[gw1] linux -- Python 3.12.12 /home/jules/.pyenv/versions/3.12.12/bin/python
+file /app/tests/unit/scenes/test_menu_scene.py, line 49
+      def test_mouse_click_triggers_option(self):
+file /app/tests/conftest.py, line 5
+  @pytest.fixture(autouse=True)
+  def mock_pygame(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: _unittest_setUpClass_fixture_TestMenuScene, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, game_state, mock_pygame, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/app/tests/conftest.py:5
+_______ ERROR at setup of TestMenuScene.test_mouse_hover_selects_option ________
+[gw2] linux -- Python 3.12.12 /home/jules/.pyenv/versions/3.12.12/bin/python
+file /app/tests/unit/scenes/test_menu_scene.py, line 32
+      def test_mouse_hover_selects_option(self):
+file /app/tests/conftest.py, line 5
+  @pytest.fixture(autouse=True)
+  def mock_pygame(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: _unittest_setUpClass_fixture_TestMenuScene, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, game_state, mock_pygame, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/app/tests/conftest.py:5
+=========================== short test summary info ============================
+ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_switch_to_editor
+ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_menu_options
+ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_click_triggers_option
+ERROR tests/unit/scenes/test_menu_scene.py::TestMenuScene::test_mouse_hover_selects_option
+============================== 4 errors in 0.76s ===============================
