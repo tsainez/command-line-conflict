@@ -84,9 +84,11 @@ class TestMapSecurity(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.path.commonpath")
     def test_load_from_file_size_limit(self, mock_commonpath, mock_open, mock_fstat):
         """Verify that loading large map files raises ValueError."""
+
         # Bypass path security check
         def side_effect(args):
             return args[0]
+
         mock_commonpath.side_effect = side_effect
 
         # Create a mock file object
@@ -114,9 +116,11 @@ class TestMapSecurity(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.path.commonpath")
     def test_load_from_special_file(self, mock_commonpath, mock_open, mock_fstat):
         """Verify that loading from special files raises ValueError."""
+
         # Bypass path security check
         def side_effect(args):
             return args[0]
+
         mock_commonpath.side_effect = side_effect
 
         # Create a mock file object
