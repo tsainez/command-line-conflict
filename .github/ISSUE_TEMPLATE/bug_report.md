@@ -24,9 +24,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
- - OS: [e.g. Ubuntu 22.04, Windows 11]
+ - OS: [e.g. Windows, macOS, Linux]
  - Python Version: [e.g. 3.12]
- - Game Version: [e.g. main branch commit hash]
+ - Game Version/Commit: [e.g. v1.0.0 or git hash]
 
 **Additional context**
 Add any other context about the problem here.

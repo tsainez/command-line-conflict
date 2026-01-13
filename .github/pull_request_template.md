@@ -11,6 +11,13 @@ Fixes # (issue)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
+## Verification
+
+**You MUST run the pre-commit script before submitting:**
+```bash
+./scripts/pre_commit.sh
+```
+
 ## Checklist:
 
 - [ ] My code follows the style guidelines of this project
