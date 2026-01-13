@@ -7,6 +7,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.health import Health
+from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
@@ -130,16 +131,29 @@ class UISystem:
         # Border (Black)
         pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
 
-    def draw(self, game_state: GameState, paused: bool, current_player_id: int = 1) -> None:
+    def draw(
+        self,
+        game_state: GameState,
+        paused: bool,
+        current_player_id: int = 1,
+        hovered_entity_id: int | None = None,
+        mouse_pos: tuple[int, int] | None = None,
+    ) -> None:
+        # pylint: disable=too-many-positional-arguments
         """Draws the main UI, including selected unit info and key options.
 
         Args:
             game_state: The current state of the game.
             paused: Whether the game is paused.
             current_player_id: The ID of the player currently controlling the game.
+            hovered_entity_id: The ID of the entity under the mouse cursor.
+            mouse_pos: The current mouse position (x, y).
         """
         self._draw_key_options()
         self._draw_player_indicator(current_player_id)
+
+        if hovered_entity_id is not None and mouse_pos is not None:
+            self._draw_tooltip(game_state, hovered_entity_id, mouse_pos)
 
         if self.cheats:
             self._draw_active_cheats(self.cheats)
@@ -218,6 +232,68 @@ class UISystem:
             width = max(1, int(3 * (1 - progress)))
 
             pygame.draw.circle(self.screen, effect["color"], (int(cam_x), int(cam_y)), radius, width)
+
+    def _draw_tooltip(self, game_state: GameState, entity_id: int, mouse_pos: tuple[int, int]) -> None:
+        """Draws a tooltip for the hovered entity.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the hovered entity.
+            mouse_pos: The current mouse position (x, y).
+        """
+        components = game_state.entities.get(entity_id)
+        if not components:
+            return
+
+        identity = components.get(UnitIdentity)
+        health = components.get(Health)
+        player = components.get(Player)
+
+        # Determine text
+        name = identity.name.title() if identity else "Unknown"
+        hp_text = ""
+        if health:
+            hp_text = f" ({int(health.hp)}/{health.max_hp})"
+
+        text_str = f"{name}{hp_text}"
+
+        # Color based on player
+        color = (200, 200, 200)  # Default grey
+        if player:
+            if player.player_id == 1:
+                color = (100, 255, 100)
+            elif player.player_id == 2:
+                color = (255, 100, 100)
+            elif player.player_id == config.NEUTRAL_PLAYER_ID:
+                color = (200, 200, 200)
+
+        # Create surface
+        text_surf = self._get_text_surface(text_str, color, "small")
+
+        # Background box
+        padding = 4
+        bg_rect = pygame.Rect(0, 0, text_surf.get_width() + padding * 2, text_surf.get_height() + padding * 2)
+
+        # Position
+        x, y = mouse_pos
+        x += 15  # Offset
+        y += 15
+
+        # Clamp to screen
+        if x + bg_rect.width > config.SCREEN_WIDTH:
+            x = mouse_pos[0] - bg_rect.width - 5
+        if y + bg_rect.height > config.SCREEN_HEIGHT:
+            y = mouse_pos[1] - bg_rect.height - 5
+
+        bg_rect.topleft = (x, y)
+
+        # Draw
+        overlay = pygame.Surface(bg_rect.size, pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 200))  # Semi-transparent black
+        self.screen.blit(overlay, bg_rect.topleft)
+        pygame.draw.rect(self.screen, color, bg_rect, 1)  # Border
+
+        self.screen.blit(text_surf, (x + padding, y + padding))
 
     def _draw_player_indicator(self, current_player_id: int) -> None:
         """Draws a visual indicator for the current player.

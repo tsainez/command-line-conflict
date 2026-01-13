@@ -60,6 +60,7 @@ class GameScene:
         self.game_state = GameState(FactoryBattleMap())
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
+        self.hovered_entity_id = None
         self.paused = False
         self.current_player_id = 1
 
@@ -354,6 +355,7 @@ class GameScene:
 
     def _update_cursor(self, screen_pos: tuple[int, int]) -> None:
         """Updates the mouse cursor based on what is under the mouse."""
+        self.hovered_entity_id = None
         # Check if over UI panel (bottom 100px)
         panel_height = 100
         if screen_pos[1] > config.SCREEN_HEIGHT - panel_height:
@@ -361,6 +363,18 @@ class GameScene:
             return
 
         grid_x, grid_y = self.camera.screen_to_grid(screen_pos[0], screen_pos[1])
+
+        # Fog of War check
+        is_visible = self.cheats["reveal_map"] or (
+            0 <= grid_x < self.game_state.map.width
+            and 0 <= grid_y < self.game_state.map.height
+            and self.fog_of_war.grid[int(grid_y)][int(grid_x)] == FogOfWar.VISIBLE
+        )
+
+        if not is_visible:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            return
+
         entity_ids = self.game_state.get_entities_at_position(grid_x, grid_y)
 
         cursor_set = False
@@ -369,6 +383,7 @@ class GameScene:
             if self.game_state.get_component(entity_id, Dead):
                 continue
 
+            self.hovered_entity_id = entity_id
             player = self.game_state.get_component(entity_id, Player)
             if player:
                 if player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
@@ -573,7 +588,9 @@ class GameScene:
             self.fog_of_war.draw(screen, self.camera)
 
         self.chat_system.draw()
-        self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
+        self.ui_system.draw(
+            self.game_state, self.paused, self.current_player_id, self.hovered_entity_id, pygame.mouse.get_pos()
+        )
 
         # Highlight selected units
         if self.selection_start:
