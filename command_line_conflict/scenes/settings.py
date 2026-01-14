@@ -1,4 +1,5 @@
 import functools
+import math
 
 import pygame
 
@@ -36,6 +37,16 @@ class SettingsScene:
             self.current_screen_size_index = self.screen_sizes.index((config.SCREEN["width"], config.SCREEN["height"]))
         except ValueError:
             self.current_screen_size_index = 0
+
+        self.time = 0.0
+        self.help_texts = {
+            "Screen Size": "Changes the window resolution.",
+            "Debug Mode": "Shows FPS, grid coordinates, and hitbox outlines.",
+            "Master Volume": "Adjusts the overall game volume.",
+            "Music Volume": "Adjusts the background music volume.",
+            "SFX Volume": "Adjusts sound effects volume.",
+            "Back": "Return to the main menu.",
+        }
 
     @functools.lru_cache(maxsize=64)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
@@ -122,11 +133,12 @@ class SettingsScene:
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
-        """Updates the settings scene. This scene has no dynamic elements.
+        """Updates the settings scene.
 
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.time += dt
 
     def _get_volume_bar(self, volume):
         """Returns a string representation of a volume bar.
@@ -154,10 +166,16 @@ class SettingsScene:
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
+        # Pulse calculation: varies between 0 and 1
+        pulse = (math.sin(self.time * 5) + 1) / 2
+        # Interpolate between dim yellow (150, 150, 0) and bright yellow (255, 255, 0)
+        yellow_val = 150 + int(105 * pulse)
+        pulse_color = (yellow_val, yellow_val, 0)
+
         self.option_rects.clear()
         for i, option in enumerate(self.settings_options):
             if i == self.selected_option:
-                color = (255, 255, 0)
+                color = pulse_color
             else:
                 color = (255, 255, 255)
 
@@ -185,9 +203,14 @@ class SettingsScene:
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
 
-        # Helper text for volume controls
+        # Helper text for current option
         current_option = self.settings_options[self.selected_option]
+        help_message = self.help_texts.get(current_option, "")
         if "Volume" in current_option:
-            help_text = self._get_text_surface("Use Arrow Keys or Click Left/Right to Adjust", (150, 150, 150), "help")
+            # Append volume specific help
+            help_message += " (Left/Right to Adjust)"
+
+        if help_message:
+            help_text = self._get_text_surface(help_message, (150, 150, 150), "help")
             help_rect = help_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
             screen.blit(help_text, help_rect)
