@@ -190,7 +190,17 @@ class Map:
         Returns:
             A new Map instance.
         """
-        m = cls(width=data["width"], height=data["height"])
+        # Security: Validate input structure to prevent crashes (DoS)
+        if not isinstance(data, dict):
+            raise ValueError("Map data must be a dictionary")
+
+        width = data.get("width")
+        height = data.get("height")
+
+        if not isinstance(width, int) or not isinstance(height, int):
+            raise ValueError("Map width and height must be integers")
+
+        m = cls(width=width, height=height)
 
         # Security: Validate walls are within bounds and well-formed
         walls = set()
