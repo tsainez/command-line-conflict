@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2026-01-14 - Component-Based Iteration Speed
+**Learning:** In scenes with many entities (e.g., 5000), iterating over `get_entities_with_component(Component)` is significantly faster (~20% speedup in `GameScene.update`) than iterating over all entities using `entities.items()` when the target component is sparse (e.g., only 10% of entities have it).
+**Action:** Prefer `get_entities_with_component` over full entity iteration for systems or checks that only affect a subset of entities.

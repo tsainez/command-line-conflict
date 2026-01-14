@@ -476,13 +476,23 @@ class GameScene:
         self.spawn_system.update(self.game_state, dt)
 
         # Update Fog of War
+        # Optimization: Iterate only over entities with Vision component to avoid O(N) scan
         vision_units = []
-        for entity_id, components in self.game_state.entities.items():
-            pos = components.get(Position)
-            vis = components.get(Vision)
+        for entity_id in self.game_state.get_entities_with_component(Vision):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
-            if pos and vis and player and player.is_human:
-                vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
+            if not player or not player.is_human:
+                continue
+
+            pos = components.get(Position)
+            if not pos:
+                continue
+
+            vis = components.get(Vision)
+            vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
         if self.check_win_condition():
@@ -497,13 +507,21 @@ class GameScene:
             True if the win condition is met, False otherwise.
         """
         enemy_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Player component
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
-            if player and not player.is_human:
-                if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
-                    continue
-                if Health in components:
-                    enemy_count += 1
+            if not player or player.is_human:
+                continue
+
+            if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
+                continue
+
+            if Health in components:
+                enemy_count += 1
 
         if enemy_count == 0:
             log.info("Victory! Mission Complete.")
@@ -530,7 +548,12 @@ class GameScene:
             True if the loss condition is met, False otherwise.
         """
         player_entity_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Player component
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)
