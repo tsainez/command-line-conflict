@@ -235,6 +235,12 @@ class Map:
         # Resolve symlinks to ensure we check the actual destination
         abs_path = os.path.realpath(filename)
 
+        # Security: Enforce file extension
+        # We check the resolved path extension to ensure it is .json
+        if not abs_path.lower().endswith(".json"):
+            log.error(f"Security violation: Attempted to save map with invalid extension: {abs_path}")
+            raise ValueError("Map files must have .json extension")
+
         # Define allowed directories
         # 1. The maps directory (where this file resides)
         maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
