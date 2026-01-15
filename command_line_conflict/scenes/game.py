@@ -188,25 +188,65 @@ class GameScene:
             self.selection_start = None
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             grid_x, grid_y = self.camera.screen_to_grid(event.pos[0], event.pos[1])
-            log.debug(f"Right-click move command at grid coordinates: {(grid_x, grid_y)}")
-            # Add visual feedback (green ripple)
-            self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
+            log.debug(f"Right-click command at grid coordinates: {(grid_x, grid_y)}")
 
-            for entity_id, components in self.game_state.entities.items():
-                selectable = components.get(Selectable)
-                if selectable and selectable.is_selected:
-                    log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
-                    # Moving clears hold position
-                    from command_line_conflict.components.movable import Movable
+            # Check if there is an enemy at the target location
+            target_enemy_id = None
+            entities_at_pos = self.game_state.get_entities_at_position(grid_x, grid_y)
+            for eid in entities_at_pos:
+                # Filter for live enemies
+                if self.game_state.get_component(eid, Dead):
+                    continue
+                player = self.game_state.get_component(eid, Player)
+                if player and player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
+                    target_enemy_id = eid
+                    break
 
-                    movable = components.get(Movable)
-                    if movable:
-                        movable.hold_position = False
+            if target_enemy_id:
+                # Attack Command
+                log.info(f"Attack command issued on entity {target_enemy_id}")
+                # Visual feedback (red ripple)
+                self.ui_system.add_click_effect(grid_x, grid_y, (255, 0, 0))
 
-                    self.movement_system.set_target(self.game_state, entity_id, grid_x, grid_y)
-                    attack = components.get(Attack)
-                    if attack:
-                        attack.attack_target = None
+                for entity_id, components in self.game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        attack = components.get(Attack)
+                        if attack:
+                            attack.attack_target = target_enemy_id
+                            # Clear move target if attacking? CombatSystem handles closing distance.
+                            # But if we were moving elsewhere, we should stop?
+                            # CombatSystem will update position if needed.
+                            # We should probably clear explicit move path so it doesn't wander off.
+                            from command_line_conflict.components.movable import Movable
+
+                            movable = components.get(Movable)
+                            if movable:
+                                movable.path = []
+                                movable.target_x = None
+                                movable.target_y = None
+                                movable.hold_position = False
+            else:
+                # Move Command
+                log.info(f"Move command issued to {(grid_x, grid_y)}")
+                # Visual feedback (green ripple)
+                self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
+
+                for entity_id, components in self.game_state.entities.items():
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
+                        # Moving clears hold position
+                        from command_line_conflict.components.movable import Movable
+
+                        movable = components.get(Movable)
+                        if movable:
+                            movable.hold_position = False
+
+                        self.movement_system.set_target(self.game_state, entity_id, grid_x, grid_y)
+                        attack = components.get(Attack)
+                        if attack:
+                            attack.attack_target = None
         elif event.type == pygame.KEYDOWN:
             # Camera movement
             if event.key == pygame.K_UP:
