@@ -273,8 +273,16 @@ class UISystem:
         panel_x_offset = 10
         panel_y = config.SCREEN_HEIGHT - 90
 
-        if renderable:
+        identity = components.get(UnitIdentity)
+        text = None
+
+        if identity:
+            display_name = identity.name.replace("_", " ").title()
+            text = self._get_text_surface(f"Unit: {display_name}", (255, 255, 255))
+        elif renderable:
             text = self._get_text_surface(f"Unit: {renderable.icon}", (255, 255, 255))
+
+        if text:
             self.screen.blit(text, (panel_x_offset, panel_y))
             panel_y += 20
 
