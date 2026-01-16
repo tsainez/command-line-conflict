@@ -231,6 +231,10 @@ class Map:
 
         from ..utils.paths import get_user_data_dir
 
+        # Security fix: Enforce .json extension to prevent overwriting source files
+        if not filename.endswith(".json"):
+            raise ValueError("Map files must have a .json extension")
+
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
         abs_path = os.path.realpath(filename)
