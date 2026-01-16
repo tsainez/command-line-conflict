@@ -10,8 +10,16 @@ version: 2
 updates:
   # Enable version updates for pip
   - package-ecosystem: "pip"
-    # Look for `package.json` and `lock` files in the `root` directory
+    # Look for `requirements.txt` in the `root` directory
     directory: "/"
-    # Check the npm registry for updates every day (weekdays)
+    # Check for updates every day
     schedule:
       interval: "daily"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for workflows in the `.github/workflows` directory
+    directory: "/"
+    # Check for updates every week
+    schedule:
+      interval: "weekly"

@@ -1,6 +1,5 @@
-import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from command_line_conflict.music import MusicManager
 
@@ -11,7 +10,7 @@ class TestMusicPathTraversal(unittest.TestCase):
         self.patchers = [
             patch("pygame.mixer.init"),
             patch("pygame.mixer.get_init", return_value=True),
-            patch("pygame.mixer.music")
+            patch("pygame.mixer.music"),
         ]
         for p in self.patchers:
             p.start()
@@ -60,6 +59,7 @@ class TestMusicPathTraversal(unittest.TestCase):
 
         # Verification: It SHOULD have called load
         mock_load.assert_called_with(target_file)
+
 
 if __name__ == "__main__":
     unittest.main()
