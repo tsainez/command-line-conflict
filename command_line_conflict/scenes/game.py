@@ -192,7 +192,12 @@ class GameScene:
             # Add visual feedback (green ripple)
             self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
 
-            for entity_id, components in self.game_state.entities.items():
+            # Optimization: Iterate only over entities with Selectable component
+            for entity_id in self.game_state.get_entities_with_component(Selectable):
+                components = self.game_state.entities.get(entity_id)
+                if not components:
+                    continue
+
                 selectable = components.get(Selectable)
                 if selectable and selectable.is_selected:
                     log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
@@ -477,11 +482,16 @@ class GameScene:
 
         # Update Fog of War
         vision_units = []
-        for entity_id, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Vision component
+        for entity_id in self.game_state.get_entities_with_component(Vision):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             pos = components.get(Position)
-            vis = components.get(Vision)
             player = components.get(Player)
-            if pos and vis and player and player.is_human:
+            if pos and player and player.is_human:
+                vis = components.get(Vision)
                 vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
@@ -497,7 +507,12 @@ class GameScene:
             True if the win condition is met, False otherwise.
         """
         enemy_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Player component
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and not player.is_human:
                 if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
@@ -530,7 +545,12 @@ class GameScene:
             True if the loss condition is met, False otherwise.
         """
         player_entity_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Player component
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)
