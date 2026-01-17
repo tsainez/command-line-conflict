@@ -1,9 +1,9 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 # We need to ensure pygame is mocked before importing FileDialog
 # This is handled by conftest.py, but we need to be careful with imports
-from command_line_conflict import config
 
 
 class TestFileDialogScrollbar:
