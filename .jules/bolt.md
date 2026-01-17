@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-05-29 - Sparse Component Iteration
+**Learning:** Iterating over all entities to find those with a specific component (e.g., Vision) is inefficient when non-target entities (like particles) outnumber target entities. Using `get_entities_with_component` reduced update time by ~14x in high-entity scenarios.
+**Action:** Always prefer `get_entities_with_component` for systems that operate on a subset of entities, especially in the main update loop.
