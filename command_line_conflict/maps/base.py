@@ -229,7 +229,7 @@ class Map:
         """
         import json
 
-        from ..utils.paths import get_user_data_dir
+        from ..utils.paths import atomic_save_json, get_user_data_dir
 
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
@@ -263,10 +263,8 @@ class Map:
         # Ensure directory exists
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
 
-        # Security: Use the resolved absolute path to prevent TOCTOU attacks
-        # where the file path (symlink) could change between validation and open.
-        with open(abs_path, "w", encoding="utf-8") as f:
-            json.dump(self.to_dict(), f, indent=4)
+        # Security: Use atomic save to prevent data corruption and TOCTOU
+        atomic_save_json(abs_path, self.to_dict())
 
     @classmethod
     def load_from_file(cls, filename: str) -> "Map":
