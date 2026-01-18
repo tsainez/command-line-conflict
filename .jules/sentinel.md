@@ -8,6 +8,10 @@
 **Learning:** Using `os.fstat(f.fileno())` on an open file descriptor is the correct pattern to validate file properties securely. It ensures the checks apply to the exact file object that will be read.
 **Prevention:** Open the file first, get the file descriptor, run `os.fstat`, and only then proceed to read.
 
+## 2026-01-14 - [Crash via Unvalidated Map Data]
+**Vulnerability:** `Map.from_dict` assumed input keys (`width`, `height`) existed and were valid, leading to `KeyError` or `TypeError` crashes when loading malformed map files.
+**Learning:** `from_dict` methods often trust their input too much, assuming they come from a trusted `to_dict` source. However, when loading from files, the input is untrusted user data.
+**Prevention:** Always validate existence and types of keys in deserialization methods before using them. Raise handled exceptions (like `ValueError`) instead of letting runtime errors crash the application.
 ## 2026-01-17 - [Atomic File Writes for Data Integrity]
 **Vulnerability:** Direct writes to important data files (save games, maps) using `open(..., 'w')` were vulnerable to data corruption if the process crashed or disk filled up during the write operation. This compromised data integrity and availability.
 **Learning:** Python's standard `json.dump` does not guarantee atomicity. A crash mid-write leaves a truncated, invalid JSON file.
