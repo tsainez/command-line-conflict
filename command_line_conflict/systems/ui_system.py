@@ -7,6 +7,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
 from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.health import Health
+from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
 from command_line_conflict.components.selectable import Selectable
@@ -487,3 +488,60 @@ class UISystem:
                 text = self._get_text_surface(hint, (200, 200, 200), "small")
                 self.screen.blit(text, (panel_x_offset, panel_y))
                 panel_y += 18
+
+    def draw_tooltip(self, game_state: GameState, entity_id: int, screen_pos: tuple[int, int]) -> None:
+        """Draws a tooltip for the hovered entity.
+
+        Args:
+            game_state: The current state of the game.
+            entity_id: The ID of the hovered entity.
+            screen_pos: The (x, y) coordinates of the mouse cursor.
+        """
+        components = game_state.entities.get(entity_id, {})
+        identity = components.get(UnitIdentity)
+        health = components.get(Health)
+        player = components.get(Player)
+
+        if not identity:
+            return
+
+        lines = [identity.name.title()]
+        if health:
+            lines.append(f"HP: {int(health.hp)}/{health.max_hp}")
+        if player:
+            lines.append(f"P{player.player_id}" if player.player_id != 0 else "Neutral")
+
+        # Determine tooltip dimensions
+        padding = 5
+        line_height = 16
+        width = max(len(line) * 7 for line in lines) + padding * 2  # Approx width
+        height = len(lines) * line_height + padding * 2
+
+        x, y = screen_pos
+        x += 15  # Offset to right
+        y += 15  # Offset to bottom
+
+        # Ensure tooltip stays on screen
+        if x + width > config.SCREEN_WIDTH:
+            x = x - width - 20
+        if y + height > config.SCREEN_HEIGHT:
+            y = y - height - 20
+
+        # Draw Background
+        bg_rect = pygame.Rect(x, y, width, height)
+        s = pygame.Surface((width, height), pygame.SRCALPHA)
+        s.fill((0, 0, 0, 200))  # Semi-transparent black
+        self.screen.blit(s, (x, y))
+
+        # Draw Border
+        border_color = (255, 255, 255)
+        if player:
+            border_color = (0, 255, 0) if player.player_id == 1 else (255, 0, 0)
+            if player.player_id == 0:
+                border_color = (150, 150, 150)
+        pygame.draw.rect(self.screen, border_color, bg_rect, 1)
+
+        # Draw Text
+        for i, line in enumerate(lines):
+            text = self._get_text_surface(line, (255, 255, 255), "small")
+            self.screen.blit(text, (x + padding, y + padding + i * line_height))

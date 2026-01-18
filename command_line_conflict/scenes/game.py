@@ -82,6 +82,7 @@ class GameScene:
         }
         self.drag_start_pos = None  # For middle mouse drag
         self.camera_start_pos = None
+        self.hovered_entity_id = None
 
         # Initialize systems
         self.campaign_manager = CampaignManager()
@@ -354,6 +355,7 @@ class GameScene:
 
     def _update_cursor(self, screen_pos: tuple[int, int]) -> None:
         """Updates the mouse cursor based on what is under the mouse."""
+        self.hovered_entity_id = None
         # Check if over UI panel (bottom 100px)
         panel_height = 100
         if screen_pos[1] > config.SCREEN_HEIGHT - panel_height:
@@ -369,6 +371,7 @@ class GameScene:
             if self.game_state.get_component(entity_id, Dead):
                 continue
 
+            self.hovered_entity_id = entity_id
             player = self.game_state.get_component(entity_id, Player)
             if player:
                 if player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
@@ -583,6 +586,9 @@ class GameScene:
 
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
+
+        if self.hovered_entity_id is not None:
+            self.ui_system.draw_tooltip(self.game_state, self.hovered_entity_id, pygame.mouse.get_pos())
 
         # Highlight selected units
         if self.selection_start:
