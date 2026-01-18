@@ -82,6 +82,7 @@ class GameScene:
         }
         self.drag_start_pos = None  # For middle mouse drag
         self.camera_start_pos = None
+        self.hovered_entity_id = None
 
         # Initialize systems
         self.campaign_manager = CampaignManager()
@@ -394,6 +395,7 @@ class GameScene:
 
     def _update_cursor(self, screen_pos: tuple[int, int]) -> None:
         """Updates the mouse cursor based on what is under the mouse."""
+        self.hovered_entity_id = None
         # Check if over UI panel (bottom 100px)
         panel_height = 100
         if screen_pos[1] > config.SCREEN_HEIGHT - panel_height:
@@ -409,6 +411,7 @@ class GameScene:
             if self.game_state.get_component(entity_id, Dead):
                 continue
 
+            self.hovered_entity_id = entity_id
             player = self.game_state.get_component(entity_id, Player)
             if player:
                 if player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
@@ -517,11 +520,20 @@ class GameScene:
 
         # Update Fog of War
         vision_units = []
-        for entity_id, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Vision component
+        # This avoids iterating over non-combat entities (walls, minerals, etc.)
+        for entity_id in self.game_state.get_entities_with_component(Vision):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
+            player = components.get(Player)
+            if not player or not player.is_human:
+                continue
+
             pos = components.get(Position)
             vis = components.get(Vision)
-            player = components.get(Player)
-            if pos and vis and player and player.is_human:
+            if pos and vis:
                 vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
@@ -614,6 +626,9 @@ class GameScene:
 
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
+
+        if self.hovered_entity_id is not None:
+            self.ui_system.draw_tooltip(self.game_state, self.hovered_entity_id, pygame.mouse.get_pos())
 
         # Highlight selected units
         if self.selection_start:
