@@ -458,6 +458,21 @@ class UISystem:
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)
 
+    def draw_quit_confirm_message(self) -> None:
+        """Draws a confirmation message for quitting."""
+        # Dim the background slightly
+        self.screen.blit(self.pause_overlay, (0, 0))
+
+        # Draw "Quit?" text
+        text = self._get_text_surface("Confirm Quit?", (255, 50, 50), "large")
+        text_rect = text.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2))
+        self.screen.blit(text, text_rect)
+
+        # Draw instruction text
+        instruction = self._get_text_surface("Press ESC again to Exit", (255, 200, 200), "medium")
+        instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
+        self.screen.blit(instruction, instruction_rect)
+
     def _draw_construction_hints(self, game_state: GameState, selected_entities: list[int]) -> None:
         """Draws construction hints if a builder unit is selected.
 
