@@ -480,11 +480,20 @@ class GameScene:
 
         # Update Fog of War
         vision_units = []
-        for entity_id, components in self.game_state.entities.items():
+        # Optimization: Iterate only over entities with Vision component
+        # This avoids iterating over non-combat entities (walls, minerals, etc.)
+        for entity_id in self.game_state.get_entities_with_component(Vision):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
+            player = components.get(Player)
+            if not player or not player.is_human:
+                continue
+
             pos = components.get(Position)
             vis = components.get(Vision)
-            player = components.get(Player)
-            if pos and vis and player and player.is_human:
+            if pos and vis:
                 vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
