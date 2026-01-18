@@ -23,3 +23,9 @@ build/
 dist/
 *.spec
 icon.ico
+
+# MkDocs
+site/
+
+# Pytest
+.pytest_cache/
