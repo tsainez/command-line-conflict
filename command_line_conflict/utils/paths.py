@@ -1,5 +1,7 @@
+import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 APP_NAME = "command_line_conflict"
@@ -31,3 +33,40 @@ def get_user_data_dir() -> Path:
             path = Path.home() / ".local" / "share"
 
     return path / APP_NAME
+
+
+def atomic_save_json(filepath: str, data: dict) -> None:
+    """Saves data to a JSON file atomically to prevent data corruption.
+
+    This method writes data to a temporary file first, flushes it to disk,
+    and then atomically moves it to the target location. This ensures that
+    in case of a crash or disk failure, the original file is either intact
+    or fully replaced, never partially written.
+
+    Args:
+        filepath: The path to the file to save to.
+        data: The dictionary data to save.
+
+    Raises:
+        OSError: If an error occurs during file operations.
+    """
+    filepath = str(filepath)  # Ensure string if Path passed
+    dir_name = os.path.dirname(filepath)
+    # Ensure directory exists
+    os.makedirs(dir_name, exist_ok=True)
+
+    # Create temp file in same directory to ensure atomic move is possible
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name, text=True)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+            f.flush()
+            os.fsync(f.fileno())
+
+        # Atomic rename
+        os.replace(tmp_path, filepath)
+    except Exception:
+        # Clean up temp file if something went wrong
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise
