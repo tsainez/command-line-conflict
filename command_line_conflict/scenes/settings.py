@@ -1,4 +1,5 @@
 import functools
+import math
 
 import pygame
 
@@ -36,6 +37,7 @@ class SettingsScene:
             self.current_screen_size_index = self.screen_sizes.index((config.SCREEN["width"], config.SCREEN["height"]))
         except ValueError:
             self.current_screen_size_index = 0
+        self.time = 0.0
 
     @functools.lru_cache(maxsize=64)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
@@ -122,11 +124,12 @@ class SettingsScene:
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
-        """Updates the settings scene. This scene has no dynamic elements.
+        """Updates the settings scene.
 
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.time += dt
 
     def _get_volume_bar(self, volume):
         """Returns a string representation of a volume bar.
@@ -154,10 +157,16 @@ class SettingsScene:
         title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
         screen.blit(title_text, title_rect)
 
+        # Pulse calculation: varies between 0 and 1
+        pulse = (math.sin(self.time * 5) + 1) / 2
+        # Interpolate between dim yellow (150, 150, 0) and bright yellow (255, 255, 0)
+        yellow_val = 150 + int(105 * pulse)
+        pulse_color = (yellow_val, yellow_val, 0)
+
         self.option_rects.clear()
         for i, option in enumerate(self.settings_options):
             if i == self.selected_option:
-                color = (255, 255, 0)
+                color = pulse_color
             else:
                 color = (255, 255, 255)
 
