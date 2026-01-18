@@ -12,8 +12,10 @@ class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.path.abspath")
     # Patch where it is imported in command_line_conflict.maps.base
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
-    def test_save_to_file_uses_resolved_path(
+    @patch("command_line_conflict.utils.paths.atomic_save_json")
+    def test_save_to_file_uses_resolved_path(  # pylint: disable=too-many-positional-arguments
         self,
+        mock_atomic_save,
         mock_get_user_data,
         mock_abspath,
         mock_dirname,
@@ -52,8 +54,8 @@ class TestMapTOCTOU(unittest.TestCase):
         # Call save_to_file
         m.save_to_file(filename)
 
-        # Assert open was called with resolved_path
-        mock_file.assert_called_with(resolved_path, "w", encoding="utf-8")
+        # Assert atomic_save_json was called with resolved_path
+        mock_atomic_save.assert_called_with(resolved_path, m.to_dict())
 
 
 if __name__ == "__main__":
