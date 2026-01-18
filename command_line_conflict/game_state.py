@@ -51,7 +51,16 @@ class GameState:
             log.debug(f"Event added: {event}")
 
     def create_entity(self) -> int:
-        """Creates a new entity and returns its ID."""
+        """Creates a new entity and returns its ID.
+
+        Raises:
+            RuntimeError: If the maximum number of entities is reached.
+        """
+        # Security: Check for MAX_ENTITIES to prevent DoS via memory exhaustion
+        if len(self.entities) >= config.MAX_ENTITIES:
+            log.warning(f"Maximum entity limit reached ({config.MAX_ENTITIES}). Cannot create new entity.")
+            raise RuntimeError("Maximum entity limit reached")
+
         entity_id = self.next_entity_id
         self.entities[entity_id] = {}
         self.next_entity_id += 1
