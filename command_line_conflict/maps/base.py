@@ -225,15 +225,20 @@ class Map:
             filename: The path to the file to save to.
 
         Raises:
-            ValueError: If the filename is outside authorized directories.
+            ValueError: If the filename is outside authorized directories or has invalid extension.
         """
         import json
 
-        from ..utils.paths import get_user_data_dir
+        from ..utils.paths import atomic_save_json, get_user_data_dir
 
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
         abs_path = os.path.realpath(filename)
+
+        # Security fix: Enforce .json extension to prevent overwriting source files
+        if not abs_path.lower().endswith(".json"):
+            log.error(f"Security violation: Invalid file extension for map save: {abs_path}")
+            raise ValueError("Map files must have a .json extension.")
 
         # Define allowed directories
         # 1. The maps directory (where this file resides)
@@ -263,10 +268,8 @@ class Map:
         # Ensure directory exists
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
 
-        # Security: Use the resolved absolute path to prevent TOCTOU attacks
-        # where the file path (symlink) could change between validation and open.
-        with open(abs_path, "w", encoding="utf-8") as f:
-            json.dump(self.to_dict(), f, indent=4)
+        # Security: Use atomic save to prevent data corruption and TOCTOU
+        atomic_save_json(abs_path, self.to_dict())
 
     @classmethod
     def load_from_file(cls, filename: str) -> "Map":
