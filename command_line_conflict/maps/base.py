@@ -225,7 +225,7 @@ class Map:
             filename: The path to the file to save to.
 
         Raises:
-            ValueError: If the filename is outside authorized directories.
+            ValueError: If the filename is outside authorized directories or has invalid extension.
         """
         import json
 
@@ -234,6 +234,11 @@ class Map:
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
         abs_path = os.path.realpath(filename)
+
+        # Security fix: Enforce .json extension to prevent overwriting source files
+        if not abs_path.lower().endswith(".json"):
+            log.error(f"Security violation: Invalid file extension for map save: {abs_path}")
+            raise ValueError("Map files must have a .json extension.")
 
         # Define allowed directories
         # 1. The maps directory (where this file resides)
