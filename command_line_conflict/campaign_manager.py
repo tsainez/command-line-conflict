@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 
 from .logger import log
-from .utils.paths import get_user_data_dir
+from .utils.paths import atomic_save_json, get_user_data_dir
 
 DEFAULT_SAVE_FILENAME = "save_game.json"
 
@@ -108,8 +108,8 @@ class CampaignManager:
             "completed_missions": self.completed_missions,
         }
         try:
-            with open(self.save_file, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4)
+            # Security: Use atomic save to prevent data corruption
+            atomic_save_json(self.save_file, data)
             log.info("Campaign progress saved.")
         except IOError as e:
             log.error(f"Failed to save progress: {e}")
