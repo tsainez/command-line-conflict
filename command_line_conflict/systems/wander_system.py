@@ -16,12 +16,16 @@ class WanderSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in game_state.entities.items():
-            wander = components.get(Wander)
-            movable = components.get(Movable)
-            position = components.get(Position)
+        # Optimized to iterate only over entities with Wander component
+        for entity_id in list(game_state.get_entities_with_component(Wander)):
+            wander = game_state.get_component(entity_id, Wander)
+            if not wander:
+                continue
 
-            if not wander or not movable or not position:
+            movable = game_state.get_component(entity_id, Movable)
+            position = game_state.get_component(entity_id, Position)
+
+            if not movable or not position:
                 continue
 
             # Check if currently moving
