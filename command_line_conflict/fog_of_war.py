@@ -79,10 +79,16 @@ class FogOfWar:
 
             offsets = self._get_vision_offsets(vision_range)
 
-            for dx, dy in offsets:
-                x, y = ux + dx, uy + dy
-                if 0 <= x < self.width and 0 <= y < self.height:
-                    current_visible.add((x, y))
+            # Optimization: Skip bounds check if unit is far enough from edges
+            # This avoids 4 comparisons per tile for the majority of units
+            if vision_range <= ux < self.width - vision_range and vision_range <= uy < self.height - vision_range:
+                for dx, dy in offsets:
+                    current_visible.add((ux + dx, uy + dy))
+            else:
+                for dx, dy in offsets:
+                    x, y = ux + dx, uy + dy
+                    if 0 <= x < self.width and 0 <= y < self.height:
+                        current_visible.add((x, y))
 
         # Determine what changed
         to_explore = self.visible_cells - current_visible

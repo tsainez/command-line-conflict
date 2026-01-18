@@ -105,7 +105,7 @@ class RenderingSystem:
             # Fallback to grid iteration for dense maps or zoomed out views
             for y in range(start_y, end_y):
                 for x in range(start_x, end_x):
-                     # Only process if tile has entities
+                    # Only process if tile has entities
                     if (x, y) in game_state.spatial_map:
                         self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
 
