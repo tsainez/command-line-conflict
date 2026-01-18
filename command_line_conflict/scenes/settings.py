@@ -39,6 +39,16 @@ class SettingsScene:
             self.current_screen_size_index = 0
         self.time = 0.0
 
+        self.time = 0.0
+        self.help_texts = {
+            "Screen Size": "Changes the window resolution.",
+            "Debug Mode": "Shows FPS, grid coordinates, and hitbox outlines.",
+            "Master Volume": "Adjusts the overall game volume.",
+            "Music Volume": "Adjusts the background music volume.",
+            "SFX Volume": "Adjusts sound effects volume.",
+            "Back": "Return to the main menu.",
+        }
+
     @functools.lru_cache(maxsize=64)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
         """Returns a cached surface for the text.
@@ -194,9 +204,14 @@ class SettingsScene:
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
 
-        # Helper text for volume controls
+        # Helper text for current option
         current_option = self.settings_options[self.selected_option]
+        help_message = self.help_texts.get(current_option, "")
         if "Volume" in current_option:
-            help_text = self._get_text_surface("Use Arrow Keys or Click Left/Right to Adjust", (150, 150, 150), "help")
+            # Append volume specific help
+            help_message += " (Left/Right to Adjust)"
+
+        if help_message:
+            help_text = self._get_text_surface(help_message, (150, 150, 150), "help")
             help_rect = help_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
             screen.blit(help_text, help_rect)
