@@ -20,6 +20,9 @@
 **Learning:** In the FileDialog, overflow content was hidden without any visual indicator (like a scrollbar), relying on users knowing they could scroll. This is a common accessibility trap in custom UI systems.
 **Action:** Always include visual indicators (scrollbars, "more" arrows, or pagination) when content exceeds the viewable area. Implemented a simple calculated scrollbar for the file list.
 
+## 2024-05-24 - Clarity over Brevity in Unit Info
+**Learning:** The UI was using single-character icons (e.g., "R") in the info panel to match the map representation. While efficient for the map, this increases cognitive load in the detailed info panel where space is not constrained.
+**Action:** Use full names (e.g., "Rover") in detailed views/tooltips while keeping icons for the map. If a "display name" is available, prefer it over the raw identifier or icon.
 ## 2024-05-24 - Animated Text and Caching Performance
 **Learning:** Pygame's `lru_cache` on text rendering functions can be inefficient if the color changes every frame (like in a pulse animation), but for low-element count menus, the performance impact is negligible compared to the UX gain.
 **Action:** When animating text colors, ensure the number of unique color states or the number of animated elements is low to avoid thrashing the cache.
