@@ -48,6 +48,7 @@ def test_right_click_enemy_issues_attack_command(mocker):
     game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
     # Add Movable so we can check if it tries to move
     from command_line_conflict.components.movable import Movable
+
     game_state.add_component(attacker_id, Movable(speed=5.0))
 
     # 2. Create Player 2 Unit (Target) at (12, 12)
@@ -94,6 +95,7 @@ def test_right_click_enemy_issues_attack_command(mocker):
     assert last_effect["x"] == 12
     assert last_effect["y"] == 12
 
+
 def test_right_click_ground_issues_move_command(mocker):
     """
     Verifies that right-clicking empty ground issues a MOVE command
@@ -115,6 +117,7 @@ def test_right_click_ground_issues_move_command(mocker):
     game_state.add_component(attacker_id, selectable)
     game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
     from command_line_conflict.components.movable import Movable
+
     game_state.add_component(attacker_id, Movable(speed=5.0))
 
     # Set an existing attack target
