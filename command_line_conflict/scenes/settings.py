@@ -37,6 +37,7 @@ class SettingsScene:
             self.current_screen_size_index = self.screen_sizes.index((config.SCREEN["width"], config.SCREEN["height"]))
         except ValueError:
             self.current_screen_size_index = 0
+        self.time = 0.0
 
         self.time = 0.0
         self.help_texts = {
