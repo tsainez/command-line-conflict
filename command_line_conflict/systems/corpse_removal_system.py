@@ -21,8 +21,10 @@ class CorpseRemovalSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in list(game_state.entities.items()):
-            dead = components.get(Dead)
+        # Optimized to iterate only over entities with Dead component
+        # We must iterate over a copy because we might remove entities.
+        for entity_id in list(game_state.get_entities_with_component(Dead)):
+            dead = game_state.get_component(entity_id, Dead)
             if dead:
                 dead.timer += dt
                 if dead.timer >= self.corpse_lifetime:
