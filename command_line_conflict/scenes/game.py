@@ -61,6 +61,7 @@ class GameScene:
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
+        self.quit_confirm = False
         self.current_player_id = 1
 
         # Cheats
@@ -158,6 +159,9 @@ class GameScene:
 
         # Handle construction hotkeys if a chassis is selected
         if event.type == pygame.KEYDOWN:
+            if event.key != pygame.K_ESCAPE:
+                self.quit_confirm = False
+
             if event.key in (pygame.K_r, pygame.K_a):
                 self._handle_construction(event.key)
 
@@ -353,7 +357,12 @@ class GameScene:
                 elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
                     self.paused = not self.paused
                 elif event.key == pygame.K_ESCAPE:
-                    self.game.scene_manager.switch_to("menu")
+                    if self.quit_confirm:
+                        self.game.scene_manager.switch_to("menu")
+                    else:
+                        self.quit_confirm = True
+                        self.chat_system.add_message("Press ESC again to Exit", (255, 100, 100))
+
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
                 self.camera_movement["up"] = False
@@ -626,6 +635,9 @@ class GameScene:
 
         self.chat_system.draw()
         self.ui_system.draw(self.game_state, self.paused, self.current_player_id)
+
+        if self.quit_confirm:
+            self.ui_system.draw_quit_confirm_message()
 
         if self.hovered_entity_id is not None:
             self.ui_system.draw_tooltip(self.game_state, self.hovered_entity_id, pygame.mouse.get_pos())
