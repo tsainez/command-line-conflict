@@ -12,3 +12,7 @@
 **Vulnerability:** Direct writes to important data files (save games, maps) using `open(..., 'w')` were vulnerable to data corruption if the process crashed or disk filled up during the write operation. This compromised data integrity and availability.
 **Learning:** Python's standard `json.dump` does not guarantee atomicity. A crash mid-write leaves a truncated, invalid JSON file.
 **Prevention:** Implemented `atomic_save_json` in `utils/paths.py`. This utility writes to a temporary file first, ensures it is flushed to disk (`os.fsync`), and then uses `os.replace` to atomically swap it with the target file. This pattern should be used for all critical file writes.
+## 2026-01-13 - [Source Code Overwrite via Allowed Directories]
+**Vulnerability:** `Map.save_to_file` allowed saving to the application source directory (`maps_dir`) to support local development. However, it did not enforce file extensions, allowing an attacker (or compromised UI) to overwrite critical python source files (e.g., `__init__.py`) with JSON data, causing Denial of Service or potentially corrupting the installation.
+**Learning:** Allowing an application to write to its own source/installation directory is risky. Even with directory restrictions, failing to enforce file extensions can turn a file-write feature into a destructive capability.
+**Prevention:** Strictly enforce file extensions (allowlist) for all user-generated content. Ideally, restrict write operations *only* to isolated user data directories, treating the application directory as read-only.
