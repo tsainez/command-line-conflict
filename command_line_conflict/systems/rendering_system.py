@@ -71,115 +71,113 @@ class RenderingSystem:
         grid_size = int(tile_size)
         bar_height = max(4, int(grid_size * 0.2))
 
-        # Iterate through visible tiles
-        for y in range(start_y, end_y):
-            cam_y = (y - self.camera.y) * tile_size
-            for x in range(start_x, end_x):
-                entity_ids = game_state.spatial_map.get((x, y))
-                if not entity_ids:
-                    continue
+        # Optimization: Hybrid iteration
+        # If the map is sparse (number of populated tiles < visible tiles),
+        # iterating over the spatial map keys is significantly faster than
+        # iterating over every tile in the view frustum.
+        visible_width = end_x - start_x
+        visible_height = end_y - start_y
+        visible_tiles_count = visible_width * visible_height
 
-                cam_x = (x - self.camera.x) * tile_size
+        # Use keys iteration if populated tiles are fewer than 50% of visible tiles
+        # (The threshold is empirical; benchmarks show keys iteration is much faster for sparse maps)
+        use_keys_iteration = len(game_state.spatial_map) < (visible_tiles_count * 0.5)
 
-                for entity_id in entity_ids:
-                    components = game_state.entities.get(entity_id)
-                    if not components:
-                        continue
+        if use_keys_iteration:
+            # Filter and sort keys to maintain draw order (top-to-bottom, left-to-right)
+            # Sorting is necessary because dictionary iteration order is arbitrary (insertion order),
+            # but we need to draw Y then X for correct layering/batching if we were using it,
+            # and to match the visual behavior of the grid iteration.
 
-                    # Optimization: We trust the spatial map, so we know the position is roughly (x, y).
-                    # We skip redundant Position lookup for coordinate calculation.
-                    renderable = components.get(Renderable)
+            # We filter first to reduce the number of items to sort
+            visible_keys = []
+            for pos in game_state.spatial_map:
+                if start_x <= pos[0] < end_x and start_y <= pos[1] < end_y:
+                    visible_keys.append(pos)
 
-                    if not renderable:
-                        continue
+            # Sorting O(M log M) where M is small is cheap
+            visible_keys.sort(key=lambda p: (p[1], p[0]))
 
-                    confetti = components.get(Confetti)
-                    if confetti:
-                        # Confetti is just a particle, so it should be simple
-                        # Optimization: Use deterministic color based on ID to avoid
-                        # list allocation and random.choice() per frame.
-                        # Also prevents visual flickering.
-                        color = self.CONFETTI_COLORS[entity_id % len(self.CONFETTI_COLORS)]
-                        ch = self._get_rendered_surface(renderable.icon, color, grid_size)
-                        self.screen.blit(
-                            ch,
-                            (
-                                cam_x,
-                                cam_y,
-                            ),
-                        )
-                        continue
+            # Iterate through visible keys
+            for x, y in visible_keys:
+                self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
+        else:
+            # Fallback to grid iteration for dense maps or zoomed out views
+            for y in range(start_y, end_y):
+                for x in range(start_x, end_x):
+                     # Only process if tile has entities
+                    if (x, y) in game_state.spatial_map:
+                        self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
 
-                    dead = components.get(Dead)
-                    if dead:
-                        color = (128, 128, 128)  # Grey for dead units
-                    elif paused:
-                        color = (128, 128, 128)  # Grey for paused units
-                    else:
-                        color = renderable.color
-                        selectable = components.get(Selectable)
-                        if selectable and selectable.is_selected:
-                            color = (0, 255, 0)
-                            shadow_ch = self._get_rendered_surface(renderable.icon, (128, 128, 128), grid_size)
-                            self.screen.blit(
-                                shadow_ch,
-                                (
-                                    cam_x + 2,
-                                    cam_y + 2,
-                                ),
-                            )
+    def _draw_tile(self, x: int, y: int, game_state: GameState, paused: bool, grid_size: int, bar_height: int) -> None:
+        """Draws entities at a specific tile coordinate."""
+        entity_ids = game_state.spatial_map.get((x, y))
+        if not entity_ids:
+            return
 
-                    ch = self._get_rendered_surface(renderable.icon, color, grid_size)
-                    self.screen.blit(
-                        ch,
-                        (
-                            cam_x,
-                            cam_y,
-                        ),
-                    )
+        cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
+        cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
 
-                    health = components.get(Health)
-                    if not dead and health and health.max_hp > 0:
-                        health_pct = max(0.0, min(1.0, health.hp / health.max_hp))
-                        bar_width = grid_size
-                        bar_x = cam_x
-                        bar_y = cam_y - bar_height - 2
+        for entity_id in entity_ids:
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
 
-                        # Determine color based on health percentage
-                        if health_pct > 0.5:
-                            hp_color = (0, 255, 0)  # Green
-                        elif health_pct > 0.25:
-                            hp_color = (255, 255, 0)  # Yellow
-                        else:
-                            hp_color = (255, 0, 0)  # Red
+            renderable = components.get(Renderable)
+            if not renderable:
+                continue
 
-                        # Draw background (dark grey)
-                        pygame.draw.rect(
-                            self.screen,
-                            (60, 60, 60),
-                            (bar_x, bar_y, bar_width, bar_height),
-                        )
-                        # Draw foreground
-                        if health_pct > 0:
-                            pygame.draw.rect(
-                                self.screen,
-                                hp_color,
-                                (bar_x, bar_y, int(bar_width * health_pct), bar_height),
-                            )
-                        # Draw border (black)
-                        pygame.draw.rect(
-                            self.screen,
-                            (0, 0, 0),
-                            (bar_x, bar_y, bar_width, bar_height),
-                            1,
-                        )
+            confetti = components.get(Confetti)
+            if confetti:
+                color = self.CONFETTI_COLORS[entity_id % len(self.CONFETTI_COLORS)]
+                ch = self._get_rendered_surface(renderable.icon, color, grid_size)
+                self.screen.blit(ch, (cam_x, cam_y))
+                continue
 
-                    selectable = components.get(Selectable)
-                    if not dead:
-                        if selectable and selectable.is_selected:
-                            self.draw_orders(components)
-                        elif config.DEBUG:
-                            self.draw_orders(components)
+            dead = components.get(Dead)
+            if dead:
+                color = (128, 128, 128)
+            elif paused:
+                color = (128, 128, 128)
+            else:
+                color = renderable.color
+                selectable = components.get(Selectable)
+                if selectable and selectable.is_selected:
+                    color = (0, 255, 0)
+                    shadow_ch = self._get_rendered_surface(renderable.icon, (128, 128, 128), grid_size)
+                    self.screen.blit(shadow_ch, (cam_x + 2, cam_y + 2))
+
+            ch = self._get_rendered_surface(renderable.icon, color, grid_size)
+            self.screen.blit(ch, (cam_x, cam_y))
+
+            health = components.get(Health)
+            if not dead and health and health.max_hp > 0:
+                self._draw_health_bar(cam_x, cam_y, grid_size, bar_height, health)
+
+            selectable = components.get(Selectable)
+            if not dead:
+                if selectable and selectable.is_selected:
+                    self.draw_orders(components)
+                elif config.DEBUG:
+                    self.draw_orders(components)
+
+    def _draw_health_bar(self, x: float, y: float, width: int, height: int, health: Health) -> None:
+        """Draws a health bar for an entity."""
+        health_pct = max(0.0, min(1.0, health.hp / health.max_hp))
+        bar_x = x
+        bar_y = y - height - 2
+
+        if health_pct > 0.5:
+            hp_color = (0, 255, 0)
+        elif health_pct > 0.25:
+            hp_color = (255, 255, 0)
+        else:
+            hp_color = (255, 0, 0)
+
+        pygame.draw.rect(self.screen, (60, 60, 60), (bar_x, bar_y, width, height))
+        if health_pct > 0:
+            pygame.draw.rect(self.screen, hp_color, (bar_x, bar_y, int(width * health_pct), height))
+        pygame.draw.rect(self.screen, (0, 0, 0), (bar_x, bar_y, width, height), 1)
 
     def draw_orders(self, components) -> None:
         """Draws the movement path and target for a selected entity.
