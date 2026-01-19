@@ -549,8 +549,16 @@ class GameScene:
             True if the win condition is met, False otherwise.
         """
         enemy_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate over Player component index instead of all entities
+        # This reduces checking overhead from O(N) to O(P) where P << N (excluding effects, projectiles, etc.)
+        player_entities = self.game_state.get_entities_with_component(Player)
+        for entity_id in player_entities:
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
+            # Check logic must match original implementation
             if player and not player.is_human:
                 if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
                     continue
@@ -582,7 +590,13 @@ class GameScene:
             True if the loss condition is met, False otherwise.
         """
         player_entity_count = 0
-        for _, components in self.game_state.entities.items():
+        # Optimization: Iterate over Player component index instead of all entities
+        player_entities = self.game_state.get_entities_with_component(Player)
+        for entity_id in player_entities:
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)

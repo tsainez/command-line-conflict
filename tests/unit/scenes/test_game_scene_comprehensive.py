@@ -53,6 +53,15 @@ def game_scene(mock_game):
         mock_game_state_instance.entities = {}
         mock_game_state_instance.event_queue = []
 
+        # Mock get_entities_with_component to use the entities dict
+        def get_entities_with_component_side_effect(component_type):
+            result = set()
+            for entity_id, components in mock_game_state_instance.entities.items():
+                if component_type in components:
+                    result.add(entity_id)
+            return result
+        mock_game_state_instance.get_entities_with_component.side_effect = get_entities_with_component_side_effect
+
         scene = GameScene(mock_game)
 
         # Attach mocked systems to the scene instance for assertion convenience

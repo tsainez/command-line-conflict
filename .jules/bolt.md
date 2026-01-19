@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2026-01-19 - Mocking Optimized Queries
+**Learning:** When optimizing systems to use secondary indices (like `get_entities_with_component`), legacy tests that manually inject data into the primary store (e.g., `entities` dict) will fail because the indices aren't updated.
+**Action:** When writing tests for systems using ECS queries, ensure indices are maintained (via helpers) or mock the query method to reflect the state of the primary store.
