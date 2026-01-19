@@ -52,7 +52,18 @@ class FileDialog:
         self.hovered_file_index = None
         self.hovered_element = None  # "close", "action", or None
 
+        # Blinking Cursor Logic
+        self.cursor_visible = True
+        self.cursor_timer = 0.0
+
         self.refresh_files()
+
+    def update(self, dt):
+        """Updates the dialog logic (e.g. blinking cursor)."""
+        self.cursor_timer += dt
+        if self.cursor_timer >= 0.5:
+            self.cursor_visible = not self.cursor_visible
+            self.cursor_timer = 0.0
 
     def refresh_files(self):
         """Refreshes the list of files in the current directory."""
@@ -291,6 +302,22 @@ class FileDialog:
         # Clip input text to input_rect
         self.screen.set_clip(self.input_rect)
         self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
+
+        # Draw blinking cursor
+        if self.cursor_visible:
+            # Calculate cursor X position
+            text_width = input_surf.get_width() if self.input_text else 0
+            cursor_x = self.input_rect.x + 5 + text_width
+
+            # Simple vertical line cursor
+            pygame.draw.line(
+                self.screen,
+                (0, 0, 0),
+                (cursor_x, self.input_rect.y + 5),
+                (cursor_x, self.input_rect.y + 25),
+                2,
+            )
+
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.

@@ -134,6 +134,9 @@ class EditorScene:
         if self.camera_movement["right"]:
             self.camera.move(config.CAMERA_SPEED * dt, 0)
 
+        if self.file_dialog and self.file_dialog.active:
+            self.file_dialog.update(dt)
+
     def draw(self, screen):
         """Draws the editor."""
         screen.fill((0, 0, 0))
