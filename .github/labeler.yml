@@ -1,0 +1,24 @@
+# Add 'documentation' label to any changes within 'docs' folder or any .md file
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - docs/**
+      - '*.md'
+
+# Add 'test' label to any changes within 'tests' folder
+test:
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/**
+
+# Add 'ci' label to any changes within '.github' folder
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**
+
+# Add 'feature' label to changes in source code
+feature:
+  - changed-files:
+    - any-glob-to-any-file:
+      - command_line_conflict/**

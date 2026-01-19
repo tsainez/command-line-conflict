@@ -15,5 +15,6 @@ nav:
   - Security: Security.md
   - Maps: Maps.md
   - Project Structure: ProjectStructure.md
+  - ECS Architecture: ECS.md
   - Changelog: CHANGELOG.md
   - Agent Tasks: agents.md

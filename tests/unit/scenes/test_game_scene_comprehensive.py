@@ -350,6 +350,16 @@ class TestGameSceneUpdate:
             }
         }
 
+        # Since game_state is a mock, we need to mock get_entities_with_component
+        # to ensure it returns the entities we just added.
+        def get_entities_side_effect(component_type):
+            # Check if checking for Vision component
+            if component_type == Vision:
+                return {1, 2}
+            return set()
+
+        game_scene.game_state.get_entities_with_component.side_effect = get_entities_side_effect
+
         game_scene.update(0.1)
 
         # Verify fog of war updated with only human units
