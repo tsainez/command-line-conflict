@@ -343,7 +343,12 @@ class Map:
                 if st.st_size > cls.MAX_FILE_SIZE:
                     raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
 
-                data = json.load(f)
+                # Security fix: Read with limit to prevent DoS if file grows after check (TOCTOU)
+                content = f.read(cls.MAX_FILE_SIZE + 1)
+                if len(content) > cls.MAX_FILE_SIZE:
+                    raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
+
+                data = json.loads(content)
             return cls.from_dict(data)
         except OSError as e:
             raise ValueError(f"Could not open/read file: {e}") from e

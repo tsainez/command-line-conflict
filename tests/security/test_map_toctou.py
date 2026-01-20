@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open, patch, MagicMock
 
 from command_line_conflict.maps.base import Map
 
@@ -12,8 +12,17 @@ class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.path.abspath")
     # Patch where it is imported in command_line_conflict.maps.base
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
+    # We need to patch os.path.abspath in tempfile too because atomic_save_json uses tempfile.mkstemp
+    @patch("tempfile.mkstemp")
+    @patch("command_line_conflict.utils.paths.os.replace")
+    @patch("command_line_conflict.utils.paths.os.fsync")
+    @patch("command_line_conflict.utils.paths.os.fdopen")
     def test_save_to_file_uses_resolved_path(
         self,
+        mock_fdopen,
+        mock_fsync,
+        mock_replace,
+        mock_mkstemp,
         mock_get_user_data,
         mock_abspath,
         mock_dirname,
@@ -38,6 +47,13 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
 
+        # Setup mkstemp to return a dummy fd and path
+        mock_mkstemp.return_value = (123, "/secure/path/to/tmp_file")
+
+        # Setup fdopen to return a file object that supports write
+        mock_temp_file = MagicMock()
+        mock_fdopen.return_value.__enter__.return_value = mock_temp_file
+
         # mock_realpath should return resolved_path for filename
         def realpath_side_effect(path):
             if path == filename:
@@ -52,8 +68,12 @@ class TestMapTOCTOU(unittest.TestCase):
         # Call save_to_file
         m.save_to_file(filename)
 
-        # Assert open was called with resolved_path
-        mock_file.assert_called_with(resolved_path, "w", encoding="utf-8")
+        # Verification:
+        # atomic_save_json is called with resolved_path.
+        # It creates a temp file, writes to it, and then replaces.
+        # We can assert that os.replace was called with resolved_path as destination.
+
+        mock_replace.assert_called_with("/secure/path/to/tmp_file", resolved_path)
 
 
 if __name__ == "__main__":
