@@ -45,17 +45,55 @@ class EditorScene:
         self.mode = "WALL"  # WALL, ERASE
 
         # UI Font - try to use game font if possible, or default
-        self.ui_font = pygame.font.SysFont("arial", 24)
+        self.ui_font = pygame.font.SysFont("arial", 20)
         self.tooltip_font = pygame.font.SysFont("arial", 16)
 
         self.file_dialog = None
         self.mouse_pos = (0, 0)
         self.hover_grid_pos = None
 
+        # Define buttons
+        start_x = 10
+        start_y = 10
+        btn_width = 80
+        btn_height = 30
+        spacing = 10
+
+        self.buttons = [
+            {
+                "label": "Save",
+                "rect": pygame.Rect(start_x, start_y, btn_width, btn_height),
+                "action": self.open_save_dialog,
+                "tooltip": "Save Map (S)"
+            },
+            {
+                "label": "Load",
+                "rect": pygame.Rect(start_x + btn_width + spacing, start_y, btn_width, btn_height),
+                "action": self.open_load_dialog,
+                "tooltip": "Load Map (L)"
+            },
+            {
+                "label": "Menu",
+                "rect": pygame.Rect(start_x + (btn_width + spacing) * 2, start_y, btn_width, btn_height),
+                "action": lambda: self.game.scene_manager.switch_to("menu"),
+                "tooltip": "Return to Menu (ESC)"
+            }
+        ]
+        self.hovered_button_index = None
+
     def handle_event(self, event):
         """Handles user input."""
         if event.type == pygame.MOUSEMOTION:
             self.mouse_pos = event.pos
+            self.hovered_button_index = None
+
+            # Check for button hover first
+            for i, btn in enumerate(self.buttons):
+                if btn["rect"].collidepoint(event.pos):
+                    self.hovered_button_index = i
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    return
+
             # Simple UI area check (top 60 pixels)
             if event.pos[1] < 60:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -106,7 +144,19 @@ class EditorScene:
                 self.camera_movement["right"] = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
-                self.handle_click(event.pos)
+                # Check buttons
+                clicked_btn = False
+                for btn in self.buttons:
+                    if btn["rect"].collidepoint(event.pos):
+                        btn["action"]()
+                        clicked_btn = True
+                        break
+
+                if not clicked_btn and not (self.file_dialog and self.file_dialog.active):
+                    # Only edit map if not clicking UI
+                    if event.pos[1] >= 60:
+                        self.handle_click(event.pos)
+
             elif event.button == 4:  # Scroll up
                 self.camera.zoom_in(0.1)
             elif event.button == 5:  # Scroll down
@@ -148,8 +198,10 @@ class EditorScene:
         self._draw_ui(screen)
 
         # Draw Tooltip
-        if self.hover_grid_pos:
+        if self.hover_grid_pos and not self.hovered_button_index:
             self._draw_tooltip(screen)
+        elif self.hovered_button_index is not None:
+             self._draw_button_tooltip(screen)
 
         if self.file_dialog:
             self.file_dialog.draw()
@@ -168,6 +220,25 @@ class EditorScene:
 
         screen.blit(surf, (bg_rect.x + padding, bg_rect.y + padding))
 
+    def _draw_button_tooltip(self, screen):
+        btn = self.buttons[self.hovered_button_index]
+        if "tooltip" not in btn:
+            return
+
+        surf = self.tooltip_font.render(btn["tooltip"], True, (255, 255, 255))
+        bg_rect = surf.get_rect(topleft=(self.mouse_pos[0] + 10, self.mouse_pos[1] + 20))
+
+        # Keep tooltip on screen
+        if bg_rect.right > config.SCREEN_WIDTH:
+            bg_rect.right = config.SCREEN_WIDTH - 10
+
+        padding = 4
+        bg_rect.inflate_ip(padding * 2, padding * 2)
+        pygame.draw.rect(screen, (0, 0, 0, 220), bg_rect)
+        pygame.draw.rect(screen, (150, 150, 150), bg_rect, 1)
+
+        screen.blit(surf, (bg_rect.x + padding, bg_rect.y + padding))
+
     def _draw_grid(self, screen):
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
         if grid_size > 0:
@@ -181,13 +252,28 @@ class EditorScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
     def _draw_ui(self, screen):
-        text = "Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
+        # Draw buttons
+        for i, btn in enumerate(self.buttons):
+            color = (70, 70, 70)
+            if i == self.hovered_button_index:
+                color = (100, 100, 100)
+
+            pygame.draw.rect(screen, color, btn["rect"])
+            pygame.draw.rect(screen, (200, 200, 200), btn["rect"], 1)
+
+            text_surf = self.ui_font.render(btn["label"], True, (255, 255, 255))
+            text_rect = text_surf.get_rect(center=btn["rect"].center)
+            screen.blit(text_surf, text_rect)
+
+        # Draw status text below buttons
+        status_y = 50
+        text = "Editor Mode | Left Click: Toggle Wall"
         surf = self.ui_font.render(text, True, (255, 255, 255))
-        screen.blit(surf, (10, 10))
+        screen.blit(surf, (10, status_y))
 
         status = f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
         surf2 = self.ui_font.render(status, True, (200, 200, 200))
-        screen.blit(surf2, (10, 30))
+        screen.blit(surf2, (10, status_y + 25))
 
     def open_save_dialog(self):
         """Opens the save map dialog."""
