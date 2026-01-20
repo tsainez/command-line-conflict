@@ -350,6 +350,10 @@ class TestGameSceneUpdate:
             }
         }
 
+        # Mock get_entities_with_component because game_scene.update uses it
+        # and the mock game_state doesn't automatically maintain the component index
+        game_scene.game_state.get_entities_with_component.return_value = {1, 2}
+
         game_scene.update(0.1)
 
         # Verify fog of war updated with only human units

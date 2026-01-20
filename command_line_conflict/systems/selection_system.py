@@ -17,7 +17,11 @@ class SelectionSystem:
             game_state: The current state of the game.
         """
         count = 0
-        for entity_id, components in game_state.entities.items():
+        # Optimization: Iterate only over Selectable entities
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
             selectable = components.get(Selectable)
             if selectable and selectable.is_selected:
                 selectable.is_selected = False
@@ -56,7 +60,14 @@ class SelectionSystem:
         sx, ex = sorted((x1, x2))
         sy, ey = sorted((y1, y2))
 
-        for entity_id, components in game_state.entities.items():
+        # Optimization: Iterate only over Selectable entities
+        # Note: If selection area is small, iterating spatial map tiles might be faster.
+        # But iterating Selectable is always better than iterating all entities.
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             selectable = components.get(Selectable)
             player = components.get(Player)
 
@@ -76,7 +87,10 @@ class SelectionSystem:
                 selectable.is_selected = False
 
         selected_count = 0
-        for entity_id, components in game_state.entities.items():
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components: continue
+
             selectable = components.get(Selectable)
             player = components.get(Player)
             if selectable and selectable.is_selected and player and player.player_id == current_player_id:
@@ -109,19 +123,27 @@ class SelectionSystem:
         gx, gy = grid_pos
 
         clicked_entity_id = -1
-        for entity_id, components in game_state.entities.items():
-            position = components.get(Position)
+
+        # Optimization: Use spatial hashing to find entity at position O(1)
+        entities_at_pos = game_state.get_entities_at_position(gx, gy)
+
+        # Prioritize selecting units over buildings? Or just pick the first one?
+        # Current logic picks the first match in iteration order.
+        # We preserve that behavior but iterate only over entities at the position.
+
+        for entity_id in entities_at_pos:
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
-            if (
-                position
-                and int(position.x) == gx
-                and int(position.y) == gy
-                and player
+            selectable = components.get(Selectable)
+
+            if (player
                 and player.player_id == current_player_id
-            ):
-                if components.get(Selectable):
-                    clicked_entity_id = entity_id
-                    break
+                and selectable):
+                clicked_entity_id = entity_id
+                break
 
         if clicked_entity_id != -1:
             if shift_pressed:
@@ -133,11 +155,15 @@ class SelectionSystem:
                     if selectable.is_selected:
                         game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
             else:
-                for entity_id, components in game_state.entities.items():
+                # Optimization: Iterate only over Selectable entities to deselect
+                for entity_id in game_state.get_entities_with_component(Selectable):
+                    components = game_state.entities.get(entity_id)
+                    if not components: continue
                     selectable = components.get(Selectable)
                     # Deselect other units unless they are the one clicked
                     if selectable:
                         selectable.is_selected = entity_id == clicked_entity_id
+
                 log.debug(f"Selected unit {clicked_entity_id}")
                 game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
         elif not shift_pressed:
