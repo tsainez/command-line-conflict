@@ -26,3 +26,7 @@
 ## 2024-05-23 - Unified Pulse Effect in Settings Scene
 **Learning:** Users subconsciously expect consistent feedback mechanisms across similar UI contexts. The static selection state in the Settings menu felt lifeless compared to the Main Menu's pulsing effect, creating a subtle disconnect in the design language.
 **Action:** Always verify that visual feedback for interaction states (hover, selection, active) is consistent across all screens. When implementing a new screen, cross-reference existing screens for established patterns like animation curves or color shifts.
+
+## 2024-05-25 - Alive Text Inputs
+**Learning:** Custom text inputs in game engines often feel dead without a blinking cursor, as users rely on that visual heartbeat to confirm "I can type here".
+**Action:** Always implement a blink timer (e.g., 500ms toggle) for text entry fields in custom UI systems, and ensure `update(dt)` is propagated to UI components to drive this animation.
