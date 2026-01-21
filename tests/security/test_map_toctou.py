@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, patch
 
 from command_line_conflict.maps.base import Map
 
 
 class TestMapTOCTOU(unittest.TestCase):
-    @patch("builtins.open", new_callable=mock_open)
+    @patch("command_line_conflict.utils.paths.atomic_save_json")
     @patch("os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
@@ -19,10 +19,10 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_dirname,
         mock_realpath,
         mock_makedirs,
-        mock_file,
+        mock_atomic_save,
     ):
         """
-        Test that Map.save_to_file calls open() with the resolved absolute path,
+        Test that Map.save_to_file calls atomic_save_json() with the resolved absolute path,
         not the input filename, to prevent TOCTOU vulnerabilities where the
         symlink changes after validation but before opening.
         """
@@ -52,8 +52,8 @@ class TestMapTOCTOU(unittest.TestCase):
         # Call save_to_file
         m.save_to_file(filename)
 
-        # Assert open was called with resolved_path
-        mock_file.assert_called_with(resolved_path, "w", encoding="utf-8")
+        # Assert atomic_save_json was called with resolved_path
+        mock_atomic_save.assert_called_with(resolved_path, m.to_dict())
 
 
 if __name__ == "__main__":

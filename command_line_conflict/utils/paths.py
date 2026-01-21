@@ -52,11 +52,14 @@ def atomic_save_json(filepath: str, data: dict) -> None:
     """
     filepath = str(filepath)  # Ensure string if Path passed
     dir_name = os.path.dirname(filepath)
-    # Ensure directory exists
-    os.makedirs(dir_name, exist_ok=True)
+    if dir_name:
+        # Ensure directory exists
+        os.makedirs(dir_name, exist_ok=True)
 
     # Create temp file in same directory to ensure atomic move is possible
-    fd, tmp_path = tempfile.mkstemp(dir=dir_name, text=True)
+    # If dir_name is empty (current directory), pass "." to mkstemp
+    mkstemp_dir = dir_name if dir_name else "."
+    fd, tmp_path = tempfile.mkstemp(dir=mkstemp_dir, text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)

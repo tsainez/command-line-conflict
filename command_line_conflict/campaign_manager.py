@@ -55,16 +55,26 @@ class CampaignManager:
 
     def load_progress(self) -> None:
         """Loads progress from the save file."""
-        if not os.path.exists(self.save_file):
-            log.info("No save file found. Starting new campaign.")
-            return
+        import stat
 
-        # Security check: File size
-        # We perform this check when reading to prevent TOCTOU race conditions
-        # where the file grows between check and read.
         try:
+            # Security fix: Use file descriptor to prevent TOCTOU attacks
+            # Open the file first, then check stats on the open file descriptor
             with open(self.save_file, "r", encoding="utf-8") as f:
-                # Read up to the limit + 1 char to detect overflow
+                st = os.fstat(f.fileno())
+
+                # Security: Check file type to prevent reading from special files (e.g., /dev/zero)
+                if not stat.S_ISREG(st.st_mode):
+                    log.error(f"Security violation: Save file is not a regular file: {self.save_file}")
+                    return
+
+                # Security: Check file size to prevent DoS via memory exhaustion
+                if st.st_size > self.MAX_SAVE_FILE_SIZE:
+                    log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
+                    return
+
+                # Read the content
+                # Security: Read with limit to prevent DoS if file grows after size check
                 content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
 
                 if len(content) > self.MAX_SAVE_FILE_SIZE:
@@ -99,6 +109,9 @@ class CampaignManager:
                 # Re-evaluate unlocks based on completed missions
                 self._update_unlocks()
                 log.info(f"Loaded campaign progress: {len(self.completed_missions)} missions completed.")
+        except FileNotFoundError:
+            log.info("No save file found. Starting new campaign.")
+            return
         except (IOError, json.JSONDecodeError) as e:
             log.error(f"Failed to load save file: {e}")
 
