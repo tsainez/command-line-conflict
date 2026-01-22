@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/selection_system.py
+# hypothesis_version: 6.150.2
+
+['click_select', 'data', 'deselected', 'name', 'selected', 'sound', 'type']

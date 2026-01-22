@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/sound_system.py
+# hypothesis_version: 6.150.2
+
+['.ogg', '.wav', 'data', 'name', 'sound', 'sounds', 'type']

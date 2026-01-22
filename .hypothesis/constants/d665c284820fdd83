@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/scenes/game.py
+# hypothesis_version: 6.150.2
+
+[0.1, 5.0, 100, 255, '1-6: Spawn Units', 'BUILDER', 'DEFEAT', 'Debug Cheats:', 'Disabled', 'Enabled', 'F2: Toggle God Mode', 'TAB: Switch Player', 'VICTORY', 'arachnotron', 'chassis', 'create_initial_units', 'defeat', 'down', 'god_mode', 'left', 'menu', 'mission_1', 'music/game_theme.ogg', 'reveal_map', 'right', 'rover', 'up', 'victory']

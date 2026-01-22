@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/scenes/settings.py
+# hypothesis_version: 6.150.2
+
+[0.0, 0.1, 1.0, 100, 105, 150, 250, 255, 600, 720, 768, 800, 1024, 1280, 'Back', 'Debug Mode', 'Master Volume', 'Music Volume', 'SFX Volume', 'Screen Size', 'Settings', 'Volume', 'height', 'help', 'menu', 'option', 'title', 'width']

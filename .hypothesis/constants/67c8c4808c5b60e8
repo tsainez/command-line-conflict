@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/logger.py
+# hypothesis_version: 6.150.2
+
+[1024, 'DEBUG', 'INFO', 'LOG_LEVEL', 'game.log']

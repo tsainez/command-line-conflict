@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/combat_system.py
+# hypothesis_version: 6.150.2
+
+[1.5, 'attack_melee', 'attack_ranged', 'data', 'name', 'sound', 'type']

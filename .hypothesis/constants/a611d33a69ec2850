@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/health_system.py
+# hypothesis_version: 6.150.2
+
+['data', 'explosion', 'name', 'sound', 'type']
