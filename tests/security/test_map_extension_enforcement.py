@@ -1,6 +1,7 @@
-import os
 import pytest
+
 from command_line_conflict.maps.base import Map
+
 
 def test_save_map_invalid_extension():
     """Verify that saving a map with a non-json extension raises a ValueError."""
@@ -17,6 +18,7 @@ def test_save_map_invalid_extension():
     # Try with no extension
     with pytest.raises(ValueError, match="Map files must have a .json extension"):
         m.save_to_file("test_map")
+
 
 def test_save_map_valid_extension(tmp_path):
     """Verify that saving a map with .json extension works (within allowed dir logic)."""
