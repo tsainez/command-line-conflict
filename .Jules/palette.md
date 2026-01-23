@@ -29,3 +29,7 @@
 ## 2024-05-23 - Unified Pulse Effect in Settings Scene
 **Learning:** Users subconsciously expect consistent feedback mechanisms across similar UI contexts. The static selection state in the Settings menu felt lifeless compared to the Main Menu's pulsing effect, creating a subtle disconnect in the design language.
 **Action:** Always verify that visual feedback for interaction states (hover, selection, active) is consistent across all screens. When implementing a new screen, cross-reference existing screens for established patterns like animation curves or color shifts.
+
+## 2024-05-24 - Event-Driven Visual Effects
+**Learning:** Visual feedback (like floating damage text) often requires data from logic systems (Combat) but rendering in UI systems. Direct coupling creates spaghetti code. The Event Queue pattern is perfect here: Combat logic emits a "visual_effect" event, and the Scene routes it to the UI.
+**Action:** When adding new visual feedback triggered by game logic (e.g., healing numbers, level up flash), use `game_state.add_event({"type": "visual_effect", ...})` instead of calling UI methods directly.
