@@ -1,5 +1,6 @@
 import functools
 import math
+from typing import cast
 
 import pygame
 
@@ -48,8 +49,8 @@ class MenuScene:
             font_type: 'title' or 'option'.
         """
         if font_type == "title":
-            return self.title_font.render(text, True, color)
-        return self.option_font.render(text, True, color)
+            return cast(pygame.Surface, self.title_font.render(text, True, color))
+        return cast(pygame.Surface, self.option_font.render(text, True, color))
 
     def handle_event(self, event):
         """Handles user input for menu navigation.

@@ -1,4 +1,5 @@
 import functools
+from typing import cast
 
 import pygame
 
@@ -49,7 +50,7 @@ class RenderingSystem:
         s = self.font.render(char, True, color)
         if size is not None:
             s = pygame.transform.scale(s, (size, size))
-        return s
+        return cast(pygame.Surface, s)
 
     def draw(self, game_state: GameState, paused: bool) -> None:
         """Draws all renderable entities to the screen.
