@@ -514,6 +514,12 @@ class GameScene:
         self.corpse_removal_system.update(self.game_state, dt)
         self.sound_system.update(self.game_state)
 
+        # Process visual events
+        for event in self.game_state.event_queue:
+            if event.get("type") == "visual_effect":
+                if event.get("subtype") == "floating_text":
+                    self.ui_system.add_floating_text(event["x"], event["y"], event["text"], event["color"])
+
         # Clear event queue after all systems have processed events
         self.game_state.event_queue.clear()
         self.spawn_system.update(self.game_state, dt)

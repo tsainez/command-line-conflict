@@ -58,6 +58,10 @@ class UISystem:
         # Each effect is a dict: {x, y, time, color, duration}
         self.click_effects: list[dict] = []
 
+        # List of active floating texts
+        # Each item is a dict: {x, y, text, color, start_time, duration}
+        self.floating_texts: list[dict] = []
+
         log.debug("UISystem initialized")
 
     @functools.lru_cache(maxsize=256)
@@ -167,6 +171,7 @@ class UISystem:
             self._draw_aggregate_attack_range(game_state, selected_entities)
 
         self._draw_click_effects()
+        self._draw_floating_texts()
 
         if paused:
             self._draw_paused_message()
@@ -188,6 +193,58 @@ class UISystem:
                 "duration": 500,  # ms
             }
         )
+
+    def add_floating_text(
+        self, grid_x: float, grid_y: float, text: str, color: tuple[int, int, int] = (255, 255, 255)
+    ) -> None:
+        """Adds a floating text effect at the specified grid coordinates.
+
+        Args:
+            grid_x: The X coordinate on the grid.
+            grid_y: The Y coordinate on the grid.
+            text: The text to display.
+            color: The RGB color of the text.
+        """
+        self.floating_texts.append(
+            {
+                "x": grid_x,
+                "y": grid_y,
+                "text": text,
+                "color": color,
+                "start_time": pygame.time.get_ticks(),
+                "duration": 1000,  # ms
+            }
+        )
+
+    def _draw_floating_texts(self) -> None:
+        """Draws and updates active floating texts."""
+        current_time = pygame.time.get_ticks()
+        # Filter out expired texts
+        self.floating_texts = [t for t in self.floating_texts if current_time - t["start_time"] < t["duration"]]
+
+        for item in self.floating_texts:
+            elapsed = current_time - item["start_time"]
+            progress = elapsed / item["duration"]
+
+            # Calculate screen position
+            cam_x = ((item["x"] - self.camera.x) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
+            cam_y = ((item["y"] - self.camera.y) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
+
+            # Float up
+            # Float distance in pixels
+            float_dist = 30 * progress
+            cam_y -= float_dist
+
+            # Draw text
+            text_surf = self._get_text_surface(item["text"], item["color"], "small")
+
+            # Center the text
+            rect = text_surf.get_rect(center=(int(cam_x), int(cam_y)))
+            self.screen.blit(text_surf, rect)
 
     def _draw_click_effects(self) -> None:
         """Draws and updates active click effects (ripples)."""
