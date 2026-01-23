@@ -34,7 +34,8 @@ def test_draw_orders_are_affected_by_camera():
     components = game_state.entities[entity_id]
 
     # Act
-    rendering_system.draw_orders(components)
+    tile_size = config.GRID_SIZE * camera.zoom
+    rendering_system.draw_orders(components, tile_size)
 
     # Assert
     expected_x1 = (21 - camera.x) * config.GRID_SIZE * camera.zoom
