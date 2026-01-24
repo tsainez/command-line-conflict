@@ -513,6 +513,7 @@ class GameScene:
         self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
         self.sound_system.update(self.game_state)
+        self.ui_system.update(self.game_state)
 
         # Clear event queue after all systems have processed events
         self.game_state.event_queue.clear()
