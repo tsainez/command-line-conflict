@@ -100,3 +100,25 @@ class TestTargeting:
 
         target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target == enemy_id
+
+    def test_find_closest_enemy_dense_fallback(self, game_state):
+        """Test the fallback logic when map is dense (more populated cells than vision area * 0.5)."""
+        my_id = 1
+        my_pos = Position(50, 50)
+        my_player = Player(1)
+        vision = Vision(5) # Area ~ 121
+
+        # Fill map to force dense mode
+        # Need > 60 entities
+        for i in range(100):
+            eid = 1000 + i
+            # Place them out of range but populated in map
+            self.create_unit(game_state, eid, i * 2, 200, 2)
+
+        # Add target in range
+        target_id = 2
+        self.create_unit(game_state, target_id, 52, 50, 2)
+
+        # Verify logic
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
+        assert target == target_id
