@@ -58,7 +58,31 @@ class UISystem:
         # Each effect is a dict: {x, y, time, color, duration}
         self.click_effects: list[dict] = []
 
+        # List of active floating texts
+        # Each text is a dict: {text, x, y, color, time, duration}
+        self.floating_texts: list[dict] = []
+
         log.debug("UISystem initialized")
+
+    def update(self, game_state: GameState) -> None:
+        """Processes UI-related events from the game state.
+
+        Args:
+            game_state: The current state of the game.
+        """
+        for event in game_state.event_queue:
+            if event.get("type") == "visual_effect" and event.get("subtype") == "floating_text":
+                data = event.get("data", {})
+                self.floating_texts.append(
+                    {
+                        "text": data.get("text", ""),
+                        "x": data.get("x", 0),
+                        "y": data.get("y", 0),
+                        "color": data.get("color", (255, 255, 255)),
+                        "time": pygame.time.get_ticks(),
+                        "duration": 1000,  # 1 second
+                    }
+                )
 
     @functools.lru_cache(maxsize=256)
     def _get_text_surface(self, text: str, color: tuple, font_size: str = "normal") -> pygame.Surface:
@@ -167,6 +191,7 @@ class UISystem:
             self._draw_aggregate_attack_range(game_state, selected_entities)
 
         self._draw_click_effects()
+        self._draw_floating_texts()
 
         if paused:
             self._draw_paused_message()
@@ -219,6 +244,39 @@ class UISystem:
             width = max(1, int(3 * (1 - progress)))
 
             pygame.draw.circle(self.screen, effect["color"], (int(cam_x), int(cam_y)), radius, width)
+
+    def _draw_floating_texts(self) -> None:
+        """Draws and updates floating text effects."""
+        current_time = pygame.time.get_ticks()
+        self.floating_texts = [t for t in self.floating_texts if current_time - t["time"] < t["duration"]]
+
+        for text_data in self.floating_texts:
+            elapsed = current_time - text_data["time"]
+            progress = elapsed / text_data["duration"]
+
+            # Float up
+            y_offset = -progress * 2.0  # Float up by 2 grid units
+
+            # Calculate screen position
+            cam_x = ((text_data["x"] - self.camera.x) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
+            cam_y = ((text_data["y"] + y_offset - self.camera.y) * config.GRID_SIZE * self.camera.zoom) + (
+                config.GRID_SIZE * self.camera.zoom / 2
+            )
+
+            # Render text
+            text_surf = self._get_text_surface(text_data["text"], text_data["color"], "small")
+
+            # Apply alpha fade if possible (Pygame surfaces with per-pixel alpha)
+            # Since _get_text_surface returns a cached surface, we must copy it to modify alpha
+            if progress > 0.5:
+                alpha = int(255 * (1 - (progress - 0.5) * 2))
+                text_surf = text_surf.copy()
+                text_surf.set_alpha(alpha)
+
+            rect = text_surf.get_rect(center=(int(cam_x), int(cam_y)))
+            self.screen.blit(text_surf, rect)
 
     def _draw_player_indicator(self, current_player_id: int) -> None:
         """Draws a visual indicator for the current player.
