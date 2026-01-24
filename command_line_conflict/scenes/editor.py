@@ -8,6 +8,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.logger import log
 from command_line_conflict.maps.base import Map
 from command_line_conflict.ui.file_dialog import FileDialog
+from command_line_conflict.utils.paths import get_user_data_dir
 
 
 class EditorScene:
@@ -23,14 +24,33 @@ class EditorScene:
         self.font = game.font
 
         # Load custom map if exists, else create new
-        self.map_path = os.path.join("command_line_conflict", "maps", "custom", "custom_map.json")
+        # Use user data directory for security (avoid writing to source)
+        user_maps_dir = get_user_data_dir() / "maps" / "custom"
+        try:
+            user_maps_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            log.error(f"Failed to create user maps directory: {e}")
+
+        self.map_path = str(user_maps_dir / "custom_map.json")
+
         try:
             self.map = Map.load_from_file(self.map_path)
             log.info(f"Loaded map from {self.map_path}")
-        except FileNotFoundError:
-            self.map = Map(width=40, height=30)
-            log.info("Created new blank map")
-        except (IOError, ValueError) as e:
+        except (FileNotFoundError, ValueError):
+            # Fallback: Check if there is a default custom map in source to load from (read-only)
+            # This maintains backward compatibility for loading, but we will save to user dir.
+            source_map_path = os.path.join("command_line_conflict", "maps", "custom", "custom_map.json")
+            if os.path.exists(source_map_path):
+                try:
+                    self.map = Map.load_from_file(source_map_path)
+                    log.info(f"Loaded default map from source: {source_map_path}")
+                except Exception as e:
+                    log.error(f"Error loading source map: {e}")
+                    self.map = Map(width=40, height=30)
+            else:
+                self.map = Map(width=40, height=30)
+                log.info("Created new blank map")
+        except IOError as e:
             log.error(f"Error loading map: {e}")
             self.map = Map(width=40, height=30)
 
@@ -191,14 +211,16 @@ class EditorScene:
 
     def open_save_dialog(self):
         """Opens the save map dialog."""
-        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        # Use user data directory
+        initial_dir = str(get_user_data_dir() / "maps" / "custom")
         self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Save Map", initial_dir, mode="save")
         # Stop camera movement
         self.camera_movement = {k: False for k in self.camera_movement}
 
     def open_load_dialog(self):
         """Opens the load map dialog."""
-        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        # Use user data directory
+        initial_dir = str(get_user_data_dir() / "maps" / "custom")
         self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Load Map", initial_dir, mode="load")
         # Stop camera movement
         self.camera_movement = {k: False for k in self.camera_movement}

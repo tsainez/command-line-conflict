@@ -250,15 +250,13 @@ class Map:
             raise ValueError("Map files must have a .json extension.")
 
         # Define allowed directories
-        # 1. The maps directory (where this file resides)
-        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
-
-        # 2. The user data directory
+        # Security: Only allow saving to user data directory.
+        # We do NOT allow saving to the application source directory (immutable code).
         user_data_dir = str(get_user_data_dir())
         # Ensure user_data_dir is also resolved if it's a symlink
         user_data_dir = os.path.realpath(user_data_dir)
 
-        allowed_dirs = [maps_dir, user_data_dir]
+        allowed_dirs = [user_data_dir]
 
         is_allowed = False
         for allowed_dir in allowed_dirs:
