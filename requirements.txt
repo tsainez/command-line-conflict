@@ -14,3 +14,4 @@ flake8
 pytest-cov
 pylint
 mypy
+hypothesis
