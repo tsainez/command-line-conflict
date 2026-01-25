@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import os
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
@@ -147,6 +148,13 @@ class Map:
 
         return []
 
+    @functools.lru_cache(maxsize=16)
+    def _get_wall_surface(self, font, size: int) -> pygame.Surface:
+        """Returns a cached surface for the wall character, scaled."""
+        ch = font.render("#", True, (100, 100, 100))
+        ch = pygame.transform.scale(ch, (size, size))
+        return ch
+
     def draw(self, surf, font, camera=None) -> None:
         """Draws the map walls to a surface, using camera if provided.
 
@@ -155,18 +163,35 @@ class Map:
             font: The pygame font to use for rendering the walls.
             camera: The camera object for view/zoom (optional).
         """
-        for x, y in self.walls:
-            grid_size = config.GRID_SIZE
-            if camera:
-                draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
-                draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
-                grid_size = int(config.GRID_SIZE * camera.zoom)
-            else:
+        grid_size = config.GRID_SIZE
+        if camera:
+            grid_size = max(1, int(config.GRID_SIZE * camera.zoom))
+
+        wall_surf = self._get_wall_surface(font, grid_size)
+
+        if camera:
+            screen_width = surf.get_width()
+            screen_height = surf.get_height()
+
+            # Calculate visible grid bounds with buffer
+            start_x = int(camera.x) - 1
+            end_x = int(camera.x + screen_width / grid_size) + 2
+            start_y = int(camera.y) - 1
+            end_y = int(camera.y + screen_height / grid_size) + 2
+
+            # Iterate over visible tiles
+            for y in range(start_y, end_y):
+                for x in range(start_x, end_x):
+                    if (x, y) in self.walls:
+                        draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
+                        draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
+                        surf.blit(wall_surf, (draw_x, draw_y))
+        else:
+            # Fallback for non-camera drawing (iterates all walls)
+            for x, y in self.walls:
                 draw_x = x * grid_size
                 draw_y = y * grid_size
-            ch = font.render("#", True, (100, 100, 100))
-            ch = pygame.transform.scale(ch, (grid_size, grid_size))
-            surf.blit(ch, (draw_x, draw_y))
+                surf.blit(wall_surf, (draw_x, draw_y))
 
     def to_dict(self) -> dict:
         """Converts the map data to a dictionary for serialization.

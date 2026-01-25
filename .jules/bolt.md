@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-06-03 - Map Rendering Caching and Culling
+**Learning:** Rendering map tiles (walls) by iterating over all map entities and calling `pygame.transform.scale` every frame is extremely expensive (O(N) where N is map size). Caching the scaled surface and culling invisible tiles (O(View) where View is viewport size) provides massive speedups (e.g. 8x).
+**Action:** Use `functools.lru_cache` for repeated surface transformations and always cull static map elements against the camera viewport.
