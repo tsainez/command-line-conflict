@@ -22,6 +22,41 @@ Run from the root of the repository:
 4.  **Pylint**: Checks for code quality and bugs (enforces a score >= 9.0).
 5.  **Pytest**: Runs unit tests and checks code coverage (must be >= 80%).
 
+## `build_windows.ps1`
+
+A PowerShell script to build a standalone executable for Windows using PyInstaller.
+
+### Usage
+
+Run from PowerShell:
+```powershell
+./scripts/build_windows.ps1
+```
+
+Options:
+- `-Clean`: Cleans previous build artifacts (`build`, `dist`).
+- `-NoVenv`: Skips creating/using a virtual environment and uses the system python.
+
+## `generate_changelog.py`
+
+Generates a `CHANGELOG.md` file from the git commit history. It groups commits by date and lists the author and commit hash.
+
+### Usage
+
+```bash
+python scripts/generate_changelog.py
+```
+
+## `generate_icon.py`
+
+Generates the application icon (`icon.ico`) using `Pillow`.
+
+### Usage
+
+```bash
+python scripts/generate_icon.py
+```
+
 ## Note
 
 Ensure you have your virtual environment activated and dependencies installed (`pip install -r requirements.txt`) before running these scripts.
