@@ -20,3 +20,8 @@
 **Vulnerability:** `Map.save_to_file` allowed saving to the application source directory (`maps_dir`) to support local development. However, it did not enforce file extensions, allowing an attacker (or compromised UI) to overwrite critical python source files (e.g., `__init__.py`) with JSON data, causing Denial of Service or potentially corrupting the installation.
 **Learning:** Allowing an application to write to its own source/installation directory is risky. Even with directory restrictions, failing to enforce file extensions can turn a file-write feature into a destructive capability.
 **Prevention:** Strictly enforce file extensions (allowlist) for all user-generated content. Ideally, restrict write operations *only* to isolated user data directories, treating the application directory as read-only.
+
+## 2026-05-20 - [Memory Exhaustion via json.load]
+**Vulnerability:** Even with `fstat` size checks, `json.load(f)` is vulnerable to DoS if the file grows after the check (race condition). `json.load` reads until EOF, ignoring the previously checked size.
+**Learning:** Checking size via `fstat` is not enough if the read operation is unbounded.
+**Prevention:** Read the file content into a string with a strict limit (`f.read(MAX + 1)`), verify the length, and then use `json.loads(content)`.
