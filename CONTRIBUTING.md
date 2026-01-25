@@ -51,6 +51,13 @@ This script will run:
 
 Ensure the script exits with "All checks passed!" before pushing your changes.
 
+### Multi-Environment Testing
+If you have `tox` installed, you can run tests across multiple Python versions (3.10, 3.11, 3.12) to ensure compatibility:
+
+```bash
+tox
+```
+
 ### Logging
 *   Avoid wrapping `log.debug()` calls with `if config.DEBUG:`. Rely on the logging library's level filtering instead.
 
