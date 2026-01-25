@@ -9,6 +9,8 @@ from command_line_conflict.maps.simple_map import SimpleMap
 def test_map_draw_with_camera(mock_scale):
     # Arrange
     mock_surf = Mock()
+    mock_surf.get_width.return_value = 800
+    mock_surf.get_height.return_value = 600
     mock_font = Mock()
     mock_surface = Mock()
     mock_scaled_surface = Mock()
