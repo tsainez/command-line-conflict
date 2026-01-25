@@ -23,9 +23,15 @@
 ## 2024-05-24 - Clarity over Brevity in Unit Info
 **Learning:** The UI was using single-character icons (e.g., "R") in the info panel to match the map representation. While efficient for the map, this increases cognitive load in the detailed info panel where space is not constrained.
 **Action:** Use full names (e.g., "Rover") in detailed views/tooltips while keeping icons for the map. If a "display name" is available, prefer it over the raw identifier or icon.
+
 ## 2024-05-24 - Animated Text and Caching Performance
 **Learning:** Pygame's `lru_cache` on text rendering functions can be inefficient if the color changes every frame (like in a pulse animation), but for low-element count menus, the performance impact is negligible compared to the UX gain.
 **Action:** When animating text colors, ensure the number of unique color states or the number of animated elements is low to avoid thrashing the cache.
+
 ## 2024-05-23 - Unified Pulse Effect in Settings Scene
 **Learning:** Users subconsciously expect consistent feedback mechanisms across similar UI contexts. The static selection state in the Settings menu felt lifeless compared to the Main Menu's pulsing effect, creating a subtle disconnect in the design language.
 **Action:** Always verify that visual feedback for interaction states (hover, selection, active) is consistent across all screens. When implementing a new screen, cross-reference existing screens for established patterns like animation curves or color shifts.
+
+## 2024-05-25 - Custom Input Affordances in Pygame
+**Learning:** Custom UI components in Pygame (like text inputs) that need animation (like cursors) require explicit `update(dt)` calls propagated from the parent scene, unlike retained-mode UI frameworks where components might manage their own loops. A static rectangle is often ambiguous; a blinking cursor significantly improves the affordance.
+**Action:** When creating stateful UI components that require animation, implement an `update(dt)` method and ensure the parent container calls it.
