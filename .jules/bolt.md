@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-05-29 - SelectionSystem Optimization
+**Learning:** The `SelectionSystem` was iterating over ALL entities (O(N)) for every selection operation (click, drag, clear), even though the ECS provided `get_entities_at_position` (O(1) via spatial hashing) and `get_entities_with_component` (O(S) where S is selectable count).
+**Action:** Always check the `GameState` or `EntityManager` API for optimized lookup methods before iterating `all_entities`. Spatial hashing is powerful for mouse interactions.

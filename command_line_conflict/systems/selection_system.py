@@ -17,8 +17,8 @@ class SelectionSystem:
             game_state: The current state of the game.
         """
         count = 0
-        for entity_id, components in game_state.entities.items():
-            selectable = components.get(Selectable)
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            selectable = game_state.get_component(entity_id, Selectable)
             if selectable and selectable.is_selected:
                 selectable.is_selected = False
                 count += 1
@@ -56,15 +56,15 @@ class SelectionSystem:
         sx, ex = sorted((x1, x2))
         sy, ey = sorted((y1, y2))
 
-        for entity_id, components in game_state.entities.items():
-            selectable = components.get(Selectable)
-            player = components.get(Player)
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            selectable = game_state.get_component(entity_id, Selectable)
+            player = game_state.get_component(entity_id, Player)
 
             # Check if the unit belongs to the current player
-            if not selectable or not player or player.player_id != current_player_id:
+            if not player or player.player_id != current_player_id:
                 continue
 
-            position = components.get(Position)
+            position = game_state.get_component(entity_id, Position)
             if not position:
                 continue
 
@@ -76,10 +76,10 @@ class SelectionSystem:
                 selectable.is_selected = False
 
         selected_count = 0
-        for entity_id, components in game_state.entities.items():
-            selectable = components.get(Selectable)
-            player = components.get(Player)
-            if selectable and selectable.is_selected and player and player.player_id == current_player_id:
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            selectable = game_state.get_component(entity_id, Selectable)
+            player = game_state.get_component(entity_id, Player)
+            if selectable.is_selected and player and player.player_id == current_player_id:
                 selected_count += 1
 
         if selected_count > 0:
@@ -109,19 +109,12 @@ class SelectionSystem:
         gx, gy = grid_pos
 
         clicked_entity_id = -1
-        for entity_id, components in game_state.entities.items():
-            position = components.get(Position)
-            player = components.get(Player)
-            if (
-                position
-                and int(position.x) == gx
-                and int(position.y) == gy
-                and player
-                and player.player_id == current_player_id
-            ):
-                if components.get(Selectable):
-                    clicked_entity_id = entity_id
-                    break
+        for entity_id in game_state.get_entities_at_position(gx, gy):
+            player = game_state.get_component(entity_id, Player)
+            selectable = game_state.get_component(entity_id, Selectable)
+            if player and player.player_id == current_player_id and selectable:
+                clicked_entity_id = entity_id
+                break
 
         if clicked_entity_id != -1:
             if shift_pressed:
@@ -133,11 +126,10 @@ class SelectionSystem:
                     if selectable.is_selected:
                         game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
             else:
-                for entity_id, components in game_state.entities.items():
-                    selectable = components.get(Selectable)
+                for entity_id in game_state.get_entities_with_component(Selectable):
+                    selectable = game_state.get_component(entity_id, Selectable)
                     # Deselect other units unless they are the one clicked
-                    if selectable:
-                        selectable.is_selected = entity_id == clicked_entity_id
+                    selectable.is_selected = entity_id == clicked_entity_id
                 log.debug(f"Selected unit {clicked_entity_id}")
                 game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
         elif not shift_pressed:
