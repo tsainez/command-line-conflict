@@ -1,5 +1,5 @@
 # pylint: disable=redefined-outer-name
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pygame
 import pytest
