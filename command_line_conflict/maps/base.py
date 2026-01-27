@@ -258,7 +258,8 @@ class Map:
         # Ensure user_data_dir is also resolved if it's a symlink
         user_data_dir = os.path.realpath(user_data_dir)
 
-        allowed_dirs = [maps_dir, user_data_dir]
+        # Security fix: Only allow saving to user data directory, not installation directory
+        allowed_dirs = [user_data_dir]
 
         is_allowed = False
         for allowed_dir in allowed_dirs:
