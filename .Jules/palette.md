@@ -29,3 +29,7 @@
 ## 2024-05-23 - Unified Pulse Effect in Settings Scene
 **Learning:** Users subconsciously expect consistent feedback mechanisms across similar UI contexts. The static selection state in the Settings menu felt lifeless compared to the Main Menu's pulsing effect, creating a subtle disconnect in the design language.
 **Action:** Always verify that visual feedback for interaction states (hover, selection, active) is consistent across all screens. When implementing a new screen, cross-reference existing screens for established patterns like animation curves or color shifts.
+
+## 2026-01-27 - Map Editor Toolbar Pattern
+**Learning:** Replacing hidden hotkeys with visible, clickable toolbar buttons significantly improves discoverability for new users. However, removing static text instructions (like "Left Click: Toggle Wall") creates a regression where users know *how* to save/load but not *how* to edit the map.
+**Action:** When adding interactive UI to replace static text, always ensure the core interaction instructions (mouse vs keyboard) are preserved, either in tooltips, status bars, or a dedicated "Help" button.
