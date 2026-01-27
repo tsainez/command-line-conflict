@@ -31,10 +31,10 @@ class TestEditorUX:
             mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
     def test_cursor_changes_over_ui(self, editor_scene):
-        """Test that cursor changes to ARROW when over the UI area."""
+        """Test that cursor changes to ARROW when over the UI area but not on a button."""
         event = MagicMock()
         event.type = pygame.MOUSEMOTION
-        event.pos = (10, 10)  # Top left
+        event.pos = (5, 5)  # Top left, avoiding buttons at (10, 10)
 
         with patch("pygame.mouse.set_cursor") as mock_set_cursor:
             editor_scene.handle_event(event)

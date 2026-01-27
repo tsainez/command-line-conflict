@@ -52,13 +52,44 @@ class EditorScene:
         self.mouse_pos = (0, 0)
         self.hover_grid_pos = None
 
+        self.buttons = [
+            {
+                "text": "Save",
+                "rect": pygame.Rect(10, 10, 80, 40),
+                "action": self.open_save_dialog,
+                "tooltip": "Save Map (S)",
+            },
+            {
+                "text": "Load",
+                "rect": pygame.Rect(100, 10, 80, 40),
+                "action": self.open_load_dialog,
+                "tooltip": "Load Map (L)",
+            },
+            {
+                "text": "Menu",
+                "rect": pygame.Rect(190, 10, 80, 40),
+                "action": self._return_to_menu,
+                "tooltip": "Return to Menu (ESC)",
+            },
+        ]
+
     def handle_event(self, event):
         """Handles user input."""
         if event.type == pygame.MOUSEMOTION:
             self.mouse_pos = event.pos
             # Simple UI area check (top 60 pixels)
             if event.pos[1] < 60:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                # Check for button hover
+                hovering_button = False
+                for btn in self.buttons:
+                    if btn["rect"].collidepoint(event.pos):
+                        hovering_button = True
+                        break
+
+                if hovering_button:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                else:
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.hover_grid_pos = None
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
@@ -94,7 +125,7 @@ class EditorScene:
             elif event.key == pygame.K_l:
                 self.open_load_dialog()
             elif event.key == pygame.K_ESCAPE:
-                self.game.scene_manager.switch_to("menu")
+                self._return_to_menu()
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
                 self.camera_movement["up"] = False
@@ -106,11 +137,24 @@ class EditorScene:
                 self.camera_movement["right"] = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left click
-                self.handle_click(event.pos)
+                # Check UI first
+                ui_clicked = False
+                if event.pos[1] < 60:
+                    for btn in self.buttons:
+                        if btn["rect"].collidepoint(event.pos):
+                            btn["action"]()
+                            ui_clicked = True
+                            break
+
+                if not ui_clicked:
+                    self.handle_click(event.pos)
             elif event.button == 4:  # Scroll up
                 self.camera.zoom_in(0.1)
             elif event.button == 5:  # Scroll down
                 self.camera.zoom_out(0.1)
+
+    def _return_to_menu(self):
+        self.game.scene_manager.switch_to("menu")
 
     def handle_click(self, screen_pos):
         grid_x, grid_y = self.camera.screen_to_grid(screen_pos[0], screen_pos[1])
@@ -181,13 +225,32 @@ class EditorScene:
                 pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
 
     def _draw_ui(self, screen):
-        text = "Editor Mode | Left Click: Toggle Wall | S: Save | L: Load | ESC: Menu"
-        surf = self.ui_font.render(text, True, (255, 255, 255))
-        screen.blit(surf, (10, 10))
+        # Draw background bar
+        pygame.draw.rect(screen, (30, 30, 30), (0, 0, self.game.screen.get_width(), 60))
+        pygame.draw.line(screen, (100, 100, 100), (0, 60), (self.game.screen.get_width(), 60))
 
-        status = f"Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
-        surf2 = self.ui_font.render(status, True, (200, 200, 200))
-        screen.blit(surf2, (10, 30))
+        # Draw buttons
+        for btn in self.buttons:
+            color = (60, 60, 60)
+            if btn["rect"].collidepoint(self.mouse_pos):
+                color = (80, 80, 80)
+
+            pygame.draw.rect(screen, color, btn["rect"])
+            pygame.draw.rect(screen, (150, 150, 150), btn["rect"], 1)
+
+            text_surf = self.ui_font.render(btn["text"], True, (255, 255, 255))
+            text_rect = text_surf.get_rect(center=btn["rect"].center)
+            screen.blit(text_surf, text_rect)
+
+            # Draw tooltip if hovered
+            if btn["rect"].collidepoint(self.mouse_pos) and btn.get("tooltip"):
+                tooltip_surf = self.tooltip_font.render(btn["tooltip"], True, (255, 255, 200))
+                screen.blit(tooltip_surf, (btn["rect"].right + 10, btn["rect"].centery - 10))
+
+        # Status info on the right
+        status = f"Left Click: Toggle Wall | Map: {self.map.width}x{self.map.height} | Walls: {len(self.map.walls)}"
+        status_surf = self.ui_font.render(status, True, (200, 200, 200))
+        screen.blit(status_surf, (self.game.screen.get_width() - status_surf.get_width() - 10, 20))
 
     def open_save_dialog(self):
         """Opens the save map dialog."""
