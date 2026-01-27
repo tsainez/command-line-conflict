@@ -29,7 +29,9 @@ class TestMapTOCTOU(unittest.TestCase):
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
-        user_data_dir = "/user/data"
+        # Security update: we must save to user_data_dir now.
+        # So we ensure the user_data_dir matches the path we are saving to.
+        user_data_dir = "/secure/path/to"
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
