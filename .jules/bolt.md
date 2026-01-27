@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-05-30 - Hybrid Iteration for Spatial Queries
+**Learning:** For spatial queries (like finding closest enemy) over a limited area (vision range), iterating over all keys in the sparse spatial map is significantly faster (17x) than iterating over all grid cells in the bounding box, provided the map is sparse.
+**Action:** Implement hybrid iteration strategies that switch between key iteration and grid iteration based on the density of the map versus the query area size.

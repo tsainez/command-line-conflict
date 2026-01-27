@@ -41,6 +41,27 @@ class TestTargeting:
         target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
         assert target == enemy_id
 
+    def test_find_closest_enemy_dense_map(self, game_state):
+        # Force grid iteration by having small vision and > 50% density
+        my_id = 1
+        my_pos = Position(10, 10)
+        my_player = Player(1)
+        vision = Vision(1)  # 3x3 = 9 tiles visible. Threshold = 4.5 entities.
+
+        # Add 6 dummy entities to make density > 4.5
+        for i in range(6):
+            self.create_unit(game_state, 100 + i, 20 + i, 20 + i, 3)  # Far away, just to populate map
+
+        # Enemy within range (1 tile away)
+        enemy_id = 2
+        self.create_unit(game_state, enemy_id, 11, 10, 2)
+
+        # Ensure spatial map has enough entries
+        assert len(game_state.spatial_map) >= 6
+
+        target = Targeting.find_closest_enemy(my_id, my_pos, my_player, vision, game_state)
+        assert target == enemy_id
+
     def test_find_closest_enemy_ignores_out_of_range(self, game_state):
         my_id = 1
         my_pos = Position(10, 10)
