@@ -13,6 +13,8 @@ nav:
   - Home: index.md
   - Contributing: Contributing.md
   - Security: Security.md
+  - ECS Architecture: ECS.md
+  - AI Logic: AI_Logic.md
   - Maps: Maps.md
   - Project Structure: ProjectStructure.md
   - Changelog: CHANGELOG.md
