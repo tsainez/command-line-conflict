@@ -17,7 +17,12 @@ class SelectionSystem:
             game_state: The current state of the game.
         """
         count = 0
-        for entity_id, components in game_state.entities.items():
+        # Optimization: Iterate only Selectable entities
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             selectable = components.get(Selectable)
             if selectable and selectable.is_selected:
                 selectable.is_selected = False
@@ -56,7 +61,12 @@ class SelectionSystem:
         sx, ex = sorted((x1, x2))
         sy, ey = sorted((y1, y2))
 
-        for entity_id, components in game_state.entities.items():
+        # Optimization: Iterate only Selectable entities instead of all entities
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             selectable = components.get(Selectable)
             player = components.get(Player)
 
@@ -76,7 +86,11 @@ class SelectionSystem:
                 selectable.is_selected = False
 
         selected_count = 0
-        for entity_id, components in game_state.entities.items():
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             selectable = components.get(Selectable)
             player = components.get(Player)
             if selectable and selectable.is_selected and player and player.player_id == current_player_id:
@@ -109,16 +123,16 @@ class SelectionSystem:
         gx, gy = grid_pos
 
         clicked_entity_id = -1
-        for entity_id, components in game_state.entities.items():
-            position = components.get(Position)
+        # Optimization: Use spatial hashing O(1) instead of O(N) iteration
+        potential_entities = game_state.get_entities_at_position(gx, gy)
+
+        for entity_id in potential_entities:
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
-            if (
-                position
-                and int(position.x) == gx
-                and int(position.y) == gy
-                and player
-                and player.player_id == current_player_id
-            ):
+            if player and player.player_id == current_player_id:
                 if components.get(Selectable):
                     clicked_entity_id = entity_id
                     break
@@ -133,7 +147,12 @@ class SelectionSystem:
                     if selectable.is_selected:
                         game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
             else:
-                for entity_id, components in game_state.entities.items():
+                # Optimization: Iterate only Selectable entities
+                for entity_id in game_state.get_entities_with_component(Selectable):
+                    components = game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+
                     selectable = components.get(Selectable)
                     # Deselect other units unless they are the one clicked
                     if selectable:

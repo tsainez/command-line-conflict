@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.12"
         cache: 'pip'
@@ -40,7 +40,7 @@ jobs:
         pylint $(git ls-files '*.py') --fail-under=9.0
     - name: Type Check with Mypy
       run: |
-        mypy command_line_conflict
+        mypy .
     - name: Test with pytest
       run: |
         python -m pytest

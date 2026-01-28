@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-05-29 - Spatial Lookups for Selection
+**Learning:** Iterating over all entities to find what was clicked is O(N) and redundant when a spatial hash map exists. `get_entities_at_position` provides O(1) access. Similarly, iterating only components of interest (e.g., `Selectable`) reduces overhead for global operations like drag selection.
+**Action:** Always prefer spatial lookups or component-specific iterators over iterating `game_state.entities.items()` when possible.
