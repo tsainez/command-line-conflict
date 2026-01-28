@@ -8,9 +8,16 @@ theme:
 
 plugins:
   - include-markdown
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
 
 nav:
   - Home: index.md
+  - API Reference: API.md
+  - ECS Architecture: ECS.md
+  - Map Creation Guide: MapCreation.md
   - Contributing: Contributing.md
   - Security: Security.md
   - Maps: Maps.md
