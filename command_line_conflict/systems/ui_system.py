@@ -59,7 +59,7 @@ class UISystem:
         self.click_effects: list[dict] = []
 
         # Cache for static UI elements
-        self._key_options_surface = None
+        self._key_options_surface: pygame.Surface | None = None
 
         log.debug("UISystem initialized")
 
