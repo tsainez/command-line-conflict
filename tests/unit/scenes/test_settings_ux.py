@@ -1,5 +1,6 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+import pygame
 import pytest
 
 from command_line_conflict.scenes.settings import SettingsScene

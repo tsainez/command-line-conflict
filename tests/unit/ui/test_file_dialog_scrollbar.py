@@ -4,6 +4,7 @@ import pytest
 
 # We need to ensure pygame is mocked before importing FileDialog
 # This is handled by conftest.py, but we need to be careful with imports
+from command_line_conflict import config
 
 
 class TestFileDialogScrollbar:

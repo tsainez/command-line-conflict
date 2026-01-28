@@ -175,9 +175,6 @@ class EditorScene:
 
     def update(self, dt):
         """Updates camera."""
-        if self.file_dialog:
-            self.file_dialog.update(dt)
-
         if self.camera_movement["up"]:
             self.camera.move(0, -config.CAMERA_SPEED * dt)
         if self.camera_movement["down"]:

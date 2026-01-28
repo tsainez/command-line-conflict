@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pygame
 import pytest
 
+from command_line_conflict import config
 from command_line_conflict.scenes.editor import EditorScene
 
 
@@ -34,7 +35,7 @@ class TestEditorUX:
         """Test that cursor changes to ARROW when over the UI area."""
         event = MagicMock()
         event.type = pygame.MOUSEMOTION
-        event.pos = (10, 10)  # Top left
+        event.pos = (400, 30)  # Top center, well clear of buttons which are at x=10, 100, 190
 
         with patch("pygame.mouse.set_cursor") as mock_set_cursor:
             editor_scene.handle_event(event)
