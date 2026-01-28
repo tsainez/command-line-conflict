@@ -2,6 +2,7 @@
 """
 Generates a CHANGELOG.md file from git history.
 """
+
 import subprocess
 
 

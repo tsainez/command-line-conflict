@@ -1,5 +1,6 @@
 import functools
 import math
+from typing import cast
 
 import pygame
 
@@ -59,10 +60,10 @@ class SettingsScene:
             font_type: 'title', 'help', or 'option'.
         """
         if font_type == "title":
-            return self.title_font.render(text, True, color)
+            return cast(pygame.Surface, self.title_font.render(text, True, color))
         if font_type == "help":
-            return self.game.font.render(text, True, color)
-        return self.option_font.render(text, True, color)
+            return cast(pygame.Surface, self.game.font.render(text, True, color))
+        return cast(pygame.Surface, self.option_font.render(text, True, color))
 
     def handle_event(self, event):
         """Handles user input for changing settings.
