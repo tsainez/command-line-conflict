@@ -1,4 +1,3 @@
-import math
 import os
 
 import pygame
@@ -52,14 +51,8 @@ class FileDialog:
 
         self.hovered_file_index = None
         self.hovered_element = None  # "close", "action", or None
-        self.time = 0.0
 
         self.refresh_files()
-
-    def update(self, dt):
-        """Updates the file dialog."""
-        if self.active:
-            self.time += dt
 
     def refresh_files(self):
         """Refreshes the list of files in the current directory."""
@@ -298,14 +291,6 @@ class FileDialog:
         # Clip input text to input_rect
         self.screen.set_clip(self.input_rect)
         self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
-
-        # Draw Cursor
-        if self.active and math.sin(self.time * 8) > 0:
-            cursor_x = self.input_rect.x + 5 + input_surf.get_width()
-            cursor_y = input_surf_y
-            cursor_h = input_surf.get_height()
-            pygame.draw.line(self.screen, (0, 0, 0), (cursor_x, cursor_y), (cursor_x, cursor_y + cursor_h), 2)
-
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.

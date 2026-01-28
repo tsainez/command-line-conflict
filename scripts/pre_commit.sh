@@ -30,6 +30,9 @@ fi
 # We enforce a score of 9.0 to maintain code quality while allowing some non-critical warnings
 pylint $FILES --fail-under=9.0
 
+echo "🧮 Running Mypy..."
+mypy .
+
 echo "🧪 Running Tests..."
 export SDL_VIDEODRIVER=dummy
 python -m pytest

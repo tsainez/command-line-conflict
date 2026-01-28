@@ -12,7 +12,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
@@ -27,5 +27,5 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material mkdocs-include-markdown-plugin
+      - run: pip install mkdocs-material mkdocs-include-markdown-plugin mkdocstrings mkdocstrings-python
       - run: mkdocs gh-deploy --force
