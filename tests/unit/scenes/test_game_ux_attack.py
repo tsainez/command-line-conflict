@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pygame
+import pytest
 
 from command_line_conflict import config
 from command_line_conflict.components.attack import Attack
@@ -8,6 +9,7 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict.scenes.game import GameScene
 
 
@@ -74,6 +76,7 @@ def test_right_click_enemy_issues_attack_command(mocker):
 
     # Assert
     attacker_attack = game_state.get_component(attacker_id, Attack)
+    attacker_movable = game_state.get_component(attacker_id, Movable)
 
     # Expectation: Attack target should be set to target_id
     assert attacker_attack.attack_target == target_id, "Right-click on enemy should set attack target"

@@ -32,6 +32,6 @@ pylint $FILES --fail-under=9.0
 
 echo "🧪 Running Tests..."
 export SDL_VIDEODRIVER=dummy
-python -m pytest
+pytest --cov=command_line_conflict tests/
 
 echo "✅ All checks passed! Ready to commit."

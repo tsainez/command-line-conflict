@@ -1,16 +1,17 @@
-from unittest.mock import MagicMock, patch
-
-import pygame
 import pytest
+from unittest.mock import MagicMock, patch, ANY
+from contextlib import ExitStack
+import pygame
 
 from command_line_conflict import config
-from command_line_conflict.components.attack import Attack
-from command_line_conflict.components.health import Health
-from command_line_conflict.components.player import Player
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.components.vision import Vision
 from command_line_conflict.scenes.game import GameScene
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.unit_identity import UnitIdentity
+from command_line_conflict.components.attack import Attack
 
 
 @pytest.fixture
@@ -27,41 +28,26 @@ def mock_game():
 
 @pytest.fixture
 def game_scene(mock_game):
-    with patch("command_line_conflict.scenes.game.GameState") as MockGameState, patch(
-        "command_line_conflict.scenes.game.FogOfWar"
-    ) as MockFogOfWar, patch("command_line_conflict.scenes.game.Camera"), patch(
-        "command_line_conflict.scenes.game.CampaignManager"
-    ) as MockCampaignManager, patch(
-        "command_line_conflict.scenes.game.MovementSystem"
-    ) as MockMovementSystem, patch(
-        "command_line_conflict.scenes.game.RenderingSystem"
-    ) as MockRenderingSystem, patch(
-        "command_line_conflict.scenes.game.CombatSystem"
-    ) as MockCombatSystem, patch(
-        "command_line_conflict.scenes.game.FleeSystem"
-    ) as MockFleeSystem, patch(
-        "command_line_conflict.scenes.game.HealthSystem"
-    ) as MockHealthSystem, patch(
-        "command_line_conflict.scenes.game.SelectionSystem"
-    ) as MockSelectionSystem, patch(
-        "command_line_conflict.scenes.game.UISystem"
-    ) as MockUISystem, patch(
-        "command_line_conflict.scenes.game.ChatSystem"
-    ) as MockChatSystem, patch(
-        "command_line_conflict.scenes.game.CorpseRemovalSystem"
-    ) as MockCorpseRemovalSystem, patch(
-        "command_line_conflict.scenes.game.AISystem"
-    ) as MockAISystem, patch(
-        "command_line_conflict.scenes.game.ConfettiSystem"
-    ) as MockConfettiSystem, patch(
-        "command_line_conflict.scenes.game.ProductionSystem"
-    ) as MockProductionSystem, patch(
-        "command_line_conflict.scenes.game.SoundSystem"
-    ) as MockSoundSystem, patch(
-        "command_line_conflict.scenes.game.WanderSystem"
-    ) as MockWanderSystem, patch(
-        "command_line_conflict.scenes.game.SpawnSystem"
-    ) as MockSpawnSystem:
+    with ExitStack() as stack:
+        MockGameState = stack.enter_context(patch("command_line_conflict.scenes.game.GameState"))
+        MockFogOfWar = stack.enter_context(patch("command_line_conflict.scenes.game.FogOfWar"))
+        MockCamera = stack.enter_context(patch("command_line_conflict.scenes.game.Camera"))
+        MockCampaignManager = stack.enter_context(patch("command_line_conflict.scenes.game.CampaignManager"))
+        MockMovementSystem = stack.enter_context(patch("command_line_conflict.scenes.game.MovementSystem"))
+        MockRenderingSystem = stack.enter_context(patch("command_line_conflict.scenes.game.RenderingSystem"))
+        MockCombatSystem = stack.enter_context(patch("command_line_conflict.scenes.game.CombatSystem"))
+        MockFleeSystem = stack.enter_context(patch("command_line_conflict.scenes.game.FleeSystem"))
+        MockHealthSystem = stack.enter_context(patch("command_line_conflict.scenes.game.HealthSystem"))
+        MockSelectionSystem = stack.enter_context(patch("command_line_conflict.scenes.game.SelectionSystem"))
+        MockUISystem = stack.enter_context(patch("command_line_conflict.scenes.game.UISystem"))
+        MockChatSystem = stack.enter_context(patch("command_line_conflict.scenes.game.ChatSystem"))
+        MockCorpseRemovalSystem = stack.enter_context(patch("command_line_conflict.scenes.game.CorpseRemovalSystem"))
+        MockAISystem = stack.enter_context(patch("command_line_conflict.scenes.game.AISystem"))
+        MockConfettiSystem = stack.enter_context(patch("command_line_conflict.scenes.game.ConfettiSystem"))
+        MockProductionSystem = stack.enter_context(patch("command_line_conflict.scenes.game.ProductionSystem"))
+        MockSoundSystem = stack.enter_context(patch("command_line_conflict.scenes.game.SoundSystem"))
+        MockWanderSystem = stack.enter_context(patch("command_line_conflict.scenes.game.WanderSystem"))
+        MockSpawnSystem = stack.enter_context(patch("command_line_conflict.scenes.game.SpawnSystem"))
 
         # Setup GameState behavior
         mock_game_state_instance = MockGameState.return_value
@@ -70,16 +56,6 @@ def game_scene(mock_game):
         mock_game_state_instance.map.height = 100
         mock_game_state_instance.entities = {}
         mock_game_state_instance.event_queue = []
-
-        # Mock get_entities_with_component to filter self.entities
-        def get_entities_with_component_side_effect(*component_types):
-            result = {}
-            for entity_id, components in mock_game_state_instance.entities.items():
-                if all(comp_type in components for comp_type in component_types):
-                    result[entity_id] = components
-            return result
-
-        mock_game_state_instance.get_entities_with_component.side_effect = get_entities_with_component_side_effect
 
         scene = GameScene(mock_game)
 
@@ -103,7 +79,7 @@ def game_scene(mock_game):
         scene.mock_spawn_system = MockSpawnSystem.return_value
         scene.rendering_system = MockRenderingSystem.return_value  # GameScene stores it in self.rendering_system
 
-        return scene
+        yield scene
 
 
 class TestGameSceneInit:
@@ -132,45 +108,28 @@ class TestGameSceneInit:
         mock_game.music_manager.play.assert_called_with("music/game_theme.ogg")
 
     def test_init_creates_initial_units_fallback(self, mock_game):
-        with patch("command_line_conflict.scenes.game.GameState") as MockGameState, patch(
-            "command_line_conflict.scenes.game.factories"
-        ) as mock_factories, patch("command_line_conflict.scenes.game.FactoryBattleMap") as MockMap, patch(
-            "command_line_conflict.scenes.game.FogOfWar"
-        ), patch(
-            "command_line_conflict.scenes.game.Camera"
-        ), patch(
-            "command_line_conflict.scenes.game.CampaignManager"
-        ), patch(
-            "command_line_conflict.scenes.game.MovementSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.RenderingSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.CombatSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.FleeSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.HealthSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SelectionSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.UISystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ChatSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.CorpseRemovalSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.AISystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ConfettiSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ProductionSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SoundSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.WanderSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SpawnSystem"
-        ):
+        with ExitStack() as stack:
+            MockGameState = stack.enter_context(patch("command_line_conflict.scenes.game.GameState"))
+            mock_factories = stack.enter_context(patch("command_line_conflict.scenes.game.factories"))
+            MockMap = stack.enter_context(patch("command_line_conflict.scenes.game.FactoryBattleMap"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.FogOfWar"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.Camera"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.CampaignManager"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.MovementSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.RenderingSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.CombatSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.FleeSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.HealthSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.SelectionSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.UISystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.ChatSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.CorpseRemovalSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.AISystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.ConfettiSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.ProductionSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.SoundSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.WanderSystem"))
+            stack.enter_context(patch("command_line_conflict.scenes.game.SpawnSystem"))
 
             mock_game_state_instance = MockGameState.return_value
             # Ensure map does NOT have create_initial_units
@@ -384,6 +343,9 @@ class TestGameSceneUpdate:
                 Player: MagicMock(is_human=False),  # Should be ignored
             },
         }
+
+        # Mock get_entities_with_component to return IDs that have Vision
+        game_scene.game_state.get_entities_with_component.return_value = [1, 2]
 
         game_scene.update(0.1)
 
