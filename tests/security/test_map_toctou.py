@@ -25,11 +25,12 @@ class TestMapTOCTOU(unittest.TestCase):
         """
         # Setup mocks
         filename = "some_symlink.json"
-        resolved_path = "/secure/path/to/real_file.json"
+        # Updated to match new security policy: saves only allowed in user data dir
+        user_data_dir = "/user/data"
+        resolved_path = "/user/data/real_file.json"
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
-        user_data_dir = "/user/data"
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir

@@ -20,3 +20,8 @@
 **Vulnerability:** `Map.save_to_file` allowed saving to the application source directory (`maps_dir`) to support local development. However, it did not enforce file extensions, allowing an attacker (or compromised UI) to overwrite critical python source files (e.g., `__init__.py`) with JSON data, causing Denial of Service or potentially corrupting the installation.
 **Learning:** Allowing an application to write to its own source/installation directory is risky. Even with directory restrictions, failing to enforce file extensions can turn a file-write feature into a destructive capability.
 **Prevention:** Strictly enforce file extensions (allowlist) for all user-generated content. Ideally, restrict write operations *only* to isolated user data directories, treating the application directory as read-only.
+
+## 2026-01-28 - [Restricting Map Saves to User Data]
+**Vulnerability:** `Map.save_to_file` allowed writing to the installation source directory. This could allow an attacker to overwrite bundled maps or corrupt the installation if they could control the filename.
+**Learning:** Write permissions should always be minimized to the specific user data folder. Applications should treat their own source code/installation directory as read-only to prevent self-modification attacks.
+**Prevention:** Explicitly separate "read-allowed" paths (bundled content) from "write-allowed" paths (user content). In this case, `allowed_dirs` for saving was restricted to just `user_data_dir`.
