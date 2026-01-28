@@ -88,7 +88,7 @@ This file contains a backlog of 100 potential tasks that can be performed by aut
 ## Testing / QA
 71. Add unit tests for the core `Game` class.
 72. Add integration tests for full campaign mission flow.
-73. Implement property-based testing using `Hypothesis`.
+73. [x] Implement property-based testing using `Hypothesis`.
 74. Add performance benchmarks for the game loop.
 75. Implement fuzz testing for input handling.
 76. Add visual regression tests (comparing screen output snapshots).

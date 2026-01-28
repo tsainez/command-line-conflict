@@ -29,3 +29,4 @@ site/
 
 # Pytest
 .pytest_cache/
+.hypothesis/

@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/maps/base.py
+# hypothesis_version: 6.151.3
+
+[100, 256, 1024, 50000, '#', '.json', 'Map', 'height', 'r', 'utf-8', 'walls', 'width']
