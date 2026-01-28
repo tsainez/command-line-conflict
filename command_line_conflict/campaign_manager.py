@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import stat
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
@@ -64,6 +65,13 @@ class CampaignManager:
         # where the file grows between check and read.
         try:
             with open(self.save_file, "r", encoding="utf-8") as f:
+                # Security: Check file type to prevent reading from special files (e.g., pipes, devices)
+                # which could cause blocking or DoS.
+                st = os.fstat(f.fileno())
+                if not stat.S_ISREG(st.st_mode):
+                    log.error(f"Failed to load save file: {self.save_file} is not a regular file")
+                    return
+
                 # Read up to the limit + 1 char to detect overflow
                 content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
 
