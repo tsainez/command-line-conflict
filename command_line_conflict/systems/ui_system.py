@@ -58,6 +58,9 @@ class UISystem:
         # Each effect is a dict: {x, y, time, color, duration}
         self.click_effects: list[dict] = []
 
+        # Cache for static UI elements
+        self._key_options_surface = None
+
         log.debug("UISystem initialized")
 
     @functools.lru_cache(maxsize=256)
@@ -408,18 +411,19 @@ class UISystem:
 
         self._draw_health_bar(panel_x_offset, panel_y, 150, 10, total_health, max_health)
 
-    def _draw_key_options(self) -> None:
-        """Draws the panel at the bottom of the screen showing key bindings."""
+    def _render_key_options_surface(self) -> pygame.Surface:
+        """Renders the key options panel to a cached surface."""
         panel_height = 100
-        panel_y = config.SCREEN_HEIGHT - panel_height
-        panel_rect = pygame.Rect(0, panel_y, config.SCREEN_WIDTH, panel_height)
-        overlay = pygame.Surface(panel_rect.size, pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 128))
-        self.screen.blit(overlay, panel_rect.topleft)
-        pygame.draw.rect(self.screen, (255, 255, 255), panel_rect, 1)
+        surface = pygame.Surface((config.SCREEN_WIDTH, panel_height), pygame.SRCALPHA)
+
+        # Background overlay
+        surface.fill((0, 0, 0, 128))
+
+        # Border
+        pygame.draw.rect(surface, (255, 255, 255), (0, 0, config.SCREEN_WIDTH, panel_height), 1)
 
         x_offset = 380
-        y_offset = panel_y + 10
+        y_offset = 10
         column_width = 180
         row_height = 20
         items_per_row = 2
@@ -432,7 +436,18 @@ class UISystem:
             y_pos = y_offset + row * row_height
 
             text = self._get_text_surface(option, (255, 255, 255))
-            self.screen.blit(text, (x_pos, y_pos))
+            surface.blit(text, (x_pos, y_pos))
+
+        return surface
+
+    def _draw_key_options(self) -> None:
+        """Draws the panel at the bottom of the screen showing key bindings."""
+        if self._key_options_surface is None:
+            self._key_options_surface = self._render_key_options_surface()
+
+        panel_height = 100
+        panel_y = config.SCREEN_HEIGHT - panel_height
+        self.screen.blit(self._key_options_surface, (0, panel_y))
 
     def _draw_active_cheats(self, cheats: dict) -> None:
         """Draws a list of active cheats."""

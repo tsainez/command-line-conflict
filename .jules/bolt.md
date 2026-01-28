@@ -25,3 +25,7 @@
 ## 2025-05-28 - Loop Hoisting in Rendering
 **Learning:** Hoisting constant calculations (like grid size and screen coordinate conversions) out of inner loops in rendering systems can provide significant speedups (e.g., ~45%) by reducing arithmetic operations per entity.
 **Action:** Pre-calculate screen coordinates for tiles in the outer loop instead of re-calculating them for every entity in the tile.
+
+## 2025-06-01 - Static UI Composition Caching
+**Learning:** Even with cached text surfaces, the overhead of multiple `blit` calls and `draw.rect` for static UI panels adds up. Caching the entire composed panel into a single surface reduced draw time by ~50%.
+**Action:** Identify static UI panels (menus, HUDs) and render them to a single off-screen surface during initialization or on first draw.
