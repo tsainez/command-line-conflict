@@ -1,16 +1,16 @@
-from unittest.mock import MagicMock, patch
-
-import pygame
 import pytest
+from unittest.mock import MagicMock, patch, ANY
+import pygame
 
 from command_line_conflict import config
-from command_line_conflict.components.attack import Attack
-from command_line_conflict.components.health import Health
-from command_line_conflict.components.player import Player
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.components.vision import Vision
 from command_line_conflict.scenes.game import GameScene
+from command_line_conflict.components.player import Player
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.vision import Vision
+from command_line_conflict.components.selectable import Selectable
+from command_line_conflict.components.unit_identity import UnitIdentity
+from command_line_conflict.components.attack import Attack
 
 
 @pytest.fixture
@@ -26,84 +26,59 @@ def mock_game():
 
 
 @pytest.fixture
-def game_scene(mock_game):
-    with patch("command_line_conflict.scenes.game.GameState") as MockGameState, patch(
-        "command_line_conflict.scenes.game.FogOfWar"
-    ) as MockFogOfWar, patch("command_line_conflict.scenes.game.Camera"), patch(
-        "command_line_conflict.scenes.game.CampaignManager"
-    ) as MockCampaignManager, patch(
-        "command_line_conflict.scenes.game.MovementSystem"
-    ) as MockMovementSystem, patch(
-        "command_line_conflict.scenes.game.RenderingSystem"
-    ) as MockRenderingSystem, patch(
-        "command_line_conflict.scenes.game.CombatSystem"
-    ) as MockCombatSystem, patch(
-        "command_line_conflict.scenes.game.FleeSystem"
-    ) as MockFleeSystem, patch(
-        "command_line_conflict.scenes.game.HealthSystem"
-    ) as MockHealthSystem, patch(
-        "command_line_conflict.scenes.game.SelectionSystem"
-    ) as MockSelectionSystem, patch(
-        "command_line_conflict.scenes.game.UISystem"
-    ) as MockUISystem, patch(
-        "command_line_conflict.scenes.game.ChatSystem"
-    ) as MockChatSystem, patch(
-        "command_line_conflict.scenes.game.CorpseRemovalSystem"
-    ) as MockCorpseRemovalSystem, patch(
-        "command_line_conflict.scenes.game.AISystem"
-    ) as MockAISystem, patch(
-        "command_line_conflict.scenes.game.ConfettiSystem"
-    ) as MockConfettiSystem, patch(
-        "command_line_conflict.scenes.game.ProductionSystem"
-    ) as MockProductionSystem, patch(
-        "command_line_conflict.scenes.game.SoundSystem"
-    ) as MockSoundSystem, patch(
-        "command_line_conflict.scenes.game.WanderSystem"
-    ) as MockWanderSystem, patch(
-        "command_line_conflict.scenes.game.SpawnSystem"
-    ) as MockSpawnSystem:
+def game_scene(mock_game, mocker):
+    # Setup GameState behavior
+    MockGameState = mocker.patch("command_line_conflict.scenes.game.GameState")
+    mock_game_state_instance = MockGameState.return_value
+    mock_game_state_instance.map = MagicMock()
+    mock_game_state_instance.map.width = 100
+    mock_game_state_instance.map.height = 100
+    mock_game_state_instance.entities = {}
+    mock_game_state_instance.event_queue = []
 
-        # Setup GameState behavior
-        mock_game_state_instance = MockGameState.return_value
-        mock_game_state_instance.map = MagicMock()
-        mock_game_state_instance.map.width = 100
-        mock_game_state_instance.map.height = 100
-        mock_game_state_instance.entities = {}
-        mock_game_state_instance.event_queue = []
+    # Mock other dependencies
+    mocker.patch("command_line_conflict.scenes.game.FogOfWar")
+    mocker.patch("command_line_conflict.scenes.game.Camera")
+    MockCampaignManager = mocker.patch("command_line_conflict.scenes.game.CampaignManager")
+    mocker.patch("command_line_conflict.scenes.game.MovementSystem")
+    MockRenderingSystem = mocker.patch("command_line_conflict.scenes.game.RenderingSystem")
+    mocker.patch("command_line_conflict.scenes.game.CombatSystem")
+    mocker.patch("command_line_conflict.scenes.game.FleeSystem")
+    mocker.patch("command_line_conflict.scenes.game.HealthSystem")
+    mocker.patch("command_line_conflict.scenes.game.SelectionSystem")
+    MockUISystem = mocker.patch("command_line_conflict.scenes.game.UISystem")
+    MockChatSystem = mocker.patch("command_line_conflict.scenes.game.ChatSystem")
+    mocker.patch("command_line_conflict.scenes.game.CorpseRemovalSystem")
+    mocker.patch("command_line_conflict.scenes.game.AISystem")
+    mocker.patch("command_line_conflict.scenes.game.ConfettiSystem")
+    mocker.patch("command_line_conflict.scenes.game.ProductionSystem")
+    mocker.patch("command_line_conflict.scenes.game.SoundSystem")
+    mocker.patch("command_line_conflict.scenes.game.WanderSystem")
+    mocker.patch("command_line_conflict.scenes.game.SpawnSystem")
 
-        # Mock get_entities_with_component to filter self.entities
-        def get_entities_with_component_side_effect(*component_types):
-            result = {}
-            for entity_id, components in mock_game_state_instance.entities.items():
-                if all(comp_type in components for comp_type in component_types):
-                    result[entity_id] = components
-            return result
+    scene = GameScene(mock_game)
 
-        mock_game_state_instance.get_entities_with_component.side_effect = get_entities_with_component_side_effect
+    # Attach mocked systems to the scene instance for assertion convenience
+    scene.mock_game_state = mock_game_state_instance
+    scene.mock_campaign_manager = MockCampaignManager.return_value
+    scene.mock_ui_system = MockUISystem.return_value
+    scene.mock_selection_system = scene.selection_system  # It's a mock because we patched the class
+    scene.mock_movement_system = scene.movement_system
+    scene.mock_chat_system = MockChatSystem.return_value
+    scene.mock_sound_system = scene.sound_system
+    scene.mock_fog_of_war = scene.fog_of_war
+    scene.mock_combat_system = scene.combat_system
+    scene.mock_health_system = scene.health_system
+    scene.mock_flee_system = scene.flee_system
+    scene.mock_ai_system = scene.ai_system
+    scene.mock_wander_system = scene.wander_system
+    scene.mock_confetti_system = scene.confetti_system
+    scene.mock_production_system = scene.production_system
+    scene.mock_corpse_removal_system = scene.corpse_removal_system
+    scene.mock_spawn_system = scene.spawn_system
+    scene.rendering_system = MockRenderingSystem.return_value  # GameScene stores it in self.rendering_system
 
-        scene = GameScene(mock_game)
-
-        # Attach mocked systems to the scene instance for assertion convenience
-        scene.mock_game_state = mock_game_state_instance
-        scene.mock_campaign_manager = MockCampaignManager.return_value
-        scene.mock_ui_system = MockUISystem.return_value
-        scene.mock_selection_system = MockSelectionSystem.return_value
-        scene.mock_movement_system = MockMovementSystem.return_value
-        scene.mock_chat_system = MockChatSystem.return_value
-        scene.mock_sound_system = MockSoundSystem.return_value
-        scene.mock_fog_of_war = MockFogOfWar.return_value
-        scene.mock_combat_system = MockCombatSystem.return_value
-        scene.mock_health_system = MockHealthSystem.return_value
-        scene.mock_flee_system = MockFleeSystem.return_value
-        scene.mock_ai_system = MockAISystem.return_value
-        scene.mock_wander_system = MockWanderSystem.return_value
-        scene.mock_confetti_system = MockConfettiSystem.return_value
-        scene.mock_production_system = MockProductionSystem.return_value
-        scene.mock_corpse_removal_system = MockCorpseRemovalSystem.return_value
-        scene.mock_spawn_system = MockSpawnSystem.return_value
-        scene.rendering_system = MockRenderingSystem.return_value  # GameScene stores it in self.rendering_system
-
-        return scene
+    return scene
 
 
 class TestGameSceneInit:
@@ -131,62 +106,44 @@ class TestGameSceneInit:
     def test_init_plays_music(self, game_scene, mock_game):
         mock_game.music_manager.play.assert_called_with("music/game_theme.ogg")
 
-    def test_init_creates_initial_units_fallback(self, mock_game):
-        with patch("command_line_conflict.scenes.game.GameState") as MockGameState, patch(
-            "command_line_conflict.scenes.game.factories"
-        ) as mock_factories, patch("command_line_conflict.scenes.game.FactoryBattleMap") as MockMap, patch(
-            "command_line_conflict.scenes.game.FogOfWar"
-        ), patch(
-            "command_line_conflict.scenes.game.Camera"
-        ), patch(
-            "command_line_conflict.scenes.game.CampaignManager"
-        ), patch(
-            "command_line_conflict.scenes.game.MovementSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.RenderingSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.CombatSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.FleeSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.HealthSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SelectionSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.UISystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ChatSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.CorpseRemovalSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.AISystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ConfettiSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.ProductionSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SoundSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.WanderSystem"
-        ), patch(
-            "command_line_conflict.scenes.game.SpawnSystem"
-        ):
+    def test_init_creates_initial_units_fallback(self, mock_game, mocker):
+        MockGameState = mocker.patch("command_line_conflict.scenes.game.GameState")
+        mock_factories = mocker.patch("command_line_conflict.scenes.game.factories")
+        MockMap = mocker.patch("command_line_conflict.scenes.game.FactoryBattleMap")
+        mocker.patch("command_line_conflict.scenes.game.FogOfWar")
+        mocker.patch("command_line_conflict.scenes.game.Camera")
+        mocker.patch("command_line_conflict.scenes.game.CampaignManager")
+        mocker.patch("command_line_conflict.scenes.game.MovementSystem")
+        mocker.patch("command_line_conflict.scenes.game.RenderingSystem")
+        mocker.patch("command_line_conflict.scenes.game.CombatSystem")
+        mocker.patch("command_line_conflict.scenes.game.FleeSystem")
+        mocker.patch("command_line_conflict.scenes.game.HealthSystem")
+        mocker.patch("command_line_conflict.scenes.game.SelectionSystem")
+        mocker.patch("command_line_conflict.scenes.game.UISystem")
+        mocker.patch("command_line_conflict.scenes.game.ChatSystem")
+        mocker.patch("command_line_conflict.scenes.game.CorpseRemovalSystem")
+        mocker.patch("command_line_conflict.scenes.game.AISystem")
+        mocker.patch("command_line_conflict.scenes.game.ConfettiSystem")
+        mocker.patch("command_line_conflict.scenes.game.ProductionSystem")
+        mocker.patch("command_line_conflict.scenes.game.SoundSystem")
+        mocker.patch("command_line_conflict.scenes.game.WanderSystem")
+        mocker.patch("command_line_conflict.scenes.game.SpawnSystem")
 
-            mock_game_state_instance = MockGameState.return_value
-            # Ensure map does NOT have create_initial_units
-            mock_map_instance = MockMap.return_value
-            del mock_map_instance.create_initial_units
-            mock_game_state_instance.map = mock_map_instance
-            mock_game_state_instance.map.width = 100
-            mock_game_state_instance.map.height = 100
+        mock_game_state_instance = MockGameState.return_value
+        # Ensure map does NOT have create_initial_units
+        mock_map_instance = MockMap.return_value
+        del mock_map_instance.create_initial_units
+        mock_game_state_instance.map = mock_map_instance
+        mock_game_state_instance.map.width = 100
+        mock_game_state_instance.map.height = 100
 
-            GameScene(mock_game)
+        GameScene(mock_game)
 
-            # Check if fallback factories were called
-            # 3 chassis for player 1
-            assert mock_factories.create_chassis.call_count == 3
-            # 1 rover for player 2
-            mock_factories.create_rover.assert_called_once()
+        # Check if fallback factories were called
+        # 3 chassis for player 1
+        assert mock_factories.create_chassis.call_count == 3
+        # 1 rover for player 2
+        mock_factories.create_rover.assert_called_once()
 
 
 class TestGameSceneHandleEvent:

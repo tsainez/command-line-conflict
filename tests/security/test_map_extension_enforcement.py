@@ -1,5 +1,5 @@
+import os
 import pytest
-
 from command_line_conflict.maps.base import Map
 
 

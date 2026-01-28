@@ -1,5 +1,6 @@
+import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from command_line_conflict.music import MusicManager
 

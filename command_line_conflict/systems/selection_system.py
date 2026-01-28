@@ -89,7 +89,8 @@ class SelectionSystem:
         selected_count = 0
         for entity_id in game_state.get_entities_with_component(Selectable):
             components = game_state.entities.get(entity_id)
-            if not components: continue
+            if not components:
+                continue
 
             selectable = components.get(Selectable)
             player = components.get(Player)
@@ -139,9 +140,7 @@ class SelectionSystem:
             player = components.get(Player)
             selectable = components.get(Selectable)
 
-            if (player
-                and player.player_id == current_player_id
-                and selectable):
+            if player and player.player_id == current_player_id and selectable:
                 clicked_entity_id = entity_id
                 break
 
@@ -158,7 +157,8 @@ class SelectionSystem:
                 # Optimization: Iterate only over Selectable entities to deselect
                 for entity_id in game_state.get_entities_with_component(Selectable):
                     components = game_state.entities.get(entity_id)
-                    if not components: continue
+                    if not components:
+                        continue
                     selectable = components.get(Selectable)
                     # Deselect other units unless they are the one clicked
                     if selectable:
