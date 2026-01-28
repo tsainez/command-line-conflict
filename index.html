@@ -1,0 +1,901 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="API/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Command Line Conflict</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#command-line-conflict" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Command Line Conflict" class="md-header__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Command Line Conflict
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Command Line Conflict" class="md-nav__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Command Line Conflict
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-platform-environment-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Platform Environment Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-Platform Environment Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windows 11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        macOS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-11-build-pyinstaller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windows 11 Build (PyInstaller)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-running-tests-and-linters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (Optional) Running Tests and Linters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ECS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECS Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="MapCreation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map Creation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Maps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ProjectStructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Started">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-platform-environment-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Platform Environment Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-Platform Environment Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windows 11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        macOS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Linux
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-11-build-pyinstaller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windows 11 Build (PyInstaller)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-running-tests-and-linters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (Optional) Running Tests and Linters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="command-line-conflict">Command Line Conflict</h1>
+<p>"Command Line Conflict" is a codename for a fast-paced, open-source real-time strategy game inspired by Starcraft, rendered entirely in charming ASCII art.</p>
+<p><a href="https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/tsainez/command-line-conflict/actions/workflows/ci.yml/badge.svg" /></a>
+<a href="https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/tsainez/command-line-conflict/actions/workflows/tests.yml/badge.svg" /></a>
+<a href="https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml"><img alt="Docs" src="https://github.com/tsainez/command-line-conflict/actions/workflows/deploy_docs.yml/badge.svg" /></a></p>
+<h2 id="getting-started">Getting Started</h2>
+<p>This guide will walk you through setting up and running the game on your local machine, as well as development best practices. </p>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Python 3.8 or higher</li>
+<li><code>pip</code> and <code>venv</code></li>
+</ul>
+<h3 id="cross-platform-environment-setup">Cross-Platform Environment Setup</h3>
+<p>To run the game manually, your system must know where to find Python. If running <code>python --version</code> or <code>pip --version</code> fails, follow these steps to add Python to your system's PATH.</p>
+<h4 id="windows-11">Windows 11</h4>
+<ol>
+<li><strong>Search for "Environment Variables"</strong>: Open the Start menu, type "env", and select <strong>"Edit the system environment variables"</strong>.</li>
+<li><strong>Environment Variables</strong>: Click the <strong>"Environment Variables..."</strong> button.</li>
+<li><strong>Edit Path</strong>: In the "User variables" section, locate the row named <strong>"Path"</strong> and double-click it.</li>
+<li><strong>Add Python Paths</strong>: Click <strong>"New"</strong> and add the paths to your Python executable and Scripts folder. They usually look like this (replace <code>YourUsername</code> and version number):<ul>
+<li><code>C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\</code></li>
+<li><code>C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\Scripts\</code></li>
+</ul>
+</li>
+<li><strong>Apply</strong>: Click OK on all dialogs and restart your terminal (PowerShell or Command Prompt).</li>
+</ol>
+<h4 id="macos">macOS</h4>
+<p>If you installed Python via the official installer, it likely set the PATH for you. If not, or if using Homebrew:
+1.  Open your terminal.
+2.  Edit your shell profile (e.g., <code>~/.zshrc</code> or <code>~/.bash_profile</code>):
+    <code>bash
+    nano ~/.zshrc</code>
+3.  Add the following line (adjusting for your specific installation path):
+    <code>bash
+    export PATH="/usr/local/bin:$PATH"
+    # or for Homebrew on Apple Silicon:
+    export PATH="/opt/homebrew/bin:$PATH"</code>
+4.  Save and exit (<code>Ctrl+O</code>, <code>Enter</code>, <code>Ctrl+X</code>), then reload:
+    <code>bash
+    source ~/.zshrc</code></p>
+<h4 id="linux">Linux</h4>
+<p>Most Linux distributions come with Python installed. If you installed a custom version:
+1.  Open your terminal.
+2.  Edit your <code>.bashrc</code> or <code>.zshrc</code>:
+    <code>bash
+    nano ~/.bashrc</code>
+3.  Add the export line pointing to your Python bin directory:
+    <code>bash
+    export PATH="/path/to/python/bin:$PATH"</code>
+4.  Reload the configuration:
+    <code>bash
+    source ~/.bashrc</code></p>
+<h3 id="installation">Installation</h3>
+<ol>
+<li>
+<p><strong>Clone the repository:</strong>
+    <code>bash
+    git clone https://github.com/tsainez/command-line-conflict.git
+    cd command-line-conflict</code></p>
+</li>
+<li>
+<p><strong>Create and activate a virtual environment:</strong>
+    This isolates the project's dependencies from your system's Python installation.
+    <code>bash
+    # For macOS and Linux
+    python3 -m venv .venv
+    source .venv/bin/activate</code></p>
+</li>
+<li>
+<p><strong>Install the required packages:</strong>
+    <code>bash
+    pip install --upgrade pip
+    pip install -r requirements.txt</code></p>
+</li>
+<li>
+<p><strong>Launch the game:</strong>
+    <code>bash
+    python main.py</code></p>
+</li>
+</ol>
+<h3 id="windows-11-build-pyinstaller">Windows 11 Build (PyInstaller)</h3>
+<p>The build script creates a standalone executable using PyInstaller.</p>
+<pre><code class="language-powershell">.\scripts\build_windows.ps1
+</code></pre>
+<p>Optional flags:</p>
+<pre><code class="language-powershell">.\scripts\build_windows.ps1 -Clean
+.\scripts\build_windows.ps1 -NoVenv -Python &quot;py&quot;
+</code></pre>
+<p>The output executable will be in the <code>dist</code> folder.</p>
+<h3 id="optional-running-tests-and-linters">(Optional) Running Tests and Linters</h3>
+<p>Before a change can be safely integrated, it must first pass through linting, automated testing, and finally a human player's assessment. </p>
+<p>Run the checks:</p>
+<pre><code>```bash
+# Check code formatting with Black
+black --check .
+
+# Check import sorting with isort
+isort --check-only .
+
+# Run the test suite with pytest
+pytest -q
+```
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
