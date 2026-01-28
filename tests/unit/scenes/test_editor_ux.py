@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import pygame
 import pytest
 
-from command_line_conflict import config
 from command_line_conflict.scenes.editor import EditorScene
 
 
