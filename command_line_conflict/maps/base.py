@@ -237,7 +237,6 @@ class Map:
         Raises:
             ValueError: If the filename is outside authorized directories or has invalid extension.
         """
-        import json
 
         from ..utils.paths import atomic_save_json, get_user_data_dir
 

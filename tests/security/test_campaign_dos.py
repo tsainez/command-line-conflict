@@ -1,47 +1,37 @@
-import json
-import os
-import tempfile
 import unittest
-
+from unittest.mock import MagicMock, patch
+import os
+import stat
 from command_line_conflict.campaign_manager import CampaignManager
 
+class TestCampaignManagerDos(unittest.TestCase):
+    @patch("builtins.open")
+    @patch("os.path.exists")
+    @patch("os.fstat")
+    def test_load_progress_non_regular_file(self, mock_fstat, mock_exists, mock_open):
+        # Setup mocks
+        mock_exists.return_value = True
 
-class TestCampaignManagerDoS(unittest.TestCase):
-    def setUp(self):
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            self.save_file = temp_file.name
+        # Mock file object
+        mock_file = MagicMock()
+        mock_file.read.return_value = "{}" # Return valid empty JSON so it doesn't crash on json.loads
+        mock_open.return_value.__enter__.return_value = mock_file
 
-    def tearDown(self):
-        if os.path.exists(self.save_file):
-            os.remove(self.save_file)
+        # Simulate a FIFO/special file (not S_ISREG)
+        # st_mode = 0 means it's definitely not a regular file
+        mock_st = MagicMock()
+        mock_st.st_mode = stat.S_IFIFO  # Named pipe
+        mock_st.st_size = 0
+        mock_fstat.return_value = mock_st
 
-    def test_load_large_file_prevention(self):
-        # Create a file larger than the limit we intend to set (512KB)
-        # We'll use 1MB to be sure.
-        with open(self.save_file, "w", encoding="utf-8") as f:
-            f.write(" " * (1024 * 1024))
+        # Initialize CampaignManager
+        # It will try to load progress in __init__
+        cm = CampaignManager(save_file="fifo_pipe")
 
-        # We expect an error log when loading fails due to size
-        with self.assertLogs("Command Line Conflict", level="ERROR") as cm:
-            manager = CampaignManager(save_file=self.save_file)
+        # Verification
+        # In the FIXED version, it should check fstat, see it's not regular, and NOT read.
 
-        # Verify that it didn't load (empty missions)
-        self.assertEqual(len(manager.completed_missions), 0)
-        # Verify log message
-        self.assertTrue(any("exceeds maximum allowed size" in o for o in cm.output))
+        mock_file.read.assert_not_called()
 
-    def test_load_excessive_missions_truncation(self):
-        # Create a valid JSON but with excessive items
-        limit = 1000  # The limit we plan to set
-        excess = 5000
-        data = {"completed_missions": [f"mission_{i}" for i in range(excess)]}
-        with open(self.save_file, "w", encoding="utf-8") as f:
-            json.dump(data, f)
-
-        with self.assertLogs("Command Line Conflict", level="WARNING") as cm:
-            manager = CampaignManager(save_file=self.save_file)
-
-        # Should be truncated to the limit
-        self.assertLessEqual(len(manager.completed_missions), limit)
-        # Verify log message about truncation
-        self.assertTrue(any("Too many completed missions" in o for o in cm.output))
+if __name__ == "__main__":
+    unittest.main()

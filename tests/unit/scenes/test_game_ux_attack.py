@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 import pygame
-import pytest
 
 from command_line_conflict import config
 from command_line_conflict.components.attack import Attack
@@ -9,7 +8,6 @@ from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict.scenes.game import GameScene
 
 
@@ -48,6 +46,7 @@ def test_right_click_enemy_issues_attack_command(mocker):
     game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
     # Add Movable so we can check if it tries to move
     from command_line_conflict.components.movable import Movable
+
     game_state.add_component(attacker_id, Movable(speed=5.0))
 
     # 2. Create Player 2 Unit (Target) at (12, 12)
@@ -75,7 +74,6 @@ def test_right_click_enemy_issues_attack_command(mocker):
 
     # Assert
     attacker_attack = game_state.get_component(attacker_id, Attack)
-    attacker_movable = game_state.get_component(attacker_id, Movable)
 
     # Expectation: Attack target should be set to target_id
     assert attacker_attack.attack_target == target_id, "Right-click on enemy should set attack target"
@@ -93,6 +91,7 @@ def test_right_click_enemy_issues_attack_command(mocker):
     assert last_effect["color"] == (255, 0, 0), "Should show red ripple for attack command"
     assert last_effect["x"] == 12
     assert last_effect["y"] == 12
+
 
 def test_right_click_ground_issues_move_command(mocker):
     """
@@ -115,6 +114,7 @@ def test_right_click_ground_issues_move_command(mocker):
     game_state.add_component(attacker_id, selectable)
     game_state.add_component(attacker_id, Attack(attack_damage=10, attack_range=5, attack_speed=1.0))
     from command_line_conflict.components.movable import Movable
+
     game_state.add_component(attacker_id, Movable(speed=5.0))
 
     # Set an existing attack target

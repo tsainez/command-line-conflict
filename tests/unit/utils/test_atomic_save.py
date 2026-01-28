@@ -14,6 +14,7 @@ class TestAtomicSave(unittest.TestCase):
 
     def tearDown(self):
         import shutil
+
         shutil.rmtree(self.test_dir)
 
     def test_atomic_save_success(self):
