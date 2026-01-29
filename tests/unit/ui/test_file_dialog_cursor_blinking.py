@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock, patch
 
-import pygame
 import pytest
 
 from command_line_conflict.ui.file_dialog import FileDialog
