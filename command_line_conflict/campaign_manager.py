@@ -30,7 +30,11 @@ class CampaignManager:
 
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
-            self.save_file = save_file
+            # Security fix: Enforce .json extension to prevent arbitrary file overwrite
+            path = Path(save_file).resolve()
+            if path.suffix.lower() != ".json":
+                raise ValueError("Save file must have .json extension")
+            self.save_file = str(path)
         else:
             data_dir = get_user_data_dir()
             try:

@@ -8,7 +8,7 @@ from command_line_conflict.campaign_manager import CampaignManager
 
 class TestCampaignManagerDoS(unittest.TestCase):
     def setUp(self):
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
             self.save_file = temp_file.name
 
     def tearDown(self):
