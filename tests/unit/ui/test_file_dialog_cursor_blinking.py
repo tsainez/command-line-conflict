@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
 import pygame
+import pytest
 
 from command_line_conflict.ui.file_dialog import FileDialog
 
@@ -16,10 +16,12 @@ class TestFileDialogCursorBlinking:
     def mock_font(self):
         font = MagicMock()
         font.render.return_value = MagicMock()
+
         # Mock size to estimate width
         # Let's say each char is 10px wide
         def size(text):
             return (len(text) * 10, 20)
+
         font.size.side_effect = size
         return font
 
@@ -69,7 +71,7 @@ class TestFileDialogCursorBlinking:
     def test_cursor_position(self, mock_get_ticks, mock_draw_line, dialog, mock_screen):
         """Test that the cursor is drawn at the correct position."""
         mock_get_ticks.return_value = 0
-        dialog.input_text = "ABC" # 3 chars * 10px = 30px width
+        dialog.input_text = "ABC"  # 3 chars * 10px = 30px width
 
         dialog.draw()
 
