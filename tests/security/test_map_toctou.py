@@ -52,7 +52,7 @@ class TestMapTOCTOU(unittest.TestCase):
                 return maps_dir
             if p1 == user_data_dir and p2.startswith(user_data_dir):
                 return user_data_dir
-            return "/" # No common path
+            return "/"  # No common path
 
         mock_commonpath.side_effect = commonpath_side_effect
 
