@@ -49,6 +49,7 @@ class TestMapTOCTOU(unittest.TestCase):
 
         # Mock commonpath to verify the resolved path against allowed dirs
         # We simulate that the resolved path IS inside the maps dir
+        # (This mock is required because Windows paths differ from mocked Unix paths)
         def commonpath_side_effect(paths):
             # paths = [allowed_dir, target_path]
             # If target_path starts with allowed_dir, commonpath returns allowed_dir
