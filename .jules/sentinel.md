@@ -20,3 +20,7 @@
 **Vulnerability:** `Map.save_to_file` allowed saving to the application source directory (`maps_dir`) to support local development. However, it did not enforce file extensions, allowing an attacker (or compromised UI) to overwrite critical python source files (e.g., `__init__.py`) with JSON data, causing Denial of Service or potentially corrupting the installation.
 **Learning:** Allowing an application to write to its own source/installation directory is risky. Even with directory restrictions, failing to enforce file extensions can turn a file-write feature into a destructive capability.
 **Prevention:** Strictly enforce file extensions (allowlist) for all user-generated content. Ideally, restrict write operations *only* to isolated user data directories, treating the application directory as read-only.
+## 2026-01-29 - [Arbitrary File Overwrite via CampaignManager]
+**Vulnerability:** `CampaignManager` allowed initialization with any file path as `save_file`. A malicious actor could set this to a sensitive system file (e.g., `.bashrc`), causing it to be overwritten with JSON data.
+**Learning:** Classes that write to files based on user-supplied paths must strictly validate those paths, even if "default" usage is safe.
+**Prevention:** Enforce strict file extensions (allowlist) and resolve paths to absolute paths immediately upon initialization.

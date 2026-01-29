@@ -69,6 +69,6 @@ class TestCampaignManagerMigration(unittest.TestCase):
         custom_path = "custom_save.json"
         manager = CampaignManager(custom_path)
 
-        self.assertEqual(manager.save_file, custom_path)
+        self.assertEqual(manager.save_file, str(Path(custom_path).resolve()))
         # Legacy file untouched
         self.assertTrue(os.path.exists(DEFAULT_SAVE_FILENAME))
