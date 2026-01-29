@@ -1,7 +1,9 @@
-import unittest
-import tempfile
 import os
+import tempfile
+import unittest
+
 from command_line_conflict.campaign_manager import CampaignManager
+
 
 class TestCampaignOverwrite(unittest.TestCase):
     def test_prevent_non_json_extension(self):
@@ -23,6 +25,7 @@ class TestCampaignOverwrite(unittest.TestCase):
                 CampaignManager(save_file=tmp.name)
             except ValueError:
                 self.fail("CampaignManager raised ValueError for valid .json file")
+
 
 if __name__ == "__main__":
     unittest.main()
