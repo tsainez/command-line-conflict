@@ -63,7 +63,9 @@ class TestSoundSystem(unittest.TestCase):
         mock_sound_class.assert_called_once()
         args, _ = mock_sound_class.call_args
         # With our changes, it tries .wav first. Since os.path.exists returns True for everything, it finds .wav
-        self.assertTrue(args[0].endswith("sounds/cached_sound.wav") or args[0].endswith("sounds/cached_sound.ogg"))
+        # Normalize path separators for Windows compatibility
+        normalized_path = args[0].replace("\\", "/")
+        self.assertTrue(normalized_path.endswith("sounds/cached_sound.wav") or normalized_path.endswith("sounds/cached_sound.ogg"))
         # Should play twice (once per update loop iteration if we were looping, but update iterates list)
         # Actually update iterates over list.
         # First iteration: play "cached_sound". Loads it.

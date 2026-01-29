@@ -57,7 +57,8 @@ def atomic_save_json(filepath: str, data: dict) -> None:
         os.makedirs(dir_name, exist_ok=True)
 
     # Create temp file in same directory to ensure atomic move is possible
-    fd, tmp_path = tempfile.mkstemp(dir=dir_name if dir_name else None, text=True)
+    # Use "." if dir_name is empty to ensure we stay in CWD and avoid cross-device link errors
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name if dir_name else ".", text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
