@@ -63,6 +63,14 @@ Components are pure data containers attached to entities.
 *   `attack.py`: Defines damage, range, and attack speed.
 *   `vision.py`: Defines the vision range for Fog of War.
 *   `player.py`: Identifies which player owns the entity.
+*   `confetti.py`: Stores particle data for visual effects.
+*   `dead.py`: Tag component for entities that have been killed.
+*   `detection.py`: Handles stealth detection mechanics.
+*   `factory.py`: Stores production queue and build progress for buildings.
+*   `flee.py`: Stores state for fleeing behaviors.
+*   `selectable.py`: Marks an entity as selectable by the user.
+*   `unit_identity.py`: Stores unique unit types and names.
+*   `wander.py`: Stores state for random movement behaviors.
 
 ### ECS Systems (`command_line_conflict/systems/`)
 
@@ -74,6 +82,14 @@ Systems contain the logic that operates on entities with specific components.
 *   `ai_system.py`: Controls AI behavior for non-human players.
 *   `ui_system.py`: Renders the Heads-Up Display (HUD), selection boxes, and tooltips.
 *   `sound_system.py`: Listens for game events and plays appropriate sound effects.
+*   `chat_system.py`: Manages in-game chat and message display.
+*   `confetti_system.py`: Updates and renders confetti particle effects.
+*   `corpse_removal_system.py`: Removes dead entities after a delay.
+*   `flee_system.py`: Updates movement vectors for fleeing entities.
+*   `production_system.py`: Manages unit production queues and building progress.
+*   `selection_system.py`: Handles mouse input for selecting entities.
+*   `spawn_system.py`: Handles the creation of new entities during gameplay.
+*   `wander_system.py`: Updates movement vectors for wandering entities.
 
 ### Scenes (`command_line_conflict/scenes/`)
 
