@@ -16,8 +16,10 @@ def test_get_user_data_dir_linux():
             # When XDG_DATA_HOME is not set, defaults to ~/.local/share
             # We mock Path.home() to ensure consistent testing if needed,
             # but Path.home() is stable enough for unit tests usually.
-            path = get_user_data_dir()
-            assert path == Path.home() / ".local" / "share" / APP_NAME
+            # On Windows, clearing os.environ causes Path.home() to fail, so we must mock it.
+            with patch("pathlib.Path.home", return_value=Path("/home/user")):
+                path = get_user_data_dir()
+                assert path == Path("/home/user") / ".local" / "share" / APP_NAME
 
 
 def test_get_user_data_dir_windows():
