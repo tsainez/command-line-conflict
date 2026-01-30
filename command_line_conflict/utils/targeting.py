@@ -49,9 +49,9 @@ class Targeting:
         else:
             for x in range(min_x, max_x + 1):
                 for y in range(min_y, max_y + 1):
-                    entities = game_state.spatial_map.get((x, y))
-                    if entities:
-                        candidate_cells.append(entities)
+                    entities_in_cell = game_state.spatial_map.get((x, y))
+                    if entities_in_cell:
+                        candidate_cells.append(entities_in_cell)
 
         for cell_entities in candidate_cells:
             for other_id in cell_entities:
