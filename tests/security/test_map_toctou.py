@@ -6,6 +6,7 @@ from command_line_conflict.maps.base import Map
 
 class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
@@ -16,6 +17,7 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_dirname,
         mock_realpath,
         mock_makedirs,
+        mock_commonpath,
         mock_atomic_save,
     ):
         """
@@ -33,6 +35,16 @@ class TestMapTOCTOU(unittest.TestCase):
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
+
+        # Mock commonpath to behave consistently on all platforms for the test paths
+        def commonpath_side_effect(paths):
+            p1 = paths[0]
+            p2 = paths[1]
+            if p2.startswith(p1):
+                return p1
+            return ""
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         # mock_realpath should return resolved_path for filename
         def realpath_side_effect(path):
