@@ -9,10 +9,12 @@ class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
     def test_save_to_file_uses_resolved_path(
         self,
         mock_get_user_data,
+        mock_commonpath,
         mock_dirname,
         mock_realpath,
         mock_makedirs,
@@ -25,7 +27,8 @@ class TestMapTOCTOU(unittest.TestCase):
         """
         # Setup mocks
         filename = "some_symlink.json"
-        resolved_path = "/secure/path/to/real_file.json"
+        # The resolved path must be within user_data_dir now
+        resolved_path = "/user/data/real_file.json"
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
@@ -42,6 +45,15 @@ class TestMapTOCTOU(unittest.TestCase):
             return str(path)
 
         mock_realpath.side_effect = realpath_side_effect
+
+        # Mock commonpath to verify logic without OS dependency
+        def commonpath_side_effect(paths):
+            # If checking allowed_dir vs resolved_path
+            if paths == [user_data_dir, resolved_path]:
+                return user_data_dir
+            return ""
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         m = Map(10, 10)
 

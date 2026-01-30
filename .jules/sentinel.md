@@ -12,11 +12,18 @@
 **Vulnerability:** `Map.from_dict` assumed input keys (`width`, `height`) existed and were valid, leading to `KeyError` or `TypeError` crashes when loading malformed map files.
 **Learning:** `from_dict` methods often trust their input too much, assuming they come from a trusted `to_dict` source. However, when loading from files, the input is untrusted user data.
 **Prevention:** Always validate existence and types of keys in deserialization methods before using them. Raise handled exceptions (like `ValueError`) instead of letting runtime errors crash the application.
+
 ## 2026-01-17 - [Atomic File Writes for Data Integrity]
 **Vulnerability:** Direct writes to important data files (save games, maps) using `open(..., 'w')` were vulnerable to data corruption if the process crashed or disk filled up during the write operation. This compromised data integrity and availability.
 **Learning:** Python's standard `json.dump` does not guarantee atomicity. A crash mid-write leaves a truncated, invalid JSON file.
 **Prevention:** Implemented `atomic_save_json` in `utils/paths.py`. This utility writes to a temporary file first, ensures it is flushed to disk (`os.fsync`), and then uses `os.replace` to atomically swap it with the target file. This pattern should be used for all critical file writes.
+
 ## 2026-01-13 - [Source Code Overwrite via Allowed Directories]
 **Vulnerability:** `Map.save_to_file` allowed saving to the application source directory (`maps_dir`) to support local development. However, it did not enforce file extensions, allowing an attacker (or compromised UI) to overwrite critical python source files (e.g., `__init__.py`) with JSON data, causing Denial of Service or potentially corrupting the installation.
 **Learning:** Allowing an application to write to its own source/installation directory is risky. Even with directory restrictions, failing to enforce file extensions can turn a file-write feature into a destructive capability.
 **Prevention:** Strictly enforce file extensions (allowlist) for all user-generated content. Ideally, restrict write operations *only* to isolated user data directories, treating the application directory as read-only.
+
+## 2026-01-30 - [Installation Directory Pollution]
+**Vulnerability:** The map editor defaulted to saving user-created maps within the game's installation directory (`maps_dir`), and the security controls explicitly allowed this. This violates the principle of least privilege and could lead to permission errors (on multi-user systems) or accidental corruption of game assets.
+**Learning:** Developer convenience (saving maps next to code) often creeps into production, creating security and usability issues. User-generated content must always be isolated from application code/assets.
+**Prevention:** Explicitly remove the installation directory from the list of allowed write locations. Enforce saving to the OS-specific user data directory (e.g., AppData, ~/.local/share) by default.

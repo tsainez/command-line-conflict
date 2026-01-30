@@ -1,5 +1,4 @@
 import math
-import os
 
 import pygame
 
@@ -8,6 +7,7 @@ from command_line_conflict.camera import Camera
 from command_line_conflict.logger import log
 from command_line_conflict.maps.base import Map
 from command_line_conflict.ui.file_dialog import FileDialog
+from command_line_conflict.utils.paths import get_user_data_dir
 
 
 class EditorScene:
@@ -23,7 +23,7 @@ class EditorScene:
         self.font = game.font
 
         # Load custom map if exists, else create new
-        self.map_path = os.path.join("command_line_conflict", "maps", "custom", "custom_map.json")
+        self.map_path = str(get_user_data_dir() / "custom_map.json")
         try:
             self.map = Map.load_from_file(self.map_path)
             log.info(f"Loaded map from {self.map_path}")
@@ -191,14 +191,14 @@ class EditorScene:
 
     def open_save_dialog(self):
         """Opens the save map dialog."""
-        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        initial_dir = str(get_user_data_dir())
         self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Save Map", initial_dir, mode="save")
         # Stop camera movement
         self.camera_movement = {k: False for k in self.camera_movement}
 
     def open_load_dialog(self):
         """Opens the load map dialog."""
-        initial_dir = os.path.join("command_line_conflict", "maps", "custom")
+        initial_dir = str(get_user_data_dir())
         self.file_dialog = FileDialog(self.game.screen, self.ui_font, "Load Map", initial_dir, mode="load")
         # Stop camera movement
         self.camera_movement = {k: False for k in self.camera_movement}
