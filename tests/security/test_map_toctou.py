@@ -6,6 +6,7 @@ from command_line_conflict.maps.base import Map
 
 class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
@@ -16,6 +17,7 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_dirname,
         mock_realpath,
         mock_makedirs,
+        mock_commonpath,
         mock_atomic_save,
     ):
         """
@@ -36,12 +38,24 @@ class TestMapTOCTOU(unittest.TestCase):
 
         # mock_realpath should return resolved_path for filename
         def realpath_side_effect(path):
-            if path == filename:
+            # Normalize path separators for comparison to handle Windows execution
+            path_str = str(path).replace("\\", "/")
+            if path_str == filename:
                 return resolved_path
             # For other paths (maps_dir, user_data_dir), return them as-is
             return str(path)
 
         mock_realpath.side_effect = realpath_side_effect
+
+        # Mock commonpath to behave like Unix even on Windows, since we use Unix-style mock paths
+        def commonpath_side_effect(paths):
+            p1 = str(paths[0]).replace("\\", "/")
+            p2 = str(paths[1]).replace("\\", "/")
+            if p2.startswith(p1):
+                return p1
+            return ""
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         m = Map(10, 10)
 
