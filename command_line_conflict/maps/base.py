@@ -250,8 +250,8 @@ class Map:
             raise ValueError("Map files must have a .json extension.")
 
         # Define allowed directories
-        # 1. The maps directory (where this file resides)
-        maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+        # 1. The maps directory (where this file resides) - REMOVED for saving security
+        # maps_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
 
         # 2. The user data directory
         user_data_dir = str(get_user_data_dir())
