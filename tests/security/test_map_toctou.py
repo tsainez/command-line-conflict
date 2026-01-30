@@ -8,12 +8,14 @@ class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
     def test_save_to_file_uses_resolved_path(
         self,
         mock_get_user_data,
         mock_dirname,
+        mock_commonpath,
         mock_realpath,
         mock_makedirs,
         mock_atomic_save,
@@ -42,6 +44,15 @@ class TestMapTOCTOU(unittest.TestCase):
             return str(path)
 
         mock_realpath.side_effect = realpath_side_effect
+
+        # mock_commonpath logic: return the first arg if the second starts with it
+        def commonpath_side_effect(paths):
+            p1, p2 = paths
+            if p2.startswith(p1):
+                return p1
+            raise ValueError()
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         m = Map(10, 10)
 

@@ -281,9 +281,13 @@ class FileDialog:
 
         # Draw Input Field
         pygame.draw.rect(self.screen, (255, 255, 255), self.input_rect)
+
+        # Calculate text and cursor position
+        cursor_x = self.input_rect.x + 5
         if self.input_text:
             input_surf = self.font.render(self.input_text, True, (0, 0, 0))
             input_surf_y = self.input_rect.y + 5
+            cursor_x += input_surf.get_width()
         else:
             input_surf = self.font.render("Enter a file name", True, (130, 130, 130))
             input_surf_y = self.input_rect.y + 5
@@ -291,6 +295,18 @@ class FileDialog:
         # Clip input text to input_rect
         self.screen.set_clip(self.input_rect)
         self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
+
+        # Draw blinking cursor
+        if (pygame.time.get_ticks() // 500) % 2 == 0:
+            cursor_height = input_surf.get_height()
+            pygame.draw.line(
+                self.screen,
+                (0, 0, 0),
+                (cursor_x, input_surf_y),
+                (cursor_x, input_surf_y + cursor_height),
+                2,
+            )
+
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.

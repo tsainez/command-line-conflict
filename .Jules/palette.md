@@ -29,3 +29,7 @@
 ## 2024-05-23 - Unified Pulse Effect in Settings Scene
 **Learning:** Users subconsciously expect consistent feedback mechanisms across similar UI contexts. The static selection state in the Settings menu felt lifeless compared to the Main Menu's pulsing effect, creating a subtle disconnect in the design language.
 **Action:** Always verify that visual feedback for interaction states (hover, selection, active) is consistent across all screens. When implementing a new screen, cross-reference existing screens for established patterns like animation curves or color shifts.
+
+## 2024-05-24 - Text Input Affordance
+**Learning:** A static text field with placeholder text provides no visual feedback that it is "active" or "focused" for typing, especially in a custom UI system where browser defaults don't exist.
+**Action:** Implement a blinking cursor (caret) for all text input fields. Using `pygame.time.get_ticks()` for a 500ms blink cycle is a standard and effective pattern. Ensure the cursor respects the clipping region of the input field to avoid visual glitches.
