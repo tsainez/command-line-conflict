@@ -35,37 +35,48 @@ class Targeting:
         min_y = int(my_pos.y - vision_range)
         max_y = int(my_pos.y + vision_range)
 
-        # Iterate only over the grid cells within the vision range
-        for x in range(min_x, max_x + 1):
-            for y in range(min_y, max_y + 1):
-                # Retrieve potential targets from the spatial map
-                cell_entities = game_state.spatial_map.get((x, y))
-                if not cell_entities:
+        # Hybrid iteration strategy:
+        # If the map is sparse relative to the vision area, it's faster to iterate
+        # the spatial map keys than to check every tile in the vision grid.
+        vision_area = (max_x - min_x + 1) * (max_y - min_y + 1)
+        use_keys_iteration = len(game_state.spatial_map) < (vision_area * 0.5)
+
+        candidate_cells = []
+        if use_keys_iteration:
+            for (x, y), entities in game_state.spatial_map.items():
+                if min_x <= x <= max_x and min_y <= y <= max_y:
+                    candidate_cells.append(entities)
+        else:
+            for x in range(min_x, max_x + 1):
+                for y in range(min_y, max_y + 1):
+                    entities_in_cell = game_state.spatial_map.get((x, y))
+                    if entities_in_cell:
+                        candidate_cells.append(entities_in_cell)
+
+        for cell_entities in candidate_cells:
+            for other_id in cell_entities:
+                if other_id == my_id:
                     continue
 
-                for other_id in cell_entities:
-                    if other_id == my_id:
-                        continue
+                # Retrieve components directly for performance
+                other_components = game_state.entities.get(other_id)
+                if not other_components:
+                    continue
 
-                    # Retrieve components directly for performance
-                    other_components = game_state.entities.get(other_id)
-                    if not other_components:
-                        continue
+                other_player = other_components.get(Player)
+                if not other_player or other_player.player_id == my_player.player_id:
+                    continue
 
-                    other_player = other_components.get(Player)
-                    if not other_player or other_player.player_id == my_player.player_id:
-                        continue
+                other_pos = other_components.get(Position)
+                if not other_pos:
+                    continue
 
-                    other_pos = other_components.get(Position)
-                    if not other_pos:
-                        continue
+                # Optimization: Use squared distance to avoid expensive sqrt() in the loop
+                dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
 
-                    # Optimization: Use squared distance to avoid expensive sqrt() in the loop
-                    dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
-
-                    if dist_sq <= vision_range_sq and dist_sq < min_dist_sq:
-                        min_dist_sq = dist_sq
-                        closest_enemy = other_id
+                if dist_sq <= vision_range_sq and dist_sq < min_dist_sq:
+                    min_dist_sq = dist_sq
+                    closest_enemy = other_id
 
         if DEBUG and closest_enemy:
             log.debug(f"Targeting: Found target {closest_enemy} for unit {my_id} at distance {min_dist_sq**0.5:.2f}")

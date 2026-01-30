@@ -29,3 +29,7 @@
 ## 2025-05-29 - Spatial Lookups for Selection
 **Learning:** Iterating over all entities to find what was clicked is O(N) and redundant when a spatial hash map exists. `get_entities_at_position` provides O(1) access. Similarly, iterating only components of interest (e.g., `Selectable`) reduces overhead for global operations like drag selection.
 **Action:** Always prefer spatial lookups or component-specific iterators over iterating `game_state.entities.items()` when possible.
+
+## 2025-06-01 - Hybrid Spatial Iteration
+**Learning:** When querying a spatial map with a bounding box (e.g. vision range), iterating grid cells is slow for large ranges (O(R^2)). Iterating all map keys is slow for dense maps (O(N)). A hybrid approach switching based on `len(map) < area * 0.5` provides optimal performance for both cases (e.g. 28x faster for sparse/large range).
+**Action:** Implement hybrid iteration strategies in spatial query hot paths.
