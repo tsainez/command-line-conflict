@@ -30,9 +30,7 @@ class TestSoundSystem(unittest.TestCase):
         # With our changes, it tries .wav first. Since os.path.exists returns True for everything, it finds .wav
         # Normalize paths for Windows compatibility
         normalized_path = args[0].replace("\\", "/")
-        self.assertTrue(
-            normalized_path.endswith("sounds/test_sound.wav") or normalized_path.endswith("sounds/test_sound.ogg")
-        )
+        self.assertTrue(normalized_path.endswith("sounds/test_sound.wav") or normalized_path.endswith("sounds/test_sound.ogg"))
         mock_sound_instance.play.assert_called()
 
     @patch("pygame.mixer.Sound")
