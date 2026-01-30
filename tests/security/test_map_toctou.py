@@ -25,7 +25,8 @@ class TestMapTOCTOU(unittest.TestCase):
         """
         # Setup mocks
         filename = "some_symlink.json"
-        resolved_path = "/secure/path/to/real_file.json"
+        # The resolved path must be within user_data_dir now
+        resolved_path = "/user/data/real_file.json"
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
