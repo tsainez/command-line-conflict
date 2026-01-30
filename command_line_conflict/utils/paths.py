@@ -59,7 +59,8 @@ def atomic_save_json(filepath: str, data: dict) -> None:
     # Create temp file in same directory to ensure atomic move is possible
     # If dir_name is empty, explicitly use "." to force current directory,
     # otherwise mkstemp defaults to system temp dir, which causes cross-device link errors.
-    fd, tmp_path = tempfile.mkstemp(dir=dir_name if dir_name else ".", text=True)
+    target_dir = dir_name if dir_name else "."
+    fd, tmp_path = tempfile.mkstemp(dir=target_dir, text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
