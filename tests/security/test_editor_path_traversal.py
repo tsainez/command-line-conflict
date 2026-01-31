@@ -1,6 +1,6 @@
 import os
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from command_line_conflict.ui.file_dialog import FileDialog
 
@@ -8,6 +8,13 @@ from command_line_conflict.ui.file_dialog import FileDialog
 
 
 class TestEditorPathTraversal(unittest.TestCase):
+    def setUp(self):
+        self.mouse_patcher = patch("pygame.mouse")
+        self.mouse_patcher.start()
+
+    def tearDown(self):
+        self.mouse_patcher.stop()
+
     def test_path_traversal_sanitization(self):
         """
         Test that path traversal characters are stripped from the filename.

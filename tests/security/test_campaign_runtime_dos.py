@@ -2,6 +2,8 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from command_line_conflict.campaign_manager import CampaignManager
 
@@ -12,7 +14,14 @@ class TestCampaignRuntimeDoS(unittest.TestCase):
         self.test_dir = tempfile.mkdtemp()
         self.save_file = os.path.join(self.test_dir, "test_save.json")
 
+        self.patcher = patch(
+            "command_line_conflict.campaign_manager.get_user_data_dir",
+            return_value=Path(self.test_dir),
+        )
+        self.patcher.start()
+
     def tearDown(self):
+        self.patcher.stop()
         shutil.rmtree(self.test_dir)
 
     def test_unbounded_mission_growth(self):

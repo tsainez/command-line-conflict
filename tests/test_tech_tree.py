@@ -17,16 +17,27 @@ from command_line_conflict.systems.production_system import ProductionSystem
 # But existing tests use factories, so it should be fine with the conftest.
 
 
+import tempfile
+from pathlib import Path
+
+
 class TestCampaignManager(unittest.TestCase):
     def setUp(self):
-        self.save_file = "test_save_game.json"
-        if os.path.exists(self.save_file):
-            os.remove(self.save_file)
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.save_file = os.path.join(self.temp_dir.name, "test_save_game.json")
+
+        # Patch get_user_data_dir to return the temp dir so the security check passes
+        self.patcher = patch(
+            "command_line_conflict.campaign_manager.get_user_data_dir",
+            return_value=Path(self.temp_dir.name),
+        )
+        self.mock_get_user_data = self.patcher.start()
+
         self.manager = CampaignManager(self.save_file)
 
     def tearDown(self):
-        if os.path.exists(self.save_file):
-            os.remove(self.save_file)
+        self.patcher.stop()
+        self.temp_dir.cleanup()
 
     def test_initial_state(self):
         self.assertIn("chassis", self.manager.unlocked_units)
