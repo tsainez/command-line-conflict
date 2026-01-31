@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/ui/file_dialog.py
+# hypothesis_version: 6.151.4
+
+[100, 110, 120, 130, 140, 150, 170, 200, 230, 255, 400, 600, '.json', 'Enter a file name', 'Load', 'MAX_FILENAME_LENGTH', 'No files found', 'Save', 'X', 'action', 'close', 'load', 'save']

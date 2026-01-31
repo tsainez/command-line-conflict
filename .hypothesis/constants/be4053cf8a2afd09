@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/factories.py
+# hypothesis_version: 6.151.4
+
+[0.2, 0.5, 0.8, 1.0, 1.5, 1.8, 2.0, 2.5, 4.0, 120, 128, 150, 200, 255, 300, '*', 'A', 'C', 'E', 'F', 'I', 'O', 'R', 'arachnotron', 'arachnotron_factory', 'chassis', 'extractor', 'f', 'immortal', 'observer', 'rover', 'rover_factory', 'w']

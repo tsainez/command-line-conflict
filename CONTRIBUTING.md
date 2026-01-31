@@ -51,6 +51,22 @@ This script will run:
 
 Ensure the script exits with "All checks passed!" before pushing your changes.
 
+### Advanced Testing
+
+#### Property-based Testing
+We use `hypothesis` for property-based testing. These tests generate random inputs to verify that the code satisfies certain properties or invariants.
+To run property tests:
+```bash
+python -m pytest tests/property
+```
+
+#### Performance Benchmarking
+We use `pytest-benchmark` for performance testing.
+To run benchmarks:
+```bash
+python -m pytest tests/benchmarks
+```
+
 ### Logging
 *   Avoid wrapping `log.debug()` calls with `if config.DEBUG:`. Rely on the logging library's level filtering instead.
 

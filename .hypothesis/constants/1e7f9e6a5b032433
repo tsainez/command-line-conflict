@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/flee_system.py
+# hypothesis_version: 6.151.4
+
+[0.5, 'enemy proximity', 'low health']

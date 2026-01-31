@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/chat_system.py
+# hypothesis_version: 6.151.4
+
+[0.5, 100, 120, 160, 180, 255, 400, 600, 5000, '_', 'color', 'log', 'shadow_surface', 'surface', 'text', 'time', 'type']
