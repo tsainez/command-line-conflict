@@ -101,24 +101,36 @@ class RenderingSystem:
 
             # Iterate through visible keys
             for x, y in visible_keys:
-                self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
+                entity_ids = game_state.spatial_map.get((x, y))
+                if entity_ids:
+                    cam_x = (x - self.camera.x) * tile_size
+                    cam_y = (y - self.camera.y) * tile_size
+                    self._draw_tile(entity_ids, cam_x, cam_y, game_state, paused, grid_size, bar_height, tile_size)
         else:
             # Fallback to grid iteration for dense maps or zoomed out views
             for y in range(start_y, end_y):
+                # Optimization: Hoist Y calculation out of the inner loop
+                cam_y = (y - self.camera.y) * tile_size
                 for x in range(start_x, end_x):
                     # Only process if tile has entities
-                    if (x, y) in game_state.spatial_map:
-                        self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
+                    # Optimization: Get entity_ids directly to avoid double lookup (in check + get)
+                    entity_ids = game_state.spatial_map.get((x, y))
+                    if entity_ids:
+                        cam_x = (x - self.camera.x) * tile_size
+                        self._draw_tile(entity_ids, cam_x, cam_y, game_state, paused, grid_size, bar_height, tile_size)
 
-    def _draw_tile(self, x: int, y: int, game_state: GameState, paused: bool, grid_size: int, bar_height: int) -> None:
+    def _draw_tile(
+        self,
+        entity_ids: set[int],
+        cam_x: float,
+        cam_y: float,
+        game_state: GameState,
+        paused: bool,
+        grid_size: int,
+        bar_height: int,
+        tile_size: float,
+    ) -> None:
         """Draws entities at a specific tile coordinate."""
-        entity_ids = game_state.spatial_map.get((x, y))
-        if not entity_ids:
-            return
-
-        cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-        cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-
         for entity_id in entity_ids:
             components = game_state.entities.get(entity_id)
             if not components:
@@ -158,9 +170,9 @@ class RenderingSystem:
             selectable = components.get(Selectable)
             if not dead:
                 if selectable and selectable.is_selected:
-                    self.draw_orders(components)
+                    self.draw_orders(components, tile_size)
                 elif config.DEBUG:
-                    self.draw_orders(components)
+                    self.draw_orders(components, tile_size)
 
     def _draw_health_bar(self, x: float, y: float, width: int, height: int, health: Health) -> None:
         """Draws a health bar for an entity."""
@@ -180,11 +192,12 @@ class RenderingSystem:
             pygame.draw.rect(self.screen, hp_color, (bar_x, bar_y, int(width * health_pct), height))
         pygame.draw.rect(self.screen, (0, 0, 0), (bar_x, bar_y, width, height), 1)
 
-    def draw_orders(self, components) -> None:
+    def draw_orders(self, components, tile_size: float) -> None:
         """Draws the movement path and target for a selected entity.
 
         Args:
             components: The component dictionary for the entity.
+            tile_size: The size of a tile in pixels (grid_size * zoom).
         """
         movable = components.get(Movable)
         if not movable:
@@ -214,16 +227,16 @@ class RenderingSystem:
         for tx, ty in tiles[:-1]:
             arrow = self._arrow_char(tx - prev_x, ty - prev_y)
             ch = self._get_rendered_surface(arrow, (0, 255, 0))
-            cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-            cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+            cam_x = (tx - self.camera.x) * tile_size
+            cam_y = (ty - self.camera.y) * tile_size
             self.screen.blit(ch, (cam_x, cam_y))
             prev_x, prev_y = tx, ty
 
         tx, ty = tiles[-1]
         final_char = "X"
         ch = self._get_rendered_surface(final_char, (255, 0, 0))
-        cam_x = (tx - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-        cam_y = (ty - self.camera.y) * config.GRID_SIZE * self.camera.zoom
+        cam_x = (tx - self.camera.x) * tile_size
+        cam_y = (ty - self.camera.y) * tile_size
         self.screen.blit(ch, (cam_x, cam_y))
 
     @staticmethod
