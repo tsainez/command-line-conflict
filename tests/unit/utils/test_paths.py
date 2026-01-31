@@ -6,7 +6,9 @@ from unittest.mock import patch
 from command_line_conflict.utils.paths import APP_NAME, get_user_data_dir
 
 
-def test_get_user_data_dir_linux():
+@patch("pathlib.Path.home")
+def test_get_user_data_dir_linux(mock_home):
+    mock_home.return_value = Path("/home/testuser")
     with patch.object(sys, "platform", "linux"):
         with patch.dict(os.environ, {"XDG_DATA_HOME": "/tmp/xdg_home"}):
             path = get_user_data_dir()
@@ -17,7 +19,7 @@ def test_get_user_data_dir_linux():
             # We mock Path.home() to ensure consistent testing if needed,
             # but Path.home() is stable enough for unit tests usually.
             path = get_user_data_dir()
-            assert path == Path.home() / ".local" / "share" / APP_NAME
+            assert path == Path("/home/testuser") / ".local" / "share" / APP_NAME
 
 
 def test_get_user_data_dir_windows():
