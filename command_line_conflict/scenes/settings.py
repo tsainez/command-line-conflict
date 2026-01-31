@@ -5,6 +5,7 @@ from typing import cast
 import pygame
 
 from command_line_conflict import config
+from command_line_conflict.systems.sound_system import SoundSystem
 
 from ..logger import log
 
@@ -20,6 +21,7 @@ class SettingsScene:
                   and scene manager.
         """
         self.game = game
+        self.sound_system = SoundSystem()
         self.option_font = pygame.font.Font(None, 50)
         self.title_font = pygame.font.Font(None, 74)
         self.settings_options = [
@@ -76,6 +78,8 @@ class SettingsScene:
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
                     hovered = True
+                    if self.selected_option != i:
+                        self.sound_system.play_sound("click_select")
                     self.selected_option = i
 
             if hovered:
@@ -86,6 +90,7 @@ class SettingsScene:
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
+                    self.sound_system.play_sound("click_select")
                     self.selected_option = i
                     option_name = self.settings_options[i]
                     if "Volume" in option_name:
@@ -97,6 +102,7 @@ class SettingsScene:
 
         elif event.type == pygame.KEYDOWN:
             option_name = self.settings_options[self.selected_option]
+            old_selection = self.selected_option
 
             if event.key == pygame.K_UP:
                 self.selected_option = (self.selected_option - 1) % len(self.settings_options)
@@ -104,10 +110,15 @@ class SettingsScene:
                 self.selected_option = (self.selected_option + 1) % len(self.settings_options)
             elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                 direction = -1 if event.key == pygame.K_LEFT else 1
+                self.sound_system.play_sound("click_select")
                 self._change_volume(option_name, direction)
 
             elif event.key == pygame.K_RETURN:
+                self.sound_system.play_sound("click_select")
                 self._trigger_option(option_name)
+
+            if self.selected_option != old_selection:
+                self.sound_system.play_sound("click_select")
 
     def _change_volume(self, option_name, direction):
         change = direction * 0.1

@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+import pygame
 import pytest
 
 from command_line_conflict.scenes.settings import SettingsScene
@@ -65,3 +66,59 @@ def test_volume_help_text_append(settings_scene):
         help_message += " (Left/Right to Adjust)"
 
     assert help_message == expected_help
+
+
+def test_sound_feedback_on_navigation(settings_scene):
+    """Test that sound is played when navigating options."""
+    settings_scene.sound_system = MagicMock()
+
+    # 1. Keyboard Navigation
+    event_down = MagicMock()
+    event_down.type = pygame.KEYDOWN
+    event_down.key = pygame.K_DOWN
+
+    settings_scene.handle_event(event_down)
+    settings_scene.sound_system.play_sound.assert_called_with("click_select")
+    settings_scene.sound_system.play_sound.reset_mock()
+
+    # 2. Mouse Navigation (hover change)
+    # Setup option rects
+    rect0 = MagicMock()
+    rect0.collidepoint.return_value = False
+    rect1 = MagicMock()
+    rect1.collidepoint.return_value = True  # Hovering over 2nd option
+    settings_scene.option_rects = [(rect0, 0), (rect1, 1)]
+    settings_scene.selected_option = 0
+
+    event_motion = MagicMock()
+    event_motion.type = pygame.MOUSEMOTION
+    event_motion.pos = (100, 100)
+
+    settings_scene.handle_event(event_motion)
+    settings_scene.sound_system.play_sound.assert_called_with("click_select")
+
+
+def test_sound_feedback_on_action(settings_scene):
+    """Test that sound is played when changing settings."""
+    settings_scene.sound_system = MagicMock()
+
+    # 1. Toggle Option (Return key)
+    # Ensure current option is safe to trigger (e.g. Debug Mode)
+    settings_scene.selected_option = 1  # Debug Mode
+
+    event_enter = MagicMock()
+    event_enter.type = pygame.KEYDOWN
+    event_enter.key = pygame.K_RETURN
+
+    settings_scene.handle_event(event_enter)
+    settings_scene.sound_system.play_sound.assert_called_with("click_select")
+    settings_scene.sound_system.play_sound.reset_mock()
+
+    # 2. Volume Change (Left/Right)
+    settings_scene.selected_option = 2  # Master Volume
+    event_right = MagicMock()
+    event_right.type = pygame.KEYDOWN
+    event_right.key = pygame.K_RIGHT
+
+    settings_scene.handle_event(event_right)
+    settings_scene.sound_system.play_sound.assert_called_with("click_select")
