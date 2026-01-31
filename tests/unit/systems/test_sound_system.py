@@ -28,7 +28,11 @@ class TestSoundSystem(unittest.TestCase):
         # Check that it was called with a path ending in sounds/test_sound.wav or .ogg
         args, _ = mock_sound_class.call_args
         # With our changes, it tries .wav first. Since os.path.exists returns True for everything, it finds .wav
-        self.assertTrue(args[0].endswith("sounds/test_sound.wav") or args[0].endswith("sounds/test_sound.ogg"))
+        # Use replace("\\", "/") to handle Windows paths in tests
+        normalized_path = args[0].replace("\\", "/")
+        self.assertTrue(
+            normalized_path.endswith("sounds/test_sound.wav") or normalized_path.endswith("sounds/test_sound.ogg")
+        )
         mock_sound_instance.play.assert_called()
 
     @patch("pygame.mixer.Sound")
@@ -63,7 +67,11 @@ class TestSoundSystem(unittest.TestCase):
         mock_sound_class.assert_called_once()
         args, _ = mock_sound_class.call_args
         # With our changes, it tries .wav first. Since os.path.exists returns True for everything, it finds .wav
-        self.assertTrue(args[0].endswith("sounds/cached_sound.wav") or args[0].endswith("sounds/cached_sound.ogg"))
+        # Use replace("\\", "/") to handle Windows paths in tests
+        normalized_path = args[0].replace("\\", "/")
+        self.assertTrue(
+            normalized_path.endswith("sounds/cached_sound.wav") or normalized_path.endswith("sounds/cached_sound.ogg")
+        )
         # Should play twice (once per update loop iteration if we were looping, but update iterates list)
         # Actually update iterates over list.
         # First iteration: play "cached_sound". Loads it.
