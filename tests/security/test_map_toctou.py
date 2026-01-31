@@ -7,6 +7,7 @@ from command_line_conflict.maps.base import Map
 class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
     @patch("command_line_conflict.maps.base.os.makedirs")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
@@ -15,6 +16,7 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_get_user_data,
         mock_dirname,
         mock_realpath,
+        mock_commonpath,
         mock_makedirs,
         mock_atomic_save,
     ):
@@ -33,6 +35,12 @@ class TestMapTOCTOU(unittest.TestCase):
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
+
+        # We mock commonpath to return the parent dir, simulating a successful check
+        # regardless of platform separators or drive letters.
+        # This bypasses the actual validation logic to focus on TOCTOU mitigation
+        # (ensuring the resolved path is used for saving).
+        mock_commonpath.return_value = user_data_dir
 
         # mock_realpath should return resolved_path for filename
         def realpath_side_effect(path):

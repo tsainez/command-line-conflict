@@ -13,7 +13,12 @@ class TestCampaignRaceCondition(unittest.TestCase):
         self.test_dir.mkdir(parents=True, exist_ok=True)
         self.save_file = self.test_dir / "large_save.json"
 
+        # Security Fix: Mock get_user_data_dir to allow test path
+        self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir", return_value=self.test_dir.resolve())
+        self.patcher.start()
+
     def tearDown(self):
+        self.patcher.stop()
         if self.save_file.exists():
             os.remove(self.save_file)
         if self.test_dir.exists():
@@ -43,6 +48,8 @@ class TestCampaignRaceCondition(unittest.TestCase):
         # 2. Mock os.path.getsize to return a small safe size (e.g. 100 bytes)
         # This simulates the check passing (Time Of Check)
         # while the real file is huge (Time Of Use)
+        # NOTE: If the implementation correctly uses fstat on the open file,
+        # patching os.path.getsize shouldn't matter, but it confirms we aren't relying on os.path.getsize.
         with patch("os.path.getsize", return_value=100):
             cm = CampaignManager(save_file=str(self.save_file))
 

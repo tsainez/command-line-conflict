@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import stat
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
@@ -30,6 +31,7 @@ class CampaignManager:
 
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
+            self._validate_save_file(save_file)
             self.save_file = save_file
         else:
             data_dir = get_user_data_dir()
@@ -53,23 +55,62 @@ class CampaignManager:
         self.unlocked_units: Set[str] = {"chassis", "extractor"}  # Default unlocks
         self.load_progress()
 
+    def _validate_save_file(self, filepath: str) -> None:
+        """Validates that the save file path is secure.
+
+        Args:
+            filepath: The path to validate.
+
+        Raises:
+            ValueError: If the path is insecure (unauthorized directory or invalid extension).
+        """
+        # Security fix: Path traversal prevention
+        # Resolve symlinks to ensure we check the actual destination
+        real_path = os.path.realpath(filepath)
+
+        # 1. Enforce .json extension
+        if not real_path.lower().endswith(".json"):
+            raise ValueError("Save file must have a .json extension.")
+
+        # 2. Enforce allowed directory (user data dir)
+        user_data_dir = str(get_user_data_dir())
+        user_data_dir = os.path.realpath(user_data_dir)
+
+        try:
+            # Check if path is within user data dir
+            # commonpath returns the longest common sub-path
+            if os.path.commonpath([user_data_dir, real_path]) != user_data_dir:
+                log.error(f"Security violation: Attempted to use save file in unauthorized location: {real_path}")
+                raise ValueError(f"Save file must be located within the user data directory: {user_data_dir}")
+        except ValueError:
+            # commonpath raises ValueError if paths are on different drives
+            log.error(f"Security violation: Attempted to use save file on different drive/unauthorized location: {real_path}")
+            raise ValueError(f"Save file must be located within the user data directory: {user_data_dir}")
+
     def load_progress(self) -> None:
         """Loads progress from the save file."""
         if not os.path.exists(self.save_file):
             log.info("No save file found. Starting new campaign.")
             return
 
-        # Security check: File size
+        # Security check: File size and type
         # We perform this check when reading to prevent TOCTOU race conditions
         # where the file grows between check and read.
         try:
             with open(self.save_file, "r", encoding="utf-8") as f:
-                # Read up to the limit + 1 char to detect overflow
-                content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
+                st = os.fstat(f.fileno())
 
-                if len(content) > self.MAX_SAVE_FILE_SIZE:
+                # Security: Check file type to prevent reading from special files
+                if not stat.S_ISREG(st.st_mode):
+                    log.error("Save file is not a regular file.")
+                    return
+
+                # Security: Check file size to prevent DoS via memory exhaustion
+                if st.st_size > self.MAX_SAVE_FILE_SIZE:
                     log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
                     return
+
+                content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
 
                 if not content:
                     log.info("Save file is empty. Starting new campaign.")
