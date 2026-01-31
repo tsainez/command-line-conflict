@@ -29,3 +29,7 @@
 ## 2025-05-29 - Spatial Lookups for Selection
 **Learning:** Iterating over all entities to find what was clicked is O(N) and redundant when a spatial hash map exists. `get_entities_at_position` provides O(1) access. Similarly, iterating only components of interest (e.g., `Selectable`) reduces overhead for global operations like drag selection.
 **Action:** Always prefer spatial lookups or component-specific iterators over iterating `game_state.entities.items()` when possible.
+
+## 2025-05-30 - Reducing Lookups in Hot Loops
+**Learning:** In nested loops (like rendering grids), re-querying data structures (e.g., `spatial_map.get((x,y))`) inside helper functions adds unnecessary overhead. Passing the retrieved data directly to the helper avoids redundant hash lookups.
+**Action:** Extract data in the outer loop and pass it down to helper methods to minimize repeated lookups.
