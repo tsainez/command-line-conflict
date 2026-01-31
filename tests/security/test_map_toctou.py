@@ -9,10 +9,12 @@ class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
     def test_save_to_file_uses_resolved_path(
         self,
         mock_get_user_data,
+        mock_commonpath,
         mock_dirname,
         mock_realpath,
         mock_makedirs,
@@ -33,6 +35,19 @@ class TestMapTOCTOU(unittest.TestCase):
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
+
+        # mock_commonpath logic
+        def commonpath_side_effect(paths):
+            if not paths:
+                return ""
+            # Simple prefix check for testing
+            p1 = paths[0]
+            p2 = paths[1]
+            if p2.startswith(p1):
+                return p1
+            return ""
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         # mock_realpath should return resolved_path for filename
         def realpath_side_effect(path):
