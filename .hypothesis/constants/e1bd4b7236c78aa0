@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/scenes/editor.py
+# hypothesis_version: 6.151.4
+
+[0.1, 100, 200, 255, 'Load Map', 'Save Map', 'WALL', 'arial', 'custom', 'custom_map.json', 'down', 'left', 'load', 'maps', 'menu', 'right', 'save', 'up']

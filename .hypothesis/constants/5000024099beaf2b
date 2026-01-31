@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/utils/paths.py
+# hypothesis_version: 6.151.4
+
+['.local', 'APPDATA', 'AppData', 'Application Support', 'LOCALAPPDATA', 'Library', 'Local', 'XDG_DATA_HOME', 'darwin', 'share', 'utf-8', 'w', 'win32']

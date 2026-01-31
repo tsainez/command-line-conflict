@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/scenes/menu.py
+# hypothesis_version: 6.151.4
+
+[0.0, 100, 105, 150, 255, 300, '> Confirm Quit? <', 'Continue Campaign', 'Map Editor', 'New Game', 'Options', 'Quit', 'click_select', 'editor', 'game', 'music/menu_theme.ogg', 'option', 'settings', 'title']

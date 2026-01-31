@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/systems/rendering_system.py
+# hypothesis_version: 6.151.4
+
+[0.0, 0.2, 0.25, 0.5, 1.0, 128, 255, 1024, '+', '-', '/', '<', '>', 'X', '\\', '^', 'v', '|']

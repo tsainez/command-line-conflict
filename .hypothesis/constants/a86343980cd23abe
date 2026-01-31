@@ -1,0 +1,4 @@
+# file: /app/command_line_conflict/engine.py
+# hypothesis_version: 6.151.4
+
+[1000.0, 'ASCII RTS', 'DejaVuSansMono.ttf', 'GAME_START', 'Game starting...', 'Pygame initialized', '__main__', 'consolas', 'couriernew', 'defeat', 'dejavusansmono', 'editor', 'fonts', 'game', 'height', 'menlo', 'menu', 'monospace', 'settings', 'victory', 'width']
