@@ -67,7 +67,9 @@ class TestSoundSystem(unittest.TestCase):
         # With our changes, it tries .wav first. Since os.path.exists returns True for everything, it finds .wav
         # Normalize separators for Windows compatibility
         normalized_arg = args[0].replace("\\", "/")
-        self.assertTrue(normalized_arg.endswith("sounds/cached_sound.wav") or normalized_arg.endswith("sounds/cached_sound.ogg"))
+        self.assertTrue(
+            normalized_arg.endswith("sounds/cached_sound.wav") or normalized_arg.endswith("sounds/cached_sound.ogg")
+        )
         # Should play twice (once per update loop iteration if we were looping, but update iterates list)
         # Actually update iterates over list.
         # First iteration: play "cached_sound". Loads it.
