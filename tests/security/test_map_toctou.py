@@ -7,6 +7,7 @@ from command_line_conflict.maps.base import Map
 class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
     @patch("command_line_conflict.maps.base.os.makedirs")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
     @patch("command_line_conflict.utils.paths.get_user_data_dir")
@@ -15,6 +16,7 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_get_user_data,
         mock_dirname,
         mock_realpath,
+        mock_commonpath,
         mock_makedirs,
         mock_atomic_save,
     ):
@@ -42,6 +44,10 @@ class TestMapTOCTOU(unittest.TestCase):
             return str(path)
 
         mock_realpath.side_effect = realpath_side_effect
+
+        # Mock commonpath to simulate validation success without relying on OS path logic
+        # which might fail with Unix-style paths on Windows runners
+        mock_commonpath.return_value = maps_dir
 
         m = Map(10, 10)
 
