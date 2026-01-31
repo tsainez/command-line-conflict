@@ -1,13 +1,14 @@
-import unittest
 import os
 import shutil
 import tempfile
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 # We need to import CampaignManager.
 # Assuming PYTHONPATH is set correctly when running tests.
 from command_line_conflict.campaign_manager import CampaignManager
+
 
 class TestCampaignManagerSecurity(unittest.TestCase):
     def setUp(self):
@@ -45,5 +46,6 @@ class TestCampaignManagerSecurity(unittest.TestCase):
             with self.assertRaises(ValueError, msg="Should raise ValueError for non-json extension"):
                 CampaignManager(save_file=invalid_ext_path)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

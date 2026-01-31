@@ -1,5 +1,7 @@
 import os
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from command_line_conflict.campaign_manager import CampaignManager
@@ -15,10 +17,6 @@ from command_line_conflict.systems.production_system import ProductionSystem
 # or just ensure mock_pygame is active.
 # Since we import factories in production_system, we should be careful.
 # But existing tests use factories, so it should be fine with the conftest.
-
-
-import tempfile
-from pathlib import Path
 
 
 class TestCampaignManager(unittest.TestCase):

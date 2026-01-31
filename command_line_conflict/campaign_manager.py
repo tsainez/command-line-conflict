@@ -84,9 +84,7 @@ class CampaignManager:
                 raise ValueError(f"Save file must be located within the user data directory: {user_data_dir}")
         except ValueError:
             # commonpath raises ValueError if paths are on different drives
-            log.error(
-                f"Security violation: Attempted to use save file on different drive/unauthorized location: {real_path}"
-            )
+            log.error(f"Security violation: Attempted to use save file on different drive/unauthorized location: {real_path}")
             raise ValueError(f"Save file must be located within the user data directory: {user_data_dir}")
 
     def load_progress(self) -> None:
@@ -109,9 +107,7 @@ class CampaignManager:
 
                 # Security: Check file size to prevent DoS via memory exhaustion
                 if st.st_size > self.MAX_SAVE_FILE_SIZE:
-                    log.error(
-                        f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)"
-                    )
+                    log.error(f"Failed to load save file: File exceeds maximum allowed size ({self.MAX_SAVE_FILE_SIZE} bytes)")
                     return
 
                 content = f.read(self.MAX_SAVE_FILE_SIZE + 1)
