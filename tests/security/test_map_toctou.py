@@ -53,7 +53,7 @@ class TestMapTOCTOU(unittest.TestCase):
                 return maps_dir
             # If checking if resolved_path is in user_data_dir
             if p1 == user_data_dir and p2 == resolved_path:
-                return "/common/root" # Not a match
+                return "/common/root"  # Not a match
             return "/common/root"
 
         mock_commonpath.side_effect = commonpath_side_effect
