@@ -29,7 +29,8 @@ class TestMapTOCTOU(unittest.TestCase):
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
-        user_data_dir = "/user/data"
+        # We must use a path that matches the resolved path, as only user_data_dir is allowed now
+        user_data_dir = "/secure/path/to"
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
