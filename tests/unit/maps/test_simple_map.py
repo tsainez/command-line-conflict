@@ -15,6 +15,9 @@ def test_map_draw_with_camera(mock_scale):
     mock_font.render.return_value = mock_surface
     mock_scale.return_value = mock_scaled_surface
 
+    mock_surf.get_width.return_value = 800
+    mock_surf.get_height.return_value = 600
+
     camera = Camera(x=10, y=5, zoom=2.0)
     game_map = SimpleMap()
     game_map.add_wall(15, 20)

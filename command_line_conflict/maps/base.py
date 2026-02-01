@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import functools
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
 
@@ -147,6 +148,12 @@ class Map:
 
         return []
 
+    @functools.lru_cache(maxsize=32)
+    def _get_wall_surface(self, font, size: int) -> pygame.Surface:
+        """Returns a cached surface for the wall tile."""
+        s = font.render("#", True, (100, 100, 100))
+        return pygame.transform.scale(s, (size, size))
+
     def draw(self, surf, font, camera=None) -> None:
         """Draws the map walls to a surface, using camera if provided.
 
@@ -155,18 +162,53 @@ class Map:
             font: The pygame font to use for rendering the walls.
             camera: The camera object for view/zoom (optional).
         """
-        for x, y in self.walls:
-            grid_size = config.GRID_SIZE
-            if camera:
-                draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
-                draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
-                grid_size = int(config.GRID_SIZE * camera.zoom)
+        grid_size = config.GRID_SIZE
+        start_x, end_x = 0, self.width
+        start_y, end_y = 0, self.height
+
+        if camera:
+            grid_size = int(config.GRID_SIZE * camera.zoom)
+            screen_width = surf.get_width()
+            screen_height = surf.get_height()
+
+            # Calculate visible grid bounds with buffer
+            start_x = int(camera.x) - 1
+            end_x = int(camera.x + screen_width / grid_size) + 2
+            start_y = int(camera.y) - 1
+            end_y = int(camera.y + screen_height / grid_size) + 2
+
+        wall_surf = self._get_wall_surface(font, grid_size)
+
+        # Culling Optimization
+        if camera:
+            visible_width = end_x - start_x
+            visible_height = end_y - start_y
+            visible_tiles_count = visible_width * visible_height
+
+            # If map is sparse relative to view, iterate walls
+            # Otherwise, iterate view
+            use_wall_iteration = len(self.walls) < (visible_tiles_count * 0.5)
+
+            if use_wall_iteration:
+                for x, y in self.walls:
+                    if start_x <= x < end_x and start_y <= y < end_y:
+                        draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
+                        draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
+                        surf.blit(wall_surf, (draw_x, draw_y))
             else:
+                # Dense map: iterate viewport
+                for y in range(max(0, start_y), min(self.height, end_y)):
+                    for x in range(max(0, start_x), min(self.width, end_x)):
+                        if (x, y) in self.walls:
+                            draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
+                            draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
+                            surf.blit(wall_surf, (draw_x, draw_y))
+        else:
+            # No camera, draw all
+            for x, y in self.walls:
                 draw_x = x * grid_size
                 draw_y = y * grid_size
-            ch = font.render("#", True, (100, 100, 100))
-            ch = pygame.transform.scale(ch, (grid_size, grid_size))
-            surf.blit(ch, (draw_x, draw_y))
+                surf.blit(wall_surf, (draw_x, draw_y))
 
     def to_dict(self) -> dict:
         """Converts the map data to a dictionary for serialization.
