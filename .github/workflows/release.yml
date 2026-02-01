@@ -44,7 +44,7 @@ jobs:
           Move-Item "dist/Command Line Conflict.exe" "dist/Command-Line-Conflict-${{ runner.os }}.exe"
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Command-Line-Conflict-${{ runner.os }}
           path: dist/Command-Line-Conflict*
