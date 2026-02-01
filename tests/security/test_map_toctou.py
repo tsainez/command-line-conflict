@@ -29,7 +29,7 @@ class TestMapTOCTOU(unittest.TestCase):
         # On Linux/Mac, it will just root it (e.g. /)
 
         # Use a fake root for testing that works with commonpath
-        if os.name == 'nt':
+        if os.name == "nt":
             root = "C:\\"
         else:
             root = "/"
