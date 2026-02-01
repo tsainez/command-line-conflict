@@ -22,9 +22,20 @@ class TestCampaignManager(unittest.TestCase):
         self.save_file = "test_save_game.json"
         if os.path.exists(self.save_file):
             os.remove(self.save_file)
+        # Mock get_user_data_dir so atomic_save_json puts temp file in same dir
+        # as save_file (which is current dir)
+        self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir")
+        self.mock_get_user_data_dir = self.patcher.start()
+        # CampaignManager uses get_user_data_dir() to validate the path.
+        # It also likely prepends it if save_file is relative?
+        # Let's check CampaignManager.
+        # But assuming save_file is passed as is.
+        # If CampaignManager enforces path to be in user_data_dir, we need to mock it to be current dir.
+        self.mock_get_user_data_dir.return_value = os.path.abspath(".")
         self.manager = CampaignManager(self.save_file)
 
     def tearDown(self):
+        self.patcher.stop()
         if os.path.exists(self.save_file):
             os.remove(self.save_file)
 
