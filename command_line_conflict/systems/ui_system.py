@@ -509,6 +509,7 @@ class UISystem:
         identity = components.get(UnitIdentity)
         health = components.get(Health)
         player = components.get(Player)
+        attack = components.get(Attack)
 
         if not identity:
             return
@@ -516,13 +517,24 @@ class UISystem:
         lines = [identity.name.title()]
         if health:
             lines.append(f"HP: {int(health.hp)}/{health.max_hp}")
+        if attack:
+            lines.append(f"Dmg: {attack.attack_damage} | Rng: {attack.attack_range}")
         if player:
             lines.append(f"P{player.player_id}" if player.player_id != 0 else "Neutral")
 
         # Determine tooltip dimensions
         padding = 5
         line_height = 16
-        width = max(len(line) * 7 for line in lines) + padding * 2  # Approx width
+
+        # Calculate exact width needed based on font
+        max_line_width = 0
+        for line in lines:
+            # We use small_font for tooltips (see usage below)
+            w = self.small_font.size(line)[0]
+            if w > max_line_width:
+                max_line_width = w
+
+        width = max_line_width + padding * 2
         height = len(lines) * line_height + padding * 2
 
         x, y = screen_pos
