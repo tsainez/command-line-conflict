@@ -6,6 +6,7 @@ from command_line_conflict.maps.base import Map
 
 class TestMapTOCTOU(unittest.TestCase):
     @patch("command_line_conflict.utils.paths.atomic_save_json")
+    @patch("command_line_conflict.maps.base.os.path.commonpath")
     @patch("command_line_conflict.maps.base.os.makedirs")
     @patch("command_line_conflict.maps.base.os.path.realpath")
     @patch("command_line_conflict.maps.base.os.path.dirname")
@@ -16,6 +17,7 @@ class TestMapTOCTOU(unittest.TestCase):
         mock_dirname,
         mock_realpath,
         mock_makedirs,
+        mock_commonpath,
         mock_atomic_save,
     ):
         """
@@ -29,7 +31,8 @@ class TestMapTOCTOU(unittest.TestCase):
 
         # Setup allowed directories to pass validation
         maps_dir = "/secure/path/to"
-        user_data_dir = "/user/data"
+        # We must use a path that matches the resolved path, as only user_data_dir is allowed now
+        user_data_dir = "/secure/path/to"
 
         mock_dirname.return_value = maps_dir
         mock_get_user_data.return_value = user_data_dir
@@ -42,6 +45,19 @@ class TestMapTOCTOU(unittest.TestCase):
             return str(path)
 
         mock_realpath.side_effect = realpath_side_effect
+
+        # Mock commonpath to prevent OS-specific path parsing issues on Windows
+        # when dealing with mocked Unix-style paths.
+        def commonpath_side_effect(paths):
+            # Check if resolved_path is inside user_data_dir
+            if user_data_dir in paths and resolved_path in paths:
+                # Naive implementation for the mock:
+                # If both paths start with the user_data_dir string, return it.
+                if resolved_path.startswith(user_data_dir):
+                    return user_data_dir
+            return ""
+
+        mock_commonpath.side_effect = commonpath_side_effect
 
         m = Map(10, 10)
 
