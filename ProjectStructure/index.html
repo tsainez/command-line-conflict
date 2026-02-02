@@ -1,0 +1,881 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../Maps/">
+      
+      
+        <link rel="next" href="../CHANGELOG/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Project Structure - Command Line Conflict</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#project-structure" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Command Line Conflict" class="md-header__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Command Line Conflict
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Project Structure
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Command Line Conflict" class="md-nav__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Command Line Conflict
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ECS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECS Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapCreation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map Creation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Maps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#directory-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory Layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detailed Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="detailed Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs-components-command_line_conflictcomponents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS Components (command_line_conflict/components/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs-systems-command_line_conflictsystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS Systems (command_line_conflict/systems/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenes-command_line_conflictscenes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenes (command_line_conflict/scenes/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maps-command_line_conflictmaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maps (command_line_conflict/maps/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ui-command_line_conflictui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UI (command_line_conflict/ui/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing (tests/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#directory-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory Layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detailed Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="detailed Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs-components-command_line_conflictcomponents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS Components (command_line_conflict/components/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs-systems-command_line_conflictsystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS Systems (command_line_conflict/systems/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenes-command_line_conflictscenes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenes (command_line_conflict/scenes/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maps-command_line_conflictmaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maps (command_line_conflict/maps/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ui-command_line_conflictui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UI (command_line_conflict/ui/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing (tests/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="project-structure">Project Structure</h1>
+<p>This document outlines the file organization and key modules of the <strong>Command Line Conflict</strong> repository.</p>
+<h2 id="directory-layout">Directory Layout</h2>
+<p>The project follows a standard Python package structure.</p>
+<pre><code class="language-text">command-line-conflict/
+├── .github/                 # GitHub Actions workflows and templates
+│   ├── ISSUE_TEMPLATE/      # Bug report and feature request templates
+│   ├── workflows/           # CI/CD pipelines (ci.yml, tests.yml, etc.)
+│   └── pull_request_template.md
+├── command_line_conflict/   # Main game source code
+│   ├── components/          # ECS Components (Data)
+│   ├── maps/                # Map definitions and loading logic
+│   ├── scenes/              # Game States (Menu, Game, etc.)
+│   ├── systems/             # ECS Systems (Logic)
+│   ├── ui/                  # Reusable UI widgets
+│   ├── utils/               # Utility helper functions
+│   ├── config.py            # Global configuration
+│   ├── engine.py            # Main game loop and scene management
+│   ├── factories.py         # Entity creation factories
+│   └── game_state.py        # Central data holder for the game
+├── docs/                    # Documentation (MkDocs)
+├── scripts/                 # Maintenance scripts (pre-commit, etc.)
+├── tests/                   # Test suite (pytest)
+│   ├── integration/         # Integration tests
+│   ├── security/            # Security-focused tests
+│   └── unit/                # Unit tests for individual modules
+├── AGENTS.md                # Task backlog for AI agents
+├── CONTRIBUTING.md          # Contribution guidelines
+├── ISSUES.md                # Known issues and code cleanup tasks
+├── README.md                # Project overview and instructions
+├── TODO_ISSUES.md           # Instructions for specific pending tasks
+├── build.py                 # PyInstaller build script
+├── main.py                  # Application entry point
+├── mkdocs.yml               # Documentation configuration
+└── requirements.txt         # Project dependencies
+</code></pre>
+<h2 id="detailed-architecture">detailed Architecture</h2>
+<p>The game uses an <strong>Entity-Component-System (ECS)</strong> architecture to manage game objects and logic.</p>
+<h3 id="core-modules">Core Modules</h3>
+<ul>
+<li><strong><code>main.py</code></strong>: The entry point. Initializes the engine and starts the application.</li>
+<li><strong><code>command_line_conflict/engine.py</code></strong>: Manages the main game loop, time deltas, and the <code>SceneManager</code> which transitions between different game states.</li>
+<li><strong><code>command_line_conflict/game_state.py</code></strong>: The heart of the ECS. It stores all entities and their components, manages the spatial hash map for performance, and handles the event queue.</li>
+<li><strong><code>command_line_conflict/config.py</code></strong>: Contains global constants, configuration settings, and debug flags.</li>
+<li><strong><code>command_line_conflict/logger.py</code></strong>: Configures the application-wide logging system.</li>
+</ul>
+<h3 id="ecs-components-command_line_conflictcomponents">ECS Components (<code>command_line_conflict/components/</code>)</h3>
+<p>Components are pure data containers attached to entities.</p>
+<ul>
+<li><code>position.py</code>: Stores x, y coordinates.</li>
+<li><code>movable.py</code>: Stores velocity, target destination, and pathfinding state.</li>
+<li><code>renderable.py</code>: Defines how an entity looks (character, color).</li>
+<li><code>health.py</code>: Manages HP, max HP, and regeneration.</li>
+<li><code>attack.py</code>: Defines damage, range, and attack speed.</li>
+<li><code>vision.py</code>: Defines the vision range for Fog of War.</li>
+<li><code>player.py</code>: Identifies which player owns the entity.</li>
+</ul>
+<h3 id="ecs-systems-command_line_conflictsystems">ECS Systems (<code>command_line_conflict/systems/</code>)</h3>
+<p>Systems contain the logic that operates on entities with specific components.</p>
+<ul>
+<li><code>movement_system.py</code>: Updates positions, handles pathfinding (A*), and collision avoidance.</li>
+<li><code>rendering_system.py</code>: Handles drawing entities, the map, Fog of War, and UI overlays to the screen.</li>
+<li><code>combat_system.py</code>: Manages target acquisition, attacking, and damage calculation.</li>
+<li><code>ai_system.py</code>: Controls AI behavior for non-human players.</li>
+<li><code>ui_system.py</code>: Renders the Heads-Up Display (HUD), selection boxes, and tooltips.</li>
+<li><code>sound_system.py</code>: Listens for game events and plays appropriate sound effects.</li>
+</ul>
+<h3 id="scenes-command_line_conflictscenes">Scenes (<code>command_line_conflict/scenes/</code>)</h3>
+<p>The game is divided into distinct states or "scenes".</p>
+<ul>
+<li><code>menu.py</code>: The main menu.</li>
+<li><code>game.py</code>: The core gameplay loop (<code>GameScene</code>).</li>
+<li><code>editor.py</code>: The built-in map editor.</li>
+<li><code>settings.py</code>: Configuration menu.</li>
+<li><code>victory.py</code> / <code>defeat.py</code>: End-of-game screens.</li>
+</ul>
+<h3 id="maps-command_line_conflictmaps">Maps (<code>command_line_conflict/maps/</code>)</h3>
+<ul>
+<li><code>base.py</code>: Defines the <code>Map</code> base class and file loading/saving logic.</li>
+<li><code>simple_map.py</code>: A basic empty map.</li>
+<li><code>wall_map.py</code>: A map with randomly generated walls.</li>
+</ul>
+<h3 id="ui-command_line_conflictui">UI (<code>command_line_conflict/ui/</code>)</h3>
+<p>Reusable UI components.</p>
+<ul>
+<li><code>file_dialog.py</code>: A modal file picker for saving/loading maps.</li>
+</ul>
+<h3 id="testing-tests">Testing (<code>tests/</code>)</h3>
+<ul>
+<li><strong>Unit Tests</strong>: Located in <code>tests/unit/</code>, mirroring the source structure. Focus on individual functions and classes.</li>
+<li><strong>Integration Tests</strong>: Located in <code>tests/integration/</code>. Test the interaction between multiple systems (e.g., game flow).</li>
+<li><strong>Security Tests</strong>: Located in <code>tests/security/</code>. Verify fixes for vulnerabilities (DoS, path traversal, cheat protection).</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
