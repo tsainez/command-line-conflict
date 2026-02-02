@@ -87,6 +87,17 @@ class CombatSystem:
                                 "data": {"name": ("attack_melee" if attack.attack_range <= 1.5 else "attack_ranged")},
                             }
                         )
+                        # Trigger visual damage text
+                        game_state.add_event(
+                            {
+                                "type": "visual_effect",
+                                "subtype": "floating_text",
+                                "x": target_pos.x,
+                                "y": target_pos.y,
+                                "text": str(int(attack.attack_damage)),
+                                "color": (255, 50, 50),  # Reddish for damage
+                            }
+                        )
                         # Retaliation Logic:
                         # If the target has an Attack component and no current target, make them fight back.
                         target_attack = target_components.get(Attack)
