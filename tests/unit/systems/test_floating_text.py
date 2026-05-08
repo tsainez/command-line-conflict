@@ -11,6 +11,7 @@ from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.ui_system import UISystem
 
 
+
 class TestFloatingText:
     @pytest.fixture
     def mock_camera(self):
