@@ -1,4 +1,5 @@
 from ..components.attack import Attack
+from ..components.flee import Flee
 from ..components.player import Player
 from ..components.position import Position
 from ..components.vision import Vision
@@ -38,6 +39,14 @@ class AISystem:
             # Attack component is guaranteed by the get_entities_with_component call,
             # but we still check it to be safe and get the reference.
             if not attack:
+                continue
+
+            # Self-preservation: a fleeing unit (e.g. immortal at low HP) must
+            # not auto-acquire a target, otherwise the combat system would
+            # override the flee path and chase the enemy.
+            flee = components.get(Flee)
+            if flee and flee.is_fleeing:
+                attack.attack_target = None
                 continue
 
             # Find a target if we don't have one

@@ -23,3 +23,7 @@ class Movable(Component):
 
         # Optimization: Throttling for pathfinding failures
         self.path_retry_timer: float = 0.0
+
+        # For non-intelligent units: ensure we only ping the player once
+        # per stuck event instead of every frame.
+        self.stuck_notified: bool = False
