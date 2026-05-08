@@ -155,17 +155,21 @@ class Map:
             font: The pygame font to use for rendering the walls.
             camera: The camera object for view/zoom (optional).
         """
+        grid_size = config.GRID_SIZE
+        if camera:
+            grid_size = int(config.GRID_SIZE * camera.zoom)
+
+        # Pre-render and scale the wall character once per frame instead of per wall
+        ch = font.render("#", True, (100, 100, 100))
+        ch = pygame.transform.scale(ch, (grid_size, grid_size))
+
         for x, y in self.walls:
-            grid_size = config.GRID_SIZE
             if camera:
                 draw_x = (x - camera.x) * config.GRID_SIZE * camera.zoom
                 draw_y = (y - camera.y) * config.GRID_SIZE * camera.zoom
-                grid_size = int(config.GRID_SIZE * camera.zoom)
             else:
-                draw_x = x * grid_size
-                draw_y = y * grid_size
-            ch = font.render("#", True, (100, 100, 100))
-            ch = pygame.transform.scale(ch, (grid_size, grid_size))
+                draw_x = x * config.GRID_SIZE
+                draw_y = y * config.GRID_SIZE
             surf.blit(ch, (draw_x, draw_y))
 
     def to_dict(self) -> dict:
