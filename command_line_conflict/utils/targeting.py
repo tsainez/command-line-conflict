@@ -74,7 +74,7 @@ class Targeting:
             for x in range(min_x, max_x + 1):
                 for y in range(min_y, max_y + 1):
                     # Retrieve potential targets from the spatial map
-                    cell_entities = game_state.spatial_map.get((x, y))
+                    cell_entities = game_state.spatial_map.get((x, y))  # type: ignore
                     if not cell_entities:
                         continue
 
