@@ -1,13 +1,15 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from command_line_conflict.systems.ui_system import UISystem
-from command_line_conflict.systems.combat_system import CombatSystem
-from command_line_conflict.components.health import Health
+
+import pytest
+
 from command_line_conflict.components.attack import Attack
-from command_line_conflict.components.position import Position
+from command_line_conflict.components.health import Health
 from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.position import Position
 from command_line_conflict.components.unit_identity import UnitIdentity
-from command_line_conflict import config
+from command_line_conflict.systems.combat_system import CombatSystem
+from command_line_conflict.systems.ui_system import UISystem
+
 
 
 class TestFloatingText:
