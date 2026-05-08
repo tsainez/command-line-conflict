@@ -2,6 +2,8 @@
 
 # A boolean that turns on/off debug mode.
 DEBUG = False
+# A boolean that turns on developer features like the profiler and dev console.
+DEV_MODE = True
 
 # The width of the screen in pixels.
 SCREEN_WIDTH = 800

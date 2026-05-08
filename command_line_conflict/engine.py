@@ -13,6 +13,8 @@ from .scenes.menu import MenuScene
 from .scenes.settings import SettingsScene
 from .scenes.victory import VictoryScene
 from .steam_integration import SteamIntegration
+from .ui.dev_console import DeveloperConsole
+from .utils.profiler import profiler
 
 
 class SceneManager:
@@ -135,22 +137,35 @@ class Game:
                 log.warning("No suitable font found, using generic monospace.")
 
         self.scene_manager = SceneManager(self)
+        self.dev_console = DeveloperConsole(config.SCREEN["width"], config.SCREEN["height"], self.font)
 
     def run(self) -> None:
         """Starts and runs the main game loop."""
         log.info("Game starting...")
         while self.running:
             dt = self.clock.tick(config.FPS) / 1000.0
+            profiler.record_frame(dt)
             self.steam.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     log.info("Quit event received. Stopping game loop...")
                     self.running = False
+
+                # Let dev console consume events first (e.g., toggling)
+                if getattr(config, "DEV_MODE", False) and self.dev_console.handle_event(event):
+                    continue
+
                 self.scene_manager.handle_event(event)
             self.scene_manager.update(dt)
             self.scene_manager.draw(self.screen)
+
+            if getattr(config, "DEV_MODE", False):
+                self.dev_console.draw(self.screen)
+
             pygame.display.flip()
+
+        profiler.flush()
         log.info("Game loop finished. Quitting...")
         pygame.quit()
 
