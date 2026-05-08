@@ -29,3 +29,7 @@
 ## 2025-05-29 - Spatial Lookups for Selection
 **Learning:** Iterating over all entities to find what was clicked is O(N) and redundant when a spatial hash map exists. `get_entities_at_position` provides O(1) access. Similarly, iterating only components of interest (e.g., `Selectable`) reduces overhead for global operations like drag selection.
 **Action:** Always prefer spatial lookups or component-specific iterators over iterating `game_state.entities.items()` when possible.
+
+## 2025-05-30 - Map Drawing Optimization
+**Learning:** Calling `pygame.font.render` and `pygame.transform.scale` inside the inner rendering loop for static map elements (like walls) causes severe performance degradation, doing O(N) expensive text renders when the result is identical.
+**Action:** Always hoist invariant rendering operations (like text rendering and scaling of identical sprites) out of loops. Render once per frame and blit multiple times.
