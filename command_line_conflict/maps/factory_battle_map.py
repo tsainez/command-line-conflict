@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .. import factories
 from .base import Map
 
 if TYPE_CHECKING:
@@ -50,6 +49,8 @@ class FactoryBattleMap(Map):
         Args:
             game_state: The game state to add units to.
         """
+        from .. import factories
+
         # Player 1 units (Human) - Start at the top left area
         for i in range(3):
             factories.create_chassis(game_state, 5 + i * 2, 5, player_id=1, is_human=True)
