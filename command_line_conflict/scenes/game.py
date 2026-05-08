@@ -19,6 +19,7 @@ from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
 from command_line_conflict.maps import SimpleMap  # noqa: F401  # pylint: disable=unused-import
 from command_line_conflict.maps.factory_battle_map import FactoryBattleMap
+from command_line_conflict.maps.procedural_map import ProceduralMap  # noqa: F401  # pylint: disable=unused-import
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
@@ -57,7 +58,13 @@ class GameScene:
         """
         self.game = game
         self.font = game.font
-        self.game_state = GameState(FactoryBattleMap())
+        if config.DEBUG:
+            # Generate procedural map for debug mode playtesting
+            map_width = config.SCREEN_WIDTH // config.GRID_SIZE
+            map_height = config.SCREEN_HEIGHT // config.GRID_SIZE
+            self.game_state = GameState(ProceduralMap(width=map_width, height=map_height))
+        else:
+            self.game_state = GameState(FactoryBattleMap())
         self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
         self.selection_start = None
         self.paused = False
