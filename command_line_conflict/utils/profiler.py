@@ -38,7 +38,7 @@ class Profiler:
             log_dir = get_user_data_dir()
             log_dir.mkdir(parents=True, exist_ok=True)
             self.csv_path = log_dir / f"profiler_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-            with open(self.csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+            with open(self.csv_path, "w", newline="", encoding="utf-8") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["Timestamp", "FrameTime", "FrameDrop", "MemoryUsageMB", "FunctionName", "ExecTime"])
 
@@ -87,7 +87,7 @@ class Profiler:
         if not self.enabled or not self.csv_path or not self.metrics_buffer:
             return
 
-        with open(self.csv_path, 'a', newline='', encoding='utf-8') as csvfile:
+        with open(self.csv_path, "a", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerows(self.metrics_buffer)
         self.metrics_buffer.clear()
@@ -99,11 +99,7 @@ class Profiler:
 
         current, _ = tracemalloc.get_traced_memory()
         mem_mb = current / (1024 * 1024)
-        return {
-            "fps": self.fps,
-            "frame_drops": self.frame_drops,
-            "memory_mb": mem_mb
-        }
+        return {"fps": self.fps, "frame_drops": self.frame_drops, "memory_mb": mem_mb}
 
 
 profiler = Profiler()
@@ -111,6 +107,7 @@ profiler = Profiler()
 
 def profile(func):
     """Decorator to profile execution time of a function."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if not profiler.enabled:
@@ -123,4 +120,5 @@ def profile(func):
 
         profiler.log_metric(func.__name__, exec_time)
         return result
+
     return wrapper

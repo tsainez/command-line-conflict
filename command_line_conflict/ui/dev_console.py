@@ -52,7 +52,7 @@ class DeveloperConsole:
         y_offset = 10
         for line in lines:
             if self.font:
-                text_surface = self.font.render(line, True, (0, 255, 0)) # Green text
+                text_surface = self.font.render(line, True, (0, 255, 0))  # Green text
                 self.surface.blit(text_surface, (10, y_offset))
                 y_offset += text_surface.get_height() + 5
 
