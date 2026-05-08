@@ -9,6 +9,7 @@ from command_line_conflict.components.movable import Movable
 from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict import config
 
+
 class TestFloatingText:
     @pytest.fixture
     def mock_camera(self):
@@ -69,7 +70,7 @@ class TestFloatingText:
 
         # Create target
         target = game_state.create_entity()
-        game_state.add_component(target, Position(11, 10)) # Distance 1
+        game_state.add_component(target, Position(11, 10))  # Distance 1
         game_state.add_component(target, Health(hp=100, max_hp=100))
         game_state.add_component(target, UnitIdentity(name="Target"))
 
