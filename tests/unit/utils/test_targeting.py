@@ -106,7 +106,7 @@ class TestTargeting:
         my_id = 1
         my_pos = Position(50, 50)
         my_player = Player(1)
-        vision = Vision(5) # Area ~ 121
+        vision = Vision(5)  # Area ~ 121
 
         # Fill map to force dense mode
         # Need > 60 entities
