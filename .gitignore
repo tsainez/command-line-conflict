@@ -29,3 +29,10 @@ site/
 
 # Pytest
 .pytest_cache/
+
+# AI agent working files (private — do not commit)
+.claude/
+CLAUDE.md
+TASKS.md
+memory/
+dashboard.html
