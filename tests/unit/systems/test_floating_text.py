@@ -1,15 +1,13 @@
-from unittest.mock import MagicMock, patch
-
 import pytest
-
-from command_line_conflict.components.attack import Attack
-from command_line_conflict.components.health import Health
-from command_line_conflict.components.movable import Movable
-from command_line_conflict.components.position import Position
-from command_line_conflict.components.unit_identity import UnitIdentity
-from command_line_conflict.systems.combat_system import CombatSystem
+from unittest.mock import MagicMock, patch
 from command_line_conflict.systems.ui_system import UISystem
-
+from command_line_conflict.systems.combat_system import CombatSystem
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.position import Position
+from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.unit_identity import UnitIdentity
+from command_line_conflict import config
 
 class TestFloatingText:
     @pytest.fixture
@@ -71,7 +69,7 @@ class TestFloatingText:
 
         # Create target
         target = game_state.create_entity()
-        game_state.add_component(target, Position(11, 10))  # Distance 1
+        game_state.add_component(target, Position(11, 10)) # Distance 1
         game_state.add_component(target, Health(hp=100, max_hp=100))
         game_state.add_component(target, UnitIdentity(name="Target"))
 
