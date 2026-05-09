@@ -28,7 +28,11 @@ class FleeSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in game_state.entities.items():
+        for entity_id in game_state.get_entities_with_component(Flee):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             flee = components.get(Flee)
             if not flee:
                 continue

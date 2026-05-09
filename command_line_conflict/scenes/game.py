@@ -109,8 +109,11 @@ class GameScene:
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
 
+        player_entities = [
+            self.game_state.entities.get(eid) for eid in self.game_state.get_entities_with_component(Player)
+        ]
         self.has_player_2_opponent = any(
-            c.get(Player) and c.get(Player).player_id == 2 for _, c in self.game_state.entities.items()
+            c and c.get(Player) and c.get(Player).player_id == 2 for c in player_entities
         )
 
         # Start game music
@@ -209,7 +212,11 @@ class GameScene:
                 # Visual feedback (red ripple)
                 self.ui_system.add_click_effect(grid_x, grid_y, (255, 0, 0))
 
-                for entity_id, components in self.game_state.entities.items():
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+
                     selectable = components.get(Selectable)
                     if selectable and selectable.is_selected:
                         attack = components.get(Attack)
@@ -233,7 +240,11 @@ class GameScene:
                 # Visual feedback (green ripple)
                 self.ui_system.add_click_effect(grid_x, grid_y, (0, 255, 0))
 
-                for entity_id, components in self.game_state.entities.items():
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+
                     selectable = components.get(Selectable)
                     if selectable and selectable.is_selected:
                         log.info(f"Moving entity {entity_id} to {(grid_x, grid_y)}")
@@ -339,7 +350,11 @@ class GameScene:
                     self.chat_system.add_message("Hold Position command issued", (255, 255, 0))
                     from command_line_conflict.components.movable import Movable
 
-                    for entity_id, components in self.game_state.entities.items():
+                    for entity_id in self.game_state.get_entities_with_component(Selectable):
+                        components = self.game_state.entities.get(entity_id)
+                        if not components:
+                            continue
+
                         selectable = components.get(Selectable)
                         if selectable and selectable.is_selected:
                             movable = components.get(Movable)
@@ -433,7 +448,11 @@ class GameScene:
         """Handles building construction requests."""
         # Find selected chassis
         selected_chassis_ids = []
-        for entity_id, components in self.game_state.entities.items():
+        for entity_id in self.game_state.get_entities_with_component(Selectable):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             selectable = components.get(Selectable)
             identity = components.get(UnitIdentity)
 
@@ -496,7 +515,11 @@ class GameScene:
 
         # God Mode Cheat
         if self.cheats["god_mode"]:
-            for _, components in self.game_state.entities.items():
+            for entity_id in self.game_state.get_entities_with_component(Player):
+                components = self.game_state.entities.get(entity_id)
+                if not components:
+                    continue
+
                 player = components.get(Player)
                 health = components.get(Health)
                 if player and player.is_human and health:
@@ -555,7 +578,11 @@ class GameScene:
             True if the win condition is met, False otherwise.
         """
         enemy_count = 0
-        for _, components in self.game_state.entities.items():
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and not player.is_human:
                 if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
@@ -588,7 +615,11 @@ class GameScene:
             True if the loss condition is met, False otherwise.
         """
         player_entity_count = 0
-        for _, components in self.game_state.entities.items():
+        for entity_id in self.game_state.get_entities_with_component(Player):
+            components = self.game_state.entities.get(entity_id)
+            if not components:
+                continue
+
             player = components.get(Player)
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)

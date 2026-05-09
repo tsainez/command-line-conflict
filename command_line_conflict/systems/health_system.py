@@ -23,9 +23,12 @@ class HealthSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
-        for entity_id, components in list(game_state.entities.items()):
-            health = components.get(Health)
+        for entity_id in list(game_state.get_entities_with_component(Health)):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
 
+            health = components.get(Health)
             if not health:
                 continue
 
