@@ -109,12 +109,8 @@ class GameScene:
         self.spawn_system = SpawnSystem(spawn_interval=5.0)  # Spawn every 5 seconds
         self._create_initial_units()
 
-        player_entities = [
-            self.game_state.entities.get(eid) for eid in self.game_state.get_entities_with_component(Player)
-        ]
-        self.has_player_2_opponent = any(
-            c and c.get(Player) and c.get(Player).player_id == 2 for c in player_entities
-        )
+        player_entities = [self.game_state.entities.get(eid) for eid in self.game_state.get_entities_with_component(Player)]
+        self.has_player_2_opponent = any(c and c.get(Player) and c.get(Player).player_id == 2 for c in player_entities)
 
         # Start game music
         # Assuming the music file is in the root or a music folder
