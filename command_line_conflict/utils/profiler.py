@@ -26,7 +26,7 @@ class Profiler:
         if self.enabled:
             tracemalloc.start()
 
-        self.metrics_buffer = []
+        self.metrics_buffer: list[list[str | int]] = []
         self.frame_count = 0
         self.total_time = 0.0
         self.fps = 0.0
