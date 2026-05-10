@@ -58,8 +58,11 @@ class CombatSystem:
                     continue
 
                 # Optimization: Compare squared distances to avoid expensive sqrt()
-                dist_sq = (my_pos.x - target_pos.x) ** 2 + (my_pos.y - target_pos.y) ** 2
-                attack_range_sq = attack.attack_range**2
+                # Use multiplication instead of ** 2 for performance
+                dx = my_pos.x - target_pos.x
+                dy = my_pos.y - target_pos.y
+                dist_sq = dx * dx + dy * dy
+                attack_range_sq = attack.attack_range * attack.attack_range
 
                 if dist_sq <= attack_range_sq:
                     # Stop moving and attack

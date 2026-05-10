@@ -27,7 +27,7 @@ class Targeting:
         closest_enemy = None
         min_dist_sq = float("inf")
         vision_range = vision.vision_range
-        vision_range_sq = vision_range**2
+        vision_range_sq = vision_range * vision_range
 
         # Calculate search bounds based on vision range
         min_x = int(my_pos.x - vision_range)
@@ -64,7 +64,10 @@ class Targeting:
                             continue
 
                         # Optimization: Use squared distance to avoid expensive sqrt() in the loop
-                        dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+                        # Use multiplication instead of ** 2 for performance
+                        dx = my_pos.x - other_pos.x
+                        dy = my_pos.y - other_pos.y
+                        dist_sq = dx * dx + dy * dy
 
                         if dist_sq <= vision_range_sq and dist_sq < min_dist_sq:
                             min_dist_sq = dist_sq
@@ -96,7 +99,10 @@ class Targeting:
                             continue
 
                         # Optimization: Use squared distance to avoid expensive sqrt() in the loop
-                        dist_sq = (my_pos.x - other_pos.x) ** 2 + (my_pos.y - other_pos.y) ** 2
+                        # Use multiplication instead of ** 2 for performance
+                        dx = my_pos.x - other_pos.x
+                        dy = my_pos.y - other_pos.y
+                        dist_sq = dx * dx + dy * dy
 
                         if dist_sq <= vision_range_sq and dist_sq < min_dist_sq:
                             min_dist_sq = dist_sq

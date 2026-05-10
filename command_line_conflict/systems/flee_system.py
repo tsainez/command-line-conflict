@@ -76,7 +76,7 @@ class FleeSystem:
                         if enemy_pos:
                             dx = my_pos.x - enemy_pos.x
                             dy = my_pos.y - enemy_pos.y
-                            dist = (dx**2 + dy**2) ** 0.5
+                            dist = (dx * dx + dy * dy) ** 0.5
                             if dist > 0:
                                 flee_x = my_pos.x + dx / dist * 5
                                 flee_y = my_pos.y + dy / dist * 5
