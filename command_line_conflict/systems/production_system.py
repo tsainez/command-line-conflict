@@ -22,8 +22,9 @@ class ProductionSystem:
         """
         # Find all entities with Factory component
         factory_entities = []
-        for entity_id, components in game_state.entities.items():
-            if Factory in components and Position in components:
+        for entity_id in game_state.get_entities_with_component(Factory):
+            components = game_state.entities.get(entity_id)
+            if components and Position in components:
                 factory_entities.append((entity_id, components))
 
         if not factory_entities:

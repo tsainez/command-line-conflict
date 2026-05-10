@@ -74,11 +74,11 @@ class Targeting:
             for x in range(min_x, max_x + 1):
                 for y in range(min_y, max_y + 1):
                     # Retrieve potential targets from the spatial map
-                    cell_entities = game_state.spatial_map.get((x, y))
-                    if not cell_entities:
+                    grid_cell_entities: set[int] | None = game_state.spatial_map.get((x, y))
+                    if not grid_cell_entities:
                         continue
 
-                    for other_id in cell_entities:
+                    for other_id in grid_cell_entities:
                         if other_id == my_id:
                             continue
 
