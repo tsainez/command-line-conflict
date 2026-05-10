@@ -12,6 +12,7 @@ class DefeatScene:
         """
         self.game = game
         self.font = game.font
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
     def handle_event(self, event):
         """Handles events for the defeat scene.
@@ -22,6 +23,8 @@ class DefeatScene:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.game.scene_manager.switch_to("menu")
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
         """Updates the defeat scene.
@@ -42,7 +45,7 @@ class DefeatScene:
         screen.blit(text, text_rect)
 
         # Instructions to go back to menu
-        instruction_text = self.font.render("Press Enter to return to the menu", True, (255, 255, 255))
+        instruction_text = self.font.render("Press Enter or Click to return to the menu", True, (255, 255, 255))
         instruction_rect = instruction_text.get_rect(
             center=(
                 self.game.screen.get_width() / 2,
