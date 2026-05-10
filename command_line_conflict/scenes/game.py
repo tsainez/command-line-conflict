@@ -321,17 +321,19 @@ class GameScene:
                             )
 
                     # Debug cheats
-                    if event.key == pygame.K_F1:
-                        self.cheats["reveal_map"] = not self.cheats["reveal_map"]
-                        status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
-                        log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
-                        self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
-                    elif event.key == pygame.K_F2:
-                        self.cheats["god_mode"] = not self.cheats["god_mode"]
-                        status = "Enabled" if self.cheats["god_mode"] else "Disabled"
-                        log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
-                        self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
-                    elif event.key == pygame.K_TAB:
+                    if config.DEBUG:
+                        if event.key == pygame.K_F1:
+                            self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                            status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
+                            log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                            self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
+                        elif event.key == pygame.K_F2:
+                            self.cheats["god_mode"] = not self.cheats["god_mode"]
+                            status = "Enabled" if self.cheats["god_mode"] else "Disabled"
+                            log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
+                            self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
+
+                    if event.key == pygame.K_TAB:
                         # Switch sides
                         self.selection_system.clear_selection(self.game_state)
                         if self.current_player_id == 1:

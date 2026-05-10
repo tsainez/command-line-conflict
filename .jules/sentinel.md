@@ -25,3 +25,7 @@
 **Vulnerability:** Allowing the application to write to its own source directory (`maps_dir`) creates a risk of code overwrite or integrity violation, even with extension checks.
 **Learning:** Enforcing a strict "write only to user data" policy requires updating all default paths in the UI (e.g., Editor) to prevent usability regressions. Security restrictions often necessitate UX changes.
 **Prevention:** Removed `maps_dir` from `allowed_dirs` in `Map.save_to_file` and updated `EditorScene` to default to `user_data_dir`.
+## 2026-05-10 - [Cheat Mode Bypass]
+**Vulnerability:** The developer cheats (F1 for reveal map, F2 for god mode) in GameScene were not gated by the DEBUG configuration flag.
+**Learning:** Even if a feature is intended only for development, it must be explicitly protected by a configuration check. Otherwise, it might be accessible in production builds.
+**Prevention:** Wrap all debug and cheat functionalities in a check against the relevant configuration flag (e.g., `if config.DEBUG:`).
