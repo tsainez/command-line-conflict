@@ -15,8 +15,9 @@ class TestMovementSystemLogging(unittest.TestCase):
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_set_target_logs_debug(self, mock_log):
-        # Create a unit
-        unit_id = create_chassis(self.game_state, x=10, y=10, player_id=1)
+        # Use a rover (intelligent) since "Path found" is only logged for
+        # units that actually run pathfinding. The chassis is non-intelligent.
+        unit_id = create_rover(self.game_state, x=10, y=10, player_id=1)
 
         # Move to a valid location
         self.movement_system.set_target(self.game_state, unit_id, 12, 12)
@@ -29,8 +30,9 @@ class TestMovementSystemLogging(unittest.TestCase):
 
     @patch("command_line_conflict.systems.movement_system.log")
     def test_set_target_logs_warning_when_no_path(self, mock_log):
-        # Create a unit
-        unit_id = create_chassis(self.game_state, x=10, y=10, player_id=1)
+        # Pathfinding is only used by intelligent units. The chassis (worker)
+        # is non-intelligent by design and never pathfinds, so use a rover.
+        unit_id = create_rover(self.game_state, x=10, y=10, player_id=1)
 
         # Enclose the unit with walls so no path can be found
         self.game_state.map.add_wall(9, 10)
@@ -54,8 +56,10 @@ class TestMovementSystemLogging(unittest.TestCase):
         # Set target to the obstacle
         self.movement_system.set_target(self.game_state, unit1_id, 10, 11)
 
-        # Run update
-        self.movement_system.update(self.game_state, dt=0.1)
+        # Chassis walks in a straight line; run enough updates for it to
+        # actually reach the blocking unit's tile.
+        for _ in range(10):
+            self.movement_system.update(self.game_state, dt=0.1)
 
         # Check if any debug call contains "Collision detected"
         collision_logged = any("Collision detected" in str(call) for call in mock_log.debug.mock_calls)
