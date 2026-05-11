@@ -33,3 +33,7 @@
 ## 2025-05-30 - Map Drawing Optimization
 **Learning:** Calling `pygame.font.render` and `pygame.transform.scale` inside the inner rendering loop for static map elements (like walls) causes severe performance degradation, doing O(N) expensive text renders when the result is identical.
 **Action:** Always hoist invariant rendering operations (like text rendering and scaling of identical sprites) out of loops. Render once per frame and blit multiple times.
+
+## 2025-05-31 - Fast Distance Calculations
+**Learning:** Using the exponentiation operator (`** 2`) for calculating squared distances in performance-critical paths (like nested loops for targeting, combat, or UI rendering) routes through slower C-level `BINARY_POWER` operations.
+**Action:** Always prefer explicit multiplication (e.g., `dx * dx + dy * dy`) over exponentiation for squared distances to eliminate the function call overhead.

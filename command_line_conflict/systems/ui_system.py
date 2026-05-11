@@ -379,7 +379,9 @@ class UISystem:
                     unit_y - detection.detection_range,
                     unit_y + detection.detection_range + 1,
                 ):
-                    if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= detection.detection_range**2:
+                    dx = x - unit_x
+                    dy = y - unit_y
+                    if dx * dx + dy * dy <= detection.detection_range * detection.detection_range:
                         detection_tiles.add((x, y))
 
         # Pre-calculate common values
@@ -402,7 +404,9 @@ class UISystem:
             unit_x, unit_y = int(position.x), int(position.y)
             for x in range(unit_x - attack.attack_range, unit_x + attack.attack_range + 1):
                 for y in range(unit_y - attack.attack_range, unit_y + attack.attack_range + 1):
-                    if (x - unit_x) ** 2 + (y - unit_y) ** 2 <= attack.attack_range**2:
+                    dx = x - unit_x
+                    dy = y - unit_y
+                    if dx * dx + dy * dy <= attack.attack_range * attack.attack_range:
                         attack_tiles.add((x, y))
 
         # Pre-calculate common values
