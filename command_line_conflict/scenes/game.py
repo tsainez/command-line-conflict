@@ -166,7 +166,9 @@ class GameScene:
             x1, y1 = self.selection_start
             x2, y2 = event.pos
             # If the mouse moved less than 5 pixels, it's a click
-            if (x2 - x1) ** 2 + (y2 - y1) ** 2 < 25:
+            dx = x2 - x1
+            dy = y2 - y1
+            if dx * dx + dy * dy < 25:
                 mods = pygame.key.get_mods()
                 shift_pressed = mods & pygame.KMOD_SHIFT
                 grid_pos = self.camera.screen_to_grid(event.pos[0], event.pos[1])
