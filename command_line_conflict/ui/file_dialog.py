@@ -291,6 +291,17 @@ class FileDialog:
         # Clip input text to input_rect
         self.screen.set_clip(self.input_rect)
         self.screen.blit(input_surf, (self.input_rect.x + 5, input_surf_y))
+
+        # Blinking cursor
+        if pygame.time.get_ticks() % 1000 < 500:
+            if self.input_text:
+                text_width = self.font.size(self.input_text)[0]
+                cursor_x = self.input_rect.x + 5 + text_width + 2
+            else:
+                cursor_x = self.input_rect.x + 5
+            cursor_y = self.input_rect.y + 5
+            pygame.draw.rect(self.screen, (0, 0, 0), (cursor_x, cursor_y, 2, self.input_rect.height - 10))
+
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.
