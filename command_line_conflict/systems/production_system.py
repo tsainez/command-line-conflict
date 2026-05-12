@@ -33,9 +33,14 @@ class ProductionSystem:
         # Check for overlap with input units
         # Iterate over a copy of entities to avoid modification issues if we delete
         # entities while iterating (though create_entity creates a new ID, best be safe)
-        all_entities = list(game_state.entities.items())
+        # Optimization: Iterate over entities with UnitIdentity instead of all entities
+        all_unit_entities = list(game_state.get_entities_with_component(UnitIdentity))
 
-        for unit_id, unit_components in all_entities:
+        for unit_id in all_unit_entities:
+            unit_components = game_state.entities.get(unit_id)
+            if not unit_components:
+                continue
+
             unit_pos = unit_components.get(Position)
             unit_identity = unit_components.get(UnitIdentity)
             unit_player = unit_components.get(Player)
