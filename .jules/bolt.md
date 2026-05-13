@@ -37,3 +37,7 @@
 ## 2025-05-31 - Fast Distance Calculations
 **Learning:** Using the exponentiation operator (`** 2`) for calculating squared distances in performance-critical paths (like nested loops for targeting, combat, or UI rendering) routes through slower C-level `BINARY_POWER` operations.
 **Action:** Always prefer explicit multiplication (e.g., `dx * dx + dy * dy`) over exponentiation for squared distances to eliminate the function call overhead.
+
+## 2025-06-01 - Fast Square Root Calculations
+**Learning:** While explicit multiplication is faster than exponentiation for squaring (`** 2`), calculating the square root via the exponentiation operator (`** 0.5`) routes through the slower C-level `BINARY_POWER` operations compared to calling `math.sqrt()`. Benchmarks show `math.sqrt()` is noticeably faster.
+**Action:** Always prefer `math.sqrt(dx * dx + dy * dy)` over `(dx * dx + dy * dy) ** 0.5` for explicit distance calculations.

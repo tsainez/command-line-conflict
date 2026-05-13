@@ -1,3 +1,5 @@
+import math
+
 from ..components.movable import Movable
 from ..components.player import Player
 from ..components.position import Position
@@ -149,7 +151,7 @@ class MovementSystem:
                 movable.target_x, movable.target_y = next_x, next_y
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = (dx * dx + dy * dy) ** 0.5
+                dist = math.sqrt(dx * dx + dy * dy)
                 if dist < 0.01:
                     game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
@@ -173,7 +175,7 @@ class MovementSystem:
             elif not movable.intelligent and movable.target_x is not None and movable.target_y is not None:
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = (dx * dx + dy * dy) ** 0.5
+                dist = math.sqrt(dx * dx + dy * dy)
                 if dist < 0.01:
                     # The unit has effectively arrived. If the target tile
                     # itself is blocked we're stuck on the destination, not

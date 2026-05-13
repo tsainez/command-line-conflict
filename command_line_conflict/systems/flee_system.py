@@ -1,3 +1,5 @@
+import math
+
 from .. import config
 from ..components.attack import Attack
 from ..components.flee import Flee
@@ -76,7 +78,7 @@ class FleeSystem:
                         if enemy_pos:
                             dx = my_pos.x - enemy_pos.x
                             dy = my_pos.y - enemy_pos.y
-                            dist = (dx * dx + dy * dy) ** 0.5
+                            dist = math.sqrt(dx * dx + dy * dy)
                             if dist > 0:
                                 flee_x = my_pos.x + dx / dist * 5
                                 flee_y = my_pos.y + dy / dist * 5
