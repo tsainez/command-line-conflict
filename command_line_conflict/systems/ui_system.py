@@ -310,7 +310,11 @@ class UISystem:
             A list of entity IDs for all selected entities.
         """
         selected_entities = []
-        for entity_id, components in game_state.entities.items():
+        # Optimization: Use component index instead of iterating all entities (O(K) vs O(N))
+        for entity_id in game_state.get_entities_with_component(Selectable):
+            components = game_state.entities.get(entity_id)
+            if not components:
+                continue
             selectable = components.get(Selectable)
             if selectable and selectable.is_selected:
                 selected_entities.append(entity_id)

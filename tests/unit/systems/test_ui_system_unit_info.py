@@ -46,6 +46,7 @@ def test_draw_unit_name_with_identity(ui_system, game_state):
             Selectable: selectable,
         }
     }
+    game_state.component_index = {Selectable: {1}}
 
     # Mock the font.render method to capture what is being rendered
     ui_system.font.render = MagicMock()
@@ -79,6 +80,7 @@ def test_draw_unit_name_fallback_to_icon(ui_system, game_state):
             Selectable: selectable,
         }
     }
+    game_state.component_index = {Selectable: {1}}
 
     ui_system.font.render = MagicMock()
     ui_system.draw(game_state, paused=False)
