@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 
@@ -12,7 +14,8 @@ class DefeatScene:
         """
         self.game = game
         self.font = game.font
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        self.time = 0.0
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def handle_event(self, event):
         """Handles events for the defeat scene.
@@ -32,6 +35,7 @@ class DefeatScene:
         Args:
             dt: The time since the last frame.
         """
+        self.time += dt
 
     def draw(self, screen):
         """Draws the defeat scene.
@@ -45,7 +49,10 @@ class DefeatScene:
         screen.blit(text, text_rect)
 
         # Instructions to go back to menu
-        instruction_text = self.font.render("Press Enter or Click to return to the menu", True, (255, 255, 255))
+        pulse = (math.sin(self.time * 5) + 1) / 2
+        color_val = 150 + int(105 * pulse)
+        pulse_color = (color_val, color_val, color_val)
+        instruction_text = self.font.render("Press Enter or Click to return to the menu", True, pulse_color)
         instruction_rect = instruction_text.get_rect(
             center=(
                 self.game.screen.get_width() / 2,
