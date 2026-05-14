@@ -114,7 +114,7 @@ class Map:
         width = self.width
         height = self.height
         goal_x, goal_y = goal
-        inf = float('inf')
+        inf = float("inf")
 
         while open_set:
             # Security: Prevent infinite loops or excessive CPU usage
