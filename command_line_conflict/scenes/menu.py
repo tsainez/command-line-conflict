@@ -94,9 +94,6 @@ class MenuScene:
     def _trigger_option(self, option_index):
         option_text = self.menu_options[option_index]
 
-        # Reset cursor before switching scenes
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
         if option_text == "Continue Campaign":
             self.game.scene_manager.switch_to("game")
         elif option_text == "New Game":

@@ -131,7 +131,6 @@ class SettingsScene:
             config.DEBUG = not config.DEBUG
             log.info(f"Debug mode set to {config.DEBUG}")
         elif option_name == "Back":
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
