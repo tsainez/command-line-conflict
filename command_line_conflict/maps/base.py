@@ -148,7 +148,7 @@ class Map:
 
                 tentative_g = g_score[current] + 1
                 # Optimization: Use .get() to prevent double lookup for g_score
-                if tentative_g < g_score.get((nx, ny), float('inf')):
+                if tentative_g < g_score.get((nx, ny), float("inf")):
                     g_score[(nx, ny)] = tentative_g
                     f = tentative_g + abs(nx - goal_x) + abs(ny - goal_y)
                     heappush(open_set, (f, (nx, ny)))
