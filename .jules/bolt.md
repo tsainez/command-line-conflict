@@ -41,3 +41,7 @@
 ## 2025-06-01 - Fast Square Root Calculations
 **Learning:** While explicit multiplication is faster than exponentiation for squaring (`** 2`), calculating the square root via the exponentiation operator (`** 0.5`) routes through the slower C-level `BINARY_POWER` operations compared to calling `math.sqrt()`. Benchmarks show `math.sqrt()` is noticeably faster.
 **Action:** Always prefer `math.sqrt(dx * dx + dy * dy)` over `(dx * dx + dy * dy) ** 0.5` for explicit distance calculations.
+
+## 2025-06-02 - Micro-optimizations for Pathfinding
+**Learning:** A* Pathfinding in Python using a priority queue can suffer from significant loop overhead. Indexing lists/tuples (`current[0]`), creating arrays (`[(-1, 0), ...]`), performing property lookups (`self.width`, `self.is_blocked`), and executing double dictionary lookups (`(nx, ny) not in g_score ... g_score[(nx, ny)]`) inside the inner `while` and `for` loops quickly degrade performance on large grids or dense unit populations.
+**Action:** Always optimize hot paths like A* by caching instance attributes/methods outside the loop to avoid Python attribute lookup overhead, unrolling coordinates to prevent per-iteration object creation, and utilizing `.get()` for dictionary checks to guarantee single lookups.

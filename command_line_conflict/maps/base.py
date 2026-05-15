@@ -110,6 +110,13 @@ class Map:
 
         iterations = 0
 
+        # Optimization: Cache instance attributes and target coordinates locally
+        # to avoid lookup overhead in the hot path.
+        width = self.width
+        height = self.height
+        is_blocked = self.is_blocked
+        goal_x, goal_y = goal
+
         while open_set:
             # Security: Prevent infinite loops or excessive CPU usage
             iterations += 1
@@ -126,12 +133,13 @@ class Map:
                 path.reverse()
                 return path
 
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nx, ny = current[0] + dx, current[1] + dy
-                if not (0 <= nx < self.width and 0 <= ny < self.height):
+            curr_x, curr_y = current
+            # Optimization: Unroll coordinate calculations to avoid list/tuple creation in the loop
+            for nx, ny in ((curr_x - 1, curr_y), (curr_x + 1, curr_y), (curr_x, curr_y - 1), (curr_x, curr_y + 1)):
+                if not (0 <= nx < width and 0 <= ny < height):
                     continue
 
-                if not can_fly and self.is_blocked(nx, ny):
+                if not can_fly and is_blocked(nx, ny):
                     continue
 
                 if extra_obstacles and (nx, ny) in extra_obstacles:
@@ -139,9 +147,10 @@ class Map:
                         continue
 
                 tentative_g = g_score[current] + 1
-                if (nx, ny) not in g_score or tentative_g < g_score[(nx, ny)]:
+                # Optimization: Use .get() to prevent double lookup for g_score
+                if tentative_g < g_score.get((nx, ny), float('inf')):
                     g_score[(nx, ny)] = tentative_g
-                    f = tentative_g + abs(nx - goal[0]) + abs(ny - goal[1])
+                    f = tentative_g + abs(nx - goal_x) + abs(ny - goal_y)
                     heappush(open_set, (f, (nx, ny)))
                     came_from[(nx, ny)] = current
 
