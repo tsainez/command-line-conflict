@@ -5,6 +5,7 @@ from typing import cast
 import pygame
 
 from command_line_conflict import config
+from command_line_conflict.systems.sound_system import SoundSystem
 
 from ..logger import log
 
@@ -49,6 +50,7 @@ class SettingsScene:
             "SFX Volume": "Adjusts sound effects volume.",
             "Back": "Return to the main menu.",
         }
+        self.sound_system = SoundSystem()
 
     @functools.lru_cache(maxsize=64)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
@@ -76,6 +78,8 @@ class SettingsScene:
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
                     hovered = True
+                    if self.selected_option != i:
+                        self.sound_system.play_sound("click_select")
                     self.selected_option = i
 
             if hovered:
@@ -97,6 +101,7 @@ class SettingsScene:
 
         elif event.type == pygame.KEYDOWN:
             option_name = self.settings_options[self.selected_option]
+            old_selection = self.selected_option
 
             if event.key == pygame.K_UP:
                 self.selected_option = (self.selected_option - 1) % len(self.settings_options)
@@ -105,20 +110,28 @@ class SettingsScene:
             elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                 direction = -1 if event.key == pygame.K_LEFT else 1
                 self._change_volume(option_name, direction)
-
             elif event.key == pygame.K_RETURN:
                 self._trigger_option(option_name)
+
+            if self.selected_option != old_selection:
+                self.sound_system.play_sound("click_select")
 
     def _change_volume(self, option_name, direction):
         change = direction * 0.1
         if option_name == "Master Volume":
             config.MASTER_VOLUME = max(0.0, min(1.0, config.MASTER_VOLUME + change))
             self.game.music_manager.refresh_volume()
+            # Update local sound system and play feedback
+            self.sound_system.volume = config.SOUND_VOLUME
+            self.sound_system.play_sound("click_select")
         elif option_name == "Music Volume":
             config.MUSIC_VOLUME = max(0.0, min(1.0, config.MUSIC_VOLUME + change))
             self.game.music_manager.set_volume(config.MUSIC_VOLUME)
         elif option_name == "SFX Volume":
             config.SOUND_VOLUME = max(0.0, min(1.0, config.SOUND_VOLUME + change))
+            # Update local sound system and play feedback
+            self.sound_system.volume = config.SOUND_VOLUME
+            self.sound_system.play_sound("click_select")
 
     def _trigger_option(self, option_name):
         if option_name == "Screen Size":
