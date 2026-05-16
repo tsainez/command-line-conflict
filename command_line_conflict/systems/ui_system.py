@@ -527,7 +527,7 @@ class UISystem:
         self.screen.blit(text, text_rect)
 
         # Draw instruction text - use cached method with medium font
-        instruction = self._get_text_surface("Press P to Resume", (200, 200, 200), "medium")
+        instruction = self._get_text_surface("Press P or Space to Resume", (200, 200, 200), "medium")
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH / 2, config.SCREEN_HEIGHT / 2 + 50))
         self.screen.blit(instruction, instruction_rect)
 
