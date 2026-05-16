@@ -45,6 +45,7 @@ class SceneManager:
             scene_name: The name of the scene to switch to.
         """
         log.debug(f"Switching scene to: {scene_name}")
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         if scene_name == "game":
             self.scenes["game"] = GameScene(self.game)
         elif scene_name == "editor":
