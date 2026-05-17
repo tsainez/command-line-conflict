@@ -86,6 +86,8 @@ class MenuScene:
                 self.selected_option = (self.selected_option + 1) % len(self.menu_options)
             elif event.key == pygame.K_RETURN:
                 self._trigger_option(self.selected_option)
+            elif event.key == pygame.K_ESCAPE:
+                self._trigger_option(self.menu_options.index("Quit"))
 
             if self.selected_option != old_selection:
                 self.sound_system.play_sound("click_select")
