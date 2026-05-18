@@ -115,6 +115,20 @@ class Map:
         height = self.height
         goal_x, goal_y = goal
         inf = float("inf")
+        walls = self.walls
+
+        # Optimization: Pre-process extra_obstacles for O(1) checks
+        if extra_obstacles:
+            # Ensure exclude_obstacles is a set for O(1) lookup during comprehension
+            exclude_set = set(exclude_obstacles) if exclude_obstacles else set()
+
+            if isinstance(extra_obstacles, dict):
+                eff_extra = {k for k in extra_obstacles if k not in exclude_set}
+            else:
+                # Use set comprehension instead of set subtraction to support lists/tuples
+                eff_extra = {obs for obs in extra_obstacles if obs not in exclude_set}
+        else:
+            eff_extra = None
 
         while open_set:
             # Security: Prevent infinite loops or excessive CPU usage
@@ -135,24 +149,61 @@ class Map:
             cx, cy = current
             tentative_g = g_score[current] + 1
 
-            # Optimization: Unroll neighbor loop to avoid creating list of tuples
-            for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)):
-                if nx < 0 or nx >= width or ny < 0 or ny >= height:
-                    continue
+            # Optimization: Unroll neighbor loop and explicitly inline neighbor
+            # checks to avoid tuple creation, iteration overhead, and reduce lookup costs
 
-                if not can_fly and self.is_blocked(nx, ny):
-                    continue
+            # Left neighbor
+            nx, ny = cx - 1, cy
+            if not (nx < 0 or nx >= width or ny < 0 or ny >= height):
+                if can_fly or (nx, ny) not in walls:
+                    if not eff_extra or (nx, ny) not in eff_extra:
+                        if tentative_g < g_score.get((nx, ny), inf):
+                            g_score[(nx, ny)] = tentative_g
+                            # Inline Manhattan distance for performance
+                            dx = nx - goal_x
+                            dy = ny - goal_y
+                            f = tentative_g + (dx if dx > 0 else -dx) + (dy if dy > 0 else -dy)
+                            heappush(open_set, (f, (nx, ny)))
+                            came_from[(nx, ny)] = current
 
-                if extra_obstacles and (nx, ny) in extra_obstacles:
-                    if not (exclude_obstacles and (nx, ny) in exclude_obstacles):
-                        continue
+            # Right neighbor
+            nx, ny = cx + 1, cy
+            if not (nx < 0 or nx >= width or ny < 0 or ny >= height):
+                if can_fly or (nx, ny) not in walls:
+                    if not eff_extra or (nx, ny) not in eff_extra:
+                        if tentative_g < g_score.get((nx, ny), inf):
+                            g_score[(nx, ny)] = tentative_g
+                            dx = nx - goal_x
+                            dy = ny - goal_y
+                            f = tentative_g + (dx if dx > 0 else -dx) + (dy if dy > 0 else -dy)
+                            heappush(open_set, (f, (nx, ny)))
+                            came_from[(nx, ny)] = current
 
-                # Optimization: Use get to avoid double dict lookup
-                if tentative_g < g_score.get((nx, ny), inf):
-                    g_score[(nx, ny)] = tentative_g
-                    f = tentative_g + abs(nx - goal_x) + abs(ny - goal_y)
-                    heappush(open_set, (f, (nx, ny)))
-                    came_from[(nx, ny)] = current
+            # Top neighbor
+            nx, ny = cx, cy - 1
+            if not (nx < 0 or nx >= width or ny < 0 or ny >= height):
+                if can_fly or (nx, ny) not in walls:
+                    if not eff_extra or (nx, ny) not in eff_extra:
+                        if tentative_g < g_score.get((nx, ny), inf):
+                            g_score[(nx, ny)] = tentative_g
+                            dx = nx - goal_x
+                            dy = ny - goal_y
+                            f = tentative_g + (dx if dx > 0 else -dx) + (dy if dy > 0 else -dy)
+                            heappush(open_set, (f, (nx, ny)))
+                            came_from[(nx, ny)] = current
+
+            # Bottom neighbor
+            nx, ny = cx, cy + 1
+            if not (nx < 0 or nx >= width or ny < 0 or ny >= height):
+                if can_fly or (nx, ny) not in walls:
+                    if not eff_extra or (nx, ny) not in eff_extra:
+                        if tentative_g < g_score.get((nx, ny), inf):
+                            g_score[(nx, ny)] = tentative_g
+                            dx = nx - goal_x
+                            dy = ny - goal_y
+                            f = tentative_g + (dx if dx > 0 else -dx) + (dy if dy > 0 else -dy)
+                            heappush(open_set, (f, (nx, ny)))
+                            came_from[(nx, ny)] = current
 
         return []
 
