@@ -42,6 +42,19 @@ class TestMenuScene(unittest.TestCase):
 
         self.mock_game.scene_manager.switch_to.assert_called_with("editor")
 
+    def test_escape_key_triggers_quit(self):
+        # Ensure we are not already trying to quit
+        self.scene.quit_confirm = False
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_ESCAPE
+
+        self.scene.handle_event(event)
+
+        # The first time Quit is selected, quit_confirm should be True
+        self.assertTrue(self.scene.quit_confirm)
+
     def test_mouse_hover_selects_option(self):
         # Setup mock rects
         mock_rect_0 = MagicMock()

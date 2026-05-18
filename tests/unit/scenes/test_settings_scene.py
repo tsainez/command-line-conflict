@@ -138,3 +138,12 @@ def test_mouse_click_trigger(settings_scene):
 
     settings_scene.handle_event(event)
     settings_scene.game.scene_manager.switch_to.assert_called_with("menu")
+
+
+def test_escape_key_navigates_back(settings_scene):
+    event = MagicMock()
+    event.type = pygame.KEYDOWN
+    event.key = pygame.K_ESCAPE
+
+    settings_scene.handle_event(event)
+    settings_scene.game.scene_manager.switch_to.assert_called_with("menu")

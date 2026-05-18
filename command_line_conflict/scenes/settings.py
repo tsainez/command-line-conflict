@@ -112,6 +112,8 @@ class SettingsScene:
                 self._change_volume(option_name, direction)
             elif event.key == pygame.K_RETURN:
                 self._trigger_option(option_name)
+            elif event.key == pygame.K_ESCAPE:
+                self._trigger_option("Back")
 
             if self.selected_option != old_selection:
                 self.sound_system.play_sound("click_select")
