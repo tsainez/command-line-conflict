@@ -23,8 +23,10 @@ class DefeatScene:
         Args:
             event: The pygame event to handle.
         """
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+        if event.type == pygame.MOUSEMOTION:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        elif event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
                 self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.game.scene_manager.switch_to("menu")

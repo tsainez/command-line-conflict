@@ -10,3 +10,9 @@
 ## 2026-05-17 - Missing Escape Key Navigation
 **Learning:** Some scenes (Settings, Menu) were missing `pygame.K_ESCAPE` handling, which is a common and expected UX pattern for navigating backwards or quitting in games. This breaks standard keyboard navigation flows.
 **Action:** Always map the Escape key to the logical "Back" or "Quit" action in all full-screen menu scenes to provide a consistent and intuitive keyboard navigation experience.
+## 2024-05-19 - Test Mocking Global State Pollution
+**Learning:** When testing UI enhancements in Pygame (like changing `pygame.mouse.set_cursor`), doing `pygame.mouse.set_cursor = MagicMock()` causes severe test pollution that can cascade to other tests since the module level mock is persistent. It fails the required pre commit steps for CI pipeline since tests pollute one another.
+**Action:** Always use `unittest.mock.patch("pygame.mouse.set_cursor")` to temporarily replace Pygame's global cursor setter within the test context to avoid leaking the mock to other tests.
+## 2024-05-19 - Global Cursor State Bleeding Across Scenes
+**Learning:** Updating a Pygame cursor without resetting it can result in global side effects. `SYSTEM_CURSOR_HAND` used in an end screen will bleed over into a main menu screen if standard scene transition methods don't proactively revert back to `SYSTEM_CURSOR_ARROW`.
+**Action:** The SceneManager or the new scene's initialization must reset cursor state, or individual scenes must reset it before initiating scene switching logic.
