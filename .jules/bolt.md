@@ -4,3 +4,7 @@
 ## 2024-06-12 - [List Comprehension over Loop Append]
 **Learning:** In performance-critical Python paths (like per-frame rendering loops), initializing an empty list and calling `.append()` in a loop introduces significant overhead due to function lookup and execution. In `RenderingSystem.draw`, this slowed down spatial map filtering.
 **Action:** Replace empty list initialization and loop `.append()` with list comprehensions. List comprehensions are evaluated in C, avoiding the Python-level function call overhead, making iteration over sparse maps noticeably faster.
+
+## 2024-08-01 - [Avoid Python method call overhead in inner loops]
+**Learning:** In highly performant inner loops (like the `A*` pathfinding logic evaluating thousands of neighbor nodes), invoking an instance method (e.g., `self.is_blocked()`) incurs substantial Python call frame overhead.
+**Action:** Instead of invoking methods to access simple attributes, inline the logic (e.g., `(nx, ny) in walls`) and pre-cache the attributes (e.g., `walls = self.walls`) to local variables outside the loop to eliminate method lookups and dramatically improve execution time.

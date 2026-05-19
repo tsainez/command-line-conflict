@@ -115,6 +115,7 @@ class Map:
         height = self.height
         goal_x, goal_y = goal
         inf = float("inf")
+        walls = self.walls
 
         while open_set:
             # Security: Prevent infinite loops or excessive CPU usage
@@ -140,7 +141,8 @@ class Map:
                 if nx < 0 or nx >= width or ny < 0 or ny >= height:
                     continue
 
-                if not can_fly and self.is_blocked(nx, ny):
+                # Optimization: Inline self.is_blocked to avoid Python method call overhead
+                if not can_fly and (nx, ny) in walls:
                     continue
 
                 if extra_obstacles and (nx, ny) in extra_obstacles:
