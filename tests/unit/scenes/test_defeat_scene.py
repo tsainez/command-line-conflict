@@ -2,6 +2,7 @@ import pygame
 from unittest.mock import MagicMock, patch
 from command_line_conflict.scenes.defeat import DefeatScene
 
+
 @patch("pygame.mouse.set_cursor")
 def test_defeat_scene_mousemotion_cursor(mock_set_cursor):
     """Test that moving the mouse in the defeat scene sets the cursor to a hand."""
@@ -15,6 +16,7 @@ def test_defeat_scene_mousemotion_cursor(mock_set_cursor):
     scene.handle_event(event)
 
     mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_HAND)
+
 
 @patch("pygame.mouse.set_cursor")
 def test_defeat_scene_escape_key(mock_set_cursor):
@@ -30,6 +32,7 @@ def test_defeat_scene_escape_key(mock_set_cursor):
 
     mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_ARROW)
     game_mock.scene_manager.switch_to.assert_called_with("menu")
+
 
 @patch("pygame.mouse.set_cursor")
 def test_defeat_scene_mouse_click(mock_set_cursor):
