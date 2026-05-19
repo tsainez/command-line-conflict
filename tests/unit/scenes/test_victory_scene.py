@@ -1,5 +1,7 @@
-import pygame
 from unittest.mock import MagicMock, patch
+
+import pygame
+
 from command_line_conflict.scenes.victory import VictoryScene
 
 
