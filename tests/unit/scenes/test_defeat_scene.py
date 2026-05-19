@@ -16,8 +16,9 @@ def test_defeat_scene_mousemotion_cursor(mock_set_cursor):
 
     mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_HAND)
 
-def test_defeat_scene_escape_key():
-    """Test that pressing ESCAPE switches to the menu."""
+@patch("pygame.mouse.set_cursor")
+def test_defeat_scene_escape_key(mock_set_cursor):
+    """Test that pressing ESCAPE resets cursor and switches to the menu."""
     game_mock = MagicMock()
     scene = DefeatScene(game_mock)
 
@@ -27,4 +28,19 @@ def test_defeat_scene_escape_key():
 
     scene.handle_event(event)
 
+    mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_ARROW)
+    game_mock.scene_manager.switch_to.assert_called_with("menu")
+
+@patch("pygame.mouse.set_cursor")
+def test_defeat_scene_mouse_click(mock_set_cursor):
+    """Test that clicking resets cursor and switches to the menu."""
+    game_mock = MagicMock()
+    scene = DefeatScene(game_mock)
+
+    event = MagicMock()
+    event.type = pygame.MOUSEBUTTONDOWN
+
+    scene.handle_event(event)
+
+    mock_set_cursor.assert_called_with(pygame.SYSTEM_CURSOR_ARROW)
     game_mock.scene_manager.switch_to.assert_called_with("menu")

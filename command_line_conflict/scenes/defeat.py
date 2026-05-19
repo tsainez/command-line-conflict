@@ -27,8 +27,10 @@ class DefeatScene:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         elif event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.game.scene_manager.switch_to("menu")
 
     def update(self, dt):
