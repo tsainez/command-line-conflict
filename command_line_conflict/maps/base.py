@@ -116,6 +116,10 @@ class Map:
         goal_x, goal_y = goal
         inf = float("inf")
 
+        # Optimization: Ensure exclude_obstacles is a set for O(1) lookups
+        # We avoid copying extra_obstacles to prevent O(N) overhead on every call
+        fast_exclude = set(exclude_obstacles) if exclude_obstacles else set()
+
         while open_set:
             # Security: Prevent infinite loops or excessive CPU usage
             iterations += 1
@@ -144,13 +148,16 @@ class Map:
                     continue
 
                 if extra_obstacles and (nx, ny) in extra_obstacles:
-                    if not (exclude_obstacles and (nx, ny) in exclude_obstacles):
+                    if not (fast_exclude and (nx, ny) in fast_exclude):
                         continue
 
                 # Optimization: Use get to avoid double dict lookup
                 if tentative_g < g_score.get((nx, ny), inf):
                     g_score[(nx, ny)] = tentative_g
-                    f = tentative_g + abs(nx - goal_x) + abs(ny - goal_y)
+                    # Optimization: Inline abs() to avoid function call overhead
+                    dx = nx - goal_x
+                    dy = ny - goal_y
+                    f = tentative_g + (dx if dx > 0 else -dx) + (dy if dy > 0 else -dy)
                     heappush(open_set, (f, (nx, ny)))
                     came_from[(nx, ny)] = current
 
