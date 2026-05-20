@@ -33,3 +33,7 @@
 ## 2024-05-24 - Event-Driven Visual Effects
 **Learning:** Visual feedback (like floating damage text) often requires data from logic systems (Combat) but rendering in UI systems. Direct coupling creates spaghetti code. The Event Queue pattern is perfect here: Combat logic emits a "visual_effect" event, and the Scene routes it to the UI.
 **Action:** When adding new visual feedback triggered by game logic (e.g., healing numbers, level up flash), use `game_state.add_event({"type": "visual_effect", ...})` instead of calling UI methods directly.
+
+## 2024-05-24 - Consistent Cursor State Management
+**Learning:** Pygame custom cursors set during scene initialization (`__init__`) get overridden because the global `SceneManager.switch_to` centralized logic resets the cursor to an arrow upon transition.
+**Action:** When setting a custom cursor (like `SYSTEM_CURSOR_HAND`) for a full-screen scene, it must be continuously reapplied during event handling (e.g., on `pygame.MOUSEMOTION`) to ensure it persists throughout the scene's lifetime and maintains consistent UX.

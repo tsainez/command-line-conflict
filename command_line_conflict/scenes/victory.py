@@ -15,7 +15,6 @@ class VictoryScene:
         self.game = game
         self.font = game.font
         self.time = 0.0
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def handle_event(self, event):
         """Handles events for the victory scene.
@@ -24,10 +23,12 @@ class VictoryScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+            if event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
                 self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.game.scene_manager.switch_to("menu")
+        elif event.type == pygame.MOUSEMOTION:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def update(self, dt):
         """Updates the victory scene.
@@ -52,7 +53,7 @@ class VictoryScene:
         pulse = (math.sin(self.time * 5) + 1) / 2
         color_val = 150 + int(105 * pulse)
         pulse_color = (color_val, color_val, color_val)
-        instruction_text = self.font.render("Press Enter or Click to return to the menu", True, pulse_color)
+        instruction_text = self.font.render("Press Enter, Escape, or Click to return to the menu", True, pulse_color)
         instruction_rect = instruction_text.get_rect(
             center=(
                 self.game.screen.get_width() / 2,
