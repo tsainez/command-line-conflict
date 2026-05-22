@@ -1,6 +1,7 @@
 """Steamworks integration for Command Line Conflict."""
 
 import re
+
 from .logger import log
 
 
