@@ -4,3 +4,6 @@
 ## 2024-06-12 - [List Comprehension over Loop Append]
 **Learning:** In performance-critical Python paths (like per-frame rendering loops), initializing an empty list and calling `.append()` in a loop introduces significant overhead due to function lookup and execution. In `RenderingSystem.draw`, this slowed down spatial map filtering.
 **Action:** Replace empty list initialization and loop `.append()` with list comprehensions. List comprehensions are evaluated in C, avoiding the Python-level function call overhead, making iteration over sparse maps noticeably faster.
+## 2024-05-18 - Avoid lambda functions in Python sorts
+**Learning:** Using `lambda` functions as keys in list sorts introduces significant Python function call overhead.
+**Action:** When sorting performance is critical, generate list items natively in the desired sort order (e.g. flipping tuple elements via list comprehension) and use the native `list.sort()` to invoke the optimized C sorting logic.
