@@ -5,7 +5,7 @@ from command_line_conflict.steam_integration import SteamIntegration
 
 
 class TestSteamIntegrationSecurity(unittest.TestCase):
-    @patch('command_line_conflict.steam_integration.log')
+    @patch("command_line_conflict.steam_integration.log")
     def test_unlock_achievement_input_validation(self, mock_log):
         # Create instance and mock steam object to pretend it's initialized
         integration = SteamIntegration()
@@ -44,5 +44,6 @@ class TestSteamIntegrationSecurity(unittest.TestCase):
             integration.steam.SetAchievement.assert_not_called()
             mock_log.warning.assert_called()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
