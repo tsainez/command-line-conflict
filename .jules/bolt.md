@@ -7,3 +7,6 @@
 ## 2024-05-18 - Avoid lambda functions in Python sorts
 **Learning:** Using `lambda` functions as keys in list sorts introduces significant Python function call overhead.
 **Action:** When sorting performance is critical, generate list items natively in the desired sort order (e.g. flipping tuple elements via list comprehension) and use the native `list.sort()` to invoke the optimized C sorting logic.
+## 2024-06-13 - [A* Pathfinding: Loop Unrolling and Inlining]
+**Learning:** Python function calls (`abs()`) and tuple unpacking inside tight performance-critical loops (like A* pathfinding inner loops) add significant overhead. By fully unrolling the neighbor check loop and inlining Manhattan distance logic using ternary operators (`dx if dx > 0 else -dx`), we bypass iteration overhead and builtin function call overhead. Pre-processing complex obstacle sets outside the `while` loop prevents redundant set difference calculations.
+**Action:** Unroll small loops entirely in extremely hot code paths. Pre-process invariant structures (like obstacle diffs) before the loop. Use inline ternary operators instead of `abs()` or `math.sqrt()` to save microseconds per call, which aggregates into measurable frame-time improvements.

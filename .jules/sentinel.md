@@ -29,3 +29,7 @@
 **Vulnerability:** The developer cheats (F1 for reveal map, F2 for god mode) in GameScene were not gated by the DEBUG configuration flag.
 **Learning:** Even if a feature is intended only for development, it must be explicitly protected by a configuration check. Otherwise, it might be accessible in production builds.
 **Prevention:** Wrap all debug and cheat functionalities in a check against the relevant configuration flag (e.g., `if config.DEBUG:`).
+## 2025-05-20 - Unsanitized External API Input
+**Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
+**Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
+**Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
