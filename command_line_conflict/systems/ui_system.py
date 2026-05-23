@@ -587,7 +587,8 @@ class UISystem:
         # Determine tooltip dimensions
         padding = 5
         line_height = 16
-        width = max(len(line) * 7 for line in lines) + padding * 2  # Approx width
+        max_text_width = max(self.small_font.size(line)[0] for line in lines) if lines else 0
+        width = max_text_width + padding * 2
         height = len(lines) * line_height + padding * 2
 
         x, y = screen_pos

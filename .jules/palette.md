@@ -37,3 +37,6 @@
 ## 2026-05-23 - Escape Navigation and Interactive Cursors
 **Learning:** The 'Escape' key is heavily ingrained in gamer muscle memory for pausing, backing out, or quitting. If a full-screen scene lacks an explicit back button, users instinctively press Escape. Furthermore, if a scene is interactive anywhere (click-to-continue), setting a hand cursor once in `__init__` is fragile due to `SceneManager.switch_to` resetting cursors to arrows globally.
 **Action:** 1. Always map `pygame.K_ESCAPE` to logical "Back" or "Skip" actions in full-screen unskippable prompts or end screens. 2. Bind cursor changes (e.g., `pygame.SYSTEM_CURSOR_HAND`) to `pygame.MOUSEMOTION` inside the scene's event handler, ensuring the visual affordance persists dynamically rather than relying on a brittle initialization state.
+## 2026-05-22 - Accurate Tooltip Width Calculation
+**Learning:** Pygame's `pygame.font.Font.size` provides exact text dimensions, replacing inaccurate character-count heuristics (`len(line) * multiplier`) for dynamic content like tooltips.
+**Action:** Always use `font.size(text)` when determining the bounding box for rendered text to ensure visual precision and avoid truncation or unnecessary whitespace.
