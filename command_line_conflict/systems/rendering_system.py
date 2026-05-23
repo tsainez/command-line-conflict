@@ -92,13 +92,17 @@ class RenderingSystem:
 
             # We filter first to reduce the number of items to sort
             # Optimization: Use list comprehension to eliminate append() function call overhead
-            visible_keys = [pos for pos in game_state.spatial_map if start_x <= pos[0] < end_x and start_y <= pos[1] < end_y]
+            # Optimization: Construct tuples in (y, x) order to allow native sorting,
+            # avoiding the Python-level function call overhead of a lambda key.
+            visible_keys = [
+                (pos[1], pos[0]) for pos in game_state.spatial_map if start_x <= pos[0] < end_x and start_y <= pos[1] < end_y
+            ]
 
             # Sorting O(M log M) where M is small is cheap
-            visible_keys.sort(key=lambda p: (p[1], p[0]))
+            visible_keys.sort()
 
-            # Iterate through visible keys
-            for x, y in visible_keys:
+            # Iterate through visible keys (unpacked as y, x)
+            for y, x in visible_keys:
                 self._draw_tile(x, y, game_state, paused, grid_size, bar_height)
         else:
             # Fallback to grid iteration for dense maps or zoomed out views

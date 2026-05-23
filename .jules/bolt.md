@@ -4,3 +4,6 @@
 ## 2024-06-12 - [List Comprehension over Loop Append]
 **Learning:** In performance-critical Python paths (like per-frame rendering loops), initializing an empty list and calling `.append()` in a loop introduces significant overhead due to function lookup and execution. In `RenderingSystem.draw`, this slowed down spatial map filtering.
 **Action:** Replace empty list initialization and loop `.append()` with list comprehensions. List comprehensions are evaluated in C, avoiding the Python-level function call overhead, making iteration over sparse maps noticeably faster.
+## 2025-02-27 - [Native Tuple Sorting]
+**Learning:** When sorting a list of items based on multiple elements (e.g. coordinates), passing a lambda as the `key` argument to `.sort()` introduces significant Python-level function call overhead for every comparison during the sort. In performance critical loops like `RenderingSystem.draw`, this slows down execution.
+**Action:** Instead of `visible_keys.sort(key=lambda p: (p[1], p[0]))`, construct the tuples in the desired sort order within the list comprehension itself (e.g., `[(pos[1], pos[0]) for pos in ...]`) and use native `.sort()`. This allows the sorting to run entirely in C.
