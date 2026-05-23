@@ -33,3 +33,7 @@
 ## 2024-05-24 - Event-Driven Visual Effects
 **Learning:** Visual feedback (like floating damage text) often requires data from logic systems (Combat) but rendering in UI systems. Direct coupling creates spaghetti code. The Event Queue pattern is perfect here: Combat logic emits a "visual_effect" event, and the Scene routes it to the UI.
 **Action:** When adding new visual feedback triggered by game logic (e.g., healing numbers, level up flash), use `game_state.add_event({"type": "visual_effect", ...})` instead of calling UI methods directly.
+
+## 2026-05-23 - Escape Navigation and Interactive Cursors
+**Learning:** The 'Escape' key is heavily ingrained in gamer muscle memory for pausing, backing out, or quitting. If a full-screen scene lacks an explicit back button, users instinctively press Escape. Furthermore, if a scene is interactive anywhere (click-to-continue), setting a hand cursor once in `__init__` is fragile due to `SceneManager.switch_to` resetting cursors to arrows globally.
+**Action:** 1. Always map `pygame.K_ESCAPE` to logical "Back" or "Skip" actions in full-screen unskippable prompts or end screens. 2. Bind cursor changes (e.g., `pygame.SYSTEM_CURSOR_HAND`) to `pygame.MOUSEMOTION` inside the scene's event handler, ensuring the visual affordance persists dynamically rather than relying on a brittle initialization state.

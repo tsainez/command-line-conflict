@@ -15,7 +15,6 @@ class VictoryScene:
         self.game = game
         self.font = game.font
         self.time = 0.0
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def handle_event(self, event):
         """Handles events for the victory scene.
@@ -23,8 +22,10 @@ class VictoryScene:
         Args:
             event: The pygame event to handle.
         """
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+        if event.type == pygame.MOUSEMOTION:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        elif event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
                 self.game.scene_manager.switch_to("menu")
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.game.scene_manager.switch_to("menu")
