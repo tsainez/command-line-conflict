@@ -54,11 +54,15 @@ def test_unlock_achievement(mock_log):
 
 
 def test_unlock_achievement_not_initialized(mock_log):
-    with patch("builtins.__import__", side_effect=ImportError):
-        steam = SteamIntegration()
-        steam.unlock_achievement("TEST_ACHIEVEMENT")
-        assert steam.initialized is False
-        mock_log.debug.assert_called_with("Steam not initialized. Skipping achievement: TEST_ACHIEVEMENT")
+    with patch.dict(sys.modules):
+        if "steamworks" in sys.modules:
+            del sys.modules["steamworks"]
+
+        with patch("builtins.__import__", side_effect=ImportError):
+            steam = SteamIntegration()
+            steam.unlock_achievement("TEST_ACHIEVEMENT")
+            assert steam.initialized is False
+            mock_log.debug.assert_called_with("Steam not initialized. Skipping achievement: TEST_ACHIEVEMENT")
 
 
 def test_update(mock_log):

@@ -53,7 +53,7 @@ class VictoryScene:
         pulse = (math.sin(self.time * 5) + 1) / 2
         color_val = 150 + int(105 * pulse)
         pulse_color = (color_val, color_val, color_val)
-        instruction_text = self.font.render("Press Enter or Click to return to the menu", True, pulse_color)
+        instruction_text = self.font.render("Press Enter/Esc or Click to return to the menu", True, pulse_color)
         instruction_rect = instruction_text.get_rect(
             center=(
                 self.game.screen.get_width() / 2,
