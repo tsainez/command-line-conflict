@@ -15,7 +15,6 @@ class VictoryScene:
         self.game = game
         self.font = game.font
         self.time = 0.0
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def handle_event(self, event):
         """Handles events for the victory scene.
