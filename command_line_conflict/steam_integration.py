@@ -46,6 +46,16 @@ class SteamIntegration:
             log.debug(f"Steam not initialized. Skipping achievement: {achievement_name}")
             return
 
+        # Security check: Validate achievement_name to prevent injection or crashes
+        # Allow only alphanumeric characters and underscores, max 64 characters
+        if (
+            not isinstance(achievement_name, str)
+            or len(achievement_name) > 64
+            or not re.match(r"^[A-Za-z0-9_]+$", achievement_name)
+        ):
+            log.warning(f"Security Warning: Invalid achievement name format rejected: {achievement_name}")
+            return
+
         try:
             self.steam.SetAchievement(achievement_name)
             self.steam.StoreStats()
