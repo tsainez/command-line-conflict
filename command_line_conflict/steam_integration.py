@@ -34,6 +34,10 @@ class SteamIntegration:
             achievement_name: The API name of the achievement to unlock.
         """
         # Security: Validate achievement_name to prevent injection or DoS
+        if not isinstance(achievement_name, str):
+            log.warning(f"Invalid achievement name type: {type(achievement_name)}")
+            return
+
         if not achievement_name or len(achievement_name) > 64:
             log.warning(f"Invalid achievement name length: {achievement_name}")
             return
