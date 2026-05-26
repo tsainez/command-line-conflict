@@ -33,3 +33,7 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+## 2026-05-18 - Steamworks Integration TypeError
+**Vulnerability:** Unhandled TypeError when processing Steam achievement names.
+**Learning:** Checking `len(achievement_name)` without first verifying its type can lead to unhandled exceptions (TypeError) if an unexpected type (e.g., an integer or boolean) is passed, potentially causing localized application crashes or DoS.
+**Prevention:** Always validate that external or user-provided input matches the expected data type (e.g., using `isinstance(input, str)`) before performing type-specific operations like `len()`.
