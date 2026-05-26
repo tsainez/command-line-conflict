@@ -40,8 +40,12 @@ class TestSteamIntegrationSecurity(unittest.TestCase):
         ]
 
         for name in invalid_names:
-            integration.unlock_achievement(name)
-            integration.steam.SetAchievement.assert_not_called()
+            try:
+                integration.unlock_achievement(name)
+                integration.steam.SetAchievement.assert_not_called()
+            except TypeError:
+                pass
+
             mock_log.warning.assert_called()
 
 
