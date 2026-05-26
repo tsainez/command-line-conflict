@@ -34,22 +34,32 @@ class MenuScene:
         self.option_font = pygame.font.Font(None, 50)
         self.time = 0.0
 
+        self.help_texts = {
+            "Continue Campaign": "Resume your saved campaign progress.",
+            "New Game": "Start a new game session.",
+            "Map Editor": "Create or modify custom maps.",
+            "Options": "Adjust game settings.",
+            "Quit": "Exit the game.",
+        }
+
         # Start menu music
         # Assuming the music file is in the root or a music folder
         # For now using a placeholder path
         self.game.music_manager.play("music/menu_theme.ogg")
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=64)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:
         """Returns a cached surface for the text.
 
         Args:
             text: The string to render.
             color: The color tuple (R, G, B).
-            font_type: 'title' or 'option'.
+            font_type: 'title', 'help', or 'option'.
         """
         if font_type == "title":
             return cast(pygame.Surface, self.title_font.render(text, True, color))
+        if font_type == "help":
+            return cast(pygame.Surface, self.game.font.render(text, True, color))
         return cast(pygame.Surface, self.option_font.render(text, True, color))
 
     def handle_event(self, event):
@@ -156,3 +166,13 @@ class MenuScene:
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
+
+        # Helper text for current option
+        if 0 <= self.selected_option < len(self.menu_options):
+            current_option = self.menu_options[self.selected_option]
+            help_message = self.help_texts.get(current_option, "")
+
+            if help_message:
+                help_text = self._get_text_surface(help_message, (150, 150, 150), "help")
+                help_rect = help_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
+                screen.blit(help_text, help_rect)

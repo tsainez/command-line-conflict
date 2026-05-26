@@ -40,3 +40,6 @@
 ## 2026-05-22 - Accurate Tooltip Width Calculation
 **Learning:** Pygame's `pygame.font.Font.size` provides exact text dimensions, replacing inaccurate character-count heuristics (`len(line) * multiplier`) for dynamic content like tooltips.
 **Action:** Always use `font.size(text)` when determining the bounding box for rendered text to ensure visual precision and avoid truncation or unnecessary whitespace.
+## 2024-05-25 - Persistent Helper Text in Full-Screen Menus
+**Learning:** Pygame menus without complex native focus indicators benefit significantly from persistent helper text mapped to the selected option. It improves discoverability for options without requiring hover interactions.
+**Action:** In full-screen Pygame menus, define a dictionary mapping options to descriptive helper text strings, and render the description for the currently selected option consistently at the bottom of the screen.
