@@ -174,7 +174,5 @@ class MenuScene:
 
             if help_message:
                 help_text = self._get_text_surface(help_message, (150, 150, 150), "help")
-                help_rect = help_text.get_rect(
-                    center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50)
-                )
+                help_rect = help_text.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
                 screen.blit(help_text, help_rect)
