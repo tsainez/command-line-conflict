@@ -78,10 +78,15 @@ class FleeSystem:
                         if enemy_pos:
                             dx = my_pos.x - enemy_pos.x
                             dy = my_pos.y - enemy_pos.y
-                            dist = math.sqrt(dx * dx + dy * dy)
-                            if dist > 0:
-                                flee_x = my_pos.x + dx / dist * 5
-                                flee_y = my_pos.y + dy / dist * 5
+                            dist_sq = dx * dx + dy * dy
+
+                            # Check squared distance to prevent division by zero and sqrt overhead if at same spot
+                            if dist_sq > 0.0001:
+                                dist = math.sqrt(dist_sq)
+                                # Optimization: Pre-calculate ratio multiplier to replace 2 division ops with multiplication
+                                ratio = 5.0 / dist
+                                flee_x = my_pos.x + (dx * ratio)
+                                flee_y = my_pos.y + (dy * ratio)
                                 movable = components.get(Movable)
                                 if movable:
                                     movable.target_x = flee_x
