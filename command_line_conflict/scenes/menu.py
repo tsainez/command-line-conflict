@@ -32,7 +32,16 @@ class MenuScene:
         self.option_rects = []
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
+        self.helper_font = pygame.font.Font(None, 36)
         self.time = 0.0
+
+        self.helper_texts = {
+            "Continue Campaign": "Resume your progress in the main campaign.",
+            "New Game": "Start a new campaign from the beginning.",
+            "Map Editor": "Create and modify custom maps.",
+            "Options": "Adjust game settings and preferences.",
+            "Quit": "Exit the game."
+        }
 
         # Start menu music
         # Assuming the music file is in the root or a music folder
@@ -46,10 +55,12 @@ class MenuScene:
         Args:
             text: The string to render.
             color: The color tuple (R, G, B).
-            font_type: 'title' or 'option'.
+            font_type: 'title', 'option', or 'helper'.
         """
         if font_type == "title":
             return cast(pygame.Surface, self.title_font.render(text, True, color))
+        if font_type == "helper":
+            return cast(pygame.Surface, self.helper_font.render(text, True, color))
         return cast(pygame.Surface, self.option_font.render(text, True, color))
 
     def handle_event(self, event):
@@ -156,3 +167,14 @@ class MenuScene:
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
+
+        # Render helper text at the bottom of the screen
+        if 0 <= self.selected_option < len(self.menu_options):
+            selected_option_text = self.menu_options[self.selected_option]
+            helper_text_str = self.helper_texts.get(selected_option_text, "")
+            if helper_text_str:
+                helper_surface = self._get_text_surface(helper_text_str, (200, 200, 200), "helper")
+                helper_rect = helper_surface.get_rect(
+                    center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50)
+                )
+                screen.blit(helper_surface, helper_rect)
