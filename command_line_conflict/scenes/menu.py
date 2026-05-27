@@ -40,7 +40,7 @@ class MenuScene:
             "New Game": "Start a new campaign from the beginning.",
             "Map Editor": "Create and modify custom maps.",
             "Options": "Adjust game settings and preferences.",
-            "Quit": "Exit the game."
+            "Quit": "Exit the game.",
         }
 
         # Start menu music
