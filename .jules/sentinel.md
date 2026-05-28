@@ -33,3 +33,7 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+## 2024-05-18 - Strict Type Validation Before Regex
+**Vulnerability:** Unhandled exceptions (e.g., `TypeError`) causing Denial of Service when non-string types (like integers) are passed to functions expecting strings for regex or length validation.
+**Learning:** Checking `len()` or using `re.match()` on non-string inputs (like integers or booleans) directly throws a `TypeError`. This can be exploited by an attacker to crash the application by passing unexpected data types in API calls.
+**Prevention:** When validating external API parameters (e.g., steamworks achievements), strict type checking (e.g., `isinstance(input, str)`) must be the first step, preceding length constraints (`len()`) and regex allowlists (`^[A-Za-z0-9_]+$`).
