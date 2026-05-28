@@ -2,16 +2,23 @@ import json
 import os
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from command_line_conflict.campaign_manager import CampaignManager
 
 
 class TestCampaignManagerDoS(unittest.TestCase):
     def setUp(self):
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
             self.save_file = temp_file.name
 
+        self.test_dir = os.path.dirname(self.save_file)
+        self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir")
+        self.mock_get_dir = self.patcher.start()
+        self.mock_get_dir.return_value = self.test_dir
+
     def tearDown(self):
+        self.patcher.stop()
         if os.path.exists(self.save_file):
             os.remove(self.save_file)
 

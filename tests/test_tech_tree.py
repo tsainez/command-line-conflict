@@ -19,12 +19,18 @@ from command_line_conflict.systems.production_system import ProductionSystem
 
 class TestCampaignManager(unittest.TestCase):
     def setUp(self):
-        self.save_file = "test_save_game.json"
+        self.save_file = os.path.abspath("test_save_game.json")
         if os.path.exists(self.save_file):
             os.remove(self.save_file)
+
+        self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir")
+        self.mock_get_dir = self.patcher.start()
+        self.mock_get_dir.return_value = os.path.abspath(os.path.dirname(self.save_file))
+
         self.manager = CampaignManager(self.save_file)
 
     def tearDown(self):
+        self.patcher.stop()
         if os.path.exists(self.save_file):
             os.remove(self.save_file)
 

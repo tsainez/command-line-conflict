@@ -66,7 +66,8 @@ class TestCampaignManagerMigration(unittest.TestCase):
         with open(DEFAULT_SAVE_FILENAME, "w", encoding="utf-8") as f:
             f.write("{}")
 
-        custom_path = "custom_save.json"
+        self.temp_data_dir.mkdir(parents=True, exist_ok=True)
+        custom_path = str(self.temp_data_dir / "custom_save.json")
         manager = CampaignManager(custom_path)
 
         self.assertEqual(manager.save_file, custom_path)

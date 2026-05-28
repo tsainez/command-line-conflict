@@ -30,6 +30,25 @@ class CampaignManager:
 
     def __init__(self, save_file: Optional[str] = None):
         if save_file:
+            # Security fix: Path traversal prevention and extension enforcement
+            abs_path = os.path.realpath(save_file)
+
+            if not abs_path.lower().endswith(".json"):
+                log.error(f"Security violation: Invalid file extension for save file: {abs_path}")
+                raise ValueError("Save file must have a .json extension.")
+
+            user_data_dir = str(get_user_data_dir())
+            user_data_dir = os.path.realpath(user_data_dir)
+
+            try:
+                if os.path.commonpath([user_data_dir, abs_path]) != user_data_dir:
+                    log.error(f"Security violation: Attempted to use save file in unauthorized location: {abs_path}")
+                    raise ValueError("Save file must reside within the user data directory.")
+            except ValueError:
+                # If they are on different drives on Windows, commonpath raises ValueError
+                log.error(f"Security violation: Attempted to use save file on different drive: {abs_path}")
+                raise ValueError("Save file must reside within the user data directory.")
+
             self.save_file = save_file
         else:
             data_dir = get_user_data_dir()

@@ -33,3 +33,7 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+## 2026-05-28 - [Path Traversal and Arbitrary File Write in CampaignManager]
+**Vulnerability:** `CampaignManager.__init__` accepted an arbitrary `save_file` path without validating if it resides within the intended application user data directory (`get_user_data_dir()`), or if it possessed a `.json` extension. An attacker could exploit this path traversal to write campaign progress arbitrarily across the filesystem, potentially resulting in overwriting critical files or gaining remote code execution.
+**Learning:** Initializing components that perform sensitive file I/O using unvalidated, user-controllable arguments undermines the security bounds established in isolated directory patterns.
+**Prevention:** Always validate all paths supplied to components against an allowlist directory (`os.path.commonpath`) and strictly enforce acceptable file extensions.

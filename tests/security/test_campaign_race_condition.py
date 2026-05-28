@@ -13,7 +13,12 @@ class TestCampaignRaceCondition(unittest.TestCase):
         self.test_dir.mkdir(parents=True, exist_ok=True)
         self.save_file = self.test_dir / "large_save.json"
 
+        self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir")
+        self.mock_get_dir = self.patcher.start()
+        self.mock_get_dir.return_value = self.test_dir
+
     def tearDown(self):
+        self.patcher.stop()
         if self.save_file.exists():
             os.remove(self.save_file)
         if self.test_dir.exists():
