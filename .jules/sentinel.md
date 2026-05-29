@@ -33,3 +33,8 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+
+## 2026-05-29 - [Security Check Validation Order]
+**Vulnerability:** A `TypeError` (`object of type 'int' has no len()`) occurred in `steam_integration.py` when attempting to unlock a Steam achievement. The input parameter `achievement_name` was supplied as an `int`, bypassing the first parameter validation check `len(achievement_name) > 64`.
+**Learning:** During security reviews and boundary tests, malicious or unexpected payloads might involve data of incorrect types (e.g., passing an integer when a string is expected). Calling functions such as `len()` or string-specific regex operations on unvalidated types causes an unhandled exception before the length or content constraints can even be evaluated.
+**Prevention:** Always perform strict type checking (`isinstance(input, str)`) as the absolute first step in input validation, before evaluating length constraints (`len()`) or executing regex format validations.
