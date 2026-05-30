@@ -40,3 +40,7 @@
 ## 2026-05-22 - Accurate Tooltip Width Calculation
 **Learning:** Pygame's `pygame.font.Font.size` provides exact text dimensions, replacing inaccurate character-count heuristics (`len(line) * multiplier`) for dynamic content like tooltips.
 **Action:** Always use `font.size(text)` when determining the bounding box for rendered text to ensure visual precision and avoid truncation or unnecessary whitespace.
+
+## 2026-05-30 - Rapid Pagination in Scrollable UI
+**Learning:** For users relying on keyboard navigation in scrollable lists (like a file dialog), navigating purely with UP/DOWN arrows through large datasets is incredibly tedious and limits accessibility. Standard OS behaviors allow rapid pagination.
+**Action:** Always implement `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN` handlers for scrollable lists, leveraging existing navigation logic by passing `self.max_visible_files` as the scrolling delta to enable instant visual jumps.
