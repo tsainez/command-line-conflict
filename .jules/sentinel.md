@@ -33,3 +33,7 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+## 2024-06-15 - [API Parameter Validation Ordering]
+**Vulnerability:** Unhandled `TypeError` crashing the application (DoS) when validating external integration inputs (e.g. Steam achievements).
+**Learning:** Checking length (`len()`) or executing regex matches (`re.match()`) against raw external input can crash Python if the input is an unexpected type (like an integer).
+**Prevention:** Always explicitly verify the type of an untrusted input using `isinstance(input, expected_type)` *before* attempting length calculations or format validation to ensure safe failure.
