@@ -123,7 +123,7 @@ class TestFileDialog:
         assert file_dialog.active is False
 
     def test_keyboard_pagination(self, file_dialog, mocker):
-        mock_navigate = mocker.patch.object(file_dialog, '_navigate')
+        mock_navigate = mocker.patch.object(file_dialog, "_navigate")
         event = MagicMock()
         event.type = pygame.KEYDOWN
 
