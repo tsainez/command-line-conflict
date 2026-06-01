@@ -122,6 +122,21 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.active is False
 
+    def test_keyboard_pagination(self, file_dialog, mocker):
+        mock_navigate = mocker.patch.object(file_dialog, '_navigate')
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        mock_navigate.assert_called_with(-file_dialog.max_visible_files)
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        mock_navigate.assert_called_with(file_dialog.max_visible_files)
+
     def test_hover_states(self, file_dialog):
         # Move over close button
         event = MagicMock()
