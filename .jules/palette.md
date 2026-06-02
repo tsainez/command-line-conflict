@@ -40,3 +40,6 @@
 ## 2026-05-22 - Accurate Tooltip Width Calculation
 **Learning:** Pygame's `pygame.font.Font.size` provides exact text dimensions, replacing inaccurate character-count heuristics (`len(line) * multiplier`) for dynamic content like tooltips.
 **Action:** Always use `font.size(text)` when determining the bounding box for rendered text to ensure visual precision and avoid truncation or unnecessary whitespace.
+## 2026-05-23 - Keyboard Pagination Discoverability
+**Learning:** Adding keyboard shortcuts (like `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`) to scrollable areas improves accessibility significantly for keyboard-heavy users. However, without explicit visual hints, these shortcuts remain hidden power-user features.
+**Action:** Whenever adding new keyboard navigation shortcuts to a UI component (especially custom Pygame ones), simultaneously update the on-screen helper text or tooltip to explicitly state the supported keys to ensure discoverability.

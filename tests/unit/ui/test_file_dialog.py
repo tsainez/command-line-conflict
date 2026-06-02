@@ -160,3 +160,42 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_pagination(self, mock_screen, mock_font, tmp_path):
+        initial_dir = str(tmp_path)
+        # Create 20 dummy files
+        for i in range(20):
+            with open(os.path.join(initial_dir, f"map_{i:02d}.json"), "w") as f:
+                f.write("{}")
+
+        dialog = FileDialog(mock_screen, mock_font, "Test Pagination Dialog", initial_dir, mode="load")
+
+        # Ensure we have more than max_visible_files
+        assert len(dialog.files) == 20
+        assert dialog.max_visible_files < 20
+
+        # Initially, first file is selected implicitly (or we can select it)
+        dialog.input_text = dialog.files[0]
+
+        # Paginate down
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_PAGEDOWN
+
+        dialog.handle_event(event)
+
+        # Since max_visible_files is 10, jumping down should go to index 10
+        assert dialog.input_text == dialog.files[dialog.max_visible_files]
+
+        # Paginate down again
+        dialog.handle_event(event)
+
+        # Should go to index 19 (the end, since max is 19)
+        assert dialog.input_text == dialog.files[-1]
+
+        # Paginate up
+        event.key = pygame.K_PAGEUP
+        dialog.handle_event(event)
+
+        # Should go back up by max_visible_files (19 - 10 = 9)
+        assert dialog.input_text == dialog.files[19 - dialog.max_visible_files]
