@@ -33,3 +33,7 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
+## 2026-06-25 - [TypeError Crash on Invalid Steam Achievement Types]
+**Vulnerability:** A Denial of Service (DoS) vulnerability existed in `steam_integration.py` where passing non-string values (e.g., an integer) to `unlock_achievement` would crash the application when evaluating `len(achievement_name)`.
+**Learning:** Type checking must strictly precede length checks or string operations when validating untrusted or dynamic parameters, to prevent unhandled `TypeError` exceptions from crashing the system.
+**Prevention:** In parameter validation sequences, ensure `isinstance(val, str)` is evaluated before `len()` or `re.match()`.
