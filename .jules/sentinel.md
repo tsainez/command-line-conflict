@@ -38,3 +38,7 @@
 **Vulnerability:** A Time-of-Check to Time-of-Use (TOCTOU) vulnerability where `os.fstat(f.fileno()).st_size` was used to validate file size before reading it via `json.load(f)`.
 **Learning:** File size could be changed between check and read, or special files might misreport size. Using `os.stat` or `fstat` before a read operation without enforcing limits on the read stream itself introduces a security risk (e.g. DoS by memory exhaustion).
 **Prevention:** To prevent TOCTOU race conditions in file loading operations, do not pre-check file sizes using `os.path.getsize` or `os.fstat().st_size`. Instead, enforce size constraints atomically during the read operation using `content = f.read(limit)` and checking `len(content)`.
+## 2024-06-03 - [Mocking f.read in TOCTOU tests]
+**Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
+**Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
+**Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
