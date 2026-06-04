@@ -335,7 +335,7 @@ class GameScene:
                             log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
                             self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
 
-                    if event.key == pygame.K_TAB:
+                    if config.DEBUG and event.key == pygame.K_TAB:
                         # Switch sides
                         self.selection_system.clear_selection(self.game_state)
                         if self.current_player_id == 1:

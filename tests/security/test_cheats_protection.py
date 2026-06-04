@@ -55,3 +55,57 @@ def test_cheats_enabled_when_debug_true():
         scene.handle_event(event)
 
         assert scene.cheats["reveal_map"] is True, "Reveal Map cheat should toggle when DEBUG is True"
+
+
+def test_tab_cheat_disabled_when_debug_false():
+    """Verify that the TAB team switch cheat is disabled when DEBUG is False."""
+    with patch("command_line_conflict.config.DEBUG", False):
+        game = MockGame()
+        scene = GameScene(game)
+
+        initial_player_id = scene.current_player_id
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_TAB
+        scene.handle_event(event)
+
+        assert scene.current_player_id == initial_player_id, "TAB cheat should not change player when DEBUG is False"
+
+
+def test_chat_log_toggle_disabled_when_dev_mode_false():
+    """Verify that the chat log toggle (L key) is disabled when DEV_MODE is False."""
+    from command_line_conflict.systems.chat_system import ChatSystem
+
+    with patch("command_line_conflict.config.DEV_MODE", False):
+        screen = MagicMock()
+        font = MagicMock()
+        chat = ChatSystem(screen, font)
+
+        initial_show_log = chat.show_log
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_l
+        chat.handle_event(event)
+
+        assert chat.show_log == initial_show_log, "L key should not toggle chat log when DEV_MODE is False"
+
+
+def test_chat_log_toggle_enabled_when_dev_mode_true():
+    """Verify that the chat log toggle (L key) works when DEV_MODE is True."""
+    from command_line_conflict.systems.chat_system import ChatSystem
+
+    with patch("command_line_conflict.config.DEV_MODE", True):
+        screen = MagicMock()
+        font = MagicMock()
+        chat = ChatSystem(screen, font)
+
+        initial_show_log = chat.show_log
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_l
+        chat.handle_event(event)
+
+        assert chat.show_log != initial_show_log, "L key should toggle chat log when DEV_MODE is True"
