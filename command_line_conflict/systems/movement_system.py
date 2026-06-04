@@ -151,14 +151,20 @@ class MovementSystem:
                 movable.target_x, movable.target_y = next_x, next_y
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = math.sqrt(dx * dx + dy * dy)
-                if dist < 0.01:
+
+                # Optimization: Compare squared distance to avoid expensive sqrt() when unit has arrived
+                dist_sq = dx * dx + dy * dy
+                if dist_sq < 0.0001:
                     game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
                 else:
-                    step = min(movable.speed * dt, dist)
-                    new_x = position.x + step * dx / dist
-                    new_y = position.y + step * dy / dist
+                    dist = math.sqrt(dist_sq)
+
+                    # Optimization: Pre-calculate the ratio to avoid dividing x and y coordinates twice
+                    step_ratio = min(movable.speed * dt, dist) / dist
+                    new_x = position.x + step_ratio * dx
+                    new_y = position.y + step_ratio * dy
+
                     game_state.update_entity_position(entity_id, new_x, new_y)
 
             # Fallback for simple movement if pathfinding is not used or empty
@@ -175,8 +181,10 @@ class MovementSystem:
             elif not movable.intelligent and movable.target_x is not None and movable.target_y is not None:
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = math.sqrt(dx * dx + dy * dy)
-                if dist < 0.01:
+
+                # Optimization: Compare squared distance to avoid expensive sqrt() when unit has arrived
+                dist_sq = dx * dx + dy * dy
+                if dist_sq < 0.0001:
                     # The unit has effectively arrived. If the target tile
                     # itself is blocked we're stuck on the destination, not
                     # mid-route, so ping the player here too.
@@ -192,10 +200,13 @@ class MovementSystem:
                     movable.target_y = None
                     continue
 
-                step = min(movable.speed * dt, dist)
+                dist = math.sqrt(dist_sq)
 
-                proposed_x = position.x + step * dx / dist
-                proposed_y = position.y + step * dy / dist
+                # Optimization: Pre-calculate the ratio to avoid dividing x and y coordinates twice
+                step_ratio = min(movable.speed * dt, dist) / dist
+
+                proposed_x = position.x + step_ratio * dx
+                proposed_y = position.y + step_ratio * dy
 
                 pix, piy = int(proposed_x), int(proposed_y)
 
