@@ -130,6 +130,10 @@ class FileDialog:
                 self._navigate(-1)
             elif event.key == pygame.K_DOWN:
                 self._navigate(1)
+            elif event.key == pygame.K_PAGEUP:
+                self._navigate(-self.max_visible_files)
+            elif event.key == pygame.K_PAGEDOWN:
+                self._navigate(self.max_visible_files)
             elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
@@ -305,7 +309,7 @@ class FileDialog:
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.
-        hint_text = "Enter to confirm, Esc to cancel, scroll to browse"
+        hint_text = "Enter to confirm, Esc to cancel, scroll/PgUp/PgDn to browse"
         hint_surf = self.font.render(hint_text, True, (170, 170, 170))
         self.screen.blit(hint_surf, (self.input_rect.x, self.input_rect.y + 32))
 
