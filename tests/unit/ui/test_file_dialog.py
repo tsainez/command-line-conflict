@@ -166,7 +166,7 @@ class TestFileDialog:
         for i in range(3, 20):
             file_dialog.files.append(f"map{i}.json")
 
-        file_dialog.input_text = "map1.json" # index 0
+        file_dialog.input_text = "map1.json"  # index 0
 
         event = MagicMock()
         event.type = pygame.KEYDOWN
