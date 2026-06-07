@@ -101,7 +101,7 @@ class TestMapSecurity(unittest.TestCase):
         mock_st.st_mode = stat.S_IFREG  # Regular file
         mock_fstat.return_value = mock_st
 
-        mock_file.read.return_value = "x" * (2 * 1024 * 1024 + 1) # Size larger than limit
+        mock_file.read.return_value = "x" * (2 * 1024 * 1024 + 1)  # Size larger than limit
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("large_map.json")
