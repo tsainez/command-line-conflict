@@ -11,3 +11,6 @@
 **Learning:** Some scenes (Settings, Menu) were missing `pygame.K_ESCAPE` handling, which is a common and expected UX pattern for navigating backwards or quitting in games. This breaks standard keyboard navigation flows.
 **Action:** Always map the Escape key to the logical "Back" or "Quit" action in all full-screen menu scenes to provide a consistent and intuitive keyboard navigation experience.
 ## 2026-05-18 - Pygame Cursor State Resets on Scene Switch\n**Learning:** The `SceneManager.switch_to` centrally resets the mouse cursor to `pygame.SYSTEM_CURSOR_ARROW`. Any custom cursor (like `pygame.SYSTEM_CURSOR_HAND`) set during a scene's initialization (`__init__`) will be immediately overwritten upon transitioning to that scene.\n**Action:** To maintain a custom cursor throughout a scene, it must be continuously evaluated or explicitly set during event handling, such as on `pygame.MOUSEMOTION`.
+## 2024-05-19 - Pygame Scrollable UI Pagination
+**Learning:** Keyboard accessibility and navigation speed in Pygame scrollable UI components (such as `FileDialog`) are severely impacted without rapid pagination support. Users have to press arrow keys repeatedly for long lists.
+**Action:** Implement rapid pagination support by handling `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN` key events to scroll/navigate by the maximum visible items in scrollable components.

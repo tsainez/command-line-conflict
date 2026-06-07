@@ -160,3 +160,24 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_keyboard_pagination(self, file_dialog):
+        # file_dialog already has "map1.json", "map2.json". Let's add more to test pagination
+        for i in range(3, 20):
+            file_dialog.files.append(f"map{i}.json")
+
+        file_dialog.input_text = "map1.json" # index 0
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+
+        # max_visible_files is 10, so index 0 + 10 = 10, which is "map11.json"
+        # map1.json (0), map2.json (1), map3.json (2), ... map11.json (10)
+        assert file_dialog.input_text == "map11.json"
+
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map1.json"
