@@ -151,14 +151,18 @@ class MovementSystem:
                 movable.target_x, movable.target_y = next_x, next_y
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = math.sqrt(dx * dx + dy * dy)
-                if dist < 0.01:
+                # Optimization: Use squared distance to avoid expensive math.sqrt if already arrived
+                dist_sq = dx * dx + dy * dy
+                if dist_sq < 0.0001:
                     game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
                 else:
+                    dist = math.sqrt(dist_sq)
                     step = min(movable.speed * dt, dist)
-                    new_x = position.x + step * dx / dist
-                    new_y = position.y + step * dy / dist
+                    # Optimization: Pre-calculate ratio to avoid multiple divisions
+                    ratio = step / dist
+                    new_x = position.x + dx * ratio
+                    new_y = position.y + dy * ratio
                     game_state.update_entity_position(entity_id, new_x, new_y)
 
             # Fallback for simple movement if pathfinding is not used or empty
@@ -175,8 +179,9 @@ class MovementSystem:
             elif not movable.intelligent and movable.target_x is not None and movable.target_y is not None:
                 dx = movable.target_x - position.x
                 dy = movable.target_y - position.y
-                dist = math.sqrt(dx * dx + dy * dy)
-                if dist < 0.01:
+                # Optimization: Use squared distance to avoid expensive math.sqrt if already arrived
+                dist_sq = dx * dx + dy * dy
+                if dist_sq < 0.0001:
                     # The unit has effectively arrived. If the target tile
                     # itself is blocked we're stuck on the destination, not
                     # mid-route, so ping the player here too.
@@ -192,10 +197,13 @@ class MovementSystem:
                     movable.target_y = None
                     continue
 
+                dist = math.sqrt(dist_sq)
                 step = min(movable.speed * dt, dist)
 
-                proposed_x = position.x + step * dx / dist
-                proposed_y = position.y + step * dy / dist
+                # Optimization: Pre-calculate ratio to avoid multiple divisions
+                ratio = step / dist
+                proposed_x = position.x + dx * ratio
+                proposed_y = position.y + dy * ratio
 
                 pix, piy = int(proposed_x), int(proposed_y)
 
