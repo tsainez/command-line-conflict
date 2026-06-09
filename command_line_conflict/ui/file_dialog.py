@@ -115,9 +115,9 @@ class FileDialog:
                     return self._confirm_selection()
 
             elif event.button == 4:  # Scroll up
-                self.scroll_offset = max(0, self.scroll_offset - 1)
+                self._navigate(-1)
             elif event.button == 5:  # Scroll down
-                self.scroll_offset = min(max(0, len(self.files) - self.max_visible_files), self.scroll_offset + 1)
+                self._navigate(1)
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -130,6 +130,10 @@ class FileDialog:
                 self._navigate(-1)
             elif event.key == pygame.K_DOWN:
                 self._navigate(1)
+            elif event.key == pygame.K_PAGEUP:
+                self._navigate(-self.max_visible_files)
+            elif event.key == pygame.K_PAGEDOWN:
+                self._navigate(self.max_visible_files)
             elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:

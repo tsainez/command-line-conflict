@@ -122,6 +122,71 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.active is False
 
+    def test_pagination(self, file_dialog):
+        # We only have 2 files by default. Let's add more to test pagination properly.
+        for i in range(15):
+            with open(os.path.join(file_dialog.initial_dir, f"test_map_{i}.json"), "w") as f:
+                f.write("{}")
+
+        file_dialog.refresh_files()
+
+        # Start at 0
+        assert file_dialog.input_text == ""
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Navigate to first item
+        event.key = pygame.K_DOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map1.json"
+
+        # Page down (jumps by max_visible_files, which is 10)
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        # Should be index 0 + 10 = 10, which is "test_map_1.json" (sorted)
+        # Files: map1.json, map2.json, test_map_0.json, test_map_1.json, ... test_map_14.json
+        # 0: map1.json
+        # 10: test_map_13.json (wait, sorting is alphabetic)
+        # let's just check it jumped by checking the index.
+        current_idx = file_dialog.files.index(file_dialog.input_text)
+        assert current_idx == 10
+
+        # Page up (jumps back by 10)
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        current_idx = file_dialog.files.index(file_dialog.input_text)
+        assert current_idx == 0
+
+    def test_mouse_scrolling(self, file_dialog):
+        for i in range(15):
+            with open(os.path.join(file_dialog.initial_dir, f"test_map_{i}.json"), "w") as f:
+                f.write("{}")
+
+        file_dialog.refresh_files()
+
+        # Start at 0
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+        event.key = pygame.K_DOWN
+        file_dialog.handle_event(event)
+
+        # Scroll down
+        scroll_event = MagicMock()
+        scroll_event.type = pygame.MOUSEBUTTONDOWN
+        scroll_event.button = 5
+        file_dialog.handle_event(scroll_event)
+
+        current_idx = file_dialog.files.index(file_dialog.input_text)
+        assert current_idx == 1
+
+        # Scroll up
+        scroll_event.button = 4
+        file_dialog.handle_event(scroll_event)
+
+        current_idx = file_dialog.files.index(file_dialog.input_text)
+        assert current_idx == 0
+
     def test_hover_states(self, file_dialog):
         # Move over close button
         event = MagicMock()
