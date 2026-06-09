@@ -5,11 +5,11 @@ from command_line_conflict.maps.base import Map
 
 
 class TestMapLoadTraversal(unittest.TestCase):
-    @patch("json.load")
+    @patch("json.loads")
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
     @patch("command_line_conflict.maps.base.os.path.realpath")
-    def test_load_from_unauthorized_location(self, mock_realpath, mock_stat, mock_open, mock_json_load):
+    def test_load_from_unauthorized_location(self, mock_realpath, mock_stat, mock_open, mock_json_loads):
         """Verify that loading map from unauthorized location raises ValueError."""
         # Setup mocks to simulate a valid file in an unauthorized location
         unauthorized_path = "/etc/passwd"  # Example unauthorized path
@@ -24,7 +24,10 @@ class TestMapLoadTraversal(unittest.TestCase):
         mock_stat.return_value = mock_st
 
         # Mock open/json to return valid map data
-        mock_json_load.return_value = {"width": 10, "height": 10, "walls": []}
+        mock_file = MagicMock()
+        mock_file.read.return_value = "{}"
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_json_loads.return_value = {"width": 10, "height": 10, "walls": []}
 
         # This call SHOULD fail with ValueError due to path traversal check
         try:

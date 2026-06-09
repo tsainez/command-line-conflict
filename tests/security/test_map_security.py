@@ -94,11 +94,10 @@ class TestMapSecurity(unittest.TestCase):
         # Create a mock file object
         mock_file = MagicMock()
         mock_file.fileno.return_value = 123
+        mock_file.read.return_value = "x" * (Map.MAX_FILE_SIZE + 2)
         mock_open.return_value.__enter__.return_value = mock_file
 
-        # Set size larger than limit (assuming 2MB limit)
         mock_st = MagicMock()
-        mock_st.st_size = 5 * 1024 * 1024  # 5MB
         mock_st.st_mode = stat.S_IFREG  # Regular file
         mock_fstat.return_value = mock_st
 

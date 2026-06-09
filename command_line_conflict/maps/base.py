@@ -401,11 +401,12 @@ class Map:
                 if not stat.S_ISREG(st.st_mode):
                     raise ValueError("Map file must be a regular file.")
 
-                # Security: Check file size to prevent DoS via memory exhaustion
-                if st.st_size > cls.MAX_FILE_SIZE:
+                # Security: Check file size to prevent DoS via memory exhaustion (atomic read prevents TOCTOU)
+                content = f.read(cls.MAX_FILE_SIZE + 1)
+                if len(content) > cls.MAX_FILE_SIZE:
                     raise ValueError(f"Map file exceeds maximum allowed size ({cls.MAX_FILE_SIZE} bytes)")
 
-                data = json.load(f)
+                data = json.loads(content)
             return cls.from_dict(data)
         except OSError as e:
             raise ValueError(f"Could not open/read file: {e}") from e
