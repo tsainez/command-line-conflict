@@ -160,3 +160,21 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_keyboard_pagination(self, file_dialog):
+        # We need more files to test pagination properly
+        file_dialog.files = [f"map{i}.json" for i in range(20)]
+        file_dialog.input_text = file_dialog.files[0]
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == file_dialog.files[10]
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == file_dialog.files[0]
