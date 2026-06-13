@@ -29,6 +29,13 @@ class MenuScene:
             self.menu_options.insert(0, "Continue Campaign")
 
         self.selected_option = 0
+        self.help_texts = {
+            "Continue Campaign": "Resume your saved progress.",
+            "New Game": "Start a new campaign from the beginning.",
+            "Map Editor": "Create and edit custom levels.",
+            "Options": "Adjust game settings.",
+            "Quit": "Exit the game.",
+        }
         self.option_rects = []
         self.title_font = pygame.font.Font(None, 74)
         self.option_font = pygame.font.Font(None, 50)
@@ -156,3 +163,11 @@ class MenuScene:
             text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
+
+        # Draw helper text for the currently selected option
+        current_option = self.menu_options[self.selected_option]
+        help_text = self.help_texts.get(current_option, "")
+        if help_text:
+            help_surf = self.game.font.render(help_text, True, (150, 150, 150))
+            help_rect = help_surf.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
+            screen.blit(help_surf, help_rect)

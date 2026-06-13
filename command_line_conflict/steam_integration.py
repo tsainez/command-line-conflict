@@ -33,27 +33,20 @@ class SteamIntegration:
         Args:
             achievement_name: The API name of the achievement to unlock.
         """
-        # Security: Validate achievement_name to prevent injection or DoS
-        if not achievement_name or len(achievement_name) > 64:
-            log.warning(f"Invalid achievement name length: {achievement_name}")
-            return
-
-        if not re.match(r"^[A-Za-z0-9_]+$", achievement_name):
-            log.warning(f"Invalid achievement name format: {achievement_name}")
-            return
-
-        if not self.initialized or not self.steam:
-            log.debug(f"Steam not initialized. Skipping achievement: {achievement_name}")
-            return
-
         # Security check: Validate achievement_name to prevent injection or crashes
         # Allow only alphanumeric characters and underscores, max 64 characters
         if (
             not isinstance(achievement_name, str)
+            or not achievement_name
             or len(achievement_name) > 64
+            or len(achievement_name) == 0
             or not re.match(r"^[A-Za-z0-9_]+$", achievement_name)
         ):
             log.warning(f"Security Warning: Invalid achievement name format rejected: {achievement_name}")
+            return
+
+        if not self.initialized or not self.steam:
+            log.debug(f"Steam not initialized. Skipping achievement: {achievement_name}")
             return
 
         try:
