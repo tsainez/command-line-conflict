@@ -130,6 +130,10 @@ class FileDialog:
                 self._navigate(-1)
             elif event.key == pygame.K_DOWN:
                 self._navigate(1)
+            elif event.key == pygame.K_PAGEUP:
+                self._navigate(-self.max_visible_files)
+            elif event.key == pygame.K_PAGEDOWN:
+                self._navigate(self.max_visible_files)
             elif event.key == pygame.K_BACKSPACE:
                 self.input_text = self.input_text[:-1]
             else:
