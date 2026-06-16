@@ -13,3 +13,6 @@
 ## 2024-06-14 - [Optimize Distance Checks and Vector Math]
 **Learning:** In performance-critical vector math (like movement updates and fleeing checks calculated per-entity per-frame), calculating `math.sqrt()` is relatively expensive. Often we only need to know if the distance is below a threshold or non-zero. Additionally, dividing multiple coordinate deltas (`dx / dist`, `dy / dist`) introduces redundant division overhead.
 **Action:** Replace `math.sqrt()` with squared distance calculations (`dist_sq = dx * dx + dy * dy`) and compare against squared thresholds for early exits. When square roots are necessary, calculate them once and pre-calculate a multiplication ratio (`step_ratio = (speed * dt) / dist`) to apply to all coordinate deltas.
+## 2024-06-15 - [Early Return in Win/Loss Checks]
+**Learning:** When iterating over ECS entities to evaluate boolean satisfaction (e.g., win/loss checks), accumulating a total count forces the system to iterate through every single entity (O(N) operation).
+**Action:** Use an early return (`return False/True`) upon finding the first match. This avoids iterating the entire collection, effectively converting an O(N) operation to O(1) in the average case.
