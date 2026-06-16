@@ -577,7 +577,6 @@ class GameScene:
         Returns:
             True if the win condition is met, False otherwise.
         """
-        enemy_count = 0
         for entity_id in self.game_state.get_entities_with_component(Player):
             components = self.game_state.entities.get(entity_id)
             if not components:
@@ -588,25 +587,24 @@ class GameScene:
                 if self.has_player_2_opponent and player.player_id == config.NEUTRAL_PLAYER_ID:
                     continue
                 if Health in components:
-                    enemy_count += 1
+                    # Optimization: Early return on first enemy found, avoiding O(N) iteration
+                    return False
 
-        if enemy_count == 0:
-            log.info("Victory! Mission Complete.")
-            self.game.steam.unlock_achievement("VICTORY")
-            # Trigger victory sound (note: scene switch might cut it off if SoundSystem isn't persistent or updated)
-            # Since SoundSystem is part of GameScene, and we switch scene, we should ideally play it in the new scene
-            # or ensure the sound continues. For now, we emit the event.
-            # But wait, if we switch immediately, update won't process events.
-            # However, GameScene.update processes systems then checks win.
-            # So the event might be lost if we don't process it.
-            # Actually, SoundSystem.update is called BEFORE check_win_condition in update().
-            # So if we add event here, it won't be processed until NEXT frame's SoundSystem.update.
-            # But next frame we are in VictoryScene.
-            # So we should play it directly via self.sound_system.play_sound("victory") to ensure it starts.
-            self.sound_system.play_sound("victory")
-            self.campaign_manager.complete_mission(self.current_mission_id)
-            return True
-        return False
+        log.info("Victory! Mission Complete.")
+        self.game.steam.unlock_achievement("VICTORY")
+        # Trigger victory sound (note: scene switch might cut it off if SoundSystem isn't persistent or updated)
+        # Since SoundSystem is part of GameScene, and we switch scene, we should ideally play it in the new scene
+        # or ensure the sound continues. For now, we emit the event.
+        # But wait, if we switch immediately, update won't process events.
+        # However, GameScene.update processes systems then checks win.
+        # So the event might be lost if we don't process it.
+        # Actually, SoundSystem.update is called BEFORE check_win_condition in update().
+        # So if we add event here, it won't be processed until NEXT frame's SoundSystem.update.
+        # But next frame we are in VictoryScene.
+        # So we should play it directly via self.sound_system.play_sound("victory") to ensure it starts.
+        self.sound_system.play_sound("victory")
+        self.campaign_manager.complete_mission(self.current_mission_id)
+        return True
 
     def check_loss_condition(self) -> bool:
         """Checks if the player has lost the level.
@@ -614,7 +612,6 @@ class GameScene:
         Returns:
             True if the loss condition is met, False otherwise.
         """
-        player_entity_count = 0
         for entity_id in self.game_state.get_entities_with_component(Player):
             components = self.game_state.entities.get(entity_id)
             if not components:
@@ -624,14 +621,13 @@ class GameScene:
             if player and player.is_human:
                 # Check for any player-controlled entity (unit or building)
                 if Health in components:
-                    player_entity_count += 1
+                    # Optimization: Early return on first friendly found, avoiding O(N) iteration
+                    return False
 
-        if player_entity_count == 0:
-            log.info("Defeat! Mission Failed.")
-            self.game.steam.unlock_achievement("DEFEAT")
-            self.sound_system.play_sound("defeat")
-            return True
-        return False
+        log.info("Defeat! Mission Failed.")
+        self.game.steam.unlock_achievement("DEFEAT")
+        self.sound_system.play_sound("defeat")
+        return True
 
     def draw(self, screen):
         """Draws the entire game scene.
