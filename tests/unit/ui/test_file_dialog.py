@@ -160,3 +160,41 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_keyboard_pagination(self, file_dialog):
+        # Add enough files to test pagination
+        file_dialog.files = [f"file{i}.txt" for i in range(25)]
+        file_dialog.input_text = "file0.txt"
+        file_dialog.max_visible_files = 10
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file10.txt"
+
+        # Test Page Down again
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file20.txt"
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file10.txt"
+
+        # Test Page Up to bounds
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file0.txt"
+
+        # Test Page Up beyond bounds
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file0.txt"
+
+        # Test Page Down beyond bounds
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        file_dialog.handle_event(event)
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "file24.txt"

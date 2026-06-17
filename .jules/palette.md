@@ -43,3 +43,7 @@
 ## 2026-05-24 - Consistent Helper Text Guidance
 **Learning:** Pygame menus lacking contextual "helper text" can leave users guessing about the exact nature of options (e.g., "Continue Campaign" vs "New Game"). Using a pattern established in the `SettingsScene`, adding descriptive text to the `MenuScene` significantly boosts discoverability and accessibility.
 **Action:** When creating or modifying full-screen menus, define a dictionary mapping options to descriptive helper text strings. Render the string corresponding to the currently selected option consistently at the bottom of the screen to guide user intent and improve the menu's overall UX.
+
+## 2024-05-24 - Rapid Pagination in UI
+**Learning:** Implementing PageUp/PageDown keys for rapid pagination significantly improves keyboard accessibility and navigation speed in scrollable Pygame components.
+**Action:** Always handle K_PAGEUP and K_PAGEDOWN in Pygame UI lists.
