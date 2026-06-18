@@ -42,3 +42,7 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+## 2026-06-18 - [Fix Authorization Bypass in Debug Cheats]
+**Vulnerability:** The "Switch Player" (TAB) cheat was accessible even when `config.DEBUG` was disabled, allowing players to bypass intended gameplay flow.
+**Learning:** All developer and debug features, such as cheat codes or side-switching functionalities in Pygame scenes, must be explicitly gated behind configuration flags (e.g., `config.DEBUG`). If multiple cheat keys are handled sequentially, ensure all of them fall inside the scope of the authorization check.
+**Prevention:** Group developer features under a single `if config.DEBUG:` block, and double-check indentation for all related conditionals.
