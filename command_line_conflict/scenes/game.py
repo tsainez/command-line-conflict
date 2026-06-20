@@ -334,16 +334,15 @@ class GameScene:
                             status = "Enabled" if self.cheats["god_mode"] else "Disabled"
                             log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
                             self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
-
-                    if event.key == pygame.K_TAB:
-                        # Switch sides
-                        self.selection_system.clear_selection(self.game_state)
-                        if self.current_player_id == 1:
-                            self.current_player_id = 2
-                        else:
-                            self.current_player_id = 1
-                        log.info(f"Switched to player {self.current_player_id}")
-                        self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
+                        elif event.key == pygame.K_TAB:
+                            # Security: Gated side-switching feature behind config.DEBUG to prevent unauthorized access
+                            self.selection_system.clear_selection(self.game_state)
+                            if self.current_player_id == 1:
+                                self.current_player_id = 2
+                            else:
+                                self.current_player_id = 1
+                            log.info(f"Switched to player {self.current_player_id}")
+                            self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
 
                 if event.key == pygame.K_h:
                     # Hold Position
