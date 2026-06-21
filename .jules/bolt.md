@@ -13,3 +13,6 @@
 ## 2024-06-14 - [Optimize Distance Checks and Vector Math]
 **Learning:** In performance-critical vector math (like movement updates and fleeing checks calculated per-entity per-frame), calculating `math.sqrt()` is relatively expensive. Often we only need to know if the distance is below a threshold or non-zero. Additionally, dividing multiple coordinate deltas (`dx / dist`, `dy / dist`) introduces redundant division overhead.
 **Action:** Replace `math.sqrt()` with squared distance calculations (`dist_sq = dx * dx + dy * dy`) and compare against squared thresholds for early exits. When square roots are necessary, calculate them once and pre-calculate a multiplication ratio (`step_ratio = (speed * dt) / dist`) to apply to all coordinate deltas.
+## 2024-06-21 - [Early returns for win/loss conditions]
+**Learning:** Accumulating counts to check if ANY entity exists (e.g. `enemy_count == 0` for win conditions) forces O(N) iteration over all units every frame.
+**Action:** Use an early return (`return False`) as soon as the first satisfying entity is found. This converts an O(N) check into O(1) for the average frame.
