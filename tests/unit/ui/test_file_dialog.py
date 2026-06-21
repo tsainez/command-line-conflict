@@ -122,6 +122,22 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.active is False
 
+    def test_pagination(self, file_dialog):
+        file_dialog.files = ["map1.json", "map2.json", "map3.json", "map4.json"]
+        file_dialog.max_visible_files = 2
+        file_dialog.input_text = "map1.json"
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map3.json"
+
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map1.json"
+
     def test_hover_states(self, file_dialog):
         # Move over close button
         event = MagicMock()
