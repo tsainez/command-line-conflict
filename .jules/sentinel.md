@@ -42,3 +42,8 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+
+## 2026-06-22 - Authorization Bypass via Developer Keybinds
+**Vulnerability:** A "switch sides" developer cheat (TAB key) was exposed in production builds because it lacked the `if config.DEBUG:` guard present on other debug commands.
+**Learning:** Developer and debug keybinds placed in close proximity to properly gated logic can accidentally slip out of the conditionally gated scope, resulting in authorization bypasses.
+**Prevention:** Ensure that all developer features, especially those that manipulate authentication/authorization states like player identity, are explicitly and strictly scoped under the application's debug configuration flags.
