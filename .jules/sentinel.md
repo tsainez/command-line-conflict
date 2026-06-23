@@ -42,3 +42,7 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+## 2024-05-15 - [Authorization Bypass via Developer Keybinds]
+**Vulnerability:** The player side-switching functionality (K_TAB) was accessible outside of the `config.DEBUG` gating in `command_line_conflict/scenes/game.py`.
+**Learning:** Developer keybinds that alter game state or provide unauthorized features must be explicitly nested within debug configuration checks, as placement in the general event loop exposes them to all users.
+**Prevention:** Always verify that every cheat code or developer-only input event handler is strictly contained within an active `if config.DEBUG:` (or similar environment flag) block.
