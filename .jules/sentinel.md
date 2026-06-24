@@ -42,3 +42,7 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+## 2026-06-21 - Fix authorization bypass in player switching
+**Vulnerability:** The TAB key, which triggers switching the player's controlled side during a game, was accessible unconditionally to any player in production, acting as an authorization/privilege bypass cheat.
+**Learning:** The debug shortcut listener was placed outside the `if config.DEBUG:` block due to an indentation error, placing the action on a peer level with normal movement hotkeys.
+**Prevention:** Ensure debug functionalities and cheats are strictly and cleanly enclosed inside debug configuration checks (like `if config.DEBUG:`) when refactoring UI logic loops.
