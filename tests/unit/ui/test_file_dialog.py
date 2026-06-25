@@ -114,6 +114,23 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.input_text == ""
 
+    def test_pagination(self, file_dialog):
+        # Setup files so pagination has effect
+        file_dialog.files = [f"file_{i}.txt" for i in range(20)]
+        file_dialog.input_text = file_dialog.files[0]
+        file_dialog.max_visible_files = 10
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == file_dialog.files[10]
+
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == file_dialog.files[0]
+
     def test_escape_closes(self, file_dialog):
         event = MagicMock()
         event.type = pygame.KEYDOWN
