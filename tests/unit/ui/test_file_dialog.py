@@ -160,3 +160,18 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
+
+    def test_pagination_keys(self, file_dialog):
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Mock _navigate
+        file_dialog._navigate = MagicMock()
+
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        file_dialog._navigate.assert_called_with(file_dialog.max_visible_files)
+
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        file_dialog._navigate.assert_called_with(-file_dialog.max_visible_files)
