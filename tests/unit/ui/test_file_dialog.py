@@ -114,6 +114,24 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.input_text == ""
 
+    def test_pagination_keys(self, file_dialog):
+        # Setup files for pagination
+        file_dialog.files = [f"map{i}.json" for i in range(20)]
+        file_dialog.input_text = "map0.json"
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == f"map{file_dialog.max_visible_files}.json"
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map0.json"
+
     def test_escape_closes(self, file_dialog):
         event = MagicMock()
         event.type = pygame.KEYDOWN
