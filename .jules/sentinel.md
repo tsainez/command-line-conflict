@@ -42,3 +42,7 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+## 2026-06-27 - [Authorization Bypass via Developer Feature]
+**Vulnerability:** The developer side-switching feature (`pygame.K_TAB`) in GameScene was not gated by the DEBUG configuration flag, allowing any player in a production build to switch control to the enemy side, bypassing authorization.
+**Learning:** All developer and debug features, including those that manipulate game state or switch sides, must be explicitly gated behind configuration flags (e.g., `config.DEBUG`) to prevent unauthorized feature access in production builds. Improper indentation of such features can lead to severe logic and authorization flaws.
+**Prevention:** Always verify the indentation level of debug features to ensure they fall correctly under the configuration flag check.
