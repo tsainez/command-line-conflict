@@ -33,11 +33,6 @@
 **Vulnerability:** The application passed user-controllable input (`achievement_name`) directly to an external API (`self.steam.SetAchievement()`) without any validation or sanitization.
 **Learning:** Even when the implementation of an external library is unknown or abstracted away, it is a critical defense-in-depth practice to validate and constrain all input parameters before passing them across the trust boundary.
 **Prevention:** Implement explicit input validation for all parameters passed to external APIs, enforcing a strict character allowlist (e.g., regex `^[A-Za-z0-9_]+$`) and a reasonable length limit.
-
-## 2024-05-30 - Type Checking Precedes Length/Format Validation
-**Vulnerability:** The `SteamIntegration.unlock_achievement` method was vulnerable to an unhandled `TypeError` (resulting in a potential Denial of Service crash) because it attempted to call `len()` and `re.match()` on user-supplied inputs before verifying the input was actually a string.
-**Learning:** Python built-in functions like `len()` and standard library functions like `re.match()` assume specific input types. Passing malformed types (like integers, lists, or None) will cause an unhandled exception if not protected.
-**Prevention:** Always enforce strict type boundaries (e.g., `isinstance(input, str)`) as the very first step in validation logic, preceding any length, format, or boundary checks, combining them securely using short-circuit logical operators (like `or`).
 ## 2026-05-24 - [Fix TypeErrors and Prevent Injection in Steam Integration]\n**Vulnerability:** The `unlock_achievement` function assumed its `achievement_name` argument was always a string when evaluating length and regex matching, which could crash the game if non-string types were inadvertently supplied. While the impact is primarily DoS (crashing) or unexpected behaviour, it lacked robust type validation before string operations.\n**Learning:** Relying on implicit typing in dynamically-typed parameters within critical integration points is fragile and vulnerable to both crashes and unexpected behaviors if data sources feed unexpected types.\n**Prevention:** Apply a strict type-check (`isinstance(val, str)`) using short-circuit `or` logic *before* executing string-specific methods like `len()` or `re.match()`. This should be universally applied to all integration boundaries.
 ## 2024-06-03 - [Fix TOCTOU vulnerability in map file loading]
 **Vulnerability:** A Time-of-Check to Time-of-Use (TOCTOU) vulnerability where `os.fstat(f.fileno()).st_size` was used to validate file size before reading it via `json.load(f)`.
@@ -47,7 +42,3 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
-## 2024-06-28 - [Side-Switching Authorization Bypass in GameScene]
-**Vulnerability:** The developer feature to switch sides (pressing TAB) was not gated by `config.DEBUG`. This allowed an attacker/player to switch to the opponent's side and issue commands, effectively bypassing authorization checks.
-**Learning:** Even features that seem like simple debugging tools can have severe security implications (like privilege escalation or auth bypass) if exposed in production.
-**Prevention:** All debug and testing features that modify state or switch roles must strictly check `config.DEBUG` or a similar configuration flag before executing.

@@ -16,22 +16,3 @@
 ## 2024-06-15 - [Early Exit in Boolean Satisfaction Loops]
 **Learning:** When iterating over entities or standard lists to evaluate boolean satisfaction (e.g., win/loss conditions), accumulating a total count introduces unnecessary overhead.
 **Action:** Use an early return upon finding the first matching element instead of accumulating a total count. This reduces an O(N) operation to O(1) in the average case.
-## 2024-06-15 - [Early Return in Win/Loss Checks]
-**Learning:** When iterating over ECS entities or standard lists to evaluate boolean satisfaction (e.g., win/loss checks), use an early return (`return False/True`) upon finding the first match instead of accumulating a total count. This converts an O(N) operation to O(1) in the average case.
-**Action:** Replace `count += 1` and subsequent `if count == 0` checks with immediate `return False` upon finding the first matching entity.
-## 2024-06-24 - [Optimize Win/Loss Checks with Early Return]
-**Learning:** When iterating over ECS entities or standard lists to evaluate boolean satisfaction (e.g., win/loss checks), accumulating a total count evaluates every entity unnecessarily. This makes checking game over conditions O(N) where N is the total number of units.
-**Action:** Use an early return (`return False/True`) upon finding the first match instead of accumulating a total count. This converts an O(N) operation to O(1) in the average case.
-## 2024-06-27 - [Early Return in Boolean Satisfaction Checks]
-**Learning:** In win/loss condition checks or similar boolean satisfaction queries over entities, accumulating a total count before evaluation results in an unnecessary O(N) operation.
-**Action:** Use an early return (e.g., `return False`) upon finding the first match instead of counting all occurrences. This changes the operation from O(N) to O(1) in the average case and improves frame-time performance when many entities are present.
-## 2024-06-25 - [Optimize Win/Loss Checks with Early Return]
-**Learning:** When iterating over ECS entities or standard lists to evaluate boolean satisfaction (e.g., win/loss checks), accumulating a total count requires evaluating every entity, resulting in an O(N) operation.
-**Action:** Replace counting loops with an early return (`return False/True`) upon finding the first match. This converts the O(N) operation into an O(1) operation in the average case during gameplay.
-## 2024-06-18 - [Optimize ECS Boolean Checks]
-**Learning:** Iterating over ECS entities to evaluate boolean satisfaction (like checking if any enemies are alive for a win/loss condition) by accumulating a total count causes unnecessary O(N) overhead per frame, especially when there are many entities.
-**Action:** Use an early return (`return False/True`) upon finding the first match to short-circuit the loop. This converts the O(N) operation to O(1) in the average case and improves frame time during the update loop.
-
-## 2025-05-18 - Use spatial hashing for entity proximity lookups
-**Learning:** When needing to find entities that overlap or are near specific coordinates (like factories checking for overlapping units), iterating over all entities (even if filtered by component type) is O(N) and creates O(N*M) bottlenecks.
-**Action:** Use `game_state.get_entities_at_position(x, y)` which provides O(1) lookups via the spatial hash map, reducing overall complexity to O(M).

@@ -34,7 +34,6 @@ class SteamIntegration:
             achievement_name: The API name of the achievement to unlock.
         """
         # Security check: Validate achievement_name to prevent injection or crashes
-        # Type checking must occur first to avoid TypeError, followed by length and regex validation.
         # Allow only alphanumeric characters and underscores, max 64 characters
         if (
             not isinstance(achievement_name, str)
