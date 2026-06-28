@@ -42,3 +42,7 @@
 **Vulnerability:** Not a direct vulnerability, but a testing failure related to TOCTOU prevention.
 **Learning:** When migrating from `json.load(f)` to `content = f.read(); json.loads(content)`, the mocked `open()` function must explicitly mock the `.read()` method. If left un-mocked, `.read()` returns a `MagicMock`, which causes `json.loads()` to throw a `TypeError: the JSON object must be str, bytes or bytearray`.
 **Prevention:** Always update associated unit tests to reflect the new `f.read()` behavior by explicitly setting `mock_file.read.return_value = "..."`.
+## 2024-06-28 - [Side-Switching Authorization Bypass in GameScene]
+**Vulnerability:** The developer feature to switch sides (pressing TAB) was not gated by `config.DEBUG`. This allowed an attacker/player to switch to the opponent's side and issue commands, effectively bypassing authorization checks.
+**Learning:** Even features that seem like simple debugging tools can have severe security implications (like privilege escalation or auth bypass) if exposed in production.
+**Prevention:** All debug and testing features that modify state or switch roles must strictly check `config.DEBUG` or a similar configuration flag before executing.
