@@ -15,4 +15,4 @@ pytest-cov
 pylint
 mypy
 mkdocstrings>=1.0.4
-mkdocstrings-python>=2.0.3
+mkdocstrings-python>=2.0.5
