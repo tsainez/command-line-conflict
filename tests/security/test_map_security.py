@@ -94,13 +94,16 @@ class TestMapSecurity(unittest.TestCase):
         # Create a mock file object
         mock_file = MagicMock()
         mock_file.fileno.return_value = 123
+        # Make the read method return a string larger than the allowed size
+        mock_file.read.return_value = "a" * (Map.MAX_FILE_SIZE + 1)
         mock_open.return_value.__enter__.return_value = mock_file
 
-        # Set size larger than limit (assuming 2MB limit)
+        # Mock fstat so S_ISREG check passes
         mock_st = MagicMock()
-        mock_st.st_size = 5 * 1024 * 1024  # 5MB
         mock_st.st_mode = stat.S_IFREG  # Regular file
         mock_fstat.return_value = mock_st
+
+        mock_file.read.return_value = "x" * (2 * 1024 * 1024 + 1)  # Size larger than limit
 
         with self.assertRaises(ValueError) as cm:
             Map.load_from_file("large_map.json")

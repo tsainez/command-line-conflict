@@ -309,7 +309,7 @@ class FileDialog:
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.
-        hint_text = "Enter to confirm, Esc to cancel, scroll to browse"
+        hint_text = "Enter to confirm, Esc to cancel, scroll/PgUp/PgDn to browse"
         hint_surf = self.font.render(hint_text, True, (170, 170, 170))
         self.screen.blit(hint_surf, (self.input_rect.x, self.input_rect.y + 32))
 
@@ -324,3 +324,15 @@ class FileDialog:
         btn_text_color = (255, 255, 255) if action_enabled else (200, 200, 200)
         btn_surf = self.font.render(btn_text, True, btn_text_color)
         self.screen.blit(btn_surf, (self.action_button_rect.x + 10, self.action_button_rect.y + 5))
+
+        # Tooltip for disabled action button
+        if self.hovered_element == "action" and not action_enabled:
+            tt_font = pygame.font.SysFont("arial", 16) if pygame.font.get_init() else self.font
+            tt_text = tt_font.render("Filename required", True, (255, 255, 255))
+            tt_rect = tt_text.get_rect(bottomright=(self.action_button_rect.right, self.action_button_rect.top - 5))
+            bg_rect = tt_rect.inflate(10, 6)
+            s = pygame.Surface(bg_rect.size, pygame.SRCALPHA)
+            s.fill((0, 0, 0, 200))
+            self.screen.blit(s, bg_rect.topleft)
+            pygame.draw.rect(self.screen, (150, 150, 150), bg_rect, 1)
+            self.screen.blit(tt_text, tt_rect)
