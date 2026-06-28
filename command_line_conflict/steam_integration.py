@@ -34,11 +34,13 @@ class SteamIntegration:
             achievement_name: The API name of the achievement to unlock.
         """
         # Security check: Validate achievement_name to prevent injection or crashes
+        # Type checking must occur first to avoid TypeError, followed by length and regex validation.
         # Allow only alphanumeric characters and underscores, max 64 characters
         if (
             not isinstance(achievement_name, str)
             or not achievement_name
             or len(achievement_name) > 64
+            or len(achievement_name) == 0
             or not re.match(r"^[A-Za-z0-9_]+$", achievement_name)
         ):
             log.warning(f"Security Warning: Invalid achievement name format rejected: {achievement_name}")
