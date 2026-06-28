@@ -46,3 +46,6 @@
 ## 2024-06-18 - Rapid Pagination in Scrollable Lists
 **Learning:** Keyboard navigation in scrollable Pygame UI components (like `FileDialog`) can feel slow when users must press up/down for every single item, degrading accessibility and user experience.
 **Action:** Implement rapid pagination support by handling `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN` to jump by the maximum visible items (`max_visible_files`), significantly speeding up navigation.
+## 2024-05-24 - Tooltips for Disabled States in Pygame
+**Learning:** Pygame UIs often lack native support for conveying why an element is disabled. Users can get confused when a "Save" or "Load" button is unresponsive.
+**Action:** Always draw a contextual tooltip with a semi-transparent background near disabled interactive elements when they are hovered to explain the required action (e.g., "Filename required").
