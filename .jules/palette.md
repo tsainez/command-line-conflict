@@ -47,6 +47,10 @@
 ## 2026-05-24 - Consistent Helper Text Guidance
 **Learning:** Pygame menus lacking contextual "helper text" can leave users guessing about the exact nature of options (e.g., "Continue Campaign" vs "New Game"). Using a pattern established in the `SettingsScene`, adding descriptive text to the `MenuScene` significantly boosts discoverability and accessibility.
 **Action:** When creating or modifying full-screen menus, define a dictionary mapping options to descriptive helper text strings. Render the string corresponding to the currently selected option consistently at the bottom of the screen to guide user intent and improve the menu's overall UX.
+
+## 2024-06-24 - Rapid Pagination Keyboard Support
+**Learning:** Users navigating long file lists using standard arrow keys find it slow and tedious. Implementing Page Up and Page Down keyboard support significantly improves keyboard accessibility and navigation speed in scrollable Pygame UI components.
+**Action:** Always implement Page Up/Page Down rapid pagination support (jumping by max visible items) alongside standard up/down arrows in any scrollable list component to improve keyboard accessibility.
 ## 2024-06-08 - Rapid Pagination Support in FileDialog
 **Learning:** For scrollable UI elements handling large lists (e.g., FileDialog), step-by-step navigation with Arrow Up/Down is insufficient and slow. Users expect standard rapid navigation keys like PageUp/PageDown to jump visually by screenfuls.
 **Action:** When implementing or modifying scrollable lists, handle `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`. Use the internal navigation logic (like `_navigate(delta)`) passing the max visible item count (e.g., `-self.max_visible_files` or `self.max_visible_files`) to achieve consistent pagination without duplicating bounds checking or scrolling logic.
