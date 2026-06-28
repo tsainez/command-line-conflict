@@ -16,3 +16,7 @@
 ## 2024-06-18 - [Optimize ECS Boolean Checks]
 **Learning:** Iterating over ECS entities to evaluate boolean satisfaction (like checking if any enemies are alive for a win/loss condition) by accumulating a total count causes unnecessary O(N) overhead per frame, especially when there are many entities.
 **Action:** Use an early return (`return False/True`) upon finding the first match to short-circuit the loop. This converts the O(N) operation to O(1) in the average case and improves frame time during the update loop.
+
+## 2025-05-18 - Use spatial hashing for entity proximity lookups
+**Learning:** When needing to find entities that overlap or are near specific coordinates (like factories checking for overlapping units), iterating over all entities (even if filtered by component type) is O(N) and creates O(N*M) bottlenecks.
+**Action:** Use `game_state.get_entities_at_position(x, y)` which provides O(1) lookups via the spatial hash map, reducing overall complexity to O(M).
