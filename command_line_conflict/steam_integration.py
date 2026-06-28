@@ -40,6 +40,7 @@ class SteamIntegration:
             not isinstance(achievement_name, str)
             or not achievement_name
             or len(achievement_name) > 64
+            or len(achievement_name) == 0
             or not re.match(r"^[A-Za-z0-9_]+$", achievement_name)
         ):
             log.warning(f"Security Warning: Invalid achievement name format rejected: {achievement_name}")
