@@ -101,6 +101,33 @@ class TestFileDialog:
         assert result.endswith("map1.json")
         assert file_dialog.active is False
 
+    def test_pagination(self, file_dialog):
+        # Create enough files to allow pagination testing
+        file_dialog.files = [f"map{i}.json" for i in range(20)]
+        file_dialog.max_visible_files = 10
+        file_dialog.input_text = "map0.json"
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map10.json"
+
+        # Test Page Down again (hits boundary)
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map19.json"
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map9.json"
+
+        # Test Page Up again (hits boundary)
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map0.json"
+
     def test_keyboard_input(self, file_dialog):
         event = MagicMock()
         event.type = pygame.KEYDOWN
@@ -114,6 +141,24 @@ class TestFileDialog:
         file_dialog.handle_event(event)
         assert file_dialog.input_text == ""
 
+    def test_pagination_keys(self, file_dialog):
+        # Setup files for pagination
+        file_dialog.files = [f"map{i}.json" for i in range(20)]
+        file_dialog.input_text = "map0.json"
+
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == f"map{file_dialog.max_visible_files}.json"
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        assert file_dialog.input_text == "map0.json"
+
     def test_escape_closes(self, file_dialog):
         event = MagicMock()
         event.type = pygame.KEYDOWN
@@ -121,6 +166,21 @@ class TestFileDialog:
 
         file_dialog.handle_event(event)
         assert file_dialog.active is False
+
+    def test_keyboard_pagination(self, file_dialog, mocker):
+        mock_navigate = mocker.patch.object(file_dialog, "_navigate")
+        event = MagicMock()
+        event.type = pygame.KEYDOWN
+
+        # Test Page Up
+        event.key = pygame.K_PAGEUP
+        file_dialog.handle_event(event)
+        mock_navigate.assert_called_with(-file_dialog.max_visible_files)
+
+        # Test Page Down
+        event.key = pygame.K_PAGEDOWN
+        file_dialog.handle_event(event)
+        mock_navigate.assert_called_with(file_dialog.max_visible_files)
 
     def test_hover_states(self, file_dialog):
         # Move over close button
