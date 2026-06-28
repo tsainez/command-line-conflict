@@ -309,7 +309,7 @@ class FileDialog:
         self.screen.set_clip(None)
 
         # Helper hint beneath the input for quick keyboard guidance.
-        hint_text = "Enter to confirm, Esc to cancel, scroll to browse"
+        hint_text = "Enter to confirm, Esc to cancel, scroll/PgUp/PgDn to browse"
         hint_surf = self.font.render(hint_text, True, (170, 170, 170))
         self.screen.blit(hint_surf, (self.input_rect.x, self.input_rect.y + 32))
 
