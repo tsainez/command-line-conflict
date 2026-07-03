@@ -221,7 +221,7 @@ class TestFileDialog:
         assert file_dialog.hovered_element is None
         assert file_dialog.hovered_file_index is None
 
-    def test_pagination(self, file_dialog):
+    def test_pagination_dummy_files(self, file_dialog):
         # Create enough dummy files to trigger scrolling
         file_dialog.files = [f"file{i}.json" for i in range(20)]
         file_dialog.input_text = "file0.json"
