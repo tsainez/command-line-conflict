@@ -164,3 +164,6 @@
 ## 2024-05-24 - Tooltips for Disabled States in Pygame
 **Learning:** Pygame UIs often lack native support for conveying why an element is disabled. Users can get confused when a "Save" or "Load" button is unresponsive.
 **Action:** Always draw a contextual tooltip with a semi-transparent background near disabled interactive elements when they are hovered to explain the required action (e.g., "Filename required").
+## 2024-07-03 - Consistent Keyboard Hints in Overlay UIs
+**Learning:** Overlay UIs like developer consoles that are toggled via specific hotkeys (e.g., Tilde) often leave users guessing how to close them if no explicit close button exists.
+**Action:** Always provide a subtle, non-intrusive keyboard hint (e.g., "Press ` to close") in toggleable overlay UIs to improve discoverability and reduce user frustration.

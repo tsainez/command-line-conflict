@@ -56,4 +56,8 @@ class DeveloperConsole:
                 self.surface.blit(text_surface, (10, y_offset))
                 y_offset += text_surface.get_height() + 5
 
+        if self.font:
+            hint_surface = self.font.render("Press ` to close", True, (150, 150, 150))
+            self.surface.blit(hint_surface, (self.width - hint_surface.get_width() - 10, 10))
+
         screen.blit(self.surface, (0, 0))
