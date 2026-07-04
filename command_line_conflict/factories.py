@@ -11,6 +11,7 @@ from .components.movable import Movable
 from .components.player import Player
 from .components.position import Position
 from .components.renderable import Renderable
+from .components.resource_deposit import ResourceDeposit
 from .components.selectable import Selectable
 from .components.unit_identity import UnitIdentity
 from .components.vision import Vision
@@ -290,3 +291,24 @@ UNIT_NAME_TO_FACTORY = {
     "immortal": create_immortal,
     "extractor": create_extractor,
 }
+
+
+def create_scrap(game_state: GameState, x: float, y: float, amount: int = 50) -> int:
+    """Creates a scrap entity that can be harvested by players.
+
+    Args:
+        game_state: The current state of the game.
+        x: The x-coordinate where the scrap will be created.
+        y: The y-coordinate where the scrap will be created.
+        amount: The amount of scrap resources this entity holds.
+    Returns:
+        The entity ID of the newly created scrap.
+    """
+    entity_id = game_state.create_entity()
+    if config.DEBUG:
+        log.debug(f"Created scrap (ID: {entity_id}) at ({x}, {y}) with amount {amount}")
+    game_state.add_component(entity_id, Position(x, y))
+    game_state.add_component(entity_id, Renderable(icon="$", color=(255, 215, 0)))  # Gold color
+    game_state.add_component(entity_id, UnitIdentity(name="scrap"))
+    game_state.add_component(entity_id, ResourceDeposit(amount=amount))
+    return entity_id

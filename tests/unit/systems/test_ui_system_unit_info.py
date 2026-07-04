@@ -89,3 +89,94 @@ def test_draw_unit_name_fallback_to_icon(ui_system, game_state):
     rendered_texts = [call[0][0] for call in calls]
 
     assert "Unit: w" in rendered_texts
+
+
+def test_draw_rover_factory_production_info(ui_system, game_state):
+    """Test that factory production and research options are drawn when Rover Factory is selected."""
+    from command_line_conflict.campaign_manager import CampaignManager
+    from command_line_conflict.components.player import Player
+
+    selectable = Selectable()
+    selectable.is_selected = True
+
+    # Create campaign manager on game_state
+    cm = CampaignManager()
+    if "arachnotron" in cm.unlocked_units:
+        cm.unlocked_units.remove("arachnotron")
+    game_state.campaign_manager = cm
+    game_state.resources[1] = 150
+
+    # Create a Rover Factory entity
+    game_state.entities = {
+        1: {
+            UnitIdentity: UnitIdentity(name="rover_factory"),
+            Renderable: Renderable(icon="F"),
+            Health: Health(hp=200, max_hp=200),
+            Player: Player(player_id=1, is_human=True),
+            Selectable: selectable,
+        }
+    }
+    game_state.component_index = {Selectable: {1}, UnitIdentity: {1}}
+
+    # Mock the fonts
+    ui_system.font.render = MagicMock()
+    ui_system.small_font.render = MagicMock()
+
+    ui_system.draw(game_state, paused=False, current_player_id=1)
+
+    # Check if hints were rendered
+    calls = ui_system.small_font.render.call_args_list
+    rendered_texts = [call[0][0] for call in calls]
+
+    assert any("Train Chassis" in text for text in rendered_texts)
+    assert any("Research Arachnotron" in text for text in rendered_texts)
+
+
+def test_draw_arachnotron_factory_production_info(ui_system, game_state):
+    """Test that factory production options are drawn when Arachnotron Factory is selected."""
+    from command_line_conflict.components.player import Player
+    from command_line_conflict.components.position import Position
+
+    selectable = Selectable()
+    selectable.is_selected = True
+
+    game_state.resources[1] = 200
+
+    # Create an Arachnotron Factory entity
+    factory_id = 1
+    game_state.entities = {
+        factory_id: {
+            UnitIdentity: UnitIdentity(name="arachnotron_factory"),
+            Renderable: Renderable(icon="F"),
+            Health: Health(hp=300, max_hp=300),
+            Player: Player(player_id=1, is_human=True),
+            Selectable: selectable,
+            Position: Position(x=15.0, y=15.0),
+        }
+    }
+    game_state.component_index = {Selectable: {factory_id}, UnitIdentity: {factory_id}}
+
+    # Also add an adjacent friendly Rover
+    rover_id = 2
+    game_state.entities[rover_id] = {
+        UnitIdentity: UnitIdentity(name="rover"),
+        Renderable: Renderable(icon="R"),
+        Health: Health(hp=100, max_hp=100),
+        Player: Player(player_id=1, is_human=True),
+        Position: Position(x=15.0, y=14.0),
+    }
+    game_state.component_index[UnitIdentity].add(rover_id)
+    game_state.update_entity_position(rover_id, 15.0, 14.0)
+
+    # Mock the fonts
+    ui_system.font.render = MagicMock()
+    ui_system.small_font.render = MagicMock()
+
+    ui_system.draw(game_state, paused=False, current_player_id=1)
+
+    # Check if hints were rendered
+    calls = ui_system.small_font.render.call_args_list
+    rendered_texts = [call[0][0] for call in calls]
+
+    assert any("Train Rover" in text for text in rendered_texts)
+    assert any("Train Arachnotron" in text for text in rendered_texts)

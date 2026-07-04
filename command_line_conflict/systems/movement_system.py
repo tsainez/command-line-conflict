@@ -51,7 +51,7 @@ class MovementSystem:
             (int(position.x), int(position.y)),
             (x, y),
             can_fly=movable.can_fly,
-            extra_obstacles=game_state.spatial_map,
+            extra_obstacles=game_state.get_blocking_obstacles(),
             exclude_obstacles={(x, y)},
         )
 
@@ -103,7 +103,7 @@ class MovementSystem:
                         end_node = (int(movable.target_x), int(movable.target_y))
                         if start_node != end_node:
                             # Use spatial map directly and exclude the target
-                            extra_obstacles = game_state.spatial_map
+                            extra_obstacles = game_state.get_blocking_obstacles()
                             exclude_obstacles = {end_node}
 
                             movable.path = game_state.map.find_path(

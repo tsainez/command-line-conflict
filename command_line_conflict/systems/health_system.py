@@ -4,6 +4,8 @@ from ..components.dead import Dead
 from ..components.flee import Flee
 from ..components.health import Health
 from ..components.movable import Movable
+from ..components.player import Player
+from ..components.position import Position
 from ..components.selectable import Selectable
 from ..game_state import GameState
 from ..logger import log
@@ -39,6 +41,14 @@ class HealthSystem:
 
                     # Play death sound
                     game_state.add_event({"type": "sound", "data": {"name": "explosion"}})
+
+                    # Spawn scrap if a neutral unit dies
+                    player = components.get(Player)
+                    pos = components.get(Position)
+                    if player and player.player_id == config.NEUTRAL_PLAYER_ID and pos:
+                        from .. import factories
+
+                        factories.create_scrap(game_state, pos.x, pos.y, amount=50)
 
                     game_state.add_component(entity_id, Dead())
                     game_state.remove_component(entity_id, Movable)

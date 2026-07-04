@@ -43,3 +43,6 @@ MASTER_VOLUME = 1.0
 MAX_CHAT_INPUT_LENGTH = 200
 MAX_FILENAME_LENGTH = 64  # Limit filename length to prevent DoS/FS issues
 MAX_ENTITIES = 5000  # Global limit to prevent memory exhaustion DoS
+
+# Game Version
+VERSION = "0.1.0"

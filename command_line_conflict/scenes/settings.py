@@ -29,6 +29,7 @@ class SettingsScene:
             "Master Volume",
             "Music Volume",
             "SFX Volume",
+            "Mute Audio",  # TODO: clean this up, because mute audio is clipping over the screen!
             "Back",
         ]
         self.selected_option = 0
@@ -45,6 +46,7 @@ class SettingsScene:
         self.help_texts = {
             "Screen Size": "Changes the window resolution.",
             "Debug Mode": "Shows FPS, grid coordinates, and hitbox outlines.",
+            "Mute Audio": "Mutes all background music and sound effects.",
             "Master Volume": "Adjusts the overall game volume.",
             "Music Volume": "Adjusts the background music volume.",
             "SFX Volume": "Adjusts sound effects volume.",
@@ -145,6 +147,22 @@ class SettingsScene:
         elif option_name == "Debug Mode":
             config.DEBUG = not config.DEBUG
             log.info(f"Debug mode set to {config.DEBUG}")
+        elif option_name == "Mute Audio":
+            is_muted = not config.SOUND_ENABLED and not config.MUSIC_ENABLED
+            if is_muted:
+                config.SOUND_ENABLED = True
+                config.MUSIC_ENABLED = True
+                self.game.music_manager.enabled = True
+                self.sound_system.enabled = True
+                self.game.music_manager.play("music/menu_theme.ogg")
+                log.info("Audio unmuted.")
+            else:
+                config.SOUND_ENABLED = False
+                config.MUSIC_ENABLED = False
+                self.game.music_manager.enabled = False
+                self.sound_system.enabled = False
+                self.game.music_manager.stop()
+                log.info("Audio muted.")
         elif option_name == "Back":
             self.game.scene_manager.switch_to("menu")
 
@@ -199,6 +217,9 @@ class SettingsScene:
                 text_to_render = f"{option}: {config.SCREEN['width']}x{config.SCREEN['height']}"
             elif option == "Debug Mode":
                 text_to_render = f"{option}: {'On' if config.DEBUG else 'Off'}"
+            elif option == "Mute Audio":
+                is_muted = not config.SOUND_ENABLED and not config.MUSIC_ENABLED
+                text_to_render = f"{option}: {'On' if is_muted else 'Off'}"
             elif option == "Master Volume":
                 text_to_render = f"{option}: {self._get_volume_bar(config.MASTER_VOLUME)}"
             elif option == "Music Volume":

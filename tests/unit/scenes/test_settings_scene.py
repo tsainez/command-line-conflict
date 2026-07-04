@@ -127,10 +127,10 @@ def test_mouse_click_volume_left(settings_scene):
 
 
 def test_mouse_click_trigger(settings_scene):
-    # Back is index 5
+    back_index = settings_scene.settings_options.index("Back")
     rect = MagicMock()
     rect.collidepoint.return_value = True
-    settings_scene.option_rects = [(rect, 5)]
+    settings_scene.option_rects = [(rect, back_index)]
 
     event = MagicMock()
     event.type = pygame.MOUSEBUTTONUP

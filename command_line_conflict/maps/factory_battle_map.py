@@ -55,8 +55,6 @@ class FactoryBattleMap(Map):
         for i in range(3):
             factories.create_chassis(game_state, 5 + i * 2, 5, player_id=1, is_human=True)
 
-        factories.create_rover(game_state, 8, 8, player_id=1, is_human=True)
-
         # Player 2 units (AI) - Enemy Base at bottom right
 
         # Factories

@@ -10,7 +10,18 @@
 
 This guide will walk you through setting up and running the game on your local machine, as well as development best practices. 
 
+### Download Pre-compiled Releases (Quick Start)
+
+If you just want to play the game without setting up a Python development environment, you can download the pre-compiled, standalone executables for **Windows**, **macOS**, and **Linux** directly from the [GitHub Releases](https://github.com/tsainez/command-line-conflict/releases) page.
+
+Once downloaded:
+- **Windows**: Run `Command-Line-Conflict-Windows.exe`.
+- **macOS / Linux**: Mark the file as executable (`chmod +x Command-Line-Conflict-macOS` or `chmod +x Command-Line-Conflict-Linux`) and run it.
+
+---
+
 ### Prerequisites
+
 
 - Python 3.8 or higher
 - `pip` and `venv`

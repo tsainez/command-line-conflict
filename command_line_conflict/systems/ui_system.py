@@ -5,11 +5,13 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.camera import Camera
 from command_line_conflict.components.attack import Attack
+from command_line_conflict.components.dead import Dead
 from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.health import Health
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
+from command_line_conflict.components.resource_deposit import ResourceDeposit
 from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.components.unit_identity import UnitIdentity
 from command_line_conflict.game_state import GameState
@@ -146,6 +148,11 @@ class UISystem:
         self._draw_key_options()
         self._draw_player_indicator(current_player_id)
 
+        # Draw scrap count in gold color
+        resources = getattr(game_state, "resources", {}).get(current_player_id, 0)
+        scrap_text = self._get_text_surface(f"Scrap: {resources}", (255, 215, 0), "medium")
+        self.screen.blit(scrap_text, (10, 10))
+
         if self.cheats:
             self._draw_active_cheats(self.cheats)
 
@@ -164,7 +171,7 @@ class UISystem:
             self.last_selected_count = len(selected_entities)
 
         if len(selected_entities) == 1:
-            self._draw_single_unit_info(game_state, selected_entities[0])
+            self._draw_single_unit_info(game_state, selected_entities[0], current_player_id)
         elif len(selected_entities) > 1:
             self._draw_multi_unit_info(game_state, selected_entities)
             self._draw_aggregate_detection_range(game_state, selected_entities)
@@ -320,12 +327,13 @@ class UISystem:
                 selected_entities.append(entity_id)
         return selected_entities
 
-    def _draw_single_unit_info(self, game_state: GameState, entity_id: int) -> None:
+    def _draw_single_unit_info(self, game_state: GameState, entity_id: int, current_player_id: int = 1) -> None:
         """Draws the detailed information panel for a single selected unit.
 
         Args:
             game_state: The current state of the game.
             entity_id: The ID of the selected entity.
+            current_player_id: The current player ID.
         """
         components = game_state.entities[entity_id]
         health = components.get(Health)
@@ -365,6 +373,87 @@ class UISystem:
         self._draw_aggregate_detection_range(game_state, [entity_id])
         self._draw_aggregate_attack_range(game_state, [entity_id])
         self._draw_unit_health_text(game_state, entity_id)
+
+        # Draw production options if a factory is selected
+        if identity and ("factory" in identity.name or identity.name in ("rover_factory", "arachnotron_factory")):
+            panel_y = config.SCREEN_HEIGHT - 160
+            panel_x = 10
+
+            title = self._get_text_surface("Factory Production:", (255, 255, 0))
+            self.screen.blit(title, (panel_x, panel_y))
+            panel_y += 20
+
+            if identity.name == "rover_factory":
+                hint = self._get_text_surface("C: Train Chassis (50 Scrap)", (200, 200, 200), "small")
+                self.screen.blit(hint, (panel_x, panel_y))
+                panel_y += 18
+            elif identity.name == "arachnotron_factory":
+                hint_r = self._get_text_surface("R: Train Rover (80 Scrap)", (200, 200, 200), "small")
+                self.screen.blit(hint_r, (panel_x, panel_y))
+                panel_y += 18
+
+                # Check if there is an adjacent rover
+                has_adj_rover = False
+                factory_pos = game_state.get_component(entity_id, Position)
+                if factory_pos:
+                    for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
+                        nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
+                        cell_entities = game_state.get_entities_at_position(nx, ny)
+                        for ceid in cell_entities:
+                            if ceid == entity_id:
+                                continue
+                            c_ident = game_state.get_component(ceid, UnitIdentity)
+                            c_plyr = game_state.get_component(ceid, Player)
+                            c_dead = game_state.get_component(ceid, Dead)
+                            if (
+                                c_ident
+                                and c_ident.name == "rover"
+                                and c_plyr
+                                and c_plyr.player_id == current_player_id
+                                and not c_dead
+                            ):
+                                has_adj_rover = True
+                                break
+                        if has_adj_rover:
+                            break
+
+                resources = getattr(game_state, "resources", {}).get(current_player_id, 0)
+                req_text = "A: Train Arachnotron (120 Scrap) [Req: Adjacent Rover]"
+                if has_adj_rover and resources >= 120:
+                    color = (255, 255, 255)  # white
+                else:
+                    color = (255, 100, 100)  # light red
+
+                hint_a = self._get_text_surface(req_text, color, "small")
+                self.screen.blit(hint_a, (panel_x, panel_y))
+
+            # Draw research option if it is a Rover Factory and Arachnotron tech is not unlocked
+            if identity.name == "rover_factory":
+                cm = getattr(game_state, "campaign_manager", None)
+                if cm and not cm.is_unit_unlocked("arachnotron"):
+                    # Count chassis
+                    chassis_count = 0
+
+                    for eid in game_state.get_entities_with_component(UnitIdentity):
+                        ent_components = game_state.entities.get(eid)
+                        if not ent_components:
+                            continue
+                        ident = ent_components.get(UnitIdentity)
+                        plyr = ent_components.get(Player)
+                        is_dead = ent_components.get(Dead) is not None
+                        if ident and ident.name == "chassis" and plyr and plyr.player_id == current_player_id and not is_dead:
+                            chassis_count += 1
+
+                    resources = getattr(game_state, "resources", {}).get(current_player_id, 0)
+                    req_text = f"T: Research Arachnotron (100 Scrap) [Req: 6 Chassis, Have {chassis_count}]"
+
+                    if chassis_count >= 6 and resources >= 100:
+                        color = (255, 255, 255)  # white
+                    else:
+                        color = (255, 100, 100)  # light red
+
+                    hint_res = self._get_text_surface(req_text, color, "small")
+                    self.screen.blit(hint_res, (panel_x, panel_y))
 
     def _draw_aggregate_detection_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined detection range for multiple units."""
@@ -547,8 +636,8 @@ class UISystem:
 
         if is_builder_selected:
             hints = [
-                "R: Build Rover Factory",
-                "A: Build Arachnotron Factory",
+                "R: Build Rover Factory (100 Scrap)",
+                "A: Build Arachnotron Factory (150 Scrap)",
             ]
             panel_y = config.SCREEN_HEIGHT - 160
             panel_x_offset = 10
@@ -583,6 +672,10 @@ class UISystem:
             lines.append(f"HP: {int(health.hp)}/{health.max_hp}")
         if player:
             lines.append(f"P{player.player_id}" if player.player_id != 0 else "Neutral")
+
+        deposit = components.get(ResourceDeposit)
+        if deposit:
+            lines.append(f"Amount: {deposit.amount}")
 
         # Determine tooltip dimensions
         padding = 5

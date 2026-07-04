@@ -26,6 +26,8 @@ class GameState:
         self.spatial_map: dict[tuple[int, int], set[int]] = {}
         # Component index for O(1) entity lookup by component type
         self.component_index: dict[type, set[int]] = {}
+        # Resource tracker mapping player_id to scrap count
+        self.resources: dict[int, int] = {1: 0, 2: 0}
 
     def _add_to_spatial_map(self, entity_id: int, x: int, y: int) -> None:
         pos = (x, y)
@@ -191,19 +193,37 @@ class GameState:
                 (e.g., the entity moving).
 
         Returns:
-            True if the position is occupied, False otherwise.
+            True if the position is occupied by a blocking entity, False otherwise.
         """
         entities = self.spatial_map.get((x, y))
         if not entities:
             return False
 
-        if exclude_entity_id is None:
-            return True
+        from .components.dead import Dead
+        from .components.resource_deposit import ResourceDeposit
 
-        # If there are entities and we need to exclude one, we check if
-        # there are any *other* entities.
-        if len(entities) > 1:
-            return True
+        for eid in entities:
+            if exclude_entity_id is not None and eid == exclude_entity_id:
+                continue
+            # Ignore dead units and resource deposits
+            if not self.get_component(eid, Dead) and not self.get_component(eid, ResourceDeposit):
+                return True
 
-        # If there is exactly one entity, check if it is the excluded one
-        return exclude_entity_id not in entities
+        return False
+
+    def get_blocking_obstacles(self) -> dict[tuple[int, int], set[int]]:
+        """Returns a filtered version of spatial_map containing only blocking entities."""
+        from .components.dead import Dead
+        from .components.resource_deposit import ResourceDeposit
+
+        blocking = {}
+        for pos, entities in self.spatial_map.items():
+            # Check if there is any blocking entity in this cell
+            has_blocking = False
+            for eid in entities:
+                if not self.get_component(eid, Dead) and not self.get_component(eid, ResourceDeposit):
+                    has_blocking = True
+                    break
+            if has_blocking:
+                blocking[pos] = entities
+        return blocking

@@ -4,6 +4,7 @@ from typing import cast
 
 import pygame
 
+from command_line_conflict import config
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.systems.sound_system import SoundSystem
 
@@ -171,3 +172,11 @@ class MenuScene:
             help_surf = self.game.font.render(help_text, True, (150, 150, 150))
             help_rect = help_surf.get_rect(center=(self.game.screen.get_width() / 2, self.game.screen.get_height() - 50))
             screen.blit(help_surf, help_rect)
+
+        # Draw game version in bottom-right corner
+        version_text = f"v{config.VERSION}"
+        version_surf = self.game.font.render(version_text, True, (100, 100, 100))
+        version_rect = version_surf.get_rect(
+            bottomright=(self.game.screen.get_width() - 10, self.game.screen.get_height() - 10)
+        )
+        screen.blit(version_surf, version_rect)

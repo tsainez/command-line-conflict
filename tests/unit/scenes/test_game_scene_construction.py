@@ -40,6 +40,7 @@ def test_handle_construction_uses_unit_identity():
         game_state.add_component(chassis_id, Selectable())
         game_state.entities[chassis_id][Selectable].is_selected = True
         game_state.add_component(chassis_id, UnitIdentity("chassis"))
+        game_state.resources[1] = 100
 
         # Create rover (should NOT build, even if selected)
         rover_id = game_state.create_entity()

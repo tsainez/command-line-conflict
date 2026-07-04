@@ -29,6 +29,7 @@ from command_line_conflict.systems.health_system import HealthSystem
 from command_line_conflict.systems.movement_system import MovementSystem
 from command_line_conflict.systems.production_system import ProductionSystem
 from command_line_conflict.systems.rendering_system import RenderingSystem
+from command_line_conflict.systems.resource_system import ResourceSystem
 from command_line_conflict.systems.selection_system import SelectionSystem
 from command_line_conflict.systems.sound_system import SoundSystem
 from command_line_conflict.systems.spawn_system import SpawnSystem
@@ -83,9 +84,11 @@ class GameScene:
         self.drag_start_pos = None  # For middle mouse drag
         self.camera_start_pos = None
         self.hovered_entity_id = None
+        self._wave_cache = {}
 
         # Initialize systems
         self.campaign_manager = CampaignManager()
+        self.game_state.campaign_manager = self.campaign_manager
         self.movement_system = MovementSystem()
         self.rendering_system = RenderingSystem(self.game.screen, self.font, self.camera)
         self.combat_system = CombatSystem()
@@ -100,6 +103,7 @@ class GameScene:
         self.ai_system = AISystem()
         self.confetti_system = ConfettiSystem()
         self.production_system = ProductionSystem(self.campaign_manager)
+        self.resource_system = ResourceSystem()
 
         # Current Mission ID - In a full game this would be passed from a mission select screen
         self.current_mission_id = "mission_1"
@@ -200,7 +204,7 @@ class GameScene:
                 if self.game_state.get_component(eid, Dead):
                     continue
                 player = self.game_state.get_component(eid, Player)
-                if player and player.player_id != self.current_player_id and player.player_id != config.NEUTRAL_PLAYER_ID:
+                if player and player.player_id != self.current_player_id:
                     target_enemy_id = eid
                     break
 
@@ -344,6 +348,76 @@ class GameScene:
                             log.info(f"Switched to player {self.current_player_id}")
                             self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
 
+                if event.key == pygame.K_c:
+                    selected_factories = []
+                    for entity_id in self.game_state.get_entities_with_component(Selectable):
+                        components = self.game_state.entities.get(entity_id)
+                        if not components:
+                            continue
+                        selectable = components.get(Selectable)
+                        identity = components.get(UnitIdentity)
+                        player = components.get(Player)
+                        if player and player.player_id == self.current_player_id:
+                            if selectable and selectable.is_selected:
+                                if identity and (
+                                    "factory" in identity.name or identity.name in ("rover_factory", "arachnotron_factory")
+                                ):
+                                    selected_factories.append(entity_id)
+
+                    if selected_factories:
+                        self._train_chassis_at_factory(selected_factories[0])
+
+                if event.key == pygame.K_t:
+                    selected_rover_factories = []
+                    for entity_id in self.game_state.get_entities_with_component(Selectable):
+                        components = self.game_state.entities.get(entity_id)
+                        if not components:
+                            continue
+                        selectable = components.get(Selectable)
+                        identity = components.get(UnitIdentity)
+                        player = components.get(Player)
+                        if player and player.player_id == self.current_player_id:
+                            if selectable and selectable.is_selected:
+                                if identity and identity.name == "rover_factory":
+                                    selected_rover_factories.append(entity_id)
+
+                    if selected_rover_factories:
+                        self._research_arachnotron_at_factory(selected_rover_factories[0])
+
+                if event.key == pygame.K_r:
+                    selected_arachnotron_factories = []
+                    for entity_id in self.game_state.get_entities_with_component(Selectable):
+                        components = self.game_state.entities.get(entity_id)
+                        if not components:
+                            continue
+                        selectable = components.get(Selectable)
+                        identity = components.get(UnitIdentity)
+                        player = components.get(Player)
+                        if player and player.player_id == self.current_player_id:
+                            if selectable and selectable.is_selected:
+                                if identity and identity.name == "arachnotron_factory":
+                                    selected_arachnotron_factories.append(entity_id)
+
+                    if selected_arachnotron_factories:
+                        self._train_rover_at_factory(selected_arachnotron_factories[0])
+
+                if event.key == pygame.K_a:
+                    selected_arachnotron_factories = []
+                    for entity_id in self.game_state.get_entities_with_component(Selectable):
+                        components = self.game_state.entities.get(entity_id)
+                        if not components:
+                            continue
+                        selectable = components.get(Selectable)
+                        identity = components.get(UnitIdentity)
+                        player = components.get(Player)
+                        if player and player.player_id == self.current_player_id:
+                            if selectable and selectable.is_selected:
+                                if identity and identity.name == "arachnotron_factory":
+                                    selected_arachnotron_factories.append(entity_id)
+
+                    if selected_arachnotron_factories:
+                        self._train_arachnotron_at_factory(selected_arachnotron_factories[0])
+
                 if event.key == pygame.K_h:
                     # Hold Position
                     self.chat_system.add_message("Hold Position command issued", (255, 255, 0))
@@ -473,22 +547,285 @@ class GameScene:
         # Check unlock requirements and build
         if key == pygame.K_r:  # Build Rover Factory
             # Check if Rover is unlocked (implied requirement for Rover Factory)
-            if self.campaign_manager.is_unit_unlocked("rover"):
-                log.info("Building Rover Factory")
-                self.game_state.remove_entity(builder_id)
-                factories.create_rover_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
-                self.game.steam.unlock_achievement("BUILDER")
-            else:
+            if not self.campaign_manager.is_unit_unlocked("rover"):
                 log.info("Rover tech not unlocked!")
+                self.chat_system.add_message("Rover tech not unlocked!", (255, 0, 0))
+                return
+
+            cost = 100
+            player_resources = self.game_state.resources.get(player.player_id, 0)
+            if player_resources < cost:
+                log.info(f"Insufficient scrap! Need {cost}, have {player_resources}.")
+                self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
+                return
+
+            log.info("Building Rover Factory")
+            self.game_state.resources[player.player_id] = player_resources - cost
+            self.game_state.remove_entity(builder_id)
+            factories.create_rover_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
+            self.game.steam.unlock_achievement("BUILDER")
 
         elif key == pygame.K_a:  # Build Arachnotron Factory
-            if self.campaign_manager.is_unit_unlocked("arachnotron"):
-                log.info("Building Arachnotron Factory")
-                self.game_state.remove_entity(builder_id)
-                factories.create_arachnotron_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
-                self.game.steam.unlock_achievement("BUILDER")
-            else:
+            if not self.campaign_manager.is_unit_unlocked("arachnotron"):
                 log.info("Arachnotron tech not unlocked!")
+                self.chat_system.add_message("Arachnotron tech not unlocked!", (255, 0, 0))
+                return
+
+            cost = 150
+            player_resources = self.game_state.resources.get(player.player_id, 0)
+            if player_resources < cost:
+                log.info(f"Insufficient scrap! Need {cost}, have {player_resources}.")
+                self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
+                return
+
+            log.info("Building Arachnotron Factory")
+            self.game_state.resources[player.player_id] = player_resources - cost
+            self.game_state.remove_entity(builder_id)
+            factories.create_arachnotron_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
+            self.game.steam.unlock_achievement("BUILDER")
+
+    def _train_chassis_at_factory(self, factory_id):
+        """Trains a chassis at the selected factory."""
+        cost = 50
+        player_resources = self.game_state.resources.get(self.current_player_id, 0)
+        if player_resources < cost:
+            log.info(f"Insufficient scrap to train Chassis! Need {cost}, have {player_resources}.")
+            self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
+            return
+
+        factory_pos = self.game_state.get_component(factory_id, Position)
+        player = self.game_state.get_component(factory_id, Player)
+        if not factory_pos or not player:
+            return
+
+        # Find a free adjacent tile to spawn the chassis
+        spawn_x, spawn_y = factory_pos.x, factory_pos.y
+        # Look in surrounding cells on the grid
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
+            nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
+            if self.game_state.map.is_walkable(nx, ny) and not self.game_state.is_position_occupied(nx, ny):
+                spawn_x, spawn_y = float(nx), float(ny)
+                break
+
+        # Spend resources
+        self.game_state.resources[self.current_player_id] = player_resources - cost
+
+        # Spawn unit
+        factories.create_chassis(self.game_state, spawn_x, spawn_y, player_id=player.player_id, is_human=player.is_human)
+
+        log.info(f"Trained Chassis at ({spawn_x}, {spawn_y}) for player {player.player_id}")
+        self.chat_system.add_message("Chassis trained successfully.", (0, 255, 0))
+
+        # Sound effect
+        self.game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})
+
+        # Floating text at factory position
+        self.game_state.add_event(
+            {
+                "type": "visual_effect",
+                "subtype": "floating_text",
+                "x": factory_pos.x,
+                "y": factory_pos.y,
+                "text": "+Chassis",
+                "color": (0, 255, 0),
+            }
+        )
+
+    def _research_arachnotron_at_factory(self, factory_id):
+        """Researches Arachnotron tech at the selected Rover Factory."""
+        if self.campaign_manager.is_unit_unlocked("arachnotron"):
+            self.chat_system.add_message("Arachnotron tech is already unlocked!", (255, 255, 0))
+            return
+
+        # Count chassis
+        chassis_count = 0
+        from command_line_conflict.components.dead import Dead
+        from command_line_conflict.components.player import Player
+        from command_line_conflict.components.unit_identity import UnitIdentity
+
+        for eid in self.game_state.get_entities_with_component(UnitIdentity):
+            components = self.game_state.entities.get(eid)
+            if not components:
+                continue
+            ident = components.get(UnitIdentity)
+            plyr = components.get(Player)
+            is_dead = components.get(Dead) is not None
+            if ident and ident.name == "chassis" and plyr and plyr.player_id == self.current_player_id and not is_dead:
+                chassis_count += 1
+
+        cost = 100
+        player_resources = self.game_state.resources.get(self.current_player_id, 0)
+
+        # Verify chassis requirement
+        if chassis_count < 6:
+            self.chat_system.add_message(f"Research requirements not met! Need 6 Chassis (have {chassis_count}).", (255, 0, 0))
+            return
+
+        # Verify scrap requirement
+        if player_resources < cost:
+            self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
+            return
+
+        # Deduct cost
+        self.game_state.resources[self.current_player_id] = player_resources - cost
+
+        # Unlock Arachnotron tech
+        self.campaign_manager.unlocked_units.add("arachnotron")
+        self.campaign_manager.save_progress()
+
+        log.info(f"Arachnotron tech researched by player {self.current_player_id}")
+        self.chat_system.add_message(
+            "Arachnotron research complete! Arachnotron Factories can now be constructed.", (0, 255, 0)
+        )
+
+        # Visual and sound effect
+        self.game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})
+        factory_pos = self.game_state.get_component(factory_id, Position)
+        if factory_pos:
+            self.game_state.add_event(
+                {
+                    "type": "visual_effect",
+                    "subtype": "floating_text",
+                    "x": factory_pos.x,
+                    "y": factory_pos.y,
+                    "text": "RESEARCH COMPLETE",
+                    "color": (255, 215, 0),
+                }
+            )
+
+    def _train_rover_at_factory(self, factory_id):
+        """Trains a rover at the selected Arachnotron Factory."""
+        cost = 80
+        player_resources = self.game_state.resources.get(self.current_player_id, 0)
+        if player_resources < cost:
+            self.chat_system.add_message(
+                f"Insufficient scrap to train Rover! Need {cost}, have {player_resources}.", (255, 0, 0)
+            )
+            return
+
+        factory_pos = self.game_state.get_component(factory_id, Position)
+        player = self.game_state.get_component(factory_id, Player)
+        if not factory_pos or not player:
+            return
+
+        # Find a free adjacent tile to spawn the rover
+        spawn_x, spawn_y = factory_pos.x, factory_pos.y
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
+            nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
+            if self.game_state.map.is_walkable(nx, ny) and not self.game_state.is_position_occupied(nx, ny):
+                spawn_x, spawn_y = float(nx), float(ny)
+                break
+
+        # Spend resources
+        self.game_state.resources[self.current_player_id] = player_resources - cost
+
+        # Spawn unit
+        factories.create_rover(
+            self.game_state,
+            spawn_x,
+            spawn_y,
+            player_id=player.player_id,
+            is_human=player.is_human,
+        )
+
+        log.info(f"Trained Rover at ({spawn_x}, {spawn_y}) for player {player.player_id}")
+        self.chat_system.add_message("Rover trained successfully.", (0, 255, 0))
+
+        # Sound effect
+        self.game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})
+
+        # Floating text
+        self.game_state.add_event(
+            {
+                "type": "visual_effect",
+                "subtype": "floating_text",
+                "x": factory_pos.x,
+                "y": factory_pos.y,
+                "text": "+Rover",
+                "color": (0, 255, 0),
+            }
+        )
+
+    def _train_arachnotron_at_factory(self, factory_id):
+        """Trains an arachnotron at the selected Arachnotron Factory, consuming an adjacent rover."""
+        cost = 120
+        player_resources = self.game_state.resources.get(self.current_player_id, 0)
+        if player_resources < cost:
+            self.chat_system.add_message(
+                f"Insufficient scrap to train Arachnotron! Need {cost}, have {player_resources}.", (255, 0, 0)
+            )
+            return
+
+        factory_pos = self.game_state.get_component(factory_id, Position)
+        player = self.game_state.get_component(factory_id, Player)
+        if not factory_pos or not player:
+            return
+
+        # Find an adjacent friendly rover
+        from command_line_conflict.components.dead import Dead
+        from command_line_conflict.components.player import Player as PlayerComponent
+        from command_line_conflict.components.unit_identity import UnitIdentity
+
+        rover_to_consume = None
+        rover_x, rover_y = 0.0, 0.0
+
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
+            nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
+            cell_entities = self.game_state.get_entities_at_position(nx, ny)
+            for ceid in cell_entities:
+                if ceid == factory_id:
+                    continue
+                ident = self.game_state.get_component(ceid, UnitIdentity)
+                plyr = self.game_state.get_component(ceid, PlayerComponent)
+                is_dead = self.game_state.get_component(ceid, Dead) is not None
+                if ident and ident.name == "rover" and plyr and plyr.player_id == self.current_player_id and not is_dead:
+                    rover_to_consume = ceid
+                    rover_pos = self.game_state.get_component(ceid, Position)
+                    if rover_pos:
+                        rover_x, rover_y = rover_pos.x, rover_pos.y
+                    break
+            if rover_to_consume is not None:
+                break
+
+        if rover_to_consume is None:
+            self.chat_system.add_message("Requires a friendly Rover in an adjacent tile!", (255, 0, 0))
+            return
+
+        # Spend resources
+        self.game_state.resources[self.current_player_id] = player_resources - cost
+
+        # Remove the consumed rover
+        self.game_state.remove_entity(rover_to_consume)
+
+        # Spawn Arachnotron at the consumed rover's position
+        spawn_x = rover_x
+        spawn_y = rover_y
+
+        factories.create_arachnotron(
+            self.game_state,
+            spawn_x,
+            spawn_y,
+            player_id=player.player_id,
+            is_human=player.is_human,
+        )
+
+        log.info(f"Trained Arachnotron at ({spawn_x}, {spawn_y}) by consuming rover {rover_to_consume}")
+        self.chat_system.add_message("Arachnotron trained successfully.", (0, 255, 0))
+
+        # Sound effect
+        self.game_state.add_event({"type": "sound", "data": {"name": "spawn_unit"}})
+
+        # Floating text
+        self.game_state.add_event(
+            {
+                "type": "visual_effect",
+                "subtype": "floating_text",
+                "x": spawn_x,
+                "y": spawn_y,
+                "text": "+Arachnotron",
+                "color": (255, 215, 0),
+            }
+        )
 
     def _update_camera(self, dt):
         """Updates the camera position based on user input."""
@@ -532,6 +869,7 @@ class GameScene:
         self.combat_system.update(self.game_state, dt)
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
+        self.resource_system.update(self.game_state, dt)
         self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
         self.sound_system.update(self.game_state)
@@ -629,24 +967,77 @@ class GameScene:
     def draw(self, screen):
         """Draws the entire game scene.
 
-        This includes the background grid, the map, all entities, and the UI.
+        This includes the background ocean, the map area, all entities, and the UI.
 
         Args:
             screen: The pygame screen surface to draw on.
         """
-        screen.fill((0, 0, 0))
+        # Deep dark blue background for the ocean
+        screen.fill((0, 15, 35))
 
-        # Draw grid lines with camera and zoom
         grid_size = int(config.GRID_SIZE * self.camera.zoom)
-        if grid_size > 0:
-            width, height = self.game.screen.get_size()
-            start_x = (math.floor(self.camera.x) - self.camera.x) * grid_size
-            start_y = (math.floor(self.camera.y) - self.camera.y) * grid_size
+        width, height = self.game.screen.get_size()
 
-            for x in range(int(start_x), width, grid_size):
-                pygame.draw.line(screen, (40, 40, 40), (x, 0), (x, height))
-            for y in range(int(start_y), height, grid_size):
-                pygame.draw.line(screen, (40, 40, 40), (0, y), (width, y))
+        if grid_size > 0:
+            map_width = self.game_state.map.width
+            map_height = self.game_state.map.height
+            if not isinstance(map_width, (int, float)):
+                map_width = 0
+            if not isinstance(map_height, (int, float)):
+                map_height = 0
+
+            # 1. Draw solid black rectangle for the map area
+            map_left = int(-self.camera.x * grid_size)
+            map_top = int(-self.camera.y * grid_size)
+            map_width_px = map_width * grid_size
+            map_height_px = map_height * grid_size
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(map_left, map_top, map_width_px, map_height_px))
+
+            # 2. Draw animated wave characters in the out-of-bounds area
+            col_start = math.floor(self.camera.x)
+            row_start = math.floor(self.camera.y)
+            cols_count = math.ceil(width / grid_size) + 1
+            rows_count = math.ceil(height / grid_size) + 1
+
+            col_end = col_start + cols_count
+            row_end = row_start + rows_count
+            time_ms = pygame.time.get_ticks()
+
+            for r in range(row_start, row_end):
+                for c in range(col_start, col_end):
+                    # Only draw outside the map boundaries
+                    if 0 <= c < map_width and 0 <= r < map_height:
+                        continue
+
+                    # Animation frame changes every 400ms, offset by coordinates for movement
+                    char_idx = (c + r + time_ms // 400) % 4
+                    wave_surf = self._get_wave_surface(char_idx, grid_size)
+
+                    draw_x = int((c - self.camera.x) * grid_size)
+                    draw_y = int((r - self.camera.y) * grid_size)
+                    screen.blit(wave_surf, (draw_x, draw_y))
+
+            # 3. Draw grid lines *only* within the map boundaries
+            map_right = map_left + map_width_px
+            map_bottom = map_top + map_height_px
+
+            # Vertical lines
+            for col in range(map_width + 1):
+                x = int((col - self.camera.x) * grid_size)
+                if 0 <= x <= width:
+                    y_start = max(0, map_top)
+                    y_end = min(height, map_bottom)
+                    if y_start < y_end:
+                        pygame.draw.line(screen, (40, 40, 40), (x, y_start), (x, y_end))
+
+            # Horizontal lines
+            for row in range(map_height + 1):
+                y = int((row - self.camera.y) * grid_size)
+                if 0 <= y <= height:
+                    x_start = max(0, map_left)
+                    x_end = min(width, map_right)
+                    if x_start < x_end:
+                        pygame.draw.line(screen, (40, 40, 40), (x_start, y), (x_end, y))
 
         self.game_state.map.draw(screen, self.font, camera=self.camera)
         self.rendering_system.draw(self.game_state, self.paused)
@@ -671,3 +1062,17 @@ class GameScene:
             overlay.fill((0, 255, 0, 60))
             screen.blit(overlay, rect.topleft)
             pygame.draw.rect(screen, (0, 255, 0), rect, 1)
+
+    def _get_wave_surface(self, char_idx, grid_size):
+        """Pre-renders and scales wave characters to avoid runtime font overhead."""
+        cache_key = (char_idx, grid_size)
+        if cache_key not in self._wave_cache:
+            char = ["~", " ", "-", "."][char_idx]
+            surf = self.font.render(char, True, (0, 100, 180))
+            try:
+                surf = pygame.transform.scale(surf, (grid_size, grid_size))
+            except TypeError:
+                # If surf is a mock object (e.g. in tests), keep the mock as is
+                pass
+            self._wave_cache[cache_key] = surf
+        return self._wave_cache[cache_key]

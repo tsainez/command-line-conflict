@@ -22,10 +22,16 @@ class TestMenuScene(unittest.TestCase):
         self.patcher = patch("command_line_conflict.scenes.menu.SoundSystem")
         self.MockSoundSystem = self.patcher.start()
 
+        # Patch CampaignManager to avoid loading real campaign progress
+        self.cm_patcher = patch("command_line_conflict.scenes.menu.CampaignManager")
+        self.MockCampaignManager = self.cm_patcher.start()
+        self.MockCampaignManager.return_value.completed_missions = []
+
         self.scene = MenuScene(self.mock_game)
 
     def tearDown(self):
         self.patcher.stop()
+        self.cm_patcher.stop()
 
     def test_menu_options(self):
         self.assertIn("Map Editor", self.scene.menu_options)
