@@ -16,3 +16,9 @@
 ## 2024-06-21 - [Early returns for win/loss conditions]
 **Learning:** Accumulating counts to check if ANY entity exists (e.g. `enemy_count == 0` for win conditions) forces O(N) iteration over all units every frame.
 **Action:** Use an early return (`return False`) as soon as the first satisfying entity is found. This converts an O(N) check into O(1) for the average frame.
+## 2024-06-19 - [Optimize Boolean Satisfaction Loops with Early Return]
+**Learning:** When iterating over ECS entities or standard lists to evaluate boolean satisfaction (e.g., checking if all enemies are defeated or if the player has any units left), accumulating a total count is inefficient. The frame-by-frame loop evaluates this condition continuously. Accumulating forces an O(N) traversal every frame.
+**Action:** Use an early return (`return False/True`) upon finding the first match instead of accumulating a total count. This converts an O(N) operation to O(1) in the average case.
+## 2024-06-15 - [Early Exit in Boolean Satisfaction Loops]
+**Learning:** When iterating over entities or standard lists to evaluate boolean satisfaction (e.g., win/loss conditions), accumulating a total count introduces unnecessary overhead.
+**Action:** Use an early return upon finding the first matching element instead of accumulating a total count. This reduces an O(N) operation to O(1) in the average case.
