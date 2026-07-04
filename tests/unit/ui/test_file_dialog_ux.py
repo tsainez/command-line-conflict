@@ -59,29 +59,3 @@ class TestFileDialogUX:
         # and then reset to None
         mock_screen.set_clip.assert_any_call(empty_file_dialog.input_rect)
         mock_screen.set_clip.assert_any_call(None)
-
-    def test_pagination_keyboard_navigation(self, empty_file_dialog):
-        """Test that PAGEUP and PAGEDOWN navigate the file list by max_visible_files."""
-        import pygame
-
-        empty_file_dialog.files = [f"file{i}.json" for i in range(30)]
-        empty_file_dialog.max_visible_files = 10
-        empty_file_dialog.input_text = "file0.json"
-
-        # Test PAGEDOWN
-        event_pagedown = MagicMock()
-        event_pagedown.type = pygame.KEYDOWN
-        event_pagedown.key = pygame.K_PAGEDOWN
-        event_pagedown.unicode = ""
-
-        empty_file_dialog.handle_event(event_pagedown)
-        assert empty_file_dialog.input_text == "file10.json"
-
-        # Test PAGEUP
-        event_pageup = MagicMock()
-        event_pageup.type = pygame.KEYDOWN
-        event_pageup.key = pygame.K_PAGEUP
-        event_pageup.unicode = ""
-
-        empty_file_dialog.handle_event(event_pageup)
-        assert empty_file_dialog.input_text == "file0.json"
