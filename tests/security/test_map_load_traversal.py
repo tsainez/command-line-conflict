@@ -5,7 +5,7 @@ from command_line_conflict.maps.base import Map
 
 
 class TestMapLoadTraversal(unittest.TestCase):
-    @patch("json.loads")
+    @patch("json.load")
     @patch("command_line_conflict.maps.base.open")
     @patch("command_line_conflict.maps.base.os.stat")
     @patch("command_line_conflict.maps.base.os.path.realpath")

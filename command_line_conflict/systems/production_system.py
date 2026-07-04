@@ -31,36 +31,48 @@ class ProductionSystem:
             return
 
         # Check for overlap with input units
-        # Use spatial hashing to find units at factory locations in O(1) time
-        for factory_id, factory_components in factory_entities:
-            factory = factory_components[Factory]
-            factory_pos = factory_components[Position]
-            factory_player = factory_components.get(Player)
+        # Iterate over a copy of entities to avoid modification issues if we delete
+        # entities while iterating (though create_entity creates a new ID, best be safe)
+        # Optimization: Iterate over entities with UnitIdentity instead of all entities
+        all_unit_entities = list(game_state.get_entities_with_component(UnitIdentity))
 
-            fx, fy = int(factory_pos.x), int(factory_pos.y)
-            entities_at_pos = list(game_state.get_entities_at_position(fx, fy))
+        for unit_id in all_unit_entities:
+            unit_components = game_state.entities.get(unit_id)
+            if not unit_components:
+                continue
 
-            for unit_id in entities_at_pos:
+            unit_pos = unit_components.get(Position)
+            unit_identity = unit_components.get(UnitIdentity)
+            unit_player = unit_components.get(Player)
+
+            if not unit_pos or not unit_identity:
+                continue
+
+            for factory_id, factory_components in factory_entities:
+                # Don't let a factory consume itself (though it shouldn't match input_unit usually)
                 if unit_id == factory_id:
                     continue
 
-                unit_components = game_state.entities.get(unit_id)
-                if not unit_components:
-                    continue
-
-                unit_identity = unit_components.get(UnitIdentity)
-                if not unit_identity or unit_identity.name != factory.input_unit:
-                    continue
-
-                unit_player = unit_components.get(Player)
+                factory = factory_components[Factory]
+                factory_pos = factory_components[Position]
+                factory_player = factory_components.get(Player)
 
                 # Check player ownership compatibility (can only use own factories)
                 if unit_player and factory_player and unit_player.player_id != factory_player.player_id:
                     continue
 
-                # Check Campaign Unlock
-                if self.campaign_manager.is_unit_unlocked(factory.output_unit):
-                    self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
+                # Check Position Overlap
+                # Using simple integer grid comparison as movement snaps to grid or close enough
+                if int(unit_pos.x) == int(factory_pos.x) and int(unit_pos.y) == int(factory_pos.y):
+
+                    # Check Input Type Match
+                    if unit_identity.name == factory.input_unit:
+
+                        # Check Campaign Unlock
+                        if self.campaign_manager.is_unit_unlocked(factory.output_unit):
+                            self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
+                            break  # Consumed unit, stop checking factories for this unit
+                        # Optional: Feedback that tech is not unlocked
 
     def _transform_unit(
         self, game_state, input_unit_id, input_player, factory, position
