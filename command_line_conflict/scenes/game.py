@@ -64,6 +64,14 @@ class GameScene:
         self.paused = False
         self.current_player_id = 1
 
+        # Lifecycle flags used by SceneManager/MenuScene to decide whether
+        # this scene can be resumed after ESC-ing out to the menu.
+        # mission_started flips once the scene actually runs a frame (a
+        # freshly constructed, never-entered scene is not "in progress");
+        # mission_over flips when the win/loss condition fires.
+        self.mission_started = False
+        self.mission_over = False
+
         # Cheats
         self.cheats = {
             "reveal_map": False,
@@ -879,6 +887,7 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.mission_started = True
         self.chat_system.update(self.game_state, dt)
 
         if self.paused:
@@ -966,6 +975,7 @@ class GameScene:
                     return False
 
         log.info("Victory! Mission Complete.")
+        self.mission_over = True
         self.game.steam.unlock_achievement("VICTORY")
         # Trigger victory sound (note: scene switch might cut it off if SoundSystem isn't persistent or updated)
         # Since SoundSystem is part of GameScene, and we switch scene, we should ideally play it in the new scene
@@ -999,6 +1009,7 @@ class GameScene:
                     return False
 
         log.info("Defeat! Mission Failed.")
+        self.mission_over = True
         self.game.steam.unlock_achievement("DEFEAT")
         self.sound_system.play_sound("defeat")
         return True

@@ -29,9 +29,16 @@ class SettingsScene:
             "Master Volume",
             "Music Volume",
             "SFX Volume",
-            "Mute Audio",  # TODO: clean this up, because mute audio is clipping over the screen!
+            "Mute Audio",
             "Back",
         ]
+        # Vertical layout: everything must fit the smallest resolution
+        # (800x600) with the help line at the bottom. With 7 options, the
+        # last row sits at options_start_y + 6 * option_spacing; keep that
+        # comfortably above SCREEN_HEIGHT - 50 where the help text renders,
+        # or the two overprint (this happened with 250 + i * 60).
+        self.options_start_y = 200
+        self.option_spacing = 52
         self.selected_option = 0
         self.option_rects = []
         self.screen_sizes = [(800, 600), (1024, 768), (1280, 720)]
@@ -40,8 +47,6 @@ class SettingsScene:
             self.current_screen_size_index = self.screen_sizes.index((config.SCREEN["width"], config.SCREEN["height"]))
         except ValueError:
             self.current_screen_size_index = 0
-        self.time = 0.0
-
         self.time = 0.0
         self.help_texts = {
             "Screen Size": "Changes the window resolution.",
@@ -90,16 +95,32 @@ class SettingsScene:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            for rect, i in self.option_rects:
-                if rect.collidepoint(event.pos):
-                    self.selected_option = i
-                    option_name = self.settings_options[i]
-                    if "Volume" in option_name:
-                        # Left side decreases, right side increases
-                        direction = -1 if event.pos[0] < rect.centerx else 1
-                        self._change_volume(option_name, direction)
-                    else:
-                        self._trigger_option(option_name)
+            # Buttons 4/5 are legacy scroll-wheel events. Before this check,
+            # a wheel tick over ANY row activated it (toggling Mute, leaving
+            # via Back...), and over a volume row the direction came from the
+            # cursor's x position — so scrolling up and down did the same
+            # thing. Wheel direction is now static: up always raises volume,
+            # down always lowers it, and the wheel does nothing elsewhere.
+            button = getattr(event, "button", 1)
+            if button in (4, 5):
+                for rect, i in self.option_rects:
+                    if rect.collidepoint(event.pos):
+                        option_name = self.settings_options[i]
+                        if "Volume" in option_name:
+                            self.selected_option = i
+                            self._change_volume(option_name, 1 if button == 4 else -1)
+                        break
+            elif button == 1:
+                for rect, i in self.option_rects:
+                    if rect.collidepoint(event.pos):
+                        self.selected_option = i
+                        option_name = self.settings_options[i]
+                        if "Volume" in option_name:
+                            # Left side decreases, right side increases
+                            direction = -1 if event.pos[0] < rect.centerx else 1
+                            self._change_volume(option_name, direction)
+                        else:
+                            self._trigger_option(option_name)
 
         elif event.type == pygame.KEYDOWN:
             option_name = self.settings_options[self.selected_option]
@@ -236,7 +257,9 @@ class SettingsScene:
                     text_to_render = f"> {text_to_render} <"
 
             text = self._get_text_surface(text_to_render, color, "option")
-            text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 250 + i * 60))
+            text_rect = text.get_rect(
+                center=(self.game.screen.get_width() / 2, self.options_start_y + i * self.option_spacing)
+            )
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
 

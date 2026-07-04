@@ -43,6 +43,27 @@ class TestSceneManager:
         assert initial_game_scene is not new_game_scene
         assert isinstance(manager.current_scene, GameScene)
 
+    def test_switch_to_game_resume(self):
+        mock_game = Mock()
+        manager = SceneManager(mock_game)
+
+        # A never-entered scene is not resumable: reset=False still recreates.
+        initial_scene = manager.scenes["game"]
+        manager.switch_to("game", reset=False)
+        assert manager.scenes["game"] is not initial_scene
+
+        # An in-progress scene IS resumed by reset=False.
+        scene = manager.scenes["game"]
+        scene.mission_started = True
+        scene.mission_over = False
+        manager.switch_to("game", reset=False)
+        assert manager.scenes["game"] is scene
+
+        # A finished mission is not resumable.
+        scene.mission_over = True
+        manager.switch_to("game", reset=False)
+        assert manager.scenes["game"] is not scene
+
     def test_handle_event(self):
         mock_game = Mock()
         manager = SceneManager(mock_game)

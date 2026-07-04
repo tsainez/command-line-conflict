@@ -38,16 +38,31 @@ class SceneManager:
         self.current_scene = self.scenes["menu"]
         log.debug("SceneManager initialized with scenes: %s", list(self.scenes.keys()))
 
-    def switch_to(self, scene_name):
+    def switch_to(self, scene_name, reset: bool = True):
         """Switches the active scene.
 
         Args:
             scene_name: The name of the scene to switch to.
+            reset: Only meaningful for "game". True (default) starts a fresh
+                GameScene. False resumes the existing in-progress game —
+                exactly as it was left when the player pressed ESC (scenes
+                that aren't current receive no update() calls, so the match
+                is effectively frozen, not running in the background). A
+                finished (mission_over) or never-entered scene cannot be
+                resumed; a fresh one is created instead.
         """
         log.debug(f"Switching scene to: {scene_name}")
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         if scene_name == "game":
-            self.scenes["game"] = GameScene(self.game)
+            existing = self.scenes.get("game")
+            resumable = (
+                not reset
+                and isinstance(existing, GameScene)
+                and getattr(existing, "mission_started", False)
+                and not getattr(existing, "mission_over", False)
+            )
+            if not resumable:
+                self.scenes["game"] = GameScene(self.game)
         elif scene_name == "editor":
             self.scenes["editor"] = EditorScene(self.game)
         self.current_scene = self.scenes[scene_name]

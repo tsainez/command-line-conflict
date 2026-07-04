@@ -101,7 +101,33 @@ class TestMenuUX:
             # "Continue Campaign" is at index 0
             menu._trigger_option(0)
 
-            mock_game.scene_manager.switch_to.assert_called_with("game")
+            # reset=False resumes an in-progress match instead of recreating
+            # the scene; SceneManager falls back to a fresh mission if there
+            # is nothing to resume.
+            mock_game.scene_manager.switch_to.assert_called_with("game", reset=False)
+
+    def test_menu_shows_continue_for_in_progress_game(self, mock_game):
+        """'Continue Campaign' must appear when a live match was ESC'd out
+        of, even with zero completed missions (fresh install playtesting)."""
+        from types import SimpleNamespace
+
+        with patch("pygame.font.Font"), patch("command_line_conflict.scenes.menu.CampaignManager") as MockCampaignManager:
+            MockCampaignManager.return_value.completed_missions = []
+
+            menu = MenuScene(mock_game)
+            assert "Continue Campaign" not in menu.menu_options
+
+            # Simulate a frozen in-progress game scene.
+            mock_game.scene_manager.scenes = {
+                "game": SimpleNamespace(mission_started=True, mission_over=False),
+            }
+            menu.update(0.016)
+            assert menu.menu_options[0] == "Continue Campaign"
+
+            # Once the mission ends, the option disappears again.
+            mock_game.scene_manager.scenes["game"].mission_over = True
+            menu.update(0.016)
+            assert "Continue Campaign" not in menu.menu_options
 
     def test_update_increments_time(self, mock_game):
         with patch("pygame.font.Font"), patch("command_line_conflict.scenes.menu.CampaignManager"):
