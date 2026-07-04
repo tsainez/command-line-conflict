@@ -7,7 +7,24 @@ from ..logger import log
 
 
 class ResourceSystem:
-    """System that handles resource collection/harvesting from scrap entities."""
+    """System that handles resource collection/harvesting from scrap entities.
+
+    DESIGN NOTE (2026-07-04) — the scrap economy currently has exactly one
+    income source: wildlife drops 50 scrap on death (HealthSystem), and any
+    non-neutral unit that steps on the pile collects it. Two consequences
+    worth weighing before building more content on top:
+
+    * Income is capped by SpawnSystem's wildlife respawn rate (one spawn
+      per 5s in GameScene), so the mid/late game economy is a fixed drip
+      that no player decision can improve. Classic RTS pacing usually wants
+      income to scale with investment (more workers/bases -> more income).
+    * The "extractor" unit (factories.create_extractor) is default-unlocked
+      and named like a harvester, but participates in the economy in NO way
+      — it has no gathering behavior and no system references it. Either
+      give it the harvesting role (e.g. only extractors can collect scrap,
+      or extractors mine renewable deposits) or cut it; shipping a
+      do-nothing economic unit will read as a bug to players.
+    """
 
     def update(self, game_state: GameState, dt: float) -> None:
         """Checks for player units overlapping with scrap deposits and harvests them.

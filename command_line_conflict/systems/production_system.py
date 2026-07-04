@@ -8,7 +8,46 @@ from command_line_conflict.logger import log
 
 
 class ProductionSystem:
-    """System that handles unit production via factories."""
+    """System that handles unit production via factories.
+
+    DESIGN NOTE (2026-07-04) — two production mechanics currently coexist,
+    and they undercut each other. Whoever touches production next should
+    pick one direction on purpose instead of extending both:
+
+    1. Walk-in transformation (THIS system, the original mechanic):
+       a unit whose UnitIdentity matches the factory's ``input_unit`` and
+       stands on the factory's tile is transformed into ``output_unit``
+       — chassis -> rover at a Rover Factory, rover -> arachnotron at an
+       Arachnotron Factory. It costs NOTHING except the consumed unit.
+
+    2. Hotkey training (added with the scrap economy, lives in
+       GameScene._train_*_at_factory): the same conversions cost scrap
+       (Rover 80, Arachnotron 120 + an adjacent Rover consumed) plus a
+       50-scrap Chassis via the C key.
+
+    Because both are active, every scrap price on the training hotkeys can
+    be sidestepped by right-clicking the unit onto the factory tile: a
+    50-scrap Chassis walked onto a Rover Factory yields a Rover that the
+    hotkey path sells for 80, and an 80-scrap Rover walked onto an
+    Arachnotron Factory yields a 120-scrap Arachnotron. The walk-in path is
+    strictly cheaper, so the economy only disciplines players who don't
+    know about it — the worst kind of balance.
+
+    Options, roughly in order of least design churn:
+      a) Charge walk-in transformations the same scrap cost as the hotkey
+         (refuse + chat warning when the owner can't pay). Keeps both
+         interactions, one price list. Requires giving this system access
+         to game_state.resources and the chat/event queue.
+      b) Remove walk-in transformation entirely and make hotkey training
+         the only path (then Factory.input_unit only documents the recipe,
+         and the Arachnotron's "consume an adjacent Rover" rule becomes the
+         universal pattern). Simplest economy; kills a charming mechanic.
+      c) Keep walk-in as the *only* conversion path and drop the R/A
+         training hotkeys, so scrap is spent on Chassis + factories only.
+         Closest to the original vision, but weakens the new scrap sink.
+    Whichever way this goes, delete this note and update the hotkey table
+    in GameScene.handle_event plus the UISystem factory hint panel.
+    """
 
     def __init__(self, campaign_manager: CampaignManager):
         self.campaign_manager = campaign_manager

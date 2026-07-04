@@ -36,3 +36,7 @@ CLAUDE.md
 TASKS.md
 memory/
 dashboard.html
+
+# Scratch directory some security tests write into at runtime
+# (tests/security/test_campaign_race_condition.py); never commit its contents.
+tmp_test/

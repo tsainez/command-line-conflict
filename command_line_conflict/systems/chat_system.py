@@ -129,7 +129,13 @@ class ChatSystem:
         if not show_history and not self.input_active:
             return
 
-        chat_bottom = config.SCREEN_HEIGHT - 120
+        # Anchor the chat above the contextual hint panels. UISystem draws
+        # "Construction:" / "Factory Production:" hints in the band from
+        # SCREEN_HEIGHT-160 down to the bottom info panel (SCREEN_HEIGHT-100);
+        # chat lines grow upward from chat_bottom, so anchoring any lower than
+        # SCREEN_HEIGHT-170 makes chat and hints overprint each other into
+        # unreadable text whenever a factory or chassis is selected.
+        chat_bottom = config.SCREEN_HEIGHT - 170
         line_height = 20
 
         # Draw messages
