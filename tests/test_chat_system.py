@@ -33,6 +33,33 @@ def test_max_messages(chat_system):
     assert chat_system.messages[0]["text"] == "Message 5"
 
 
+def test_consecutive_duplicates_collapse(chat_system):
+    """Identical back-to-back notifications merge into one counted line
+    instead of flooding the playfield."""
+    for _ in range(4):
+        chat_system.add_message("Insufficient scrap!", (255, 0, 0))
+
+    assert len(chat_system.messages) == 1
+    assert chat_system.messages[0]["text"] == "Insufficient scrap! (x4)"
+    assert chat_system.messages[0]["count"] == 4
+
+    # A different message breaks the run...
+    chat_system.add_message("Chassis trained successfully.", (0, 255, 0))
+    assert len(chat_system.messages) == 2
+
+    # ...and the same text after it starts a fresh line, not a merge.
+    chat_system.add_message("Insufficient scrap!", (255, 0, 0))
+    assert len(chat_system.messages) == 3
+    assert chat_system.messages[-1]["text"] == "Insufficient scrap!"
+
+
+def test_same_text_different_color_not_collapsed(chat_system):
+    """Color is part of the message identity (e.g. warning vs success)."""
+    chat_system.add_message("Status", (255, 0, 0))
+    chat_system.add_message("Status", (0, 255, 0))
+    assert len(chat_system.messages) == 2
+
+
 def test_handle_event_activation(chat_system):
     # Ensure it starts inactive
     assert not chat_system.input_active

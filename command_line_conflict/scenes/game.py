@@ -64,14 +64,19 @@ class GameScene:
         self.paused = False
         self.current_player_id = 1
 
+        # Lifecycle flags used by SceneManager/MenuScene to decide whether
+        # this scene can be resumed after ESC-ing out to the menu.
+        # mission_started flips once the scene actually runs a frame (a
+        # freshly constructed, never-entered scene is not "in progress");
+        # mission_over flips when the win/loss condition fires.
+        self.mission_started = False
+        self.mission_over = False
+
         # Cheats
         self.cheats = {
             "reveal_map": False,
             "god_mode": False,
         }
-
-        # Fog of War
-        self.fog_of_war = FogOfWar(self.game_state.map.width, self.game_state.map.height)
 
         # Camera
         self.camera = Camera()
@@ -159,10 +164,16 @@ class GameScene:
 
         log.debug(f"Handling event: {event}")
 
-        # Handle construction hotkeys if a chassis is selected
+        # R and A are context-sensitive hotkeys shared between two actions:
+        #   - Chassis selected:            R/A = build a factory (consumes the chassis).
+        #   - Arachnotron Factory selected: R/A = train a Rover / Arachnotron.
+        # Construction takes priority and consumes the keypress. Without the
+        # early return, a mixed selection (chassis + factory) would trigger
+        # BOTH actions from a single keypress and double-spend scrap.
         if event.type == pygame.KEYDOWN:
             if event.key in (pygame.K_r, pygame.K_a):
-                self._handle_construction(event.key)
+                if self._handle_construction(event.key):
+                    return
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
@@ -517,8 +528,15 @@ class GameScene:
         if not cursor_set:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-    def _handle_construction(self, key):
-        """Handles building construction requests."""
+    def _handle_construction(self, key) -> bool:
+        """Handles building construction requests.
+
+        Returns:
+            True if a chassis was selected and the keypress was consumed
+            (even if the build was refused, e.g. insufficient scrap), False
+            if no builder was selected and the key should fall through to
+            other handlers (factory training shares the R/A keys).
+        """
         # Find selected chassis
         selected_chassis_ids = []
         for entity_id in self.game_state.get_entities_with_component(Selectable):
@@ -534,7 +552,7 @@ class GameScene:
                     selected_chassis_ids.append(entity_id)
 
         if not selected_chassis_ids:
-            return
+            return False
 
         # Simple logic: First selected chassis builds the factory
         builder_id = selected_chassis_ids[0]
@@ -542,7 +560,7 @@ class GameScene:
         player = self.game_state.get_component(builder_id, Player)
 
         if not pos or not player:
-            return
+            return True
 
         # Check unlock requirements and build
         if key == pygame.K_r:  # Build Rover Factory
@@ -550,14 +568,14 @@ class GameScene:
             if not self.campaign_manager.is_unit_unlocked("rover"):
                 log.info("Rover tech not unlocked!")
                 self.chat_system.add_message("Rover tech not unlocked!", (255, 0, 0))
-                return
+                return True
 
             cost = 100
             player_resources = self.game_state.resources.get(player.player_id, 0)
             if player_resources < cost:
                 log.info(f"Insufficient scrap! Need {cost}, have {player_resources}.")
                 self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
-                return
+                return True
 
             log.info("Building Rover Factory")
             self.game_state.resources[player.player_id] = player_resources - cost
@@ -569,20 +587,37 @@ class GameScene:
             if not self.campaign_manager.is_unit_unlocked("arachnotron"):
                 log.info("Arachnotron tech not unlocked!")
                 self.chat_system.add_message("Arachnotron tech not unlocked!", (255, 0, 0))
-                return
+                return True
 
             cost = 150
             player_resources = self.game_state.resources.get(player.player_id, 0)
             if player_resources < cost:
                 log.info(f"Insufficient scrap! Need {cost}, have {player_resources}.")
                 self.chat_system.add_message(f"Insufficient scrap! Need {cost}, have {player_resources}.", (255, 0, 0))
-                return
+                return True
 
             log.info("Building Arachnotron Factory")
             self.game_state.resources[player.player_id] = player_resources - cost
             self.game_state.remove_entity(builder_id)
             factories.create_arachnotron_factory(self.game_state, pos.x, pos.y, player.player_id, player.is_human)
             self.game.steam.unlock_achievement("BUILDER")
+
+        return True
+
+    def _find_free_adjacent_tile(self, center_pos: Position) -> "tuple[float, float] | None":
+        """Finds a walkable, unoccupied tile in the 8 cells around a position.
+
+        Returns:
+            (x, y) of the first free neighboring tile, or None if all eight
+            neighbors are blocked. Callers must treat None as "do not spawn"
+            rather than spawning on the center tile itself — see the exploit
+            notes in the training methods below.
+        """
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
+            nx, ny = int(center_pos.x + dx), int(center_pos.y + dy)
+            if self.game_state.map.is_walkable(nx, ny) and not self.game_state.is_position_occupied(nx, ny):
+                return float(nx), float(ny)
+        return None
 
     def _train_chassis_at_factory(self, factory_id):
         """Trains a chassis at the selected factory."""
@@ -598,14 +633,15 @@ class GameScene:
         if not factory_pos or not player:
             return
 
-        # Find a free adjacent tile to spawn the chassis
-        spawn_x, spawn_y = factory_pos.x, factory_pos.y
-        # Look in surrounding cells on the grid
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-            nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
-            if self.game_state.map.is_walkable(nx, ny) and not self.game_state.is_position_occupied(nx, ny):
-                spawn_x, spawn_y = float(nx), float(ny)
-                break
+        # Find a free adjacent tile to spawn the chassis. Never fall back to
+        # the factory's own tile: ProductionSystem transforms any input unit
+        # standing on a factory (chassis -> rover here) at zero scrap cost,
+        # so an on-factory spawn would silently upgrade the unit for free.
+        spawn_pos = self._find_free_adjacent_tile(factory_pos)
+        if spawn_pos is None:
+            self.chat_system.add_message("No open tile next to the factory to deploy a Chassis!", (255, 0, 0))
+            return
+        spawn_x, spawn_y = spawn_pos
 
         # Spend resources
         self.game_state.resources[self.current_player_id] = player_resources - cost
@@ -669,9 +705,13 @@ class GameScene:
         # Deduct cost
         self.game_state.resources[self.current_player_id] = player_resources - cost
 
-        # Unlock Arachnotron tech
+        # Unlock Arachnotron tech for THIS MATCH ONLY. This mutates the
+        # in-memory set on the scene's CampaignManager; it is deliberately not
+        # saved to disk (save_progress only persists completed_missions, and
+        # _update_unlocks would discard it anyway). A new GameScene starts
+        # with the research locked again. See the DESIGN NOTE above
+        # MISSION_REWARDS in campaign_manager.py before changing this.
         self.campaign_manager.unlocked_units.add("arachnotron")
-        self.campaign_manager.save_progress()
 
         log.info(f"Arachnotron tech researched by player {self.current_player_id}")
         self.chat_system.add_message(
@@ -708,13 +748,16 @@ class GameScene:
         if not factory_pos or not player:
             return
 
-        # Find a free adjacent tile to spawn the rover
-        spawn_x, spawn_y = factory_pos.x, factory_pos.y
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-            nx, ny = int(factory_pos.x + dx), int(factory_pos.y + dy)
-            if self.game_state.map.is_walkable(nx, ny) and not self.game_state.is_position_occupied(nx, ny):
-                spawn_x, spawn_y = float(nx), float(ny)
-                break
+        # Find a free adjacent tile to spawn the rover. Never fall back to the
+        # factory's own tile: this is an Arachnotron Factory whose input unit
+        # is "rover", so ProductionSystem would instantly convert an
+        # on-factory rover into a free Arachnotron, bypassing the 120-scrap
+        # cost and the adjacent-rover training requirement.
+        spawn_pos = self._find_free_adjacent_tile(factory_pos)
+        if spawn_pos is None:
+            self.chat_system.add_message("No open tile next to the factory to deploy a Rover!", (255, 0, 0))
+            return
+        spawn_x, spawn_y = spawn_pos
 
         # Spend resources
         self.game_state.resources[self.current_player_id] = player_resources - cost
@@ -844,6 +887,7 @@ class GameScene:
         Args:
             dt: The time elapsed since the last frame.
         """
+        self.mission_started = True
         self.chat_system.update(self.game_state, dt)
 
         if self.paused:
@@ -870,6 +914,10 @@ class GameScene:
         self.confetti_system.update(self.game_state, dt)
         self.movement_system.update(self.game_state, dt)
         self.resource_system.update(self.game_state, dt)
+        # NOTE: ProductionSystem still grants FREE walk-in transformations
+        # (unit standing on a factory tile becomes the factory's output),
+        # which bypasses the scrap prices charged by the training hotkeys.
+        # See the DESIGN NOTE on ProductionSystem before rebalancing costs.
         self.production_system.update(self.game_state, dt)
         self.corpse_removal_system.update(self.game_state, dt)
         self.sound_system.update(self.game_state)
@@ -927,6 +975,7 @@ class GameScene:
                     return False
 
         log.info("Victory! Mission Complete.")
+        self.mission_over = True
         self.game.steam.unlock_achievement("VICTORY")
         # Trigger victory sound (note: scene switch might cut it off if SoundSystem isn't persistent or updated)
         # Since SoundSystem is part of GameScene, and we switch scene, we should ideally play it in the new scene
@@ -960,6 +1009,7 @@ class GameScene:
                     return False
 
         log.info("Defeat! Mission Failed.")
+        self.mission_over = True
         self.game.steam.unlock_achievement("DEFEAT")
         self.sound_system.play_sound("defeat")
         return True

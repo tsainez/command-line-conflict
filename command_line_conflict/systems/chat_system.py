@@ -15,10 +15,17 @@ class ChatSystem:
         """
         self.screen = screen
         self.font = font
-        self.messages = []  # List of (text, color) tuples
+        # Notifications render with a smaller dedicated font: the main game
+        # font at chat size covered a third of the 600px-tall playfield once
+        # a few training/insufficient-scrap messages stacked up.
+        self.message_font = pygame.font.Font(None, 20)
+        self.messages = []  # List of message dicts (see add_message)
         self.input_active = False
         self.input_text = ""
         self.max_messages = 20
+        # Only this many lines show in the transient (auto-hiding) view;
+        # the full history stays available via the L log toggle.
+        self.max_visible_messages = 6
         self.chat_history_duration = 5000  # Milliseconds to show chat history
         self.last_message_time = 0
         self.cursor_blink_timer = 0
@@ -28,26 +35,46 @@ class ChatSystem:
     def add_message(self, text: str, color: tuple[int, int, int] = (255, 255, 255)):
         """Adds a message to the chat history.
 
+        Consecutive identical messages collapse into a single line with a
+        repeat counter ("Insufficient scrap! ... (x4)") instead of flooding
+        the screen — spamming a training hotkey used to fill the playfield.
+
         Args:
             text: The message text.
             color: The color of the text (RGB tuple).
         """
+        now = pygame.time.get_ticks()
+
+        if self.messages:
+            last = self.messages[-1]
+            if last.get("base_text") == text and last.get("color") == color:
+                last["count"] = last.get("count", 1) + 1
+                display_text = f"{text} (x{last['count']})"
+                last["text"] = display_text
+                last["surface"] = self.message_font.render(display_text, True, color)
+                last["shadow_surface"] = self.message_font.render(display_text, True, (0, 0, 0))
+                last["time"] = now
+                self.last_message_time = now
+                return
+
         # Pre-render text surfaces to avoid doing it every frame
-        text_surf = self.font.render(text, True, color)
-        shadow_surf = self.font.render(text, True, (0, 0, 0))
+        text_surf = self.message_font.render(text, True, color)
+        shadow_surf = self.message_font.render(text, True, (0, 0, 0))
 
         self.messages.append(
             {
                 "text": text,
+                "base_text": text,
+                "count": 1,
                 "color": color,
-                "time": pygame.time.get_ticks(),
+                "time": now,
                 "surface": text_surf,
                 "shadow_surface": shadow_surf,
             }
         )
         if len(self.messages) > self.max_messages:
             self.messages.pop(0)
-        self.last_message_time = pygame.time.get_ticks()
+        self.last_message_time = now
 
     def handle_event(self, event) -> bool:
         """Handles user input for the chat system.
@@ -129,7 +156,13 @@ class ChatSystem:
         if not show_history and not self.input_active:
             return
 
-        chat_bottom = config.SCREEN_HEIGHT - 120
+        # Anchor the chat above the contextual hint panels. UISystem draws
+        # "Construction:" / "Factory Production:" hints in the band from
+        # SCREEN_HEIGHT-160 down to the bottom info panel (SCREEN_HEIGHT-100);
+        # chat lines grow upward from chat_bottom, so anchoring any lower than
+        # SCREEN_HEIGHT-170 makes chat and hints overprint each other into
+        # unreadable text whenever a factory or chassis is selected.
+        chat_bottom = config.SCREEN_HEIGHT - 170
         line_height = 20
 
         # Draw messages
@@ -143,15 +176,19 @@ class ChatSystem:
                 s.fill((0, 0, 0, 160))  # Semi-transparent black
                 self.screen.blit(s, bg_rect.topleft)
 
-            for i, msg in enumerate(reversed(self.messages)):
+            # The transient overlay only shows the newest few lines; the L
+            # log toggle shows everything with a backdrop.
+            visible = self.messages if self.show_log else self.messages[-self.max_visible_messages :]
+
+            for i, msg in enumerate(reversed(visible)):
                 text_surface = msg.get("surface")
                 shadow_surface = msg.get("shadow_surface")
 
                 # Fallback if surfaces missing (e.g. from saved state or legacy)
                 if not text_surface:
-                    text_surface = self.font.render(msg["text"], True, msg["color"])
+                    text_surface = self.message_font.render(msg["text"], True, msg["color"])
                 if not shadow_surface:
-                    shadow_surface = self.font.render(msg["text"], True, (0, 0, 0))
+                    shadow_surface = self.message_font.render(msg["text"], True, (0, 0, 0))
 
                 y_pos = chat_bottom - (i + 1) * line_height
                 if self.input_active:

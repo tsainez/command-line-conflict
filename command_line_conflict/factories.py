@@ -250,6 +250,9 @@ def create_rover_factory(game_state: GameState, x: float, y: float, player_id: i
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="F", color=color))
     game_state.add_component(entity_id, Health(hp=200, max_hp=200))
+    # Buildings watch their surroundings: without Vision a player's own base
+    # sits inside fog of war, which reads as a rendering bug.
+    game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
@@ -276,6 +279,8 @@ def create_arachnotron_factory(game_state: GameState, x: float, y: float, player
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
     game_state.add_component(entity_id, Renderable(icon="f", color=color))
     game_state.add_component(entity_id, Health(hp=300, max_hp=300))
+    # See create_rover_factory: friendly buildings must clear their own fog.
+    game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
     game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))

@@ -31,7 +31,7 @@ class MenuScene:
 
         self.selected_option = 0
         self.help_texts = {
-            "Continue Campaign": "Resume your saved progress.",
+            "Continue Campaign": "Pick up the game in progress, or your saved campaign.",
             "New Game": "Start a new campaign from the beginning.",
             "Map Editor": "Create and edit custom levels.",
             "Options": "Adjust game settings.",
@@ -105,7 +105,10 @@ class MenuScene:
         option_text = self.menu_options[option_index]
 
         if option_text == "Continue Campaign":
-            self.game.scene_manager.switch_to("game")
+            # reset=False resumes the in-progress match (ESC out of a game
+            # freezes the scene rather than discarding it); if there is no
+            # resumable match, SceneManager falls back to a fresh mission.
+            self.game.scene_manager.switch_to("game", reset=False)
         elif option_text == "New Game":
             self.game.scene_manager.switch_to("game")
         elif option_text == "Map Editor":
@@ -121,6 +124,38 @@ class MenuScene:
         else:
             self.quit_confirm = False
 
+    def _has_resumable_game(self) -> bool:
+        """Whether an in-progress (ESC'd, not finished) game scene exists."""
+        scene_manager = getattr(self.game, "scene_manager", None)
+        scenes = getattr(scene_manager, "scenes", None)
+        if not isinstance(scenes, dict):
+            return False
+        game_scene = scenes.get("game")
+        return (
+            game_scene is not None
+            and getattr(game_scene, "mission_started", False) is True
+            and getattr(game_scene, "mission_over", False) is False
+        )
+
+    def _refresh_continue_option(self) -> None:
+        """Shows/hides 'Continue Campaign' as the game state changes.
+
+        The option must appear not only when the save file has completed
+        missions, but also when the player ESC'd out of a live match — on a
+        fresh install that frozen match is otherwise unreachable and the
+        player is forced to restart the mission (brutal for playtesting).
+        """
+        should_show = bool(self.campaign_manager.completed_missions) or self._has_resumable_game()
+        has_option = "Continue Campaign" in self.menu_options
+        if should_show and not has_option:
+            self.menu_options.insert(0, "Continue Campaign")
+            self.selected_option = 0
+            self.quit_confirm = False
+        elif not should_show and has_option:
+            self.menu_options.remove("Continue Campaign")
+            self.selected_option = 0
+            self.quit_confirm = False
+
     def update(self, dt):
         """Updates the menu scene.
 
@@ -128,6 +163,7 @@ class MenuScene:
             dt: The time elapsed since the last frame.
         """
         self.time += dt
+        self._refresh_continue_option()
 
     def draw(self, screen):
         """Draws the menu options and title to the screen.
@@ -161,7 +197,10 @@ class MenuScene:
                     display_text = f"> {option} <"
 
             text = self._get_text_surface(display_text, color, "option")
-            text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 300 + i * 60))
+            # 280 + i * 52 keeps the 5-row menu (with Continue Campaign)
+            # clear of the help line at SCREEN_HEIGHT - 50 on an 800x600
+            # window; 300 + i * 60 used to collide with it.
+            text_rect = text.get_rect(center=(self.game.screen.get_width() / 2, 280 + i * 52))
             screen.blit(text, text_rect)
             self.option_rects.append((text_rect, i))
 

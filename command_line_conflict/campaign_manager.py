@@ -10,15 +10,41 @@ from .utils.paths import atomic_save_json, get_user_data_dir
 DEFAULT_SAVE_FILENAME = "save_game.json"
 
 # Define the Tech Tree: Mission ID -> List of Unlocked Units
-# Mission 1 unlocks Rover
-# Mission 2 unlocks Arachnotron
-# ...
+#
+# DESIGN NOTE (2026-07-04): There are currently TWO competing tech-unlock
+# mechanisms in the game, and they need to be reconciled:
+#
+#   1. This campaign reward table: winning a mission permanently unlocks units
+#      across all future games (persisted in save_game.json).
+#   2. In-match research: GameScene._research_arachnotron_at_factory lets a
+#      player unlock the Arachnotron *during* a match ("T" at a Rover Factory,
+#      100 scrap + 6 living Chassis). That unlock is intentionally
+#      session-scoped: it mutates `unlocked_units` in memory only, is NOT
+#      written to disk (save_progress only persists completed_missions), and
+#      is discarded when `_update_unlocks` re-derives the set.
+#
+# Consequences to be aware of before extending either mechanism:
+#   - "rover" is a DEFAULT_UNLOCKED_UNITS member (see below) because the basic
+#     match loop (Chassis -> build Rover Factory) must work on a fresh save;
+#     that makes mission_1's "rover" reward redundant. Consider re-purposing
+#     mission rewards (e.g. cosmetic/stat rewards, or starting-scrap bonuses)
+#     or removing the campaign gate entirely in favor of in-match research.
+#   - If you add in-match research for more units, follow the session-scoped
+#     pattern above; do NOT call save_progress() from match code, or a single
+#     skirmish would permanently alter campaign progression.
 MISSION_REWARDS: Dict[str, List[str]] = {
     "mission_1": ["rover"],
     "mission_2": ["arachnotron"],
     "mission_3": ["observer"],
     "mission_4": ["immortal"],
 }
+
+# Units every player can build from a fresh save. "rover" must stay in this
+# set: FactoryBattleMap starts the human player with three melee Chassis
+# against ranged Rover/Arachnotron defenders, so a fresh install that cannot
+# build a Rover Factory (gated on is_unit_unlocked("rover")) has no viable
+# path to victory — and therefore no way to ever earn mission_1's unlock.
+DEFAULT_UNLOCKED_UNITS: Set[str] = {"chassis", "extractor", "rover"}
 
 
 class CampaignManager:
@@ -50,7 +76,7 @@ class CampaignManager:
                     log.error(f"Failed to migrate save file: {e}")
 
         self.completed_missions: List[str] = []
-        self.unlocked_units: Set[str] = {"chassis", "extractor"}  # Default unlocks
+        self.unlocked_units: Set[str] = set(DEFAULT_UNLOCKED_UNITS)
         self.load_progress()
 
     def load_progress(self) -> None:
@@ -141,8 +167,13 @@ class CampaignManager:
             self.save_progress()
 
     def _update_unlocks(self) -> None:
-        """Updates the set of unlocked units based on completed missions."""
-        self.unlocked_units = {"chassis", "extractor"}  # Reset to default
+        """Updates the set of unlocked units based on completed missions.
+
+        Note: this rebuilds the set from scratch, so any session-scoped
+        unlock (e.g. in-match Arachnotron research) is intentionally
+        discarded here. See the DESIGN NOTE above MISSION_REWARDS.
+        """
+        self.unlocked_units = set(DEFAULT_UNLOCKED_UNITS)  # Reset to default
         for mission_id in self.completed_missions:
             rewards = MISSION_REWARDS.get(mission_id, [])
             for unit in rewards:

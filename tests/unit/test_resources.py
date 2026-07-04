@@ -234,6 +234,122 @@ def test_research_arachnotron_at_factory(game_state):
     assert game_state.resources[1] == 20  # 120 - 100
 
 
+def test_train_chassis_refused_when_factory_surrounded(game_state):
+    """A fully surrounded factory must refuse to train (and not charge).
+
+    Regression test: the old fallback spawned the unit ON the factory tile,
+    where ProductionSystem would instantly transform it for free.
+    """
+    from command_line_conflict.scenes.game import GameScene
+
+    mock_game = MockGame()
+    scene = GameScene(mock_game)
+    scene.game_state = game_state
+    scene.current_player_id = 1
+
+    factory_id = factories.create_rover_factory(game_state, 10.0, 10.0, player_id=1, is_human=True)
+
+    # Block all 8 neighboring tiles with live units.
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if dx == 0 and dy == 0:
+                continue
+            factories.create_rover(game_state, 10.0 + dx, 10.0 + dy, player_id=1, is_human=True)
+
+    game_state.resources[1] = 100
+    scene._train_chassis_at_factory(factory_id)
+
+    chassis_entities = [
+        eid
+        for eid in game_state.get_entities_with_component(UnitIdentity)
+        if game_state.get_component(eid, UnitIdentity).name == "chassis"
+    ]
+    assert len(chassis_entities) == 0
+    assert game_state.resources[1] == 100  # No charge on refusal
+
+
+def test_train_rover_refused_when_factory_surrounded(game_state):
+    """A surrounded Arachnotron Factory must not spawn a rover on its own tile.
+
+    Regression test: an on-factory rover would be transformed into a free
+    Arachnotron by ProductionSystem, bypassing the 120-scrap cost.
+    """
+    from command_line_conflict.scenes.game import GameScene
+
+    mock_game = MockGame()
+    scene = GameScene(mock_game)
+    scene.game_state = game_state
+    scene.current_player_id = 1
+
+    factory_id = factories.create_arachnotron_factory(game_state, 15.0, 15.0, player_id=1, is_human=True)
+
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if dx == 0 and dy == 0:
+                continue
+            factories.create_chassis(game_state, 15.0 + dx, 15.0 + dy, player_id=1, is_human=True)
+
+    game_state.resources[1] = 100
+    scene._train_rover_at_factory(factory_id)
+
+    rovers = [
+        eid
+        for eid in game_state.get_entities_with_component(UnitIdentity)
+        if game_state.get_component(eid, UnitIdentity).name == "rover"
+    ]
+    assert len(rovers) == 0
+    assert game_state.resources[1] == 100  # No charge on refusal
+
+
+def test_r_key_fires_single_action_with_mixed_selection(game_state):
+    """With a chassis AND an Arachnotron Factory selected, one R keypress
+    must only build a Rover Factory (construction consumes the key), not
+    also train a Rover — the old behavior double-spent scrap.
+    """
+    from unittest.mock import MagicMock
+
+    import pygame
+
+    from command_line_conflict.components.selectable import Selectable
+    from command_line_conflict.scenes.game import GameScene
+
+    mock_game = MockGame()
+    scene = GameScene(mock_game)
+    scene.game_state = game_state
+    scene.current_player_id = 1
+    scene.campaign_manager = MagicMock()
+    scene.campaign_manager.is_unit_unlocked.return_value = True
+
+    chassis_id = factories.create_chassis(game_state, 10.0, 10.0, player_id=1, is_human=True)
+    game_state.get_component(chassis_id, Selectable).is_selected = True
+
+    arach_factory_id = factories.create_arachnotron_factory(game_state, 20.0, 20.0, player_id=1, is_human=True)
+    game_state.get_component(arach_factory_id, Selectable).is_selected = True
+
+    game_state.resources[1] = 1000
+
+    scene.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r))
+
+    # The chassis was consumed to build a Rover Factory...
+    assert chassis_id not in game_state.entities
+    rover_factories = [
+        eid
+        for eid in game_state.get_entities_with_component(UnitIdentity)
+        if game_state.get_component(eid, UnitIdentity).name == "rover_factory"
+    ]
+    assert len(rover_factories) == 1
+
+    # ...and the Arachnotron Factory did NOT also train a Rover.
+    rovers = [
+        eid
+        for eid in game_state.get_entities_with_component(UnitIdentity)
+        if game_state.get_component(eid, UnitIdentity).name == "rover"
+    ]
+    assert len(rovers) == 0
+    # Only the 100-scrap factory build was charged, not 100 + 80.
+    assert game_state.resources[1] == 900
+
+
 def test_arachnotron_factory_production(game_state):
     """Verify Rover and Arachnotron training at Arachnotron Factory."""
     from command_line_conflict.scenes.game import GameScene

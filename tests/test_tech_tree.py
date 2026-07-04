@@ -30,11 +30,14 @@ class TestCampaignManager(unittest.TestCase):
 
     def test_initial_state(self):
         self.assertIn("chassis", self.manager.unlocked_units)
-        # Assuming rover requires 1 mission, it should not be unlocked yet
-        self.assertNotIn("rover", self.manager.unlocked_units)
+        # Rover is a default unlock: the basic match loop (Chassis -> build
+        # Rover Factory) must be playable on a fresh save, otherwise
+        # mission_1 is unwinnable and the campaign deadlocks.
+        self.assertIn("rover", self.manager.unlocked_units)
+        # Arachnotron is gated (mission_2 reward or in-match research).
+        self.assertNotIn("arachnotron", self.manager.unlocked_units)
 
     def test_unlock_progression(self):
-        # Rover needs mission_1
         self.manager.complete_mission("mission_1")
         self.assertIn("rover", self.manager.unlocked_units)
         self.assertNotIn("arachnotron", self.manager.unlocked_units)
