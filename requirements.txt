@@ -14,5 +14,5 @@ flake8
 pytest-cov
 pylint
 mypy
-mkdocstrings>=1.0.4
+mkdocstrings>=1.0.6
 mkdocstrings-python>=2.0.3
