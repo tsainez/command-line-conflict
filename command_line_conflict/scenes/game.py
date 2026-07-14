@@ -717,14 +717,12 @@ class GameScene:
         from command_line_conflict.components.unit_identity import UnitIdentity
 
         for eid in self.game_state.get_entities_with_component(UnitIdentity):
-            components = self.game_state.entities.get(eid)
-            if not components:
-                continue
+            components = self.game_state.entities[eid]
             ident = components.get(UnitIdentity)
-            plyr = components.get(Player)
-            is_dead = components.get(Dead) is not None
-            if ident and ident.name == "chassis" and plyr and plyr.player_id == self.current_player_id and not is_dead:
-                chassis_count += 1
+            if ident and ident.name == "chassis":
+                plyr = components.get(Player)
+                if plyr and plyr.player_id == self.current_player_id and Dead not in components:
+                    chassis_count += 1
 
         cost = 100
         player_resources = self.game_state.resources.get(self.current_player_id, 0)

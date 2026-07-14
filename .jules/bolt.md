@@ -33,3 +33,6 @@
 ## 2024-06-21 - [Early returns for win/loss conditions]
 **Learning:** Accumulating counts to check if ANY entity exists (e.g. `enemy_count == 0` for win conditions) forces O(N) iteration over all units every frame.
 **Action:** Use an early return (`return False`) as soon as the first satisfying entity is found. This converts an O(N) check into O(1) for the average frame.
+## 2024-07-14 - Optimize Component Iteration Speed
+**Learning:** Component filtering loops using `.get()` repeatedly on entity dictionaries are significantly slower than direct dictionary access and fast-failing. Short-circuiting condition checks early (e.g., checking `UnitIdentity.name` before looking up `Player` components) saves operations.
+**Action:** In game update/render loops, prioritize direct dictionary lookup `entities[eid]` when an entity is known to exist, and structure `if` statements to evaluate the most discriminative conditions first.
