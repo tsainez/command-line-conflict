@@ -12,9 +12,9 @@ class TestMapLoadTraversal(unittest.TestCase):
     def test_load_from_unauthorized_location(self, mock_realpath, mock_stat, mock_open, mock_json_load):
         """Verify that loading map from unauthorized location raises ValueError."""
         # Setup mocks to simulate a valid file in an unauthorized location
-        unauthorized_path = "/etc/passwd.json"  # Example unauthorized path
+        unauthorized_path = "/etc/passwd"  # Example unauthorized path
 
-        # We mock realpath to just return the input, simulating it resolving to /etc/passwd.json
+        # We mock realpath to just return the input, simulating it resolving to /etc/passwd
         mock_realpath.side_effect = lambda x: x
 
         # Mock stat to look like a regular small file

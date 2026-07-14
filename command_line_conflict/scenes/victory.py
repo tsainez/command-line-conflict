@@ -2,8 +2,6 @@ import math
 
 import pygame
 
-from command_line_conflict.utils.color import get_pulse_color
-
 
 class VictoryScene:
     """A scene to display when the player wins the game."""
@@ -52,7 +50,9 @@ class VictoryScene:
         screen.blit(text, text_rect)
 
         # Instructions to go back to menu
-        pulse_color = get_pulse_color(self.time, (150, 150, 150), (255, 255, 255))
+        pulse = (math.sin(self.time * 5) + 1) / 2
+        color_val = 150 + int(105 * pulse)
+        pulse_color = (color_val, color_val, color_val)
         instruction_text = self.font.render("Press Enter/Esc or Click to return to the menu", True, pulse_color)
         instruction_rect = instruction_text.get_rect(
             center=(

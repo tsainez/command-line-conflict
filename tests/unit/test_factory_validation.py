@@ -1,4 +1,5 @@
 import pytest
+
 from command_line_conflict.components.factory import Factory
 
 

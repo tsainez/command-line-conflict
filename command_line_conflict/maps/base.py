@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
@@ -362,11 +364,6 @@ class Map:
         # Security fix: Path traversal prevention
         # Resolve symlinks to ensure we check the actual destination
         abs_path = os.path.realpath(filename)
-
-        # Security fix: Enforce .json extension to prevent reading arbitrary files
-        if not abs_path.lower().endswith(".json"):
-            log.error(f"Security violation: Invalid file extension for map load: {abs_path}")
-            raise ValueError("Map files must have a .json extension.")
 
         # Define allowed directories
         # 1. The maps directory (where this file resides)

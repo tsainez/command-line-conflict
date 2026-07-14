@@ -17,12 +17,12 @@ from command_line_conflict.components.vision import Vision
 from command_line_conflict.fog_of_war import FogOfWar
 from command_line_conflict.game_state import GameState
 from command_line_conflict.logger import log
+from command_line_conflict.maps import SimpleMap  # noqa: F401  # pylint: disable=unused-import
 from command_line_conflict.maps.factory_battle_map import FactoryBattleMap
 from command_line_conflict.systems.ai_system import AISystem
 from command_line_conflict.systems.chat_system import ChatSystem
 from command_line_conflict.systems.combat_system import CombatSystem
 from command_line_conflict.systems.confetti_system import ConfettiSystem
-from command_line_conflict.systems.control_group_system import ControlGroupSystem
 from command_line_conflict.systems.corpse_removal_system import CorpseRemovalSystem
 from command_line_conflict.systems.flee_system import FleeSystem
 from command_line_conflict.systems.health_system import HealthSystem
@@ -44,33 +44,6 @@ class UnitView:
         self.x = x
         self.y = y
         self.vision_range = vision_range
-
-
-# Maps number-row keys to control group numbers. K_0 is bound to the 10th
-# group (matching the classic RTS convention of "1-9, 0").
-NUMBER_KEY_TO_GROUP = {
-    pygame.K_1: 1,
-    pygame.K_2: 2,
-    pygame.K_3: 3,
-    pygame.K_4: 4,
-    pygame.K_5: 5,
-    pygame.K_6: 6,
-    pygame.K_7: 7,
-    pygame.K_8: 8,
-    pygame.K_9: 9,
-    pygame.K_0: 10,
-}
-
-# Debug-only unit spawning, kept off the plain number/Ctrl+number keys so it
-# doesn't collide with control-group hotkeys (see _handle_control_group_key).
-DEBUG_SPAWN_KEYS = {
-    pygame.K_1: factories.create_extractor,
-    pygame.K_2: factories.create_chassis,
-    pygame.K_3: factories.create_rover,
-    pygame.K_4: factories.create_arachnotron,
-    pygame.K_5: factories.create_observer,
-    pygame.K_6: factories.create_immortal,
-}
 
 
 class GameScene:
@@ -118,12 +91,6 @@ class GameScene:
         self.hovered_entity_id = None
         self._wave_cache = {}
 
-        # Control groups (hotkeys 1-9, 0). Tracks the last press time (ms) per
-        # group number so a quick second press can be detected as a
-        # double-tap and snap the camera to that group.
-        self.control_group_system = ControlGroupSystem()
-        self._last_group_key_time: dict[int, int] = {}
-
         # Initialize systems
         self.campaign_manager = CampaignManager()
         self.game_state.campaign_manager = self.campaign_manager
@@ -165,7 +132,7 @@ class GameScene:
                 "F1: Toggle Reveal Map",
                 "F2: Toggle God Mode",
                 "TAB: Switch Player",
-                "Ctrl+Shift+1-6: Spawn Units",
+                "1-6: Spawn Units",
             ]
             for cheat in cheats_list:
                 log.info(cheat)
@@ -315,40 +282,82 @@ class GameScene:
                 self.camera_movement["left"] = True
             elif event.key == pygame.K_RIGHT:
                 self.camera_movement["right"] = True
-            elif event.key in NUMBER_KEY_TO_GROUP:
-                mods = pygame.key.get_mods()
-                # Debug-only unit spawning shares the number row but requires
-                # Ctrl+Shift, so plain Ctrl+number stays free for assigning
-                # control groups even when config.DEBUG is on.
-                if config.DEBUG and mods & pygame.KMOD_CTRL and mods & pygame.KMOD_SHIFT:
-                    mx, my = pygame.mouse.get_pos()
-                    gx, gy = self.camera.screen_to_grid(mx, my)
-                    spawn_fn = DEBUG_SPAWN_KEYS.get(event.key)
-                    if spawn_fn:
-                        spawn_fn(self.game_state, gx, gy, player_id=self.current_player_id, is_human=True)
-                else:
-                    self._handle_control_group_key(event.key, mods)
             else:
                 if config.DEBUG:
-                    if event.key == pygame.K_F1:
-                        self.cheats["reveal_map"] = not self.cheats["reveal_map"]
-                        status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
-                        log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
-                        self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
-                    elif event.key == pygame.K_F2:
-                        self.cheats["god_mode"] = not self.cheats["god_mode"]
-                        status = "Enabled" if self.cheats["god_mode"] else "Disabled"
-                        log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
-                        self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
-                    elif event.key == pygame.K_TAB:
-                        # Security: Gated side-switching feature behind config.DEBUG to prevent unauthorized access
-                        self.selection_system.clear_selection(self.game_state)
-                        if self.current_player_id == 1:
-                            self.current_player_id = 2
-                        else:
-                            self.current_player_id = 1
-                        log.info(f"Switched to player {self.current_player_id}")
-                        self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
+                    mods = pygame.key.get_mods()
+                    if mods & pygame.KMOD_CTRL:
+                        mx, my = pygame.mouse.get_pos()
+                        gx, gy = self.camera.screen_to_grid(mx, my)
+                        if event.key == pygame.K_1:
+                            factories.create_extractor(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+                        elif event.key == pygame.K_2:
+                            factories.create_chassis(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+                        elif event.key == pygame.K_3:
+                            factories.create_rover(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+                        elif event.key == pygame.K_4:
+                            factories.create_arachnotron(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+                        elif event.key == pygame.K_5:
+                            factories.create_observer(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+                        elif event.key == pygame.K_6:
+                            factories.create_immortal(
+                                self.game_state,
+                                gx,
+                                gy,
+                                player_id=self.current_player_id,
+                                is_human=True,
+                            )
+
+                    # Debug cheats
+                    if config.DEBUG:
+                        if event.key == pygame.K_F1:
+                            self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                            status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
+                            log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                            self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
+                        elif event.key == pygame.K_F2:
+                            self.cheats["god_mode"] = not self.cheats["god_mode"]
+                            status = "Enabled" if self.cheats["god_mode"] else "Disabled"
+                            log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
+                            self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
+                        elif event.key == pygame.K_TAB:
+                            # Security: Gated side-switching feature behind config.DEBUG to prevent unauthorized access
+                            self.selection_system.clear_selection(self.game_state)
+                            if self.current_player_id == 1:
+                                self.current_player_id = 2
+                            else:
+                                self.current_player_id = 1
+                            log.info(f"Switched to player {self.current_player_id}")
+                            self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
 
                 if event.key == pygame.K_c:
                     selected_factories = []
@@ -519,52 +528,6 @@ class GameScene:
         if not cursor_set:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-    def _handle_control_group_key(self, key: int, mods: int) -> None:
-        """Handles a control-group hotkey (number row keys 1-9 and 0).
-
-        Ctrl+<number> assigns the current selection to the group. A plain
-        <number> press recalls it; pressing the same group's key twice within
-        config.CONTROL_GROUP_DOUBLE_TAP_MS also snaps the camera to it.
-        """
-        group_number = NUMBER_KEY_TO_GROUP[key]
-
-        if mods & pygame.KMOD_CTRL:
-            assigned = self.control_group_system.assign_group(self.game_state, group_number, self.current_player_id)
-            if assigned:
-                log.info(f"Control group {group_number} assigned ({len(assigned)} entities)")
-                self.chat_system.add_message(f"Control group {group_number} assigned", (255, 255, 0))
-            return
-
-        entity_ids = self.control_group_system.select_group(self.game_state, group_number, self.current_player_id)
-        if not entity_ids:
-            return
-
-        self.game_state.add_event({"type": "sound", "data": {"name": "click_select"}})
-
-        now = pygame.time.get_ticks()
-        last_press = self._last_group_key_time.get(group_number)
-        self._last_group_key_time[group_number] = now
-
-        if last_press is not None and now - last_press <= config.CONTROL_GROUP_DOUBLE_TAP_MS:
-            self._center_camera_on_group(entity_ids)
-
-    def _center_camera_on_group(self, entity_ids: list) -> None:
-        """Snaps the camera so its viewport is centered on a group's average position."""
-        center = self.control_group_system.get_center_position(self.game_state, entity_ids)
-        if center is None or self.game.screen is None:
-            return
-
-        grid_size = config.GRID_SIZE * self.camera.zoom
-        if grid_size <= 0:
-            return
-
-        screen_width, screen_height = self.game.screen.get_size()
-        cx, cy = center
-        self.camera.set_position(
-            cx - (screen_width / grid_size) / 2,
-            cy - (screen_height / grid_size) / 2,
-        )
-
     def _handle_construction(self, key) -> bool:
         """Handles building construction requests.
 
@@ -717,12 +680,14 @@ class GameScene:
         from command_line_conflict.components.unit_identity import UnitIdentity
 
         for eid in self.game_state.get_entities_with_component(UnitIdentity):
-            components = self.game_state.entities[eid]
+            components = self.game_state.entities.get(eid)
+            if not components:
+                continue
             ident = components.get(UnitIdentity)
-            if ident and ident.name == "chassis":
-                plyr = components.get(Player)
-                if plyr and plyr.player_id == self.current_player_id and Dead not in components:
-                    chassis_count += 1
+            plyr = components.get(Player)
+            is_dead = components.get(Dead) is not None
+            if ident and ident.name == "chassis" and plyr and plyr.player_id == self.current_player_id and not is_dead:
+                chassis_count += 1
 
         cost = 100
         player_resources = self.game_state.resources.get(self.current_player_id, 0)

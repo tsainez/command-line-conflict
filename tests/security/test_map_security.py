@@ -135,7 +135,7 @@ class TestMapSecurity(unittest.TestCase):
         mock_fstat.return_value = mock_st
 
         with self.assertRaises(ValueError) as cm:
-            Map.load_from_file("/dev/zero.json")
+            Map.load_from_file("/dev/zero")
 
         self.assertIn("must be a regular file", str(cm.exception))
 
