@@ -5,11 +5,13 @@ from typing import cast
 import pygame
 
 from command_line_conflict import config
+from command_line_conflict.utils.color import get_pulse_color
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.ui.menu_hover_mixin import MenuHoverMixin
 
 
-class MenuScene:
+class MenuScene(MenuHoverMixin):
     """Manages the main menu scene, allowing navigation to other scenes."""
 
     def __init__(self, game):
@@ -60,28 +62,20 @@ class MenuScene:
             return cast(pygame.Surface, self.title_font.render(text, True, color))
         return cast(pygame.Surface, self.option_font.render(text, True, color))
 
+    def _on_selection_changed(self):
+        """Hook for subclasses when the selected option changes."""
+        self.quit_confirm = False
+
     def handle_event(self, event):
         """Handles user input for menu navigation.
 
         Args:
             event: The pygame event to handle.
         """
-        if event.type == pygame.MOUSEMOTION:
-            hovered = False
-            for rect, i in self.option_rects:
-                if rect.collidepoint(event.pos):
-                    hovered = True
-                    if self.selected_option != i:
-                        self.sound_system.play_sound("click_select")
-                        self.quit_confirm = False  # Reset confirm if selection changes
-                    self.selected_option = i
+        if self.handle_hover_event(event):
+            return
 
-            if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-        elif event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
                 if rect.collidepoint(event.pos):
                     self._trigger_option(i)
@@ -178,10 +172,7 @@ class MenuScene:
         screen.blit(title_text, title_rect)
 
         # Pulse calculation: varies between 0 and 1
-        pulse = (math.sin(self.time * 5) + 1) / 2
-        # Interpolate between dim yellow (150, 150, 0) and bright yellow (255, 255, 0)
-        yellow_val = 150 + int(105 * pulse)
-        pulse_color = (yellow_val, yellow_val, 0)
+        pulse_color = get_pulse_color(self.time, (150, 150, 0), (255, 255, 0))
 
         self.option_rects.clear()
         for i, option in enumerate(self.menu_options):

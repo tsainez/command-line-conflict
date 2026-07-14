@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 from heapq import heappop, heappush
 from typing import Dict, List, Tuple
