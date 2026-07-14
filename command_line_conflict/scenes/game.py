@@ -149,32 +149,7 @@ class GameScene:
             # Player 2 units (AI) - Mission 1: Single Rover in center
             factories.create_rover(self.game_state, 20, 15, player_id=2, is_human=False)
 
-    def handle_event(self, event):
-        """Handles user input and other events for the game scene.
-
-        This includes mouse clicks for selection and movement, as well as
-        keyboard shortcuts for creating units and quitting the game.
-
-        Args:
-            event: The pygame event to handle.
-        """
-        # Pass event to chat system first
-        if self.chat_system.handle_event(event):
-            return
-
-        log.debug(f"Handling event: {event}")
-
-        # R and A are context-sensitive hotkeys shared between two actions:
-        #   - Chassis selected:            R/A = build a factory (consumes the chassis).
-        #   - Arachnotron Factory selected: R/A = train a Rover / Arachnotron.
-        # Construction takes priority and consumes the keypress. Without the
-        # early return, a mixed selection (chassis + factory) would trigger
-        # BOTH actions from a single keypress and double-spend scrap.
-        if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_r, pygame.K_a):
-                if self._handle_construction(event.key):
-                    return
-
+    def _handle_mouse_click(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.selection_start = event.pos
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1 and self.selection_start:
@@ -272,225 +247,268 @@ class GameScene:
                         attack = components.get(Attack)
                         if attack:
                             attack.attack_target = None
-        elif event.type == pygame.KEYDOWN:
-            # Camera movement
-            if event.key == pygame.K_UP:
-                self.camera_movement["up"] = True
-            elif event.key == pygame.K_DOWN:
-                self.camera_movement["down"] = True
-            elif event.key == pygame.K_LEFT:
-                self.camera_movement["left"] = True
-            elif event.key == pygame.K_RIGHT:
-                self.camera_movement["right"] = True
-            else:
+
+    def _handle_key_down(self, event):
+        # Camera movement
+        if event.key == pygame.K_UP:
+            self.camera_movement["up"] = True
+        elif event.key == pygame.K_DOWN:
+            self.camera_movement["down"] = True
+        elif event.key == pygame.K_LEFT:
+            self.camera_movement["left"] = True
+        elif event.key == pygame.K_RIGHT:
+            self.camera_movement["right"] = True
+        else:
+            if config.DEBUG:
+                mods = pygame.key.get_mods()
+                if mods & pygame.KMOD_CTRL:
+                    mx, my = pygame.mouse.get_pos()
+                    gx, gy = self.camera.screen_to_grid(mx, my)
+                    if event.key == pygame.K_1:
+                        factories.create_extractor(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+                    elif event.key == pygame.K_2:
+                        factories.create_chassis(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+                    elif event.key == pygame.K_3:
+                        factories.create_rover(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+                    elif event.key == pygame.K_4:
+                        factories.create_arachnotron(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+                    elif event.key == pygame.K_5:
+                        factories.create_observer(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+                    elif event.key == pygame.K_6:
+                        factories.create_immortal(
+                            self.game_state,
+                            gx,
+                            gy,
+                            player_id=self.current_player_id,
+                            is_human=True,
+                        )
+
+                # Debug cheats
                 if config.DEBUG:
-                    mods = pygame.key.get_mods()
-                    if mods & pygame.KMOD_CTRL:
-                        mx, my = pygame.mouse.get_pos()
-                        gx, gy = self.camera.screen_to_grid(mx, my)
-                        if event.key == pygame.K_1:
-                            factories.create_extractor(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
-                        elif event.key == pygame.K_2:
-                            factories.create_chassis(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
-                        elif event.key == pygame.K_3:
-                            factories.create_rover(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
-                        elif event.key == pygame.K_4:
-                            factories.create_arachnotron(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
-                        elif event.key == pygame.K_5:
-                            factories.create_observer(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
-                        elif event.key == pygame.K_6:
-                            factories.create_immortal(
-                                self.game_state,
-                                gx,
-                                gy,
-                                player_id=self.current_player_id,
-                                is_human=True,
-                            )
+                    if event.key == pygame.K_F1:
+                        self.cheats["reveal_map"] = not self.cheats["reveal_map"]
+                        status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
+                        log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
+                        self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
+                    elif event.key == pygame.K_F2:
+                        self.cheats["god_mode"] = not self.cheats["god_mode"]
+                        status = "Enabled" if self.cheats["god_mode"] else "Disabled"
+                        log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
+                        self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
+                    elif event.key == pygame.K_TAB:
+                        # Security: Gated side-switching feature behind config.DEBUG to prevent unauthorized access
+                        self.selection_system.clear_selection(self.game_state)
+                        if self.current_player_id == 1:
+                            self.current_player_id = 2
+                        else:
+                            self.current_player_id = 1
+                        log.info(f"Switched to player {self.current_player_id}")
+                        self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
 
-                    # Debug cheats
-                    if config.DEBUG:
-                        if event.key == pygame.K_F1:
-                            self.cheats["reveal_map"] = not self.cheats["reveal_map"]
-                            status = "Enabled" if self.cheats["reveal_map"] else "Disabled"
-                            log.info(f"Cheat 'Reveal Map' toggled: {self.cheats['reveal_map']}")
-                            self.chat_system.add_message(f"Cheat: Map Reveal {status}", (255, 0, 255))
-                        elif event.key == pygame.K_F2:
-                            self.cheats["god_mode"] = not self.cheats["god_mode"]
-                            status = "Enabled" if self.cheats["god_mode"] else "Disabled"
-                            log.info(f"Cheat 'God Mode' toggled: {self.cheats['god_mode']}")
-                            self.chat_system.add_message(f"Cheat: God Mode {status}", (255, 0, 255))
-                        elif event.key == pygame.K_TAB:
-                            # Security: Gated side-switching feature behind config.DEBUG to prevent unauthorized access
-                            self.selection_system.clear_selection(self.game_state)
-                            if self.current_player_id == 1:
-                                self.current_player_id = 2
-                            else:
-                                self.current_player_id = 1
-                            log.info(f"Switched to player {self.current_player_id}")
-                            self.chat_system.add_message(f"Switched to player {self.current_player_id}", (255, 0, 255))
-
-                if event.key == pygame.K_c:
-                    selected_factories = []
-                    for entity_id in self.game_state.get_entities_with_component(Selectable):
-                        components = self.game_state.entities.get(entity_id)
-                        if not components:
-                            continue
-                        selectable = components.get(Selectable)
-                        identity = components.get(UnitIdentity)
-                        player = components.get(Player)
-                        if player and player.player_id == self.current_player_id:
-                            if selectable and selectable.is_selected:
-                                if identity and (
-                                    "factory" in identity.name or identity.name in ("rover_factory", "arachnotron_factory")
-                                ):
-                                    selected_factories.append(entity_id)
-
-                    if selected_factories:
-                        self._train_chassis_at_factory(selected_factories[0])
-
-                if event.key == pygame.K_t:
-                    selected_rover_factories = []
-                    for entity_id in self.game_state.get_entities_with_component(Selectable):
-                        components = self.game_state.entities.get(entity_id)
-                        if not components:
-                            continue
-                        selectable = components.get(Selectable)
-                        identity = components.get(UnitIdentity)
-                        player = components.get(Player)
-                        if player and player.player_id == self.current_player_id:
-                            if selectable and selectable.is_selected:
-                                if identity and identity.name == "rover_factory":
-                                    selected_rover_factories.append(entity_id)
-
-                    if selected_rover_factories:
-                        self._research_arachnotron_at_factory(selected_rover_factories[0])
-
-                if event.key == pygame.K_r:
-                    selected_arachnotron_factories = []
-                    for entity_id in self.game_state.get_entities_with_component(Selectable):
-                        components = self.game_state.entities.get(entity_id)
-                        if not components:
-                            continue
-                        selectable = components.get(Selectable)
-                        identity = components.get(UnitIdentity)
-                        player = components.get(Player)
-                        if player and player.player_id == self.current_player_id:
-                            if selectable and selectable.is_selected:
-                                if identity and identity.name == "arachnotron_factory":
-                                    selected_arachnotron_factories.append(entity_id)
-
-                    if selected_arachnotron_factories:
-                        self._train_rover_at_factory(selected_arachnotron_factories[0])
-
-                if event.key == pygame.K_a:
-                    selected_arachnotron_factories = []
-                    for entity_id in self.game_state.get_entities_with_component(Selectable):
-                        components = self.game_state.entities.get(entity_id)
-                        if not components:
-                            continue
-                        selectable = components.get(Selectable)
-                        identity = components.get(UnitIdentity)
-                        player = components.get(Player)
-                        if player and player.player_id == self.current_player_id:
-                            if selectable and selectable.is_selected:
-                                if identity and identity.name == "arachnotron_factory":
-                                    selected_arachnotron_factories.append(entity_id)
-
-                    if selected_arachnotron_factories:
-                        self._train_arachnotron_at_factory(selected_arachnotron_factories[0])
-
-                if event.key == pygame.K_h:
-                    # Hold Position
-                    self.chat_system.add_message("Hold Position command issued", (255, 255, 0))
-                    from command_line_conflict.components.movable import Movable
-
-                    for entity_id in self.game_state.get_entities_with_component(Selectable):
-                        components = self.game_state.entities.get(entity_id)
-                        if not components:
-                            continue
-
-                        selectable = components.get(Selectable)
+            if event.key == pygame.K_c:
+                selected_factories = []
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+                    selectable = components.get(Selectable)
+                    identity = components.get(UnitIdentity)
+                    player = components.get(Player)
+                    if player and player.player_id == self.current_player_id:
                         if selectable and selectable.is_selected:
-                            movable = components.get(Movable)
-                            if movable:
-                                movable.hold_position = True
-                                movable.path = []
-                                movable.target_x = None
-                                movable.target_y = None
-                                log.info(f"Entity {entity_id} holding position")
+                            if identity and (
+                                "factory" in identity.name or identity.name in ("rover_factory", "arachnotron_factory")
+                            ):
+                                selected_factories.append(entity_id)
 
-                elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
-                    self.paused = not self.paused
-                elif event.key == pygame.K_ESCAPE:
-                    self.game.scene_manager.switch_to("menu")
+                if selected_factories:
+                    self._train_chassis_at_factory(selected_factories[0])
+
+            if event.key == pygame.K_t:
+                selected_rover_factories = []
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+                    selectable = components.get(Selectable)
+                    identity = components.get(UnitIdentity)
+                    player = components.get(Player)
+                    if player and player.player_id == self.current_player_id:
+                        if selectable and selectable.is_selected:
+                            if identity and identity.name == "rover_factory":
+                                selected_rover_factories.append(entity_id)
+
+                if selected_rover_factories:
+                    self._research_arachnotron_at_factory(selected_rover_factories[0])
+
+            if event.key == pygame.K_r:
+                selected_arachnotron_factories = []
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+                    selectable = components.get(Selectable)
+                    identity = components.get(UnitIdentity)
+                    player = components.get(Player)
+                    if player and player.player_id == self.current_player_id:
+                        if selectable and selectable.is_selected:
+                            if identity and identity.name == "arachnotron_factory":
+                                selected_arachnotron_factories.append(entity_id)
+
+                if selected_arachnotron_factories:
+                    self._train_rover_at_factory(selected_arachnotron_factories[0])
+
+            if event.key == pygame.K_a:
+                selected_arachnotron_factories = []
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+                    selectable = components.get(Selectable)
+                    identity = components.get(UnitIdentity)
+                    player = components.get(Player)
+                    if player and player.player_id == self.current_player_id:
+                        if selectable and selectable.is_selected:
+                            if identity and identity.name == "arachnotron_factory":
+                                selected_arachnotron_factories.append(entity_id)
+
+                if selected_arachnotron_factories:
+                    self._train_arachnotron_at_factory(selected_arachnotron_factories[0])
+
+            if event.key == pygame.K_h:
+                # Hold Position
+                self.chat_system.add_message("Hold Position command issued", (255, 255, 0))
+                from command_line_conflict.components.movable import Movable
+
+                for entity_id in self.game_state.get_entities_with_component(Selectable):
+                    components = self.game_state.entities.get(entity_id)
+                    if not components:
+                        continue
+
+                    selectable = components.get(Selectable)
+                    if selectable and selectable.is_selected:
+                        movable = components.get(Movable)
+                        if movable:
+                            movable.hold_position = True
+                            movable.path = []
+                            movable.target_x = None
+                            movable.target_y = None
+                            log.info(f"Entity {entity_id} holding position")
+
+            elif event.key == pygame.K_p or event.key == pygame.K_SPACE:
+                self.paused = not self.paused
+            elif event.key == pygame.K_ESCAPE:
+                self.game.scene_manager.switch_to("menu")
+
+    def _handle_key_up(self, event):
+        if event.key == pygame.K_UP:
+            self.camera_movement["up"] = False
+        elif event.key == pygame.K_DOWN:
+            self.camera_movement["down"] = False
+        elif event.key == pygame.K_LEFT:
+            self.camera_movement["left"] = False
+        elif event.key == pygame.K_RIGHT:
+            self.camera_movement["right"] = False
+
+    def _handle_mouse_button_down(self, event):
+        if event.button == 4:  # Scroll up
+            self.camera.zoom_in(0.1)
+        elif event.button == 5:  # Scroll down
+            self.camera.zoom_out(0.1)
+        elif event.button == 2:  # Middle mouse click (start drag)
+            self.drag_start_pos = event.pos
+            self.camera_start_pos = (self.camera.x, self.camera.y)
+
+    def _handle_mouse_button_up(self, event):
+        if event.button == 2:  # Middle mouse release (end drag)
+            self.drag_start_pos = None
+            self.camera_start_pos = None
+
+    def _handle_mouse_motion(self, event):
+        self._update_cursor(event.pos)
+        if self.drag_start_pos and self.camera_start_pos:
+            # Middle mouse drag logic
+            dx = event.pos[0] - self.drag_start_pos[0]
+            dy = event.pos[1] - self.drag_start_pos[1]
+
+            # Convert screen delta to grid delta
+            # When dragging the "world", if I move mouse RIGHT (positive dx),
+            # the camera should move LEFT (decrease x) to "pull" the world.
+
+            grid_dx = dx / (config.GRID_SIZE * self.camera.zoom)
+            grid_dy = dy / (config.GRID_SIZE * self.camera.zoom)
+
+            self.camera.x = self.camera_start_pos[0] - grid_dx
+            self.camera.y = self.camera_start_pos[1] - grid_dy
+
+    def handle_event(self, event):
+        """Handles user input and other events for the game scene.
+
+        This includes mouse clicks for selection and movement, as well as
+        keyboard shortcuts for creating units and quitting the game.
+
+        Args:
+            event: The pygame event to handle.
+        """
+        # Pass event to chat system first
+        if self.chat_system.handle_event(event):
+            return
+
+        log.debug(f"Handling event: {event}")
+
+        # R and A are context-sensitive hotkeys shared between two actions:
+        #   - Chassis selected:            R/A = build a factory (consumes the chassis).
+        #   - Arachnotron Factory selected: R/A = train a Rover / Arachnotron.
+        # Construction takes priority and consumes the keypress. Without the
+        # early return, a mixed selection (chassis + factory) would trigger
+        # BOTH actions from a single keypress and double-spend scrap.
+        if event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_r, pygame.K_a):
+                if self._handle_construction(event.key):
+                    return
+
+        if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP) and event.button in (1, 3):
+            self._handle_mouse_click(event)
+        elif event.type == pygame.KEYDOWN:
+            self._handle_key_down(event)
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP:
-                self.camera_movement["up"] = False
-            elif event.key == pygame.K_DOWN:
-                self.camera_movement["down"] = False
-            elif event.key == pygame.K_LEFT:
-                self.camera_movement["left"] = False
-            elif event.key == pygame.K_RIGHT:
-                self.camera_movement["right"] = False
-        # Camera zoom (mouse wheel) and middle mouse drag
+            self._handle_key_up(event)
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 4:  # Scroll up
-                self.camera.zoom_in(0.1)
-            elif event.button == 5:  # Scroll down
-                self.camera.zoom_out(0.1)
-            elif event.button == 2:  # Middle mouse click (start drag)
-                self.drag_start_pos = event.pos
-                self.camera_start_pos = (self.camera.x, self.camera.y)
+            self._handle_mouse_button_down(event)
         elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 2:  # Middle mouse release (end drag)
-                self.drag_start_pos = None
-                self.camera_start_pos = None
+            self._handle_mouse_button_up(event)
         elif event.type == pygame.MOUSEMOTION:
-            self._update_cursor(event.pos)
-            if self.drag_start_pos and self.camera_start_pos:
-                # Middle mouse drag logic
-                dx = event.pos[0] - self.drag_start_pos[0]
-                dy = event.pos[1] - self.drag_start_pos[1]
-
-                # Convert screen delta to grid delta
-                # When dragging the "world", if I move mouse RIGHT (positive dx),
-                # the camera should move LEFT (decrease x) to "pull" the world.
-
-                grid_dx = dx / (config.GRID_SIZE * self.camera.zoom)
-                grid_dy = dy / (config.GRID_SIZE * self.camera.zoom)
-
-                self.camera.x = self.camera_start_pos[0] - grid_dx
-                self.camera.y = self.camera_start_pos[1] - grid_dy
+            self._handle_mouse_motion(event)
 
     def _update_cursor(self, screen_pos: tuple[int, int]) -> None:
         """Updates the mouse cursor based on what is under the mouse."""
