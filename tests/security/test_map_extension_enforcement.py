@@ -40,3 +40,15 @@ def test_save_map_valid_extension(tmp_path):
     except ValueError as e:
         assert "Map files must have a .json extension" not in str(e)
         # It likely failed with "Cannot save to unauthorized location" or similar
+
+
+def test_load_map_invalid_extension():
+    """Verify that loading a map with a non-json extension raises a ValueError."""
+    with pytest.raises(ValueError, match="Map files must have a .json extension"):
+        Map.load_from_file("test_map.py")
+
+    with pytest.raises(ValueError, match="Map files must have a .json extension"):
+        Map.load_from_file("test_map.txt")
+
+    with pytest.raises(ValueError, match="Map files must have a .json extension"):
+        Map.load_from_file("test_map")
