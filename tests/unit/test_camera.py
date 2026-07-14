@@ -1,3 +1,5 @@
+import pytest
+
 from command_line_conflict.camera import Camera
 
 
@@ -24,3 +26,32 @@ def test_screen_to_grid():
 
     assert grid_x == expected_grid_x
     assert grid_y == expected_grid_y
+
+
+def test_zoom_operations():
+    camera = Camera(zoom=1.0, min_zoom=0.5, max_zoom=2.0)
+
+    camera.zoom_in(0.2)
+    assert camera.zoom == pytest.approx(1.2)
+
+    camera.zoom_out(0.4)
+    assert camera.zoom == pytest.approx(0.8)
+
+    camera.set_zoom(1.5)
+    assert camera.zoom == pytest.approx(1.5)
+
+
+def test_zoom_boundaries():
+    camera = Camera(zoom=1.0, min_zoom=0.5, max_zoom=2.0)
+
+    camera.zoom_in(5.0)
+    assert camera.zoom == 2.0
+
+    camera.zoom_out(5.0)
+    assert camera.zoom == 0.5
+
+    camera.set_zoom(5.0)
+    assert camera.zoom == 2.0
+
+    camera.set_zoom(0.1)
+    assert camera.zoom == 0.5
