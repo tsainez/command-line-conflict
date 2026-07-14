@@ -36,3 +36,9 @@
 ## 2026-07-14 - Optimize win/loss condition checks
 **Learning:** Checking game-ending conditions (which iterate over a large number of entities) every single frame can be computationally expensive and is often unnecessary, as these events do not need frame-perfect resolution.
 **Action:** Throttle the execution of these checks using a timer (e.g., executing twice a second) rather than running them in the main per-frame update loop to drastically reduce CPU overhead.
+## $(date +%Y-%m-%d) - Cached Blocking Obstacles in Movement Update
+**Learning:** Iterating over spatial maps to filter components (e.g. `get_blocking_obstacles`) is O(N) where N is map items. Calling this inside a loop over M movable entities makes it O(N*M).
+**Action:** When a method returns environment data that does not change within a single tick/frame, compute it lazily once per frame and cache it for subsequent uses in the same loop.
+## 2024-07-14 - Optimize Component Iteration Speed
+**Learning:** Component filtering loops using `.get()` repeatedly on entity dictionaries are significantly slower than direct dictionary access and fast-failing. Short-circuiting condition checks early (e.g., checking `UnitIdentity.name` before looking up `Player` components) saves operations.
+**Action:** In game update/render loops, prioritize direct dictionary lookup `entities[eid]` when an entity is known to exist, and structure `if` statements to evaluate the most discriminative conditions first.
