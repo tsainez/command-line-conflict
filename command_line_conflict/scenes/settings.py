@@ -7,11 +7,12 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.utils.color import get_pulse_color
 from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.ui.menu_hover_mixin import MenuHoverMixin
 
 from ..logger import log
 
 
-class SettingsScene:
+class SettingsScene(MenuHoverMixin):
     """Manages the settings menu, allowing players to change game options."""
 
     def __init__(self, game):
@@ -81,21 +82,10 @@ class SettingsScene:
         Args:
             event: The pygame event to handle.
         """
-        if event.type == pygame.MOUSEMOTION:
-            hovered = False
-            for rect, i in self.option_rects:
-                if rect.collidepoint(event.pos):
-                    hovered = True
-                    if self.selected_option != i:
-                        self.sound_system.play_sound("click_select")
-                    self.selected_option = i
+        if self.handle_hover_event(event):
+            return
 
-            if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-        elif event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONUP:
             # Buttons 4/5 are legacy scroll-wheel events. Before this check,
             # a wheel tick over ANY row activated it (toggling Mute, leaving
             # via Back...), and over a volume row the direction came from the
