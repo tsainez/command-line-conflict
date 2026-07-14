@@ -442,14 +442,12 @@ class UISystem:
                     chassis_count = 0
 
                     for eid in game_state.get_entities_with_component(UnitIdentity):
-                        ent_components = game_state.entities.get(eid)
-                        if not ent_components:
-                            continue
+                        ent_components = game_state.entities[eid]
                         ident = ent_components.get(UnitIdentity)
-                        plyr = ent_components.get(Player)
-                        is_dead = ent_components.get(Dead) is not None
-                        if ident and ident.name == "chassis" and plyr and plyr.player_id == current_player_id and not is_dead:
-                            chassis_count += 1
+                        if ident and ident.name == "chassis":
+                            plyr = ent_components.get(Player)
+                            if plyr and plyr.player_id == current_player_id and Dead not in ent_components:
+                                chassis_count += 1
 
                     resources = getattr(game_state, "resources", {}).get(current_player_id, 0)
                     req_text = f"T: Research Arachnotron (100 Scrap) [Req: 6 Chassis, Have {chassis_count}]"
