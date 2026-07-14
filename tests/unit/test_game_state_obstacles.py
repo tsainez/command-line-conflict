@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock
-from command_line_conflict.game_state import GameState
+
 from command_line_conflict.components.dead import Dead
 from command_line_conflict.components.resource_deposit import ResourceDeposit
+from command_line_conflict.game_state import GameState
+
 
 class TestGameStateObstacles:
     def test_get_blocking_obstacles(self):
@@ -10,11 +12,11 @@ class TestGameStateObstacles:
 
         # Setup spatial map with various entities
         game_state.spatial_map = {
-            (0, 0): {1}, # 1 is Dead -> no blocking
-            (1, 1): {2}, # 2 is ResourceDeposit -> no blocking
-            (2, 2): {3}, # 3 is neither -> blocking
-            (3, 3): {4, 5}, # 4 is Dead, 5 is neither -> blocking
-            (4, 4): {6, 7}  # 6 is Dead, 7 is ResourceDeposit -> no blocking
+            (0, 0): {1},  # 1 is Dead -> no blocking
+            (1, 1): {2},  # 2 is ResourceDeposit -> no blocking
+            (2, 2): {3},  # 3 is neither -> blocking
+            (3, 3): {4, 5},  # 4 is Dead, 5 is neither -> blocking
+            (4, 4): {6, 7},  # 6 is Dead, 7 is ResourceDeposit -> no blocking
         }
 
         # Mock get_component to simulate entity properties
@@ -26,7 +28,7 @@ class TestGameStateObstacles:
                 4: {Dead: MagicMock()},
                 5: {},
                 6: {Dead: MagicMock()},
-                7: {ResourceDeposit: MagicMock()}
+                7: {ResourceDeposit: MagicMock()},
             }
             return components.get(eid, {}).get(component_type, None)
 
