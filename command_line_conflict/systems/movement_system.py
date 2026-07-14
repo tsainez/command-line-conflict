@@ -71,6 +71,9 @@ class MovementSystem:
             game_state: The current state of the game.
             dt: The time elapsed since the last frame.
         """
+        # Cache for blocking obstacles to avoid redundant calculations per frame
+        blocking_obstacles_cache = None
+
         # Optimized to iterate only over entities with Movable component
         for entity_id in game_state.get_entities_with_component(Movable):
             components = game_state.entities.get(entity_id)
@@ -103,7 +106,10 @@ class MovementSystem:
                         end_node = (int(movable.target_x), int(movable.target_y))
                         if start_node != end_node:
                             # Use spatial map directly and exclude the target
-                            extra_obstacles = game_state.get_blocking_obstacles()
+                            if blocking_obstacles_cache is None:
+                                blocking_obstacles_cache = game_state.get_blocking_obstacles()
+
+                            extra_obstacles = blocking_obstacles_cache
                             exclude_obstacles = {end_node}
 
                             movable.path = game_state.map.find_path(
