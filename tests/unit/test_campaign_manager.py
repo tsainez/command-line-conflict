@@ -3,13 +3,14 @@ from unittest.mock import patch
 
 from command_line_conflict.campaign_manager import CampaignManager
 
+
 class TestCampaignManager(unittest.TestCase):
     def setUp(self):
         # Prevent accessing user data dir and migrating
         self.patcher = patch("command_line_conflict.campaign_manager.get_user_data_dir")
         self.mock_get_dir = self.patcher.start()
         # Mock load_progress to prevent reading
-        self.load_patcher = patch.object(CampaignManager, 'load_progress')
+        self.load_patcher = patch.object(CampaignManager, "load_progress")
         self.mock_load = self.load_patcher.start()
 
     def tearDown(self):
