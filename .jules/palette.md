@@ -95,7 +95,3 @@
 ## 2026-05-25 - Rapid Pagination Support in FileDialog
 **Learning:** For scrollable lists that can grow significantly (like save files or levels), standard arrow-key navigation (up/down one item at a time) becomes tedious and a barrier to efficient keyboard navigation.
 **Action:** When implementing or enhancing scrollable UI components, always support rapid pagination using `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`. Calculate the pagination jump size logically based on the visible view bounds (e.g., jump by `max_visible_files`) and ensure helper text is updated to clearly communicate this capability to the user.
-
-## 2024-07-10 - FileDialog Disabled State Feedback
-**Learning:** The FileDialog's action buttons (Save/Load) silently appear disabled without contextual feedback when no filename is provided, leaving users guessing. This pattern is specific to how custom Pygame UI elements handle interaction states in this app.
-**Action:** Always implement a contextual tooltip with a semi-transparent background near disabled interactive elements on hover (e.g., explaining "Filename required") to clarify the expected system state and improve discoverability.

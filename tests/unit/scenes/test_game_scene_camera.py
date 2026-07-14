@@ -15,12 +15,13 @@ class TestGameSceneCamera(unittest.TestCase):
 
         # Patch factories to avoid actual game state complexity
         with patch("command_line_conflict.scenes.game.factories"):
-            with patch("command_line_conflict.scenes.game.FogOfWar"):
-                with patch("command_line_conflict.scenes.game.RenderingSystem"):
-                    with patch("command_line_conflict.scenes.game.UISystem"):
-                        with patch("command_line_conflict.scenes.game.ChatSystem"):
-                            self.scene = GameScene(self.mock_game)
-                            self.scene.chat_system.handle_event.return_value = False
+            with patch("command_line_conflict.scenes.game.SimpleMap"):
+                with patch("command_line_conflict.scenes.game.FogOfWar"):
+                    with patch("command_line_conflict.scenes.game.RenderingSystem"):
+                        with patch("command_line_conflict.scenes.game.UISystem"):
+                            with patch("command_line_conflict.scenes.game.ChatSystem"):
+                                self.scene = GameScene(self.mock_game)
+                                self.scene.chat_system.handle_event.return_value = False
 
     def test_wasd_does_not_control_camera(self):
         # W key (Up) should NOT work
