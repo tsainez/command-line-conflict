@@ -72,6 +72,8 @@ class GameScene:
         self.mission_started = False
         self.mission_over = False
 
+        self.win_loss_check_timer = 0.0
+
         # Cheats
         self.cheats = {
             "reveal_map": False,
@@ -951,10 +953,13 @@ class GameScene:
                 vision_units.append(SimpleNamespace(x=pos.x, y=pos.y, vision_range=vis.vision_range))
         self.fog_of_war.update(vision_units)
 
-        if self.check_win_condition():
-            self.game.scene_manager.switch_to("victory")
-        elif self.check_loss_condition():
-            self.game.scene_manager.switch_to("defeat")
+        self.win_loss_check_timer += dt
+        if self.win_loss_check_timer >= 0.5:
+            self.win_loss_check_timer = 0.0
+            if self.check_win_condition():
+                self.game.scene_manager.switch_to("victory")
+            elif self.check_loss_condition():
+                self.game.scene_manager.switch_to("defeat")
 
     def check_win_condition(self) -> bool:
         """Checks if the player has won the level.

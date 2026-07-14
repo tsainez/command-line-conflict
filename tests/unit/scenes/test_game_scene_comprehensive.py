@@ -293,7 +293,7 @@ class TestGameSceneHandleEvent:
 class TestGameSceneUpdate:
     def test_update_paused(self, game_scene):
         game_scene.paused = True
-        game_scene.update(0.1)
+        game_scene.update(0.5)
 
         # Systems should not update when paused
         game_scene.mock_movement_system.update.assert_not_called()
@@ -325,7 +325,7 @@ class TestGameSceneUpdate:
         # Setup no enemies
         game_scene.game_state.entities = {1: {Player: MagicMock(player_id=1, is_human=True), Health: MagicMock()}}
 
-        game_scene.update(0.1)
+        game_scene.update(0.5)
 
         mock_game.scene_manager.switch_to.assert_called_with("victory")
         mock_game.steam.unlock_achievement.assert_called_with("VICTORY")
@@ -335,7 +335,7 @@ class TestGameSceneUpdate:
         # Setup no player units
         game_scene.game_state.entities = {2: {Player: MagicMock(player_id=2, is_human=False), Health: MagicMock()}}
 
-        game_scene.update(0.1)
+        game_scene.update(0.5)
 
         mock_game.scene_manager.switch_to.assert_called_with("defeat")
         mock_game.steam.unlock_achievement.assert_called_with("DEFEAT")
@@ -351,7 +351,7 @@ class TestGameSceneUpdate:
             },
         }
 
-        game_scene.update(0.1)
+        game_scene.update(0.5)
 
         # Verify fog of war updated with only human units
         assert game_scene.mock_fog_of_war.update.call_count == 1

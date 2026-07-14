@@ -33,3 +33,6 @@
 ## 2024-06-21 - [Early returns for win/loss conditions]
 **Learning:** Accumulating counts to check if ANY entity exists (e.g. `enemy_count == 0` for win conditions) forces O(N) iteration over all units every frame.
 **Action:** Use an early return (`return False`) as soon as the first satisfying entity is found. This converts an O(N) check into O(1) for the average frame.
+## 2026-07-14 - Optimize win/loss condition checks
+**Learning:** Checking game-ending conditions (which iterate over a large number of entities) every single frame can be computationally expensive and is often unnecessary, as these events do not need frame-perfect resolution.
+**Action:** Throttle the execution of these checks using a timer (e.g., executing twice a second) rather than running them in the main per-frame update loop to drastically reduce CPU overhead.
