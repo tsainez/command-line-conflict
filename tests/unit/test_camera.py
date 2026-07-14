@@ -1,6 +1,34 @@
 from command_line_conflict.camera import Camera
 
 
+def test_camera_move():
+    camera = Camera(x=10, y=20)
+
+    camera.move(5, -10)
+    assert camera.x == 15
+    assert camera.y == 10
+
+    camera.move(-20, 0)
+    assert camera.x == -5
+    assert camera.y == 10
+
+    camera.move(0, 0)
+    assert camera.x == -5
+    assert camera.y == 10
+
+
+def test_camera_set_position():
+    camera = Camera(x=10, y=20)
+
+    camera.set_position(100, 200)
+    assert camera.x == 100
+    assert camera.y == 200
+
+    camera.set_position(-50, -50)
+    assert camera.x == -50
+    assert camera.y == -50
+
+
 def test_screen_to_grid():
     # Arrange
     camera = Camera(x=10, y=20, zoom=2.0)

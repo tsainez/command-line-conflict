@@ -22,6 +22,12 @@ FPS = 60
 # The speed of the camera movement.
 CAMERA_SPEED = 10
 
+# Number of RTS-style control groups available to the player (hotkeys 1-9, 0).
+NUM_CONTROL_GROUPS = 10
+# Maximum interval (ms) between two control-group key presses that counts as a
+# double-press, which snaps the camera to that group.
+CONTROL_GROUP_DOUBLE_TAP_MS = 400
+
 # A dictionary mapping player IDs to their colors.
 PLAYER_COLORS = {
     0: (128, 128, 128),  # Grey (Neutral)

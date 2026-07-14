@@ -324,3 +324,16 @@ class FileDialog:
         btn_text_color = (255, 255, 255) if action_enabled else (200, 200, 200)
         btn_surf = self.font.render(btn_text, True, btn_text_color)
         self.screen.blit(btn_surf, (self.action_button_rect.x + 10, self.action_button_rect.y + 5))
+
+        if not action_enabled and self.hovered_element == "action":
+            tooltip_text = "Filename required"
+            tooltip_size = self.font.size(tooltip_text)
+            tooltip_surf = pygame.Surface((tooltip_size[0] + 10, tooltip_size[1] + 10), pygame.SRCALPHA)
+            tooltip_surf.fill((0, 0, 0, 200))
+
+            text_surf = self.font.render(tooltip_text, True, (255, 255, 255))
+            tooltip_surf.blit(text_surf, (5, 5))
+
+            tooltip_x = self.action_button_rect.x - tooltip_size[0] - 15
+            tooltip_y = self.action_button_rect.y + (self.action_button_rect.height - tooltip_size[1]) // 2 - 5
+            self.screen.blit(tooltip_surf, (tooltip_x, tooltip_y))
