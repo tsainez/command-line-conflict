@@ -1,5 +1,4 @@
 import functools
-import math
 from typing import cast
 
 import pygame
@@ -7,9 +6,10 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.systems.sound_system import SoundSystem
+from .base import BaseScene
 
 
-class MenuScene:
+class MenuScene(BaseScene):
     """Manages the main menu scene, allowing navigation to other scenes."""
 
     def __init__(self, game):
@@ -173,15 +173,7 @@ class MenuScene:
         """
         screen.fill((0, 0, 0))
 
-        title_text = self._get_text_surface("Command Line Conflict", (255, 255, 255), "title")
-        title_rect = title_text.get_rect(center=(self.game.screen.get_width() / 2, 100))
-        screen.blit(title_text, title_rect)
-
-        # Pulse calculation: varies between 0 and 1
-        pulse = (math.sin(self.time * 5) + 1) / 2
-        # Interpolate between dim yellow (150, 150, 0) and bright yellow (255, 255, 0)
-        yellow_val = 150 + int(105 * pulse)
-        pulse_color = (yellow_val, yellow_val, 0)
+        pulse_color = self._draw_pulsing_title(screen, "Command Line Conflict", self.time)
 
         self.option_rects.clear()
         for i, option in enumerate(self.menu_options):
