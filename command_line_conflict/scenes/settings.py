@@ -8,9 +8,10 @@ from command_line_conflict import config
 from command_line_conflict.systems.sound_system import SoundSystem
 
 from ..logger import log
+from command_line_conflict.ui.menu_mixin import MenuHoverMixin
 
 
-class SettingsScene:
+class SettingsScene(MenuHoverMixin):
     """Manages the settings menu, allowing players to change game options."""
 
     def __init__(self, game):
@@ -81,18 +82,7 @@ class SettingsScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.MOUSEMOTION:
-            hovered = False
-            for rect, i in self.option_rects:
-                if rect.collidepoint(event.pos):
-                    hovered = True
-                    if self.selected_option != i:
-                        self.sound_system.play_sound("click_select")
-                    self.selected_option = i
-
-            if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            self.handle_mouse_hover(event.pos)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             # Buttons 4/5 are legacy scroll-wheel events. Before this check,

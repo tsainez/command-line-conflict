@@ -7,9 +7,10 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.campaign_manager import CampaignManager
 from command_line_conflict.systems.sound_system import SoundSystem
+from command_line_conflict.ui.menu_mixin import MenuHoverMixin
 
 
-class MenuScene:
+class MenuScene(MenuHoverMixin):
     """Manages the main menu scene, allowing navigation to other scenes."""
 
     def __init__(self, game):
@@ -67,19 +68,7 @@ class MenuScene:
             event: The pygame event to handle.
         """
         if event.type == pygame.MOUSEMOTION:
-            hovered = False
-            for rect, i in self.option_rects:
-                if rect.collidepoint(event.pos):
-                    hovered = True
-                    if self.selected_option != i:
-                        self.sound_system.play_sound("click_select")
-                        self.quit_confirm = False  # Reset confirm if selection changes
-                    self.selected_option = i
-
-            if hovered:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            else:
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            self.handle_mouse_hover(event.pos)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             for rect, i in self.option_rects:
