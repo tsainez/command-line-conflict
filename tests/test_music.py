@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch
 
+import pygame
+
 from command_line_conflict.music import MusicManager
 
 
@@ -67,6 +69,17 @@ class TestMusicManager(unittest.TestCase):
 
         mock_music.load.assert_not_called()
         self.assertIsNone(manager.current_track)
+
+    @patch("command_line_conflict.music.log")
+    @patch("pygame.mixer.music")
+    @patch("pygame.mixer.init")
+    @patch("pygame.mixer.get_init", return_value=True)
+    @patch("os.path.exists", return_value=True)
+    def test_play_music_pygame_error(self, mock_exists, mock_get_init, mock_init, mock_music, mock_log):
+        manager = MusicManager()
+        mock_music.load.side_effect = pygame.error("Test error")
+        manager.play("test.ogg")
+        mock_log.error.assert_called_with("Failed to play music test.ogg: Test error")
 
 
 if __name__ == "__main__":
