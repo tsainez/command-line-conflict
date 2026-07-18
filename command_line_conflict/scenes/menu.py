@@ -43,9 +43,7 @@ class MenuScene:
         self.time = 0.0
 
         # Start menu music
-        # Assuming the music file is in the root or a music folder
-        # For now using a placeholder path
-        self.game.music_manager.play("music/menu_theme.ogg")
+        self.game.music_manager.play("music/menu_theme.mp3")
 
     @functools.lru_cache(maxsize=32)
     def _get_text_surface(self, text: str, color: tuple, font_type: str = "option") -> pygame.Surface:

@@ -5,6 +5,16 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.logger import log
 
+# Relative loudness applied on top of the global SFX volume. The "damage
+# taken" cues (attack landing on a target) stay at full volume; every other
+# effect is dialed down, since spawn/click/victory/defeat otherwise dominate
+# the mix and spawn_unit in particular fires on nearly every game event.
+DEFAULT_VOLUME_SCALE = 0.35
+VOLUME_SCALE_BY_SOUND = {
+    "attack_melee": 1.0,
+    "attack_ranged": 1.0,
+}
+
 
 class SoundSystem:
     """Manages sound effects playback."""
@@ -103,7 +113,8 @@ class SoundSystem:
 
         try:
             sound = pygame.mixer.Sound(filepath)
-            sound.set_volume(self.volume * config.MASTER_VOLUME)
+            scale = VOLUME_SCALE_BY_SOUND.get(name, DEFAULT_VOLUME_SCALE)
+            sound.set_volume(self.volume * config.MASTER_VOLUME * scale)
             self.sounds[name] = sound
         except pygame.error as e:
             log.error(f"Failed to load sound {filepath}: {e}")

@@ -175,7 +175,7 @@ class SettingsScene:
                 config.MUSIC_ENABLED = True
                 self.game.music_manager.enabled = True
                 self.sound_system.enabled = True
-                self.game.music_manager.play("music/menu_theme.ogg")
+                self.game.music_manager.play("music/menu_theme.mp3")
                 log.info("Audio unmuted.")
             else:
                 config.SOUND_ENABLED = False
