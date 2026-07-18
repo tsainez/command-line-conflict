@@ -5,7 +5,6 @@ import pygame
 from command_line_conflict import config
 from command_line_conflict.logger import log
 
-
 # Relative loudness applied on top of the global SFX volume. The "damage
 # taken" cues (attack landing on a target) stay at full volume; every other
 # effect is dialed down, since spawn/click/victory/defeat otherwise dominate

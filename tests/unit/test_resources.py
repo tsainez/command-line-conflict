@@ -186,7 +186,7 @@ def test_settings_scene_mute_audio():
     scene._trigger_option("Mute Audio")
     assert config.SOUND_ENABLED
     assert config.MUSIC_ENABLED
-    mock_game.music_manager.play.assert_called_with("music/menu_theme.ogg")
+    mock_game.music_manager.play.assert_called_with("music/menu_theme.mp3")
 
 
 def test_research_arachnotron_at_factory(game_state):
