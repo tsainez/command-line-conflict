@@ -22,6 +22,7 @@ nav:
   - Security: Security.md
   - Maps: Maps.md
   - Project Structure: ProjectStructure.md
+  - PR Merge Optimizer: PRMergeOptimizer.md
   - C++ Optimization Strategy: CPP_OPTIMIZATION_STRATEGY.md
   - Changelog: CHANGELOG.md
   - Agent Tasks: agents.md
