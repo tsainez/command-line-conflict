@@ -170,7 +170,10 @@ class ChatSystem:
             # If explicit log view is active, draw a background
             if self.show_log:
                 # Calculate height based on max messages or current messages
-                height = min(len(self.messages), self.max_messages) * line_height + 10
+                if not self.messages:
+                    height = line_height + 10
+                else:
+                    height = min(len(self.messages), self.max_messages) * line_height + 10
                 bg_rect = pygame.Rect(5, chat_bottom - height, 600, height)
                 s = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
                 s.fill((0, 0, 0, 160))  # Semi-transparent black
@@ -179,6 +182,17 @@ class ChatSystem:
             # The transient overlay only shows the newest few lines; the L
             # log toggle shows everything with a backdrop.
             visible = self.messages if self.show_log else self.messages[-self.max_visible_messages :]
+
+            if self.show_log and not self.messages:
+                # Empty state message
+                empty_text = "Chat log is empty."
+                text_surface = self.message_font.render(empty_text, True, (150, 150, 150))
+                shadow_surface = self.message_font.render(empty_text, True, (0, 0, 0))
+                y_pos = chat_bottom - line_height
+                if self.input_active:
+                    y_pos -= line_height + 5
+                self.screen.blit(shadow_surface, (12, y_pos + 2))
+                self.screen.blit(text_surface, (10, y_pos))
 
             for i, msg in enumerate(reversed(visible)):
                 text_surface = msg.get("surface")
