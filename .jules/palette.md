@@ -95,3 +95,6 @@
 ## 2026-05-25 - Rapid Pagination Support in FileDialog
 **Learning:** For scrollable lists that can grow significantly (like save files or levels), standard arrow-key navigation (up/down one item at a time) becomes tedious and a barrier to efficient keyboard navigation.
 **Action:** When implementing or enhancing scrollable UI components, always support rapid pagination using `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`. Calculate the pagination jump size logically based on the visible view bounds (e.g., jump by `max_visible_files`) and ensure helper text is updated to clearly communicate this capability to the user.
+## 2026-05-25 - Placeholder Text for Empty Inputs
+**Learning:** Pygame's basic input rendering often omits placeholder text, leaving empty text fields visually confusing and making it unclear what input is expected or what keyboard controls are active (e.g. Chat System).
+**Action:** Always render a distinct placeholder string using a subdued color (e.g., `(150, 150, 150)`) when `input_text` is empty to guide the user on context and controls.
