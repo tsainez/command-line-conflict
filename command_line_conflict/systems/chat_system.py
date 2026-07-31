@@ -207,9 +207,15 @@ class ChatSystem:
             pygame.draw.rect(self.screen, (100, 100, 100), input_bg_rect, 1)
 
             # Draw text
-            display_text = f"Chat: {self.input_text}"
+            if self.input_text:
+                display_text = f"Chat: {self.input_text}"
+                color = (255, 255, 255)
+            else:
+                display_text = "Chat: Type message... (Enter to send, Esc to cancel)"
+                color = (150, 150, 150)
+
             if self.cursor_visible:
                 display_text += "_"
 
-            text_surface = self.font.render(display_text, True, (255, 255, 255))
+            text_surface = self.font.render(display_text, True, color)
             self.screen.blit(text_surface, (10, input_y))
