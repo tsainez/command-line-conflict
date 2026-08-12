@@ -34,6 +34,18 @@ class TestGameStateObstacles:
 
         game_state.get_component = mock_get_component
 
+        # Since the code under test was optimized to directly read game_state.entities
+        # instead of calling get_component, we must supply them here for the test.
+        game_state.entities = {
+            1: {Dead: MagicMock()},
+            2: {ResourceDeposit: MagicMock()},
+            3: {},
+            4: {Dead: MagicMock()},
+            5: {},
+            6: {Dead: MagicMock()},
+            7: {ResourceDeposit: MagicMock()},
+        }
+
         result = game_state.get_blocking_obstacles()
 
         assert result == {(2, 2): {3}, (3, 3): {4, 5}}
