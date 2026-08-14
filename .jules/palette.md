@@ -95,3 +95,7 @@
 ## 2026-05-25 - Rapid Pagination Support in FileDialog
 **Learning:** For scrollable lists that can grow significantly (like save files or levels), standard arrow-key navigation (up/down one item at a time) becomes tedious and a barrier to efficient keyboard navigation.
 **Action:** When implementing or enhancing scrollable UI components, always support rapid pagination using `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`. Calculate the pagination jump size logically based on the visible view bounds (e.g., jump by `max_visible_files`) and ensure helper text is updated to clearly communicate this capability to the user.
+
+## 2024-05-26 - Internal Identifiers in UI
+**Learning:** Exposing raw, internal identifiers (e.g., `rover_factory` or `heavy_tank`) directly to the user in tooltips or notification panels looks unpolished and can cause slight cognitive friction.
+**Action:** Always format internal system strings destined for the UI by replacing snake_case or underscores with spaces and applying title casing (e.g., `name.replace('_', ' ').title()`) to improve readability and presentation.

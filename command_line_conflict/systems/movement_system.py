@@ -249,7 +249,7 @@ class MovementSystem:
             return
 
         identity = components.get(UnitIdentity)
-        unit_label = identity.name.capitalize() if identity else f"Unit {entity_id}"
+        unit_label = identity.name.replace("_", " ").title() if identity else f"Unit {entity_id}"
 
         if blocked_by_wall and blocked_by_unit:
             text = f"{unit_label} is stuck!"
