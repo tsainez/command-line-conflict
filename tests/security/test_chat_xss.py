@@ -1,6 +1,8 @@
 import os
-import pygame
 from unittest.mock import MagicMock
+
+import pygame
+
 from command_line_conflict.systems.chat_system import ChatSystem
 
 
