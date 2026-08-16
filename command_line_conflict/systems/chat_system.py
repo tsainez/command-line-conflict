@@ -1,3 +1,5 @@
+import html
+
 import pygame
 
 from command_line_conflict import config
@@ -91,7 +93,9 @@ class ChatSystem:
                     if self.input_text.strip():
                         # In the future, this would send the message to the server
                         # For now, we just echo it locally
-                        self.add_message(f"Me: {self.input_text}", (0, 255, 255))
+                        # Security: Sanitize user input to prevent XSS/UI spoofing
+                        sanitized_text = html.escape(self.input_text)
+                        self.add_message(f"Me: {sanitized_text}", (0, 255, 255))
                     self.input_text = ""
                     self.input_active = False
                 else:
