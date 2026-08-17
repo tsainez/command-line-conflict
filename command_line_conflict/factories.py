@@ -231,61 +231,82 @@ def create_extractor(game_state: GameState, x: float, y: float, player_id: int, 
     return entity_id
 
 
-def create_rover_factory(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
-    """Creates a factory that converts Chassis to Rovers.
+def create_factory(
+    *,
+    game_state: GameState,
+    x: float,
+    y: float,
+    player_id: int,
+    input_unit: str,
+    output_unit: str,
+    factory_name: str,
+    icon: str,
+    hp: int,
+    is_human: bool = False,
+) -> int:
+    """Creates a factory that converts an input unit to an output unit.
 
     Args:
         game_state: The current state of the game.
         x: The x-coordinate where the unit will be created.
         y: The y-coordinate where the unit will be created.
         player_id: The ID of the player who owns this unit.
+        input_unit: The name of the unit required as input.
+        output_unit: The name of the unit produced.
+        factory_name: The internal identity name for the factory.
+        icon: The display icon for the factory.
+        hp: The maximum health of the factory.
         is_human: True if the player is human-controlled.
     Returns:
         The entity ID of the newly created unit.
     """
     entity_id = game_state.create_entity()
     if config.DEBUG:
-        log.debug(f"Created rover_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
+        log.debug(f"Created {factory_name} (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
     game_state.add_component(entity_id, Position(x, y))
     color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
-    game_state.add_component(entity_id, Renderable(icon="F", color=color))
-    game_state.add_component(entity_id, Health(hp=200, max_hp=200))
+    game_state.add_component(entity_id, Renderable(icon=icon, color=color))
+    game_state.add_component(entity_id, Health(hp=hp, max_hp=hp))
     # Buildings watch their surroundings: without Vision a player's own base
     # sits inside fog of war, which reads as a rendering bug.
     game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(entity_id, Factory(input_unit="chassis", output_unit="rover"))
-    game_state.add_component(entity_id, UnitIdentity(name="rover_factory"))
+    game_state.add_component(entity_id, Factory(input_unit=input_unit, output_unit=output_unit))
+    game_state.add_component(entity_id, UnitIdentity(name=factory_name))
     return entity_id
+
+
+def create_rover_factory(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
+    """Creates a factory that converts Chassis to Rovers."""
+    return create_factory(
+        game_state=game_state,
+        x=x,
+        y=y,
+        player_id=player_id,
+        input_unit="chassis",
+        output_unit="rover",
+        factory_name="rover_factory",
+        icon="F",
+        hp=200,
+        is_human=is_human,
+    )
 
 
 def create_arachnotron_factory(game_state: GameState, x: float, y: float, player_id: int, is_human: bool = False) -> int:
-    """Creates a factory that converts Rovers to Arachnotrons.
-
-    Args:
-        game_state: The current state of the game.
-        x: The x-coordinate where the unit will be created.
-        y: The y-coordinate where the unit will be created.
-        player_id: The ID of the player who owns this unit.
-        is_human: True if the player is human-controlled.
-    Returns:
-        The entity ID of the newly created unit.
-    """
-    entity_id = game_state.create_entity()
-    if config.DEBUG:
-        log.debug(f"Created arachnotron_factory (ID: {entity_id}) at ({x}, {y}) for player {player_id}")
-    game_state.add_component(entity_id, Position(x, y))
-    color = config.PLAYER_COLORS.get(player_id, (255, 255, 255))
-    game_state.add_component(entity_id, Renderable(icon="f", color=color))
-    game_state.add_component(entity_id, Health(hp=300, max_hp=300))
-    # See create_rover_factory: friendly buildings must clear their own fog.
-    game_state.add_component(entity_id, Vision(vision_range=4))
-    game_state.add_component(entity_id, Selectable())
-    game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
-    game_state.add_component(entity_id, Factory(input_unit="rover", output_unit="arachnotron"))
-    game_state.add_component(entity_id, UnitIdentity(name="arachnotron_factory"))
-    return entity_id
+    """Creates a factory that converts Rovers to Arachnotrons."""
+    return create_factory(
+        game_state=game_state,
+        x=x,
+        y=y,
+        player_id=player_id,
+        input_unit="rover",
+        output_unit="arachnotron",
+        factory_name="arachnotron_factory",
+        icon="f",
+        hp=300,
+        is_human=is_human,
+    )
 
 
 UNIT_NAME_TO_FACTORY = {
