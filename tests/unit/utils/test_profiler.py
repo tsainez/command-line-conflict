@@ -1,5 +1,5 @@
-import pytest
 from command_line_conflict.utils.profiler import profile, profiler
+
 
 class TestProfilerDecorator:
 
@@ -9,7 +9,7 @@ class TestProfilerDecorator:
         # Ensure enabled is False initially to not leak state
         profiler.enabled = False
         # Prevent auto-flushing during tests which clears the buffer
-        profiler.last_flush_time = float('inf')
+        profiler.last_flush_time = float("inf")
 
     def test_profile_decorator_when_enabled(self):
         """Test that the @profile decorator records metrics when profiler is enabled."""
