@@ -462,61 +462,48 @@ class UISystem:
                     hint_res = self._get_text_surface(req_text, color, "small")
                     self.screen.blit(hint_res, (panel_x, panel_y))
 
-    def _draw_aggregate_detection_range(self, game_state: GameState, entity_ids: list[int]) -> None:
-        """Draws a combined detection range for multiple units."""
-        detection_tiles = set()
+    def _draw_aggregate_range(
+        self,
+        game_state: GameState,
+        entity_ids: list[int],
+        component_class: type,
+        range_attr: str,
+        color: tuple[int, int, int, int],
+    ) -> None:
+        """Draws a combined range for multiple units."""
+        tiles = set()
         for entity_id in entity_ids:
             position = game_state.get_component(entity_id, Position)
-            detection = game_state.get_component(entity_id, Detection)
-            if not position or not detection or detection.detection_range <= 0:
+            comp = game_state.get_component(entity_id, component_class)
+            if not position or not comp:
+                continue
+            r = getattr(comp, range_attr)
+            if r <= 0:
                 continue
             unit_x, unit_y = int(position.x), int(position.y)
-            for x in range(
-                unit_x - detection.detection_range,
-                unit_x + detection.detection_range + 1,
-            ):
-                for y in range(
-                    unit_y - detection.detection_range,
-                    unit_y + detection.detection_range + 1,
-                ):
+            for x in range(unit_x - r, unit_x + r + 1):
+                for y in range(unit_y - r, unit_y + r + 1):
                     dx = x - unit_x
                     dy = y - unit_y
-                    if dx * dx + dy * dy <= detection.detection_range * detection.detection_range:
-                        detection_tiles.add((x, y))
+                    if dx * dx + dy * dy <= r * r:
+                        tiles.add((x, y))
 
         # Pre-calculate common values
         size = int(config.GRID_SIZE * self.camera.zoom)
-        range_surface = self._get_range_surface(size, (0, 0, 255, 30))
+        range_surface = self._get_range_surface(size, color)
 
-        for x, y in detection_tiles:
+        for x, y in tiles:
             cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
             cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
             self.screen.blit(range_surface, (cam_x, cam_y))
+
+    def _draw_aggregate_detection_range(self, game_state: GameState, entity_ids: list[int]) -> None:
+        """Draws a combined detection range for multiple units."""
+        self._draw_aggregate_range(game_state, entity_ids, Detection, "detection_range", (0, 0, 255, 30))
 
     def _draw_aggregate_attack_range(self, game_state: GameState, entity_ids: list[int]) -> None:
         """Draws a combined attack range for multiple units."""
-        attack_tiles = set()
-        for entity_id in entity_ids:
-            position = game_state.get_component(entity_id, Position)
-            attack = game_state.get_component(entity_id, Attack)
-            if not position or not attack or attack.attack_range <= 0:
-                continue
-            unit_x, unit_y = int(position.x), int(position.y)
-            for x in range(unit_x - attack.attack_range, unit_x + attack.attack_range + 1):
-                for y in range(unit_y - attack.attack_range, unit_y + attack.attack_range + 1):
-                    dx = x - unit_x
-                    dy = y - unit_y
-                    if dx * dx + dy * dy <= attack.attack_range * attack.attack_range:
-                        attack_tiles.add((x, y))
-
-        # Pre-calculate common values
-        size = int(config.GRID_SIZE * self.camera.zoom)
-        range_surface = self._get_range_surface(size, (255, 0, 0, 30))
-
-        for x, y in attack_tiles:
-            cam_x = (x - self.camera.x) * config.GRID_SIZE * self.camera.zoom
-            cam_y = (y - self.camera.y) * config.GRID_SIZE * self.camera.zoom
-            self.screen.blit(range_surface, (cam_x, cam_y))
+        self._draw_aggregate_range(game_state, entity_ids, Attack, "attack_range", (255, 0, 0, 30))
 
     def _draw_unit_health_text(self, game_state: GameState, entity_id: int) -> None:
         """Draws the current health of a unit above its icon.
