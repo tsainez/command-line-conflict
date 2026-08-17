@@ -43,7 +43,7 @@ class FactoryBattleMap(Map):
             self.add_wall(10 + i, 20)
             self.add_wall(45 + i, 20)
 
-    def create_initial_units(self, game_state: "GameState") -> None:
+    def create_initial_units(self, game_state: GameState) -> None:
         """Creates the initial units for the map.
 
         Args:
