@@ -674,7 +674,7 @@ class UISystem:
         if not identity:
             return
 
-        lines = [identity.name.title()]
+        lines = [identity.name.replace('_', ' ').title()]
         if health:
             lines.append(f"HP: {int(health.hp)}/{health.max_hp}")
         if player:
