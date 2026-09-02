@@ -202,11 +202,13 @@ class GameState:
         from .components.dead import Dead
         from .components.resource_deposit import ResourceDeposit
 
+        all_entities = self.entities
         for eid in entities:
-            if exclude_entity_id is not None and eid == exclude_entity_id:
+            if eid == exclude_entity_id:
                 continue
             # Ignore dead units and resource deposits
-            if not self.get_component(eid, Dead) and not self.get_component(eid, ResourceDeposit):
+            comp = all_entities.get(eid, {})
+            if Dead not in comp and ResourceDeposit not in comp:
                 return True
 
         return False
@@ -217,11 +219,13 @@ class GameState:
         from .components.resource_deposit import ResourceDeposit
 
         blocking = {}
+        all_entities = self.entities
         for pos, entities in self.spatial_map.items():
             # Check if there is any blocking entity in this cell
             has_blocking = False
             for eid in entities:
-                if not self.get_component(eid, Dead) and not self.get_component(eid, ResourceDeposit):
+                comp = all_entities.get(eid, {})
+                if Dead not in comp and ResourceDeposit not in comp:
                     has_blocking = True
                     break
             if has_blocking:
