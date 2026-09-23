@@ -162,9 +162,15 @@ class MovementSystem:
                     game_state.update_entity_position(entity_id, movable.target_x, movable.target_y)
                     movable.path.pop(0)
                 else:
-                    dist = math.sqrt(dist_sq)
-                    step = min(movable.speed * dt, dist)
-                    step_ratio = step / dist
+                    # Optimization: Use squared distance to skip expensive math.sqrt()
+                    # when the entity arrives at the target within this frame.
+                    max_step = movable.speed * dt
+                    max_step_sq = max_step * max_step
+                    if dist_sq <= max_step_sq:
+                        step_ratio = 1.0
+                    else:
+                        dist = math.sqrt(dist_sq)
+                        step_ratio = max_step / dist
                     new_x = position.x + dx * step_ratio
                     new_y = position.y + dy * step_ratio
                     game_state.update_entity_position(entity_id, new_x, new_y)
@@ -200,9 +206,15 @@ class MovementSystem:
                     movable.target_y = None
                     continue
 
-                dist = math.sqrt(dist_sq)
-                step = min(movable.speed * dt, dist)
-                step_ratio = step / dist
+                # Optimization: Use squared distance to skip expensive math.sqrt()
+                # when the entity arrives at the target within this frame.
+                max_step = movable.speed * dt
+                max_step_sq = max_step * max_step
+                if dist_sq <= max_step_sq:
+                    step_ratio = 1.0
+                else:
+                    dist = math.sqrt(dist_sq)
+                    step_ratio = max_step / dist
 
                 proposed_x = position.x + dx * step_ratio
                 proposed_y = position.y + dy * step_ratio
