@@ -219,6 +219,9 @@ class FileDialog:
                 no_files_text,
                 (self.file_list_rect.x + 20, self.file_list_rect.y + 20),
             )
+            if self.mode == "save":
+                cta_text = self.font.render("Type a filename below to create a new file.", True, (120, 120, 120))
+                self.screen.blit(cta_text, (self.file_list_rect.x + 20, self.file_list_rect.y + 45))
         else:
             for i in range(self.max_visible_files):
                 idx = i + self.scroll_offset
