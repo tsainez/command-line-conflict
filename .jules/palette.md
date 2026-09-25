@@ -95,3 +95,7 @@
 ## 2026-05-25 - Rapid Pagination Support in FileDialog
 **Learning:** For scrollable lists that can grow significantly (like save files or levels), standard arrow-key navigation (up/down one item at a time) becomes tedious and a barrier to efficient keyboard navigation.
 **Action:** When implementing or enhancing scrollable UI components, always support rapid pagination using `pygame.K_PAGEUP` and `pygame.K_PAGEDOWN`. Calculate the pagination jump size logically based on the visible view bounds (e.g., jump by `max_visible_files`) and ensure helper text is updated to clearly communicate this capability to the user.
+
+## 2024-05-25 - Empty States with Helpful CTAs
+**Learning:** Empty lists (like a file dialog showing "No files found") can leave users uncertain of the next step, especially in "Save" contexts where they need to create something new. Providing contextual instructions reduces cognitive friction.
+**Action:** Always complement generic empty states with an actionable prompt (e.g., "Type a filename below...") tailored to the current context or mode.
