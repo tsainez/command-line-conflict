@@ -106,6 +106,24 @@ def test_handle_event_sending(chat_system):
     assert chat_system.messages[0]["text"] == "Me: Hello"
 
 
+def test_handle_event_sending_xss(chat_system):
+    # Activate and type XSS payload
+    chat_system.input_active = True
+    chat_system.input_text = "<script>alert(1)</script>"
+
+    # Press Enter to send
+    event = MagicMock()
+    event.type = pygame.KEYDOWN
+    event.key = pygame.K_RETURN
+
+    chat_system.handle_event(event)
+
+    assert chat_system.input_active is False
+    assert chat_system.input_text == ""
+    assert len(chat_system.messages) == 1
+    assert chat_system.messages[0]["text"] == "Me: &lt;script&gt;alert(1)&lt;/script&gt;"
+
+
 def test_handle_event_escape(chat_system):
     # Activate and type
     chat_system.input_active = True
