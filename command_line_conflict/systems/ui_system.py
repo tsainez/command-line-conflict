@@ -387,6 +387,10 @@ class UISystem:
                 hint = self._get_text_surface("C: Train Chassis (50 Scrap)", (200, 200, 200), "small")
                 self.screen.blit(hint, (panel_x, panel_y))
                 panel_y += 18
+
+                hint_r = self._get_text_surface("R: Train Rover (80 Scrap)", (200, 200, 200), "small")
+                self.screen.blit(hint_r, (panel_x, panel_y))
+                panel_y += 18
             elif identity.name == "arachnotron_factory":
                 # The C hotkey trains a chassis at BOTH factory types (see the
                 # K_c handler in GameScene.handle_event), so advertise it here
