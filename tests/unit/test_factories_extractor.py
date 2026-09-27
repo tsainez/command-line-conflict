@@ -1,5 +1,3 @@
-import pytest
-
 from command_line_conflict import factories
 from command_line_conflict.components.detection import Detection
 from command_line_conflict.components.health import Health
