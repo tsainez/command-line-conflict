@@ -251,7 +251,7 @@ def create_rover_factory(game_state: GameState, x: float, y: float, player_id: i
     game_state.add_component(entity_id, Renderable(icon="F", color=color))
     game_state.add_component(entity_id, Health(hp=200, max_hp=200))
     # Buildings watch their surroundings: without Vision a player's own base
-    # sits inside fog of war, which reads as a rendering bug.
+    # would sit inside the fog of war, appearing broken to the user.
     game_state.add_component(entity_id, Vision(vision_range=4))
     game_state.add_component(entity_id, Selectable())
     game_state.add_component(entity_id, Player(player_id=player_id, is_human=is_human))
