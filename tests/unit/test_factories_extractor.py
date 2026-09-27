@@ -1,14 +1,15 @@
 import pytest
+
 from command_line_conflict import factories
+from command_line_conflict.components.detection import Detection
+from command_line_conflict.components.health import Health
+from command_line_conflict.components.movable import Movable
+from command_line_conflict.components.player import Player
 from command_line_conflict.components.position import Position
 from command_line_conflict.components.renderable import Renderable
-from command_line_conflict.components.movable import Movable
-from command_line_conflict.components.health import Health
-from command_line_conflict.components.detection import Detection
-from command_line_conflict.components.vision import Vision
 from command_line_conflict.components.selectable import Selectable
-from command_line_conflict.components.player import Player
 from command_line_conflict.components.unit_identity import UnitIdentity
+from command_line_conflict.components.vision import Vision
 
 
 def test_create_extractor(game_state):
