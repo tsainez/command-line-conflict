@@ -19,20 +19,16 @@ class TestGameStateObstacles:
             (4, 4): {6, 7},  # 6 is Dead, 7 is ResourceDeposit -> no blocking
         }
 
-        # Mock get_component to simulate entity properties
-        def mock_get_component(eid, component_type):
-            components = {
-                1: {Dead: MagicMock()},
-                2: {ResourceDeposit: MagicMock()},
-                3: {},
-                4: {Dead: MagicMock()},
-                5: {},
-                6: {Dead: MagicMock()},
-                7: {ResourceDeposit: MagicMock()},
-            }
-            return components.get(eid, {}).get(component_type, None)
-
-        game_state.get_component = mock_get_component
+        # Mock entities directly for the optimized direct dictionary lookup
+        game_state.entities = {
+            1: {Dead: MagicMock()},
+            2: {ResourceDeposit: MagicMock()},
+            3: {},
+            4: {Dead: MagicMock()},
+            5: {},
+            6: {Dead: MagicMock()},
+            7: {ResourceDeposit: MagicMock()},
+        }
 
         result = game_state.get_blocking_obstacles()
 
