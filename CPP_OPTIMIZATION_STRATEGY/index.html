@@ -1,0 +1,1011 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../ProjectStructure/">
+      
+      
+        <link rel="next" href="../CHANGELOG/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>C++ Optimization Strategy - Command Line Conflict</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#c-optimization-strategy-for-command-line-conflict" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Command Line Conflict" class="md-header__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Command Line Conflict
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              C++ Optimization Strategy
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Command Line Conflict" class="md-nav__button md-logo" aria-label="Command Line Conflict" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Command Line Conflict
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ECS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECS Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapCreation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map Creation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Maps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ProjectStructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C++ Optimization Strategy
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C++ Optimization Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-performance-bottlenecks-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Performance Bottlenecks Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Performance Bottlenecks Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-pathfinding-command_line_conflictmapsbasepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A* Pathfinding (command_line_conflict/maps/base.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combat-system-distance-calculations-command_line_conflictsystemscombat_systempy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combat System Distance Calculations (command_line_conflict/systems/combat_system.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#movement-system-updates-command_line_conflictsystemsmovement_systempy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Movement System Updates (command_line_conflict/systems/movement_system.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-object-overhead-core-loop-command_line_conflictenginepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Object Overhead &amp; Core Loop (command_line_conflict/engine.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-c-rewrite-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. C++ Rewrite Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. C++ Rewrite Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migration-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-pybind11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why pybind11?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-example-refactored-c-class-pathfinder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Example Refactored C++ Class: Pathfinder
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-performance-bottlenecks-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Performance Bottlenecks Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Performance Bottlenecks Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-pathfinding-command_line_conflictmapsbasepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A* Pathfinding (command_line_conflict/maps/base.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combat-system-distance-calculations-command_line_conflictsystemscombat_systempy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combat System Distance Calculations (command_line_conflict/systems/combat_system.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#movement-system-updates-command_line_conflictsystemsmovement_systempy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Movement System Updates (command_line_conflict/systems/movement_system.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-object-overhead-core-loop-command_line_conflictenginepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Object Overhead &amp; Core Loop (command_line_conflict/engine.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-c-rewrite-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. C++ Rewrite Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. C++ Rewrite Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migration-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-pybind11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why pybind11?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-example-refactored-c-class-pathfinder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Example Refactored C++ Class: Pathfinder
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="c-optimization-strategy-for-command-line-conflict">C++ Optimization Strategy for Command Line Conflict</h1>
+<h2 id="1-performance-bottlenecks-analysis">1. Performance Bottlenecks Analysis</h2>
+<p>Based on the review of the core game loop and physics calculations in Python, the following areas have been identified as the most significant performance bottlenecks:</p>
+<h3 id="a-pathfinding-command_line_conflictmapsbasepy">A* Pathfinding (<code>command_line_conflict/maps/base.py</code>)</h3>
+<p>The <code>find_path</code> method implements the A* algorithm in pure Python. It uses a <code>heapq</code> for the open set and multiple dictionaries for <code>came_from</code> and <code>g_score</code>. During gameplay, particularly when many intelligent units (e.g., enemies or player units) request pathfinding simultaneously, the Python overhead of iterating through nodes, calculating heuristics (Manhattan distance), and updating dictionaries and lists is high. This can cause significant frame drops and stuttering.</p>
+<h3 id="combat-system-distance-calculations-command_line_conflictsystemscombat_systempy">Combat System Distance Calculations (<code>command_line_conflict/systems/combat_system.py</code>)</h3>
+<p>The <code>CombatSystem.update</code> method iterates over all entities with an <code>Attack</code> component. Inside the loop, it computes the squared distance between the attacker and its target. While it correctly avoids the expensive <code>math.sqrt()</code> by comparing squared distances (<code>dist_sq &lt;= attack_range_sq</code>), iterating over potentially hundreds of entities per frame in Python introduces a baseline overhead that scales poorly with unit count.</p>
+<h3 id="movement-system-updates-command_line_conflictsystemsmovement_systempy">Movement System Updates (<code>command_line_conflict/systems/movement_system.py</code>)</h3>
+<p>The <code>MovementSystem.update</code> also iterates over all movable entities every frame. It calculates step distances and does collision checks (<code>is_position_occupied</code>). The frequent function calls, object attribute access (<code>movable.target_x</code>, <code>position.y</code>), and collision checking logic in Python can bottleneck the game when the entity count grows.</p>
+<h3 id="python-object-overhead-core-loop-command_line_conflictenginepy">Python Object Overhead &amp; Core Loop (<code>command_line_conflict/engine.py</code>)</h3>
+<p>The main loop in <code>Game.run()</code> calls updates for all systems sequentially. The overhead of Python function calls, dictionary lookups for ECS components (<code>game_state.entities.get(entity_id)</code>), and dynamic typing overhead limit the maximum entity processing throughput.</p>
+<h2 id="2-c-rewrite-strategy">2. C++ Rewrite Strategy</h2>
+<p>To dramatically improve runtime efficiency while maintaining the existing logic, we propose rewriting the identified high-cost functions in C++ and exposing them to Python using <strong>pybind11</strong>.</p>
+<h3 id="migration-plan">Migration Plan</h3>
+<ol>
+<li>
+<p><strong>Phase 1: Pathfinding (Highest Priority)</strong></p>
+<ul>
+<li>Implement the A* algorithm in C++ using <code>std::priority_queue</code>, <code>std::unordered_set</code>, and <code>std::unordered_map</code> (or flat arrays for grid lookup to be even faster).</li>
+<li>Expose a <code>Pathfinder</code> class to Python using pybind11.</li>
+<li>Replace the <code>find_path</code> method in <code>Map</code> to call the C++ pathfinder.</li>
+</ul>
+</li>
+<li>
+<p><strong>Phase 2: Math and Spatial Queries (Medium Priority)</strong></p>
+<ul>
+<li>Move distance calculations and collision detection checks into C++.</li>
+<li>Create a spatial hash grid or quadtree in C++ to optimize <code>is_position_occupied</code> and closest-target queries.</li>
+</ul>
+</li>
+<li>
+<p><strong>Phase 3: System Updates (Long-term)</strong></p>
+<ul>
+<li>For systems like <code>CombatSystem</code> and <code>MovementSystem</code>, consider adopting a Data-Oriented Design (DOD). We can store component data (positions, velocities, health) in contiguous arrays (Struct of Arrays) in C++.</li>
+<li>Python will pass arrays (using <code>numpy</code> or <code>memoryview</code>) to C++ for batch processing (e.g., <code>update_positions_and_collisions(positions, velocities, dt)</code>).</li>
+</ul>
+</li>
+</ol>
+<h3 id="why-pybind11">Why pybind11?</h3>
+<ul>
+<li><strong>Modern &amp; Lightweight:</strong> It allows writing clean, pure C++11/14/17 code without the boilerplate of raw C-API or Cython syntax.</li>
+<li><strong>Performance:</strong> The overhead of crossing the Python/C++ boundary is minimal.</li>
+<li><strong>Integration:</strong> Easily integrates with <code>setuptools</code> for building the extension module during installation.</li>
+</ul>
+<h2 id="3-example-refactored-c-class-pathfinder">3. Example Refactored C++ Class: Pathfinder</h2>
+<p>Below is an example of the first refactored C++ class implementing the A* pathfinding algorithm. This class uses <code>std::priority_queue</code> for fast node retrieval and <code>std::vector</code> for fast grid lookups instead of hash maps where possible.</p>
+<pre><code class="language-cpp">#include &lt;pybind11/pybind11.h&gt;
+#include &lt;pybind11/stl.h&gt;
+#include &lt;vector&gt;
+#include &lt;queue&gt;
+#include &lt;unordered_set&gt;
+#include &lt;unordered_map&gt;
+#include &lt;cmath&gt;
+#include &lt;tuple&gt;
+
+namespace py = pybind11;
+
+// Helper struct for coordinates
+struct Point {
+    int x, y;
+    bool operator==(const Point&amp; other) const {
+        return x == other.x &amp;&amp; y == other.y;
+    }
+};
+
+// Hash function for Point to be used in unordered maps/sets
+struct PointHash {
+    std::size_t operator()(const Point&amp; p) const {
+        return std::hash&lt;int&gt;()(p.x) ^ (std::hash&lt;int&gt;()(p.y) &lt;&lt; 1);
+    }
+};
+
+class Pathfinder {
+private:
+    int width, height;
+    std::unordered_set&lt;Point, PointHash&gt; walls;
+
+public:
+    Pathfinder(int w, int h, const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp; wall_coords)
+        : width(w), height(h) {
+        for (const auto&amp; w_coord : wall_coords) {
+            walls.insert({w_coord.first, w_coord.second});
+        }
+    }
+
+    bool is_blocked(int x, int y) const {
+        return walls.find({x, y}) != walls.end();
+    }
+
+    std::vector&lt;std::pair&lt;int, int&gt;&gt; find_path(
+        std::pair&lt;int, int&gt; start_coord,
+        std::pair&lt;int, int&gt; goal_coord,
+        bool can_fly,
+        const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp; extra_obstacles,
+        const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp; exclude_obstacles) {
+
+        Point start = {start_coord.first, start_coord.second};
+        Point goal = {goal_coord.first, goal_coord.second};
+
+        if (!can_fly &amp;&amp; is_blocked(goal.x, goal.y)) {
+            return {};
+        }
+
+        std::unordered_set&lt;Point, PointHash&gt; extra_obs_set;
+        for (const auto&amp; obs : extra_obstacles) extra_obs_set.insert({obs.first, obs.second});
+
+        std::unordered_set&lt;Point, PointHash&gt; exclude_obs_set;
+        for (const auto&amp; obs : exclude_obstacles) exclude_obs_set.insert({obs.first, obs.second});
+
+        // Priority Queue elements: &lt;f_score, f_score, Point&gt;
+        using PQElement = std::pair&lt;int, Point&gt;;
+        auto cmp = [](const PQElement&amp; left, const PQElement&amp; right) {
+            return left.first &gt; right.first; // Min-heap
+        };
+        std::priority_queue&lt;PQElement, std::vector&lt;PQElement&gt;, decltype(cmp)&gt; open_set(cmp);
+
+        std::unordered_map&lt;Point, Point, PointHash&gt; came_from;
+        std::unordered_map&lt;Point, int, PointHash&gt; g_score;
+
+        open_set.push({0, start});
+        g_score[start] = 0;
+
+        int iterations = 0;
+        const int MAX_ITERATIONS = 5000;
+
+        const std::vector&lt;Point&gt; directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        while (!open_set.empty()) {
+            iterations++;
+            if (iterations &gt; MAX_ITERATIONS) break;
+
+            Point current = open_set.top().second;
+            open_set.pop();
+
+            if (current == goal) {
+                std::vector&lt;std::pair&lt;int, int&gt;&gt; path;
+                while (!(current == start)) {
+                    path.push_back({current.x, current.y});
+                    current = came_from[current];
+                }
+                std::reverse(path.begin(), path.end());
+                return path;
+            }
+
+            for (const auto&amp; dir : directions) {
+                Point next = {current.x + dir.x, current.y + dir.y};
+
+                if (next.x &lt; 0 || next.x &gt;= width || next.y &lt; 0 || next.y &gt;= height) continue;
+
+                if (!can_fly &amp;&amp; is_blocked(next.x, next.y)) continue;
+
+                if (extra_obs_set.find(next) != extra_obs_set.end()) {
+                    if (exclude_obs_set.find(next) == exclude_obs_set.end()) {
+                        continue;
+                    }
+                }
+
+                int tentative_g = g_score[current] + 1;
+
+                if (g_score.find(next) == g_score.end() || tentative_g &lt; g_score[next]) {
+                    g_score[next] = tentative_g;
+                    int f_score = tentative_g + std::abs(next.x - goal.x) + std::abs(next.y - goal.y);
+                    open_set.push({f_score, next});
+                    came_from[next] = current;
+                }
+            }
+        }
+
+        return {}; // Return empty path if no path found or iterations exceeded
+    }
+};
+
+// pybind11 module definition
+PYBIND11_MODULE(clc_cpp_core, m) {
+    m.doc() = &quot;C++ Core modules for Command Line Conflict&quot;;
+
+    py::class_&lt;Pathfinder&gt;(m, &quot;Pathfinder&quot;)
+        .def(py::init&lt;int, int, const std::vector&lt;std::pair&lt;int, int&gt;&gt;&amp;&gt;())
+        .def(&quot;find_path&quot;, &amp;Pathfinder::find_path,
+             py::arg(&quot;start&quot;), py::arg(&quot;goal&quot;), py::arg(&quot;can_fly&quot;) = false,
+             py::arg(&quot;extra_obstacles&quot;) = std::vector&lt;std::pair&lt;int, int&gt;&gt;(),
+             py::arg(&quot;exclude_obstacles&quot;) = std::vector&lt;std::pair&lt;int, int&gt;&gt;());
+}
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
