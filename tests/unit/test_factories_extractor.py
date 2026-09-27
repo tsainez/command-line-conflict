@@ -10,6 +10,7 @@ from command_line_conflict.components.selectable import Selectable
 from command_line_conflict.components.player import Player
 from command_line_conflict.components.unit_identity import UnitIdentity
 
+
 def test_create_extractor(game_state):
     """Verify that create_extractor creates an entity with expected components."""
     extractor_id = factories.create_extractor(game_state, 10.0, 15.0, player_id=1, is_human=True)
