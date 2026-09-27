@@ -32,7 +32,7 @@ def test_map_draw_with_camera(mock_scale):
 
 
 @patch("pygame.transform.scale")
-def test_map_draw_without_camera_bug(mock_scale):
+def test_map_draw_without_camera(mock_scale):
     # Arrange
     mock_surf = Mock()
     mock_font = Mock()
@@ -48,12 +48,8 @@ def test_map_draw_without_camera_bug(mock_scale):
     game_map.draw(mock_surf, mock_font)
 
     # Assert
-    # This is what it should be
     expected_x = 15 * config.GRID_SIZE
     expected_y = 20 * config.GRID_SIZE
-
-    # The bug is that it doesn't multiply by GRID_SIZE
-    # and doesn't scale the surface.
 
     # We expect scale to be called with the default grid size
     mock_scale.assert_called_once_with(mock_surface, (config.GRID_SIZE, config.GRID_SIZE))
