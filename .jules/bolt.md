@@ -42,3 +42,6 @@
 ## 2024-07-14 - Optimize Component Iteration Speed
 **Learning:** Component filtering loops using `.get()` repeatedly on entity dictionaries are significantly slower than direct dictionary access and fast-failing. Short-circuiting condition checks early (e.g., checking `UnitIdentity.name` before looking up `Player` components) saves operations.
 **Action:** In game update/render loops, prioritize direct dictionary lookup `entities[eid]` when an entity is known to exist, and structure `if` statements to evaluate the most discriminative conditions first.
+## 2024-08-05 - O(1) Spatial Hash Lookups in Collision Systems
+**Learning:** Checking for positional overlap between two groups of entities (e.g., units and factories) using nested loops is O(N*M). This becomes a major frame-rate killer as the unit count grows.
+**Action:** When one component (like factories) is stationary or sparse, iterate only over those entities and use `game_state.get_entities_at_position(x, y)` to find overlapping entities in O(1) time. This brings the complexity down to O(M).
