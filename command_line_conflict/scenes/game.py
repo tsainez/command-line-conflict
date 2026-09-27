@@ -408,7 +408,7 @@ class GameScene:
                         player = components.get(Player)
                         if player and player.player_id == self.current_player_id:
                             if selectable and selectable.is_selected:
-                                if identity and identity.name == "arachnotron_factory":
+                                if identity and identity.name in ("rover_factory", "arachnotron_factory"):
                                     selected_arachnotron_factories.append(entity_id)
 
                     if selected_arachnotron_factories:
@@ -736,7 +736,7 @@ class GameScene:
             )
 
     def _train_rover_at_factory(self, factory_id):
-        """Trains a rover at the selected Arachnotron Factory."""
+        """Trains a rover at the selected factory."""
         cost = 80
         player_resources = self.game_state.resources.get(self.current_player_id, 0)
         if player_resources < cost:
@@ -751,8 +751,8 @@ class GameScene:
             return
 
         # Find a free adjacent tile to spawn the rover. Never fall back to the
-        # factory's own tile: this is an Arachnotron Factory whose input unit
-        # is "rover", so ProductionSystem would instantly convert an
+        # factory's own tile: if this is an Arachnotron Factory whose input unit
+        # is "rover", ProductionSystem would instantly convert an
         # on-factory rover into a free Arachnotron, bypassing the 120-scrap
         # cost and the adjacent-rover training requirement.
         spawn_pos = self._find_free_adjacent_tile(factory_pos)
