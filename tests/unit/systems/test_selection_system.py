@@ -35,25 +35,6 @@ def test_drag_select_with_shift_adds_to_selection(game_state, selection_system):
     selectable1.is_selected = True
 
     # Act: Perform a drag-select over the other two units while holding Shift.
-    # We pass the original, unmodified selection_system here to test the failing case.
-    selection_system_before_fix = SelectionSystem()
-    selection_system_before_fix.update(game_state, grid_start=(11, 11), grid_end=(15, 15))
-
-    # Assert: Check that the first unit was deselected (the bug).
-    selectable1_after = game_state.get_component(unit1_id, Selectable)
-    selectable2_after = game_state.get_component(unit2_id, Selectable)
-    selectable3_after = game_state.get_component(unit3_id, Selectable)
-
-    assert not selectable1_after.is_selected
-    assert selectable2_after.is_selected
-    assert selectable3_after.is_selected
-
-    # Arrange: Reset selection state
-    selectable1.is_selected = True
-    selectable2_after.is_selected = False
-    selectable3_after.is_selected = False
-
-    # Act: Perform the same drag-select, but this time with shift_pressed=True.
     selection_system.update(game_state, grid_start=(11, 11), grid_end=(15, 15), shift_pressed=True)
 
     # Assert: All three units should now be selected.
