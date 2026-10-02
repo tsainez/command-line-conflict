@@ -46,7 +46,7 @@ class UISystem:
             "P / Space: Pause",
             "Cam: Arrows / Drag",
             "Enter: Chat",
-            "L: Chat Log",
+            "L: Toggle Chat Log",
             "ESC: Menu",
         ]
 

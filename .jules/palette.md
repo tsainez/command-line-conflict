@@ -98,3 +98,6 @@
 ## 2026-07-24 - Exposing Undiscoverable Keybinds and Empty States
 **Learning:** Hardcoded keyboard shortcuts and toggles (like the L key for the chat log) often remain undiscoverable to users without on-screen guidance. Additionally, opening a toggled UI view (like a chat log) that is completely blank leaves the user confused about whether the UI failed to load or is just empty.
 **Action:** Always add explicit on-screen UI hints for non-obvious keyboard shortcuts (like chat toggles). For dynamic lists or logs that can be toggled open, always implement an explicit "empty state" message (e.g., "Chat log is empty") to assure the user the UI is functioning correctly.
+## 2026-07-25 - Exposing Undiscoverable Keybinds
+**Learning:** Adding a key hint to an on-screen key bindings panel requires ensuring that any corresponding unit tests checking the exact textual content of the panel are also updated.
+**Action:** When updating `ui_system.py`'s `key_options`, verify and update `tests/test_ux_improvements.py` to match.

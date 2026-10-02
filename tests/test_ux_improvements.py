@@ -29,7 +29,7 @@ def test_ui_system_help_text_content():
         "P / Space: Pause",
         "Cam: Arrows / Drag",
         "Enter: Chat",
-        "L: Chat Log",
+        "L: Toggle Chat Log",
         "ESC: Menu",
     ]
 
