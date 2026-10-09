@@ -30,6 +30,7 @@ def test_ui_system_help_text_content():
         "Cam: Arrows / Drag",
         "Enter: Chat",
         "L: Chat Log",
+        "~: Dev Console",
         "ESC: Menu",
     ]
 

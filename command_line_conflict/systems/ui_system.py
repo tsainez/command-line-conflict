@@ -47,6 +47,7 @@ class UISystem:
             "Cam: Arrows / Drag",
             "Enter: Chat",
             "L: Chat Log",
+            "~: Dev Console",
             "ESC: Menu",
         ]
 
