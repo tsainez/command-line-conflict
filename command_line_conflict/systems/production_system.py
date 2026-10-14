@@ -85,12 +85,12 @@ class ProductionSystem:
                 if unit_id == factory_id:
                     continue
 
-                unit_components = game_state.entities.get(unit_id)
-                if not unit_components:
-                    continue
+                # Optimization: Direct dictionary lookup since entity exists in spatial map.
+                # Fast-fail discriminative condition first to avoid overhead.
+                unit_components = game_state.entities[unit_id]
 
                 unit_identity = unit_components.get(UnitIdentity)
-                if not unit_identity:
+                if not unit_identity or unit_identity.name != factory.input_unit:
                     continue
 
                 unit_player = unit_components.get(Player)
@@ -99,13 +99,10 @@ class ProductionSystem:
                 if unit_player and factory_player and unit_player.player_id != factory_player.player_id:
                     continue
 
-                # Check Input Type Match
-                if unit_identity.name == factory.input_unit:
-
-                    # Check Campaign Unlock
-                    if self.campaign_manager.is_unit_unlocked(factory.output_unit):
-                        self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
-                        # Consumed this unit
+                # Check Campaign Unlock
+                if self.campaign_manager.is_unit_unlocked(factory.output_unit):
+                    self._transform_unit(game_state, unit_id, unit_player, factory, factory_pos)
+                    # Consumed this unit
 
     def _transform_unit(
         self, game_state, input_unit_id, input_player, factory, position
